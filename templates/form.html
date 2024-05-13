@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+  <form action="/save/{{ page_id }}" method="post">
+    <label for="name">Nombre:</label><br>
+    <input type="text" id="name" name="name" value="{{ properties['Nombre']['title'][0]['text']['content'] }}"><br>
+    <!-- Add more input fields for other properties... -->
+    <input type="submit" value="Update">
+  </form>
+
+{% endblock %}
+
+
+
