@@ -135,22 +135,22 @@ def index():
     else:
         return render_template("index.html", user=None, pretty="No user data")
 
-@app.route('/create', methods=['POST'])
+@app.route('/create', methods=['GET', 'POST'])
 @login_required
 def handle_create():
-    data = request.get_json()
-    required_fields = ["Nombre", "País", "URL", "Destinatarios"]
+    if request.method == 'POST':
+        # Handle form submission
+        data = request.form.to_dict()
+        required_fields = ["Nombre", "País", "URL", "Destinatarios"]
+        if not data or any(field not in data for field in required_fields):
+            return "Invalid data: all fields are required", 400
 
-    # Check if data is None or if any required field is missing
-    if not data or any(field not in data for field in required_fields):
-        return "Invalid data: all fields are required", 400
-
-    # Check if each field is a dict (this requieres a middleware integration with the form frontend)
-    for field, value in data.items():
-        if not isinstance(value, dict):
-            return f"Invalid data: {field} should be a dictionary", 400
+        # Assuming create_page returns a response or redirect
         response = create_page(data)
         return response
+
+    # For GET request, just show the form
+    return render_template("form.html", properties={}, page_id=None)
 
 def create_page(data: dict):
     create_url = "https://api.notion.com/v1/pages"
@@ -209,18 +209,36 @@ def update_page(page_id):
 
     return render_template("form.html", properties=properties, page_id=page_id)
 
+@app.route('/save', methods=['POST'])
 @app.route('/save/<page_id>', methods=['POST'])
 @admin_required
-def save_page(page_id):
-    # Update the page with the form data
+def save_page(page_id=None):
     data = request.form.to_dict()
-    properties = {"Nombre": {"title": [{"text": {"content": data['name']}}]}}
-    update_url = f"https://api.notion.com/v1/pages/{page_id}"
-    payload = {"properties": properties}
-    res = requests.patch(update_url, headers=headers, json=payload)
 
-    if res.status_code != 200:
-        return "Failed to update page", 400
+    properties = {
+        "Nombre": {"title": [{"text": {"content": data.get('name', '')}}]},
+        "País": {"rich_text": [{"text": {"content": data.get('country', '')}}]},
+        "URL": {"url": data.get('url', '')},
+        "Destinatarios": {"rich_text": [{"text": {"content": data.get('recipients', '')}}]}
+    }
+
+    headers = {
+        "Authorization": "Bearer " + NOTION_TOKEN,
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+    }
+
+    if page_id:
+        update_url = f"https://api.notion.com/v1/pages/{page_id}"
+        response = requests.patch(update_url, headers=headers, json={"properties": properties})
+    else:
+        create_url = "https://api.notion.com/v1/pages"
+        parent = {"database_id": DATABASE_ID}
+        response = requests.post(create_url, headers=headers, json={"parent": parent, "properties": properties})
+
+    if response.status_code not in [200, 201]:  # 200 OK for update, 201 Created for create
+        print(f"Failed to process page: {response.status_code}, {response.text}")  # Debugging
+        return "Failed to process page", 400
 
     # Redirect to the /database route to display all pages
     return redirect(url_for('all_pages'))

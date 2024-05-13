@@ -1,14 +1,21 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-
-  <form action="/save/{{ page_id }}" method="post">
-    <label for="name">Nombre:</label><br>
-    <input type="text" id="name" name="name" value="{{ properties['Nombre']['title'][0]['text']['content'] }}"><br>
-    <!-- Add more input fields for other properties... -->
-    <input type="submit" value="Update">
-  </form>
-
+<form action="{{ url_for('save_page', page_id=page_id if page_id else None) }}" method="post">
+  <label for="name">Nombre:</label><br>
+  <input type="text" id="name" name="name" value="{{ properties.get('Nombre', {}).get('title', [{}])[0].get('text', {}).get('content', '') }}"><br>
+  
+  <label for="country">País:</label><br>
+  <input type="text" id="country" name="country" value="{{ properties.get('País', {}).get('rich_text', [{}])[0].get('text', {}).get('content', '') }}"><br>
+  
+  <label for="url">URL:</label><br>
+  <input type="text" id="url" name="url" value="{{ properties.get('URL', {}).get('url', '') }}"><br>
+  
+  <label for="recipients">Destinatarios:</label><br>
+  <input type="text" id="recipients" name="recipients" value="{{ properties.get('Destinatarios', {}).get('rich_text', [{}])[0].get('text', {}).get('content', '') }}"><br>
+  
+  <input type="submit" value="{% if page_id %}Update{% else %}Create{% endif %}">
+</form>
 {% endblock %}
 
 
