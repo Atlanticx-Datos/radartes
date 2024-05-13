@@ -9,6 +9,13 @@
     <body>
         <div class="mx-8 my-4">
         <h1 class="text-3xl font-bold underline">Oportunidades App</h1>
+        <div class="search-bar">
+            <form action="{{ url_for('all_pages') }}" method="get">
+                <input type="text" name="search" placeholder="Search..." class="search-input">
+                <button type="submit" class="search-button">Search</button>
+                <input type="reset" value="Clear" onclick="this.form.submit()" class="clear-button">
+            </form>
+        </div>        
         {% block body %}{% endblock %}
     </div>
     </body>

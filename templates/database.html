@@ -3,8 +3,11 @@
 {% block body %}
 
   {% for page in pages %}
-    <p>Name: {{ page.name }}</p>
-    <a href="/update/{{ page.id }}">Update</a>
+  <p><strong>Name:</strong> {{ page.nombre }}</p>
+  <p><strong>Country:</strong> {{ page.país }}</p>
+  <p><strong>URL:</strong> <a href="{{ page.url }}" target="_blank">{{ page.url }}</a></p>
+  <p><strong>Recipients:</strong> {{ page.destinatarios }}</p>
+  <a href="/update/{{ page.id }}">Update</a>
   {% endfor %}
 
 {% endblock %}

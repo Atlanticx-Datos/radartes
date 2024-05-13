@@ -117,7 +117,7 @@ def logout():
         + "/v2/logout?"
         + urlencode(
             {
-                "returnTo": url_for("index", _external=True),
+                "returnTo": url_for("all_pages", _external=True),
                 "client_id": env.get("AUTH0_CLIENT_ID"),
             },
             quote_via=quote_plus,
@@ -162,16 +162,62 @@ def create_page(data: dict):
 @app.route('/database', methods=['GET'])
 @login_required
 def all_pages():
-    print("Session Data:", session.get('user'))
+    search_query = request.args.get('search', '')  # Get search query from URL parameters
     url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
-    res = requests.post(url, headers=headers)
-    data = res.json()
+    headers = {
+        "Authorization": "Bearer " + NOTION_TOKEN,
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+    }
+    json_body = {
+    "filter": {
+        "and": [
+            {"property": "Publicar", "checkbox": {"equals": True}},
+            {
+                "or": [
+                    {"property": "Nombre", "title": {"contains": search_query}},
+                    {"property": "País", "rich_text": {"contains": search_query}},
+                    {"property": "Destinatarios", "rich_text": {"contains": search_query}},
+                ]
+            }
+        ]
+    }
+    } if search_query else {}
 
+    
+    print("Session Data:", session.get('user'))
+    
+    res = requests.post(url, headers=headers, json=json_body)
+    data = res.json()
     if not data or not data.get('results'):
         return render_template("database.html", pages=[])
 
-    property_name = "Nombre" 
-    pages = [{'id': page['id'], 'name': page['properties'][property_name]['title'][0]['text']['content'], 'created_time': page['created_time']} for page in data['results'] if property_name in page['properties']]
+    pages = []
+    for page in data['results']:
+        # Check if the 'Publicar' property exists and if it is checked
+        if "Publicar" in page['properties'] and page['properties']['Publicar']['checkbox']:
+            page_data = {
+                'id': page['id'],
+                'created_time': page['created_time']
+            }
+            # Extracting 'Nombre' assuming it is a 'title'
+            if "Nombre" in page['properties']:
+                page_data['nombre'] = page['properties']['Nombre']['title'][0]['text']['content'] if page['properties']['Nombre']['title'] else ''
+
+            # Extracting 'País' assuming it is 'rich_text'
+            if "País" in page['properties']:
+                page_data['país'] = page['properties']['País']['rich_text'][0]['text']['content'] if page['properties']['País']['rich_text'] else ''
+
+            # Extracting 'Destinatarios' assuming it is 'rich_text'
+            if "Destinatarios" in page['properties']:
+                page_data['destinatarios'] = page['properties']['Destinatarios']['rich_text'][0]['text']['content'] if page['properties']['Destinatarios']['rich_text'] else ''
+
+            # Extracting 'URL' assuming it is a 'URL' type
+            if "URL" in page['properties']:
+                page_data['url'] = page['properties']['URL']['url'] if page['properties']['URL'].get('url') else ''
+
+            pages.append(page_data)
+
     sorted_pages = sorted(pages, key=lambda page: page['created_time'], reverse=True)
     return render_template("database.html", pages=sorted_pages)
 
