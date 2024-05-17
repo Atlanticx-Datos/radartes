@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<form action="{{ url_for('save_page', page_id=page_id if page_id else None) }}" method="post">
+<form id="page-form" action="{{ url_for('save_page', page_id=page_id if page_id else None) }}" method="post" hx-vals='{"action": "{% if page_id %}update{% else %}create{% endif %}"}'>
   <label for="name">Nombre:</label><br>
   <input type="text" id="name" name="name" value="{{ properties.get('Nombre', {}).get('title', [{}])[0].get('text', {}).get('content', '') }}"><br>
   
@@ -18,8 +18,20 @@
   {% set fecha_de_cierre = properties.get('Fecha de cierre') %}
   <input type="date" id="fecha_de_cierre" name="fecha_de_cierre" value="{{ fecha_de_cierre['date']['start'] if fecha_de_cierre and fecha_de_cierre.get('date') else '' }}"><br>
   
-  <input type="submit" value="{% if page_id %}Update{% else %}Create{% endif %}">
+  <input type="submit" id="submit-button" value="{% if page_id %}Update{% else %}Create{% endif %}" style="cursor: pointer;">
 </form>
+
+<script>
+document.getElementById('submit-button').addEventListener('click', function(event) {
+  event.preventDefault(); // Prevent the form from submitting immediately
+  var form = document.getElementById('page-form');
+  var action = form.getAttribute('hx-vals') ? JSON.parse(form.getAttribute('hx-vals')).action : 'create';
+  var confirmation = confirm("Are you sure you want to " + action + " this page?");
+  if (confirmation) {
+    form.submit(); // Submit the form if the user confirms
+  }
+});
+</script>
 {% endblock %}
 
 
