@@ -2,12 +2,14 @@
 
 {% block body %}
 
-  {% for page in pages %}
-  <p><strong>Name:</strong> {{ page.nombre }}</p>
-  <p><strong>Country:</strong> {{ page.país }}</p>
-  <p><strong>URL:</strong> <a href="{{ page.url }}" target="_blank">{{ page.url }}</a></p>
-  <p><strong>Recipients:</strong> {{ page.destinatarios }}</p>
-  <a href="/update/{{ page.id }}">Update</a>
-  {% endfor %}
+<div hx-boost="true" hx-target="main">
+    {% for page in pages %}
+    <p><strong>Name:</strong> {{ page.nombre }}</p>
+    <p><strong>Country:</strong> {{ page.país }}</p>
+    <p><strong>URL:</strong> <a href="{{ page.url }}" target="_blank">{{ page.url }}</a></p>
+    <p><strong>Recipients:</strong> {{ page.destinatarios }}</p>
+    <a href="/update/{{ page.id }}" hx-get="/update/{{ page.id }}" hx-target="main">Update</a>
+    {% endfor %}
+</div>
 
 {% endblock %}

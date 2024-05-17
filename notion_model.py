@@ -228,8 +228,20 @@ def update_page(page_id):
     if request.method == 'POST':
         # Update the page with the form data
         data = request.form.to_dict()
+        
+        # Prepare properties for the Notion API
+        properties = {
+            "Nombre": {"title": [{"text": {"content": data.get('name', '')}}]},
+            "País": {"rich_text": [{"text": {"content": data.get('country', '')}}]},
+            "URL": {"url": data.get('url', '')},
+            "Destinatarios": {"rich_text": [{"text": {"content": data.get('recipients', '')}}]},
+        }
+        
+        if 'fecha_de_cierre' in data and data['fecha_de_cierre']:
+            properties["Fecha de cierre"] = {"date": {"start": data.get('fecha_de_cierre')}}
+
         update_url = f"https://api.notion.com/v1/pages/{page_id}"
-        res = requests.patch(update_url, headers=headers, json=data)
+        res = requests.patch(update_url, headers=headers, json={"properties": properties})
 
         if res.status_code != 200:
             return "Failed to update page", 400
@@ -267,6 +279,9 @@ def save_page(page_id=None):
         "URL": {"url": data.get('url', '')},
         "Destinatarios": {"rich_text": [{"text": {"content": data.get('recipients', '')}}]}
     }
+
+    if 'fecha_de_cierre' in data and data['fecha_de_cierre']:
+        properties["Fecha de cierre"] = {"date": {"start": data.get('fecha_de_cierre')}}
 
     headers = {
         "Authorization": "Bearer " + NOTION_TOKEN,

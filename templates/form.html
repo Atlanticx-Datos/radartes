@@ -14,9 +14,12 @@
   <label for="recipients">Destinatarios:</label><br>
   <input type="text" id="recipients" name="recipients" value="{{ properties.get('Destinatarios', {}).get('rich_text', [{}])[0].get('text', {}).get('content', '') }}"><br>
   
+  <label for="fecha_de_cierre">Fecha de cierre:</label><br>
+  {% set fecha_de_cierre = properties.get('Fecha de cierre') %}
+  <input type="date" id="fecha_de_cierre" name="fecha_de_cierre" value="{{ fecha_de_cierre['date']['start'] if fecha_de_cierre and fecha_de_cierre.get('date') else '' }}"><br>
+  
   <input type="submit" value="{% if page_id %}Update{% else %}Create{% endif %}">
 </form>
 {% endblock %}
-
 
 

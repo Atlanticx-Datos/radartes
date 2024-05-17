@@ -2,14 +2,15 @@
 
 {% block body %}
 
-  <body>
-    {% if session['user'] %}
-    <h1>Welcome {{ session['user']['name'] }}</h1>
-        <p><a href="/logout">Logout</a></p>
-    {% else %}
-        <h1>Welcome Guest</h1>
-        <p><a href="/login">Login</a></p>
-    {% endif %}
-  </body>
+<body>
+  {% if session['user'] %}
+  <h1>Welcome {{ session['user']['name'] }}</h1>
+  <p><a href="/database" hx-get="/database" hx-target="main" hx-push-url="true">Database</a></p>
+  <p><a href="/logout">Logout</a></p>
+  {% else %}
+  <h1>Welcome Guest</h1>
+  <p><a href="/login">Login</a></p>
+  {% endif %}
+</body>
 
 {% endblock %}
