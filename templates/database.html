@@ -4,12 +4,40 @@
 
 <div hx-boost="true" hx-target="main">
     {% for page in pages %}
-    <p><strong>Name:</strong> {{ page.nombre }}</p>
-    <p><strong>Country:</strong> {{ page.país }}</p>
-    <p><strong>URL:</strong> <a href="{{ page.url }}" target="_blank">{{ page.url }}</a></p>
-    <p><strong>Recipients:</strong> {{ page.destinatarios }}</p>
-    <a href="/update/{{ page.id }}" hx-get="/update/{{ page.id }}" hx-target="main">Update</a>
+    <div class="opportunity">
+        <p><strong>Name:</strong> {{ page.nombre }}</p>
+        <p><strong>Country:</strong> {{ page.país }}</p>
+        <p><strong>URL:</strong> <a href="{{ page.url }}" target="_blank">{{ page.url }}</a></p>
+        <p><strong>Recipients:</strong> {{ page.destinatarios }}</p>
+        <a href="/update/{{ page.id }}" hx-get="/update/{{ page.id }}" hx-target="main">Update</a>
+        <a href="javascript:void(0);" onclick="saveOpportunity('{{ page.id }}')">Save</a>
+    </div>
     {% endfor %}
 </div>
+
+<script>
+function saveOpportunity(pageId) {
+    fetch('/save', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ page_id: pageId })
+    })
+    .then(response => {
+        if (response.ok) {
+            window.location.href = '/database';
+        } else {
+            return response.json().then(data => {
+                alert('Error: ' + data.error);
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+</script>
 
 {% endblock %}

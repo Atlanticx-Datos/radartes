@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+<div hx-boost="true" hx-target="main">
+    {% for opportunity in opportunities %}
+    <div class="opportunity">
+        <p><strong>Name:</strong> {{ opportunity.nombre }}</p>
+        <p><strong>Country:</strong> {{ opportunity.país }}</p>
+        <p><strong>Recipients:</strong> {{ opportunity.destinatarios }}</p>
+        <p><strong>URL:</strong> <a href="{{ opportunity.url }}" target="_blank">{{ opportunity.url }}</a></p>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -58,6 +58,7 @@ def admin_required(f):
 
 NOTION_TOKEN = "secret_IVjx7fzy1C08BK3tecE3utwikJte72Mmgwhd5mUtzWv"
 DATABASE_ID = "b267157879d54cfc8f7106039d4ab221"
+OPORTUNIDADES_ID = "24112623fb4546238a2d907b40f1c2b5"
 
 headers = {
     "Authorization": "Bearer " + NOTION_TOKEN,
@@ -123,6 +124,103 @@ def logout():
             quote_via=quote_plus,
         )
     )
+
+# User Opportunities save
+
+def save_to_notion(user_id, page_id):
+    url = "https://api.notion.com/v1/pages"
+    headers = {
+        "Authorization": "Bearer " + NOTION_TOKEN,
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+    }
+    json_body = {
+        "parent": {"database_id": OPORTUNIDADES_ID},
+        "properties": {
+            "User ID": {"title": [{"text": {"content": user_id}}]},
+            "Opportunity ID": {"rich_text": [{"text": {"content": page_id}}]},
+        }
+    }
+    
+    response = requests.post(url, headers=headers, json=json_body)
+    response.raise_for_status()  # Raise an exception for HTTP errors
+
+def get_saved_opportunity_ids(user_id):
+    url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
+    headers = {
+        "Authorization": "Bearer " + NOTION_TOKEN,
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+    }
+    json_body = {
+        "filter": {
+            "property": "User ID",
+            "title": {"equals": user_id}
+        }
+    }
+    
+    response = requests.post(url, headers=headers, json=json_body)
+    response.raise_for_status()  # Raise an exception for HTTP errors
+    data = response.json()
+
+    opportunity_ids = [result['properties']['Opportunity ID']['rich_text'][0]['text']['content'] for result in data['results']]
+    return opportunity_ids
+
+def get_opportunity_by_id(opportunity_id):
+    url = f"https://api.notion.com/v1/pages/{opportunity_id}"
+    headers = {
+        "Authorization": "Bearer " + NOTION_TOKEN,
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+    }
+    
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()  # Raise an exception for HTTP errors
+    data = response.json()
+    
+    opportunity = {
+        'id': data['id'],
+        'nombre': data['properties']['Nombre']['title'][0]['text']['content'] if data['properties']['Nombre']['title'] else '',
+        'país': data['properties']['País']['rich_text'][0]['text']['content'] if data['properties']['País']['rich_text'] else '',
+        'destinatarios': data['properties']['Destinatarios']['rich_text'][0]['text']['content'] if data['properties']['Destinatarios']['rich_text'] else '',
+        'url': data['properties']['URL']['url'] if data['properties']['URL'].get('url') else ''
+    }
+    
+    return opportunity
+
+@app.route('/save', methods=['GET', 'POST'])
+@login_required
+def save_or_list_opportunities():
+    user_id = session['user']['sub']
+
+    if request.method == 'POST':
+        try:
+            # Log the incoming request data for debugging
+            print("Request Headers:", request.headers)
+            print("Request JSON:", request.get_json())
+            
+            data = request.get_json()
+            page_id = data.get('page_id')  # Get the page ID from the request body
+
+            if not page_id:
+                return jsonify({"error": "Page ID is required"}), 400
+
+            # Save the opportunity to the user's saved opportunities in Notion
+            save_to_notion(user_id, page_id)
+
+            return jsonify({"message": "Opportunity saved successfully"}), 200
+        except Exception as e:
+            print("Error:", str(e))
+            return jsonify({"error": str(e)}), 400
+    
+    elif request.method == 'GET':
+        # Fetch saved opportunity IDs from Notion
+        opportunity_ids = get_saved_opportunity_ids(user_id)
+
+        # Fetch detailed information for each opportunity
+        opportunities = [get_opportunity_by_id(opportunity_id) for opportunity_id in opportunity_ids]
+
+        return render_template("user_opportunities.html", opportunities=opportunities)
 
 # App Logic
 
