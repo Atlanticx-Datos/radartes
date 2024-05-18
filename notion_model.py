@@ -221,6 +221,64 @@ def save_or_list_opportunities():
         opportunities = [get_opportunity_by_id(opportunity_id) for opportunity_id in opportunity_ids]
 
         return render_template("user_opportunities.html", opportunities=opportunities)
+    
+def get_similar_opportunities(keywords, exclude_ids):
+    url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
+    headers = {
+        "Authorization": "Bearer " + NOTION_TOKEN,
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+    }
+
+    # Create a filter for each keyword
+    keyword_filters = [{"property": "AI keywords", "multi_select": {"contains": keyword}} for keyword in keywords]
+
+    json_body = {
+        "filter": {
+            "or": keyword_filters
+        },
+        "page_size": 10  # Limit the number of results
+    }
+    
+    # Log the payload for debugging
+    print("Query Payload:", json_body)
+    
+    response = requests.post(url, headers=headers, json=json_body)
+    response.raise_for_status()  # Raise an exception for HTTP errors
+    data = response.json()
+
+    opportunities = []
+    for result in data['results']:
+        if result['id'] not in exclude_ids:  # Exclude already saved opportunities
+            opportunity = {
+                'id': result['id'],
+                'nombre': result['properties']['Nombre']['title'][0]['text']['content'] if result['properties']['Nombre']['title'] else '',
+                'país': result['properties']['País']['rich_text'][0]['text']['content'] if result['properties']['País']['rich_text'] else '',
+                'destinatarios': result['properties']['Destinatarios']['rich_text'][0]['text']['content'] if result['properties']['Destinatarios']['rich_text'] else '',
+                'url': result['properties']['URL']['url'] if result['properties']['URL'].get('url') else ''
+            }
+            opportunities.append(opportunity)
+    
+    return opportunities
+
+@app.route('/find_similar_opportunities', methods=['GET'])
+@login_required
+def find_similar_opportunities():
+    user_id = session['user']['sub']
+
+    # Fetch saved opportunity IDs from Notion
+    opportunity_ids = get_saved_opportunity_ids(user_id)
+
+    # Fetch AI keywords from user's saved opportunities
+    keywords = set()
+    for opportunity_id in opportunity_ids:
+        opportunity = get_opportunity_by_id(opportunity_id)
+        keywords.update([tag['name'] for tag in opportunity.get('properties', {}).get('AI keywords', {}).get('multi_select', [])])
+
+    # Fetch similar opportunities based on AI keywords
+    similar_opportunities = get_similar_opportunities(keywords, opportunity_ids)
+
+    return render_template("_similar_opportunities.html", similar_opportunities=similar_opportunities)
 
 # App Logic
 

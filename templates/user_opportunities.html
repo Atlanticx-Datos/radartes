@@ -2,7 +2,8 @@
 
 {% block body %}
 
-<div hx-boost="true" hx-target="main">
+<div>
+    <h2>Your Saved Opportunities</h2>
     {% for opportunity in opportunities %}
     <div class="opportunity">
         <p><strong>Name:</strong> {{ opportunity.nombre }}</p>
@@ -11,6 +12,15 @@
         <p><strong>URL:</strong> <a href="{{ opportunity.url }}" target="_blank">{{ opportunity.url }}</a></p>
     </div>
     {% endfor %}
+</div>
+
+<div>
+    <h2>Actions</h2>
+    <a href="javascript:void(0);" hx-get="/find_similar_opportunities" hx-target="#similar-opportunities" hx-swap="innerHTML">Find Similar Opportunities</a>
+</div>
+
+<div id="similar-opportunities">
+    <!-- Similar opportunities will be loaded here -->
 </div>
 
 {% endblock %}
