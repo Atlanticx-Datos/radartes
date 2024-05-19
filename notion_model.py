@@ -1,4 +1,4 @@
-from flask import Flask, flash, redirect, url_for, render_template, request, session, jsonify
+from flask import Flask, flash, redirect, url_for, render_template, request, session, jsonify, make_response
 from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required, verify_jwt_in_request, JWTManager
 from dotenv import find_dotenv, load_dotenv
 from flask_session import Session
@@ -145,6 +145,71 @@ def save_to_notion(user_id, page_id):
     response = requests.post(url, headers=headers, json=json_body)
     response.raise_for_status()  # Raise an exception for HTTP errors
 
+@app.route('/save', methods=['POST'])
+@login_required
+def save_opportunity():
+    user_id = session['user']['sub']
+
+    try:
+        # Log the incoming request data for debugging
+        print("Request Headers:", request.headers)
+        print("Request JSON:", request.get_json())
+        
+        data = request.get_json()
+        page_id = data.get('page_id')  # Get the page ID from the request body
+
+        if not page_id:
+            return jsonify({"error": "Page ID is required"}), 400
+
+        # Check if the opportunity is already saved
+        if is_opportunity_already_saved(user_id, page_id):
+            return jsonify({"message": "Opportunity is already saved"}), 200
+
+        # Save the opportunity to the user's saved opportunities in Notion
+        save_to_notion(user_id, page_id)
+
+        return jsonify({"message": "Opportunity saved successfully"}), 200
+    except Exception as e:
+        print("Error:", str(e))
+        return jsonify({"error": str(e)}), 400
+
+@app.route('/saved_opportunities', methods=['GET'])
+@login_required
+def list_saved_opportunities():
+    user_id = session['user']['sub']
+
+    # Fetch saved opportunity IDs from Notion
+    opportunity_ids = get_saved_opportunity_ids(user_id)
+    print("Fetched opportunity IDs:", opportunity_ids)  # Debugging statement
+
+    # Fetch detailed information for each opportunity
+    opportunities = [get_opportunity_by_id(opportunity_id) for opportunity_id in opportunity_ids]
+    print("Fetched opportunities:", opportunities)  # Debugging statement
+
+    return render_template("user_opportunities.html", opportunities=opportunities)
+
+def is_opportunity_already_saved(user_id, page_id):
+    url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
+    headers = {
+        "Authorization": "Bearer " + NOTION_TOKEN,
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+    }
+    json_body = {
+        "filter": {
+            "and": [
+                {"property": "User ID", "title": {"equals": user_id}},
+                {"property": "Opportunity ID", "rich_text": {"equals": page_id}}
+            ]
+        }
+    }
+    
+    response = requests.post(url, headers=headers, json=json_body)
+    response.raise_for_status()  # Raise an exception for HTTP errors
+    data = response.json()
+
+    return bool(data['results'])
+
 def get_saved_opportunity_ids(user_id):
     url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
     headers = {
@@ -164,6 +229,7 @@ def get_saved_opportunity_ids(user_id):
     data = response.json()
 
     opportunity_ids = [result['properties']['Opportunity ID']['rich_text'][0]['text']['content'] for result in data['results']]
+    print("Opportunity IDs from Notion:", opportunity_ids)  # Debugging statement
     return opportunity_ids
 
 def get_opportunity_by_id(opportunity_id):
@@ -188,39 +254,51 @@ def get_opportunity_by_id(opportunity_id):
     
     return opportunity
 
-@app.route('/save', methods=['GET', 'POST'])
+def delete_saved_opportunity(user_id, page_id):
+    url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
+    headers = {
+        "Authorization": "Bearer " + NOTION_TOKEN,
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+    }
+    json_body = {
+        "filter": {
+            "and": [
+                {"property": "User ID", "title": {"equals": user_id}},
+                {"property": "Opportunity ID", "rich_text": {"equals": page_id}}
+            ]
+        }
+    }
+    
+    response = requests.post(url, headers=headers, json=json_body)
+    response.raise_for_status()  # Raise an exception for HTTP errors
+    data = response.json()
+
+    # Delete the first matching result (assuming there is only one)
+    if data['results']:
+        page_id_to_delete = data['results'][0]['id']
+        delete_url = f"https://api.notion.com/v1/pages/{page_id_to_delete}"
+        delete_response = requests.patch(delete_url, headers=headers, json={"archived": True})
+        delete_response.raise_for_status()  # Raise an exception for HTTP errors
+
+@app.route('/delete_opportunity/<page_id>', methods=['DELETE'])
 @login_required
-def save_or_list_opportunities():
+def delete_opportunity(page_id):
     user_id = session['user']['sub']
 
-    if request.method == 'POST':
-        try:
-            # Log the incoming request data for debugging
-            print("Request Headers:", request.headers)
-            print("Request JSON:", request.get_json())
-            
-            data = request.get_json()
-            page_id = data.get('page_id')  # Get the page ID from the request body
+    try:
+        print("Attempting to delete saved opportunity with ID:", page_id)  # Debugging statement
 
-            if not page_id:
-                return jsonify({"error": "Page ID is required"}), 400
+        # Delete the saved opportunity from the user's saved opportunities
+        delete_saved_opportunity(user_id, page_id)
 
-            # Save the opportunity to the user's saved opportunities in Notion
-            save_to_notion(user_id, page_id)
-
-            return jsonify({"message": "Opportunity saved successfully"}), 200
-        except Exception as e:
-            print("Error:", str(e))
-            return jsonify({"error": str(e)}), 400
-    
-    elif request.method == 'GET':
-        # Fetch saved opportunity IDs from Notion
-        opportunity_ids = get_saved_opportunity_ids(user_id)
-
-        # Fetch detailed information for each opportunity
-        opportunities = [get_opportunity_by_id(opportunity_id) for opportunity_id in opportunity_ids]
-
-        return render_template("user_opportunities.html", opportunities=opportunities)
+        # Redirect to /saved_opportunities after deletion
+        response = make_response('', 204)
+        response.headers['HX-Redirect'] = '/saved_opportunities'
+        return response
+    except Exception as e:
+        print("Error:", str(e))
+        return jsonify({"error": str(e)}), 400
     
 def get_similar_opportunities(keywords, exclude_ids):
     url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
@@ -279,6 +357,11 @@ def find_similar_opportunities():
     similar_opportunities = get_similar_opportunities(keywords, opportunity_ids)
 
     return render_template("_similar_opportunities.html", similar_opportunities=similar_opportunities)
+
+
+
+
+
 
 # App Logic
 

@@ -2,25 +2,48 @@
 
 {% block body %}
 
+<div id="messages"></div>
+
 <div>
     <h2>Your Saved Opportunities</h2>
-    {% for opportunity in opportunities %}
-    <div class="opportunity">
-        <p><strong>Name:</strong> {{ opportunity.nombre }}</p>
-        <p><strong>Country:</strong> {{ opportunity.país }}</p>
-        <p><strong>Recipients:</strong> {{ opportunity.destinatarios }}</p>
-        <p><strong>URL:</strong> <a href="{{ opportunity.url }}" target="_blank">{{ opportunity.url }}</a></p>
-    </div>
-    {% endfor %}
+    {% if opportunities %}
+        {% for opportunity in opportunities %}
+        <div class="opportunity" id="opportunity-{{ opportunity.id }}">
+            <p><strong>Name:</strong> {{ opportunity.nombre }}</p>
+            <p><strong>Country:</strong> {{ opportunity.país }}</p>
+            <p><strong>Recipients:</strong> {{ opportunity.destinatarios }}</p>
+            <p><strong>URL:</strong> <a href="{{ opportunity.url }}" target="_blank">{{ opportunity.url }}</a></p>
+            <button onclick="deleteOpportunity('{{ opportunity.id }}')">Delete</button>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>You have no saved opportunities.</p>
+    {% endif %}
 </div>
 
-<div>
-    <h2>Actions</h2>
-    <a href="javascript:void(0);" hx-get="/find_similar_opportunities" hx-target="#similar-opportunities" hx-swap="innerHTML">Find Similar Opportunities</a>
-</div>
-
-<div id="similar-opportunities">
-    <!-- Similar opportunities will be loaded here -->
-</div>
+<script>
+function deleteOpportunity(pageId) {
+    console.log('Deleting opportunity with ID:', pageId);  // Log the URL being constructed
+    fetch('/delete_opportunity/' + pageId, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            window.location.href = '/saved_opportunities';
+        } else {
+            return response.json().then(data => {
+                alert('Error: ' + data.error);
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+</script>
 
 {% endblock %}
