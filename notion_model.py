@@ -151,13 +151,8 @@ def save_opportunity():
     user_id = session['user']['sub']
 
     try:
-        # Log the incoming request data for debugging
-        print("Request Headers:", request.headers)
-        print("Request JSON:", request.get_json())
-        
-        data = request.get_json()
-        page_id = data.get('page_id')  # Get the page ID from the request body
-
+        page_id = request.json.get('page_id')  # Get page_id from JSON data
+        print(request.json)
         if not page_id:
             return jsonify({"error": "Page ID is required"}), 400
 
@@ -168,10 +163,11 @@ def save_opportunity():
         # Save the opportunity to the user's saved opportunities in Notion
         save_to_notion(user_id, page_id)
 
-        return jsonify({"message": "Opportunity saved successfully"}), 200
+        return "Opportunity saved successfully", 200
     except Exception as e:
         print("Error:", str(e))
         return jsonify({"error": str(e)}), 400
+
 
 @app.route('/saved_opportunities', methods=['GET'])
 @login_required

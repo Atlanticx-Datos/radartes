@@ -2,11 +2,10 @@
 
 {% block body %}
 
-<div id="messages"></div>
-
-<div>
-    <h2>Your Saved Opportunities</h2>
-    {% if opportunities %}
+<body>
+    <div>
+        <h2>Your Saved Opportunities</h2>
+        {% if opportunities %}
         {% for opportunity in opportunities %}
         <div class="opportunity" id="opportunity-{{ opportunity.id }}">
             <p><strong>Name:</strong> {{ opportunity.nombre }}</p>
@@ -16,34 +15,34 @@
             <button onclick="deleteOpportunity('{{ opportunity.id }}')">Delete</button>
         </div>
         {% endfor %}
-    {% else %}
+        {% else %}
         <p>You have no saved opportunities.</p>
-    {% endif %}
-</div>
-
+        {% endif %}
+    </div>
+</body>
 <script>
-function deleteOpportunity(pageId) {
-    console.log('Deleting opportunity with ID:', pageId);  // Log the URL being constructed
-    fetch('/delete_opportunity/' + pageId, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
-    })
-    .then(response => {
-        if (response.ok) {
-            window.location.href = '/saved_opportunities';
-        } else {
-            return response.json().then(data => {
-                alert('Error: ' + data.error);
+    function deleteOpportunity(pageId) {
+        console.log('Deleting opportunity with ID:', pageId);  // Log the URL being constructed
+        fetch('/delete_opportunity/' + pageId, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/saved_opportunities';
+                } else {
+                    return response.json().then(data => {
+                        alert('Error: ' + data.error);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
             });
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
+    }
 </script>
 
 {% endblock %}

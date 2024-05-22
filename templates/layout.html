@@ -1,29 +1,25 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.12"
-        integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2"
-        crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>   
 </head>
 
 <body>
-    <main>
-        <div class="mx-8 my-4">
-            <h1 class="text-3xl font-bold underline">Oportunidades App</h1>
-            <div class="search-bar">
-                <form action="{{ url_for('all_pages') }}" method="get">
-                    <input type="text" name="search" placeholder="Search..." class="search-input">
-                    <button type="submit" class="search-button">Search</button>
-                    <input type="reset" value="Clear" onclick="this.form.submit()" class="clear-button">
-                </form>
-            </div>
-            {% block body %}{% endblock %}
+    <main class="mx-8 my-4">
+        <h1 class="text-3xl font-bold underline">Oportunidades App</h1>
+        <div class="">
+            <form action="{{ url_for('all_pages') }}" method="get">
+                <input type="text" name="search" placeholder="Search..." class="geist-input" />
+                <button type="submit" class="geist-button">Search</button>
+                <input type="reset" value="Clear" onclick="this.form.submit()" class="geist-button geist-button-secondary" />
+            </form>
         </div>
+        {% block body %}{% endblock %}
     </main>
 </body>
 

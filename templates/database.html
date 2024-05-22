@@ -2,45 +2,21 @@
 
 {% block body %}
 
-<div id="messages"></div>
-
-<div hx-boost="true" hx-target="main">
-    {% for page in pages %}
-    <div class="opportunity">
-        <p><strong>Name:</strong> {{ page.nombre }}</p>
-        <p><strong>Country:</strong> {{ page.país }}</p>
-        <p><strong>URL:</strong> <a href="{{ page.url }}" target="_blank">{{ page.url }}</a></p>
-        <p><strong>Recipients:</strong> {{ page.destinatarios }}</p>
-        <a href="/update/{{ page.id }}" hx-get="/update/{{ page.id }}" hx-target="main">Update</a>
-        <a href="javascript:void(0);" onclick="saveOpportunity('{{ page.id }}')">Save</a>
+<body>
+    <div hx-boost="true" hx-target="main">
+        {% for page in pages %}
+        <div class="opportunity">
+            <p><strong>Name:</strong> {{ page.nombre }}</p>
+            <p><strong>Country:</strong> {{ page.país }}</p>
+            <p><strong>URL:</strong> <a href="{{ page.url }}" target="_blank">{{ page.url }}</a></p>
+            <p><strong>Recipients:</strong> {{ page.destinatarios }}</p>
+            <a href="/update/{{ page.id }}" hx-get="/update/{{ page.id }}" hx-target="main">Update</a>
+            <a href="javascript:void(0);" onClick="console.log('Sending data: ', {'page_id': '{{ page.id|tojson }}'})"
+                hx-post="/save" hx-target="#messages" hx-swap="outerHTML" hx-trigger="click"
+                hx-vals='{"page_id": {{ page.id|tojson }}}' hx-ext='json-enc'>Save</a>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
-
-<script>
-function saveOpportunity(pageId) {
-    fetch('/save', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({ page_id: pageId })
-    })
-    .then(response => response.json())
-    .then(data => {
-        var messages = document.getElementById('messages');
-        if (messages) {
-            messages.innerHTML = '<div class="alert alert-info">' + data.message + '</div>';
-        }
-    })
-    .catch(error => {
-        var messages = document.getElementById('messages');
-        if (messages) {
-            messages.innerHTML = '<div class="alert alert-danger">An error occurred: ' + error + '</div>';
-        }
-    });
-}
-</script>
+</body>
 
 {% endblock %}
