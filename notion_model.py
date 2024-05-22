@@ -1,5 +1,21 @@
-from flask import Flask, flash, redirect, url_for, render_template, request, session, jsonify, make_response
-from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required, verify_jwt_in_request, JWTManager
+from flask import (
+    Flask,
+    flash,
+    redirect,
+    url_for,
+    render_template,
+    request,
+    session,
+    jsonify,
+    make_response,
+)
+from flask_jwt_extended import (
+    get_jwt,
+    get_jwt_identity,
+    jwt_required,
+    verify_jwt_in_request,
+    JWTManager,
+)
 from dotenv import find_dotenv, load_dotenv
 from flask_session import Session
 from functools import wraps
@@ -21,36 +37,44 @@ print("Loaded AUTH0_DOMAIN:", os.environ.get("AUTH0_DOMAIN"))
 
 app: Flask = Flask(__name__)
 
-app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'default_fallback_secret_key')
+app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", "default_fallback_secret_key")
 
-app.config['SESSION_TYPE'] = 'filesystem'
-app.config['SESSION_COOKIE_SECURE'] = False
-app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_PERMANENT'] = True  # Ensure sessions don't expire immediately
-app.config['SESSION_USE_SIGNER'] = True  # Optionally, enhance security by signing the session cookie
+app.config["SESSION_TYPE"] = "filesystem"
+app.config["SESSION_COOKIE_SECURE"] = False
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_PERMANENT"] = True  # Ensure sessions don't expire immediately
+app.config["SESSION_USE_SIGNER"] = (
+    True  # Optionally, enhance security by signing the session cookie
+)
 
 
 Session(app)  # Initialize session
 
-# Role-Base Access Mgmt 
-app.config['JWT_SECRET_KEY'] = 'daleboquita'  # Change this to your actual secret key
+# Role-Base Access Mgmt
+app.config["JWT_SECRET_KEY"] = "daleboquita"  # Change this to your actual secret key
 jwt = JWTManager(app)
+
 
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'user' not in session:
-            return redirect(url_for('login'))
+        if "user" not in session:
+            return redirect(url_for("login"))
         return f(*args, **kwargs)
+
     return decorated_function
+
 
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'user' not in session or 'Admin' not in session['user'].get('https://127.0.0.1:5000/roles', []):
-            return redirect(url_for('login'))  # or some other unauthorized page
+        if "user" not in session or "Admin" not in session["user"].get(
+            "https://127.0.0.1:5000/roles", []
+        ):
+            return redirect(url_for("login"))  # or some other unauthorized page
         return f(*args, **kwargs)
+
     return decorated_function
 
 
@@ -77,14 +101,16 @@ oauth.register(
     client_kwargs={
         "scope": "openid profile email",
     },
-    server_metadata_url=f'https://{os.environ.get("AUTH0_DOMAIN")}/.well-known/openid-configuration'
+    server_metadata_url=f'https://{os.environ.get("AUTH0_DOMAIN")}/.well-known/openid-configuration',
 )
+
 
 @app.route("/login")
 def login():
     return oauth.auth0.authorize_redirect(
         redirect_uri=url_for("callback", _external=True)
     )
+
 
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
@@ -102,19 +128,21 @@ def callback():
         # Extract user information from the response
         user_info = user_info_response.json()
         session["user"] = user_info
-        print("Session Data Set:", session["user"]) 
+        print("Session Data Set:", session["user"])
         # Redirect to the dashboard or another appropriate page
-        return redirect(url_for('index'))
+        return redirect(url_for("index"))
     except Exception as e:
         # Handle errors and provide feedback
         print(f"Error during callback processing: {str(e)}")
         return f"An error occurred: {str(e)}"
 
+
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect(
-        "https://" + env.get("AUTH0_DOMAIN")
+        "https://"
+        + env.get("AUTH0_DOMAIN")
         + "/v2/logout?"
         + urlencode(
             {
@@ -125,7 +153,9 @@ def logout():
         )
     )
 
+
 # User Opportunities save
+
 
 def save_to_notion(user_id, page_id):
     url = "https://api.notion.com/v1/pages"
@@ -139,19 +169,20 @@ def save_to_notion(user_id, page_id):
         "properties": {
             "User ID": {"title": [{"text": {"content": user_id}}]},
             "Opportunity ID": {"rich_text": [{"text": {"content": page_id}}]},
-        }
+        },
     }
-    
+
     response = requests.post(url, headers=headers, json=json_body)
     response.raise_for_status()  # Raise an exception for HTTP errors
 
-@app.route('/save', methods=['POST'])
+
+@app.route("/save", methods=["POST"])
 @login_required
 def save_opportunity():
-    user_id = session['user']['sub']
+    user_id = session["user"]["sub"]
 
     try:
-        page_id = request.json.get('page_id')  # Get page_id from JSON data
+        page_id = request.json.get("page_id")  # Get page_id from JSON data
         print(request.json)
         if not page_id:
             return jsonify({"error": "Page ID is required"}), 400
@@ -169,20 +200,23 @@ def save_opportunity():
         return jsonify({"error": str(e)}), 400
 
 
-@app.route('/saved_opportunities', methods=['GET'])
+@app.route("/saved_opportunities", methods=["GET"])
 @login_required
 def list_saved_opportunities():
-    user_id = session['user']['sub']
+    user_id = session["user"]["sub"]
 
     # Fetch saved opportunity IDs from Notion
     opportunity_ids = get_saved_opportunity_ids(user_id)
     print("Fetched opportunity IDs:", opportunity_ids)  # Debugging statement
 
     # Fetch detailed information for each opportunity
-    opportunities = [get_opportunity_by_id(opportunity_id) for opportunity_id in opportunity_ids]
+    opportunities = [
+        get_opportunity_by_id(opportunity_id) for opportunity_id in opportunity_ids
+    ]
     print("Fetched opportunities:", opportunities)  # Debugging statement
 
     return render_template("user_opportunities.html", opportunities=opportunities)
+
 
 def is_opportunity_already_saved(user_id, page_id):
     url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
@@ -195,16 +229,17 @@ def is_opportunity_already_saved(user_id, page_id):
         "filter": {
             "and": [
                 {"property": "User ID", "title": {"equals": user_id}},
-                {"property": "Opportunity ID", "rich_text": {"equals": page_id}}
+                {"property": "Opportunity ID", "rich_text": {"equals": page_id}},
             ]
         }
     }
-    
+
     response = requests.post(url, headers=headers, json=json_body)
     response.raise_for_status()  # Raise an exception for HTTP errors
     data = response.json()
 
-    return bool(data['results'])
+    return bool(data["results"])
+
 
 def get_saved_opportunity_ids(user_id):
     url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
@@ -213,20 +248,19 @@ def get_saved_opportunity_ids(user_id):
         "Content-Type": "application/json",
         "Notion-Version": "2022-06-28",
     }
-    json_body = {
-        "filter": {
-            "property": "User ID",
-            "title": {"equals": user_id}
-        }
-    }
-    
+    json_body = {"filter": {"property": "User ID", "title": {"equals": user_id}}}
+
     response = requests.post(url, headers=headers, json=json_body)
     response.raise_for_status()  # Raise an exception for HTTP errors
     data = response.json()
 
-    opportunity_ids = [result['properties']['Opportunity ID']['rich_text'][0]['text']['content'] for result in data['results']]
+    opportunity_ids = [
+        result["properties"]["Opportunity ID"]["rich_text"][0]["text"]["content"]
+        for result in data["results"]
+    ]
     print("Opportunity IDs from Notion:", opportunity_ids)  # Debugging statement
     return opportunity_ids
+
 
 def get_opportunity_by_id(opportunity_id):
     url = f"https://api.notion.com/v1/pages/{opportunity_id}"
@@ -235,20 +269,37 @@ def get_opportunity_by_id(opportunity_id):
         "Content-Type": "application/json",
         "Notion-Version": "2022-06-28",
     }
-    
+
     response = requests.get(url, headers=headers)
     response.raise_for_status()  # Raise an exception for HTTP errors
     data = response.json()
-    
+
     opportunity = {
-        'id': data['id'],
-        'nombre': data['properties']['Nombre']['title'][0]['text']['content'] if data['properties']['Nombre']['title'] else '',
-        'país': data['properties']['País']['rich_text'][0]['text']['content'] if data['properties']['País']['rich_text'] else '',
-        'destinatarios': data['properties']['Destinatarios']['rich_text'][0]['text']['content'] if data['properties']['Destinatarios']['rich_text'] else '',
-        'url': data['properties']['URL']['url'] if data['properties']['URL'].get('url') else ''
+        "id": data["id"],
+        "nombre": (
+            data["properties"]["Nombre"]["title"][0]["text"]["content"]
+            if data["properties"]["Nombre"]["title"]
+            else ""
+        ),
+        "país": (
+            data["properties"]["País"]["rich_text"][0]["text"]["content"]
+            if data["properties"]["País"]["rich_text"]
+            else ""
+        ),
+        "destinatarios": (
+            data["properties"]["Destinatarios"]["rich_text"][0]["text"]["content"]
+            if data["properties"]["Destinatarios"]["rich_text"]
+            else ""
+        ),
+        "url": (
+            data["properties"]["URL"]["url"]
+            if data["properties"]["URL"].get("url")
+            else ""
+        ),
     }
-    
+
     return opportunity
+
 
 def delete_saved_opportunity(user_id, page_id):
     url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
@@ -261,41 +312,47 @@ def delete_saved_opportunity(user_id, page_id):
         "filter": {
             "and": [
                 {"property": "User ID", "title": {"equals": user_id}},
-                {"property": "Opportunity ID", "rich_text": {"equals": page_id}}
+                {"property": "Opportunity ID", "rich_text": {"equals": page_id}},
             ]
         }
     }
-    
+
     response = requests.post(url, headers=headers, json=json_body)
     response.raise_for_status()  # Raise an exception for HTTP errors
     data = response.json()
 
     # Delete the first matching result (assuming there is only one)
-    if data['results']:
-        page_id_to_delete = data['results'][0]['id']
+    if data["results"]:
+        page_id_to_delete = data["results"][0]["id"]
         delete_url = f"https://api.notion.com/v1/pages/{page_id_to_delete}"
-        delete_response = requests.patch(delete_url, headers=headers, json={"archived": True})
+        delete_response = requests.patch(
+            delete_url, headers=headers, json={"archived": True}
+        )
         delete_response.raise_for_status()  # Raise an exception for HTTP errors
 
-@app.route('/delete_opportunity/<page_id>', methods=['DELETE'])
+
+@app.route("/delete_opportunity/<page_id>", methods=["DELETE"])
 @login_required
 def delete_opportunity(page_id):
-    user_id = session['user']['sub']
+    user_id = session["user"]["sub"]
 
     try:
-        print("Attempting to delete saved opportunity with ID:", page_id)  # Debugging statement
+        print(
+            "Attempting to delete saved opportunity with ID:", page_id
+        )  # Debugging statement
 
         # Delete the saved opportunity from the user's saved opportunities
         delete_saved_opportunity(user_id, page_id)
 
         # Redirect to /saved_opportunities after deletion
-        response = make_response('', 204)
-        response.headers['HX-Redirect'] = '/saved_opportunities'
+        response = make_response("", 204)
+        response.headers["HX-Redirect"] = "/saved_opportunities"
         return response
     except Exception as e:
         print("Error:", str(e))
         return jsonify({"error": str(e)}), 400
-    
+
+
 def get_similar_opportunities(keywords, exclude_ids):
     url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
     headers = {
@@ -305,40 +362,60 @@ def get_similar_opportunities(keywords, exclude_ids):
     }
 
     # Create a filter for each keyword
-    keyword_filters = [{"property": "AI keywords", "multi_select": {"contains": keyword}} for keyword in keywords]
+    keyword_filters = [
+        {"property": "AI keywords", "multi_select": {"contains": keyword}}
+        for keyword in keywords
+    ]
 
     json_body = {
-        "filter": {
-            "or": keyword_filters
-        },
-        "page_size": 10  # Limit the number of results
+        "filter": {"or": keyword_filters},
+        "page_size": 10,  # Limit the number of results
     }
-    
+
     # Log the payload for debugging
     print("Query Payload:", json_body)
-    
+
     response = requests.post(url, headers=headers, json=json_body)
     response.raise_for_status()  # Raise an exception for HTTP errors
     data = response.json()
 
     opportunities = []
-    for result in data['results']:
-        if result['id'] not in exclude_ids:  # Exclude already saved opportunities
+    for result in data["results"]:
+        if result["id"] not in exclude_ids:  # Exclude already saved opportunities
             opportunity = {
-                'id': result['id'],
-                'nombre': result['properties']['Nombre']['title'][0]['text']['content'] if result['properties']['Nombre']['title'] else '',
-                'país': result['properties']['País']['rich_text'][0]['text']['content'] if result['properties']['País']['rich_text'] else '',
-                'destinatarios': result['properties']['Destinatarios']['rich_text'][0]['text']['content'] if result['properties']['Destinatarios']['rich_text'] else '',
-                'url': result['properties']['URL']['url'] if result['properties']['URL'].get('url') else ''
+                "id": result["id"],
+                "nombre": (
+                    result["properties"]["Nombre"]["title"][0]["text"]["content"]
+                    if result["properties"]["Nombre"]["title"]
+                    else ""
+                ),
+                "país": (
+                    result["properties"]["País"]["rich_text"][0]["text"]["content"]
+                    if result["properties"]["País"]["rich_text"]
+                    else ""
+                ),
+                "destinatarios": (
+                    result["properties"]["Destinatarios"]["rich_text"][0]["text"][
+                        "content"
+                    ]
+                    if result["properties"]["Destinatarios"]["rich_text"]
+                    else ""
+                ),
+                "url": (
+                    result["properties"]["URL"]["url"]
+                    if result["properties"]["URL"].get("url")
+                    else ""
+                ),
             }
             opportunities.append(opportunity)
-    
+
     return opportunities
 
-@app.route('/find_similar_opportunities', methods=['GET'])
+
+@app.route("/find_similar_opportunities", methods=["GET"])
 @login_required
 def find_similar_opportunities():
-    user_id = session['user']['sub']
+    user_id = session["user"]["sub"]
 
     # Fetch saved opportunity IDs from Notion
     opportunity_ids = get_saved_opportunity_ids(user_id)
@@ -347,33 +424,44 @@ def find_similar_opportunities():
     keywords = set()
     for opportunity_id in opportunity_ids:
         opportunity = get_opportunity_by_id(opportunity_id)
-        keywords.update([tag['name'] for tag in opportunity.get('properties', {}).get('AI keywords', {}).get('multi_select', [])])
+        keywords.update(
+            [
+                tag["name"]
+                for tag in opportunity.get("properties", {})
+                .get("AI keywords", {})
+                .get("multi_select", [])
+            ]
+        )
 
     # Fetch similar opportunities based on AI keywords
     similar_opportunities = get_similar_opportunities(keywords, opportunity_ids)
 
-    return render_template("_similar_opportunities.html", similar_opportunities=similar_opportunities)
-
-
-
-
+    return render_template(
+        "_similar_opportunities.html", similar_opportunities=similar_opportunities
+    )
 
 
 # App Logic
 
+
 @app.route("/")
 def index():
-    print("Current Session Data at Index:", session.get('user'))  # Debug: print session data
-    if 'user' in session:
-        user = session['user']
-        return render_template("index.html", user=user, pretty=json.dumps(user, indent=4))
+    print(
+        "Current Session Data at Index:", session.get("user")
+    )  # Debug: print session data
+    if "user" in session:
+        user = session["user"]
+        return render_template(
+            "index.html", user=user, pretty=json.dumps(user, indent=4)
+        )
     else:
         return render_template("index.html", user=None, pretty="No user data")
 
-@app.route('/create', methods=['GET', 'POST'])
+
+@app.route("/create", methods=["GET", "POST"])
 @login_required
 def handle_create():
-    if request.method == 'POST':
+    if request.method == "POST":
         # Handle form submission
         data = request.form.to_dict()
         required_fields = ["Nombre", "País", "URL", "Destinatarios"]
@@ -387,6 +475,7 @@ def handle_create():
     # For GET request, just show the form
     return render_template("form.html", properties={}, page_id=None)
 
+
 def create_page(data: dict):
     create_url = "https://api.notion.com/v1/pages"
     payload = {"parent": {"database_id": DATABASE_ID}, "properties": data}
@@ -394,89 +483,135 @@ def create_page(data: dict):
     return res.text
 
 
-@app.route('/database', methods=['GET'])
+@app.route("/database", methods=["GET"])
 @login_required
 def all_pages():
-    search_query = request.args.get('search', '')  # Get search query from URL parameters
+    search_query = request.args.get(
+        "search", ""
+    )  # Get search query from URL parameters
     url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
     headers = {
         "Authorization": "Bearer " + NOTION_TOKEN,
         "Content-Type": "application/json",
         "Notion-Version": "2022-06-28",
     }
-    json_body = {
-    "filter": {
-        "and": [
-            {"property": "Publicar", "checkbox": {"equals": True}},
-            {
-                "or": [
-                    {"property": "Nombre", "title": {"contains": search_query}},
-                    {"property": "País", "rich_text": {"contains": search_query}},
-                    {"property": "Destinatarios", "rich_text": {"contains": search_query}},
+    json_body = (
+        {
+            "filter": {
+                "and": [
+                    {"property": "Publicar", "checkbox": {"equals": True}},
+                    {
+                        "or": [
+                            {
+                                "property": "Resumen generado por la IA",
+                                "rich_text": {"contains": search_query},
+                            },
+                            {
+                                "property": "País",
+                                "rich_text": {"contains": search_query},
+                            },
+                            {
+                                "property": "Destinatarios",
+                                "rich_text": {"contains": search_query},
+                            },
+                        ]
+                    },
                 ]
             }
-        ]
-    }
-    } if search_query else {}
+        }
+        if search_query
+        else {}
+    )
 
-    
-    print("Session Data:", session.get('user'))
-    
+    print("Session Data:", session.get("user"))
+
     res = requests.post(url, headers=headers, json=json_body)
     data = res.json()
-    if not data or not data.get('results'):
+    if not data or not data.get("results"):
         return render_template("database.html", pages=[])
 
     pages = []
-    for page in data['results']:
+    for page in data["results"]:
         # Check if the 'Publicar' property exists and if it is checked
-        if "Publicar" in page['properties'] and page['properties']['Publicar']['checkbox']:
-            page_data = {
-                'id': page['id'],
-                'created_time': page['created_time']
-            }
+        if (
+            "Publicar" in page["properties"]
+            and page["properties"]["Publicar"]["checkbox"]
+        ):
+            page_data = {"id": page["id"], "created_time": page["created_time"]}
             # Extracting 'Nombre' assuming it is a 'title'
-            if "Nombre" in page['properties']:
-                page_data['nombre'] = page['properties']['Nombre']['title'][0]['text']['content'] if page['properties']['Nombre']['title'] else ''
+            if "Nombre" in page["properties"]:
+                page_data["nombre"] = (
+                    page["properties"]["Resumen generado por la IA"]["rich_text"][0]["text"]["content"]
+                    if page["properties"]["Nombre"]["title"]
+                    else ""
+                )
 
             # Extracting 'País' assuming it is 'rich_text'
-            if "País" in page['properties']:
-                page_data['país'] = page['properties']['País']['rich_text'][0]['text']['content'] if page['properties']['País']['rich_text'] else ''
+            if "País" in page["properties"]:
+                page_data["país"] = (
+                    page["properties"]["País"]["rich_text"][0]["text"]["content"]
+                    if page["properties"]["País"]["rich_text"]
+                    else ""
+                )
 
             # Extracting 'Destinatarios' assuming it is 'rich_text'
-            if "Destinatarios" in page['properties']:
-                page_data['destinatarios'] = page['properties']['Destinatarios']['rich_text'][0]['text']['content'] if page['properties']['Destinatarios']['rich_text'] else ''
+            if "Destinatarios" in page["properties"]:
+                page_data["destinatarios"] = (
+                    page["properties"]["Destinatarios"]["rich_text"][0]["text"][
+                        "content"
+                    ]
+                    if page["properties"]["Destinatarios"]["rich_text"]
+                    else ""
+                )
 
             # Extracting 'URL' assuming it is a 'URL' type
-            if "URL" in page['properties']:
-                page_data['url'] = page['properties']['URL']['url'] if page['properties']['URL'].get('url') else ''
+            if "URL" in page["properties"]:
+                page_data["url"] = (
+                    page["properties"]["URL"]["url"]
+                    if page["properties"]["URL"].get("url")
+                    else ""
+                )
+
+            # Extracting 'Fecha de cierre' assuming it is a 'date' type
+            if "Fecha de cierre" in page["properties"]:
+                page_data["fecha_de_cierre"] = (
+                    page["properties"]["Fecha de cierre"]["date"]["start"]
+                    if page["properties"]["Fecha de cierre"]["date"]
+                    else ""
+                )
 
             pages.append(page_data)
 
-    sorted_pages = sorted(pages, key=lambda page: page['created_time'], reverse=True)
+    sorted_pages = sorted(pages, key=lambda page: page["created_time"], reverse=True)
     return render_template("database.html", pages=sorted_pages)
 
 
-@app.route('/update/<page_id>', methods=['GET', 'POST'])
+@app.route("/update/<page_id>", methods=["GET", "POST"])
 @admin_required
 def update_page(page_id):
-    if request.method == 'POST':
+    if request.method == "POST":
         # Update the page with the form data
         data = request.form.to_dict()
-        
+
         # Prepare properties for the Notion API
         properties = {
-            "Nombre": {"title": [{"text": {"content": data.get('name', '')}}]},
-            "País": {"rich_text": [{"text": {"content": data.get('country', '')}}]},
-            "URL": {"url": data.get('url', '')},
-            "Destinatarios": {"rich_text": [{"text": {"content": data.get('recipients', '')}}]},
+            "Nombre": {"title": [{"text": {"content": data.get("name", "")}}]},
+            "País": {"rich_text": [{"text": {"content": data.get("country", "")}}]},
+            "URL": {"url": data.get("url", "")},
+            "Destinatarios": {
+                "rich_text": [{"text": {"content": data.get("recipients", "")}}]
+            },
         }
-        
-        if 'fecha_de_cierre' in data and data['fecha_de_cierre']:
-            properties["Fecha de cierre"] = {"date": {"start": data.get('fecha_de_cierre')}}
+
+        if "fecha_de_cierre" in data and data["fecha_de_cierre"]:
+            properties["Fecha de cierre"] = {
+                "date": {"start": data.get("fecha_de_cierre")}
+            }
 
         update_url = f"https://api.notion.com/v1/pages/{page_id}"
-        res = requests.patch(update_url, headers=headers, json={"properties": properties})
+        res = requests.patch(
+            update_url, headers=headers, json={"properties": properties}
+        )
 
         if res.status_code != 200:
             return "Failed to update page", 400
@@ -487,7 +622,7 @@ def update_page(page_id):
         page = res.json()
 
         # Extract the properties from the page
-        properties = page['properties']
+        properties = page["properties"]
 
         # Redirect to the form.html template with the updated properties
         return render_template("form.html", properties=properties, page_id=page_id)
@@ -498,25 +633,28 @@ def update_page(page_id):
     page = res.json()
 
     # Extract the properties from the page
-    properties = page['properties']
+    properties = page["properties"]
 
     return render_template("form.html", properties=properties, page_id=page_id)
 
-@app.route('/save', methods=['POST'])
-@app.route('/save/<page_id>', methods=['POST'])
+
+@app.route("/save", methods=["POST"])
+@app.route("/save/<page_id>", methods=["POST"])
 @admin_required
 def save_page(page_id=None):
     data = request.form.to_dict()
 
     properties = {
-        "Nombre": {"title": [{"text": {"content": data.get('name', '')}}]},
-        "País": {"rich_text": [{"text": {"content": data.get('country', '')}}]},
-        "URL": {"url": data.get('url', '')},
-        "Destinatarios": {"rich_text": [{"text": {"content": data.get('recipients', '')}}]}
+        "Nombre": {"title": [{"text": {"content": data.get("name", "")}}]},
+        "País": {"rich_text": [{"text": {"content": data.get("country", "")}}]},
+        "URL": {"url": data.get("url", "")},
+        "Destinatarios": {
+            "rich_text": [{"text": {"content": data.get("recipients", "")}}]
+        },
     }
 
-    if 'fecha_de_cierre' in data and data['fecha_de_cierre']:
-        properties["Fecha de cierre"] = {"date": {"start": data.get('fecha_de_cierre')}}
+    if "fecha_de_cierre" in data and data["fecha_de_cierre"]:
+        properties["Fecha de cierre"] = {"date": {"start": data.get("fecha_de_cierre")}}
 
     headers = {
         "Authorization": "Bearer " + NOTION_TOKEN,
@@ -526,23 +664,26 @@ def save_page(page_id=None):
 
     if page_id:
         update_url = f"https://api.notion.com/v1/pages/{page_id}"
-        response = requests.patch(update_url, headers=headers, json={"properties": properties})
+        response = requests.patch(
+            update_url, headers=headers, json={"properties": properties}
+        )
     else:
         create_url = "https://api.notion.com/v1/pages"
         parent = {"database_id": DATABASE_ID}
-        response = requests.post(create_url, headers=headers, json={"parent": parent, "properties": properties})
+        response = requests.post(
+            create_url,
+            headers=headers,
+            json={"parent": parent, "properties": properties},
+        )
 
-    if response.status_code not in [200, 201]:  # 200 OK for update, 201 Created for create
-        print(f"Failed to process page: {response.status_code}, {response.text}")  # Debugging
+    if response.status_code not in [
+        200,
+        201,
+    ]:  # 200 OK for update, 201 Created for create
+        print(
+            f"Failed to process page: {response.status_code}, {response.text}"
+        )  # Debugging
         return "Failed to process page", 400
 
     # Redirect to the /database route to display all pages
-    return redirect(url_for('all_pages'))
-
-
-
-
-
-
-
-
+    return redirect(url_for("all_pages"))

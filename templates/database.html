@@ -10,6 +10,7 @@
             <p><strong>Country:</strong> {{ page.país }}</p>
             <p><strong>URL:</strong> <a href="{{ page.url }}" target="_blank">{{ page.url }}</a></p>
             <p><strong>Recipients:</strong> {{ page.destinatarios }}</p>
+            <p><strong>Fecha de cierre:</strong> {{ page.fecha_de_cierre }}</p>
             <a href="/update/{{ page.id }}" hx-get="/update/{{ page.id }}" hx-target="main">Update</a>
             <a href="javascript:void(0);" onClick="console.log('Sending data: ', {'page_id': '{{ page.id|tojson }}'})"
                 hx-post="/save" hx-target="#messages" hx-swap="outerHTML" hx-trigger="click"
