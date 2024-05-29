@@ -30,6 +30,8 @@ from os import environ as env
 from urllib.parse import quote_plus, urlencode
 from authlib.integrations.flask_client import OAuth
 
+from datetime import datetime, timedelta
+
 
 load_dotenv()
 print("Loaded AUTH0_DOMAIN:", os.environ.get("AUTH0_DOMAIN"))
@@ -528,20 +530,23 @@ def all_pages():
     res = requests.post(url, headers=headers, json=json_body)
     data = res.json()
     if not data or not data.get("results"):
-        return render_template("database.html", pages=[])
+        return render_template("database.html", pages=[], current_month_pages=[], empty_fecha_pages=[])
 
     pages = []
+    upcoming_pages = []
+    empty_fecha_pages = []
+
+    now = datetime.now()
+    end_of_month = datetime(now.year, now.month + 1, 1) - timedelta(days=1)
+
     for page in data["results"]:
-        # Check if the 'Publicar' property exists and if it is checked
-        if (
-            "Publicar" in page["properties"]
-            and page["properties"]["Publicar"]["checkbox"]
-        ):
+        if "Publicar" in page["properties"] and page["properties"]["Publicar"]["checkbox"]:
             page_data = {"id": page["id"], "created_time": page["created_time"]}
+            
             # Extracting 'Nombre' assuming it is a 'title'
             if "Nombre" in page["properties"]:
                 page_data["nombre"] = (
-                    page["properties"]["Resumen generado por la IA"]["rich_text"][0]["text"]["content"]
+                    page["properties"]["Nombre"]["title"][0]["text"]["content"]
                     if page["properties"]["Nombre"]["title"]
                     else ""
                 )
@@ -557,9 +562,7 @@ def all_pages():
             # Extracting 'Destinatarios' assuming it is 'rich_text'
             if "Destinatarios" in page["properties"]:
                 page_data["destinatarios"] = (
-                    page["properties"]["Destinatarios"]["rich_text"][0]["text"][
-                        "content"
-                    ]
+                    page["properties"]["Destinatarios"]["rich_text"][0]["text"]["content"]
                     if page["properties"]["Destinatarios"]["rich_text"]
                     else ""
                 )
@@ -573,17 +576,36 @@ def all_pages():
                 )
 
             # Extracting 'Fecha de cierre' assuming it is a 'date' type
-            if "Fecha de cierre" in page["properties"]:
-                page_data["fecha_de_cierre"] = (
-                    page["properties"]["Fecha de cierre"]["date"]["start"]
-                    if page["properties"]["Fecha de cierre"]["date"]
-                    else ""
-                )
+            if "Fecha de cierre" in page["properties"] and page["properties"]["Fecha de cierre"]["date"]:
+                fecha_de_cierre = page["properties"]["Fecha de cierre"]["date"]["start"]
+                page_data["fecha_de_cierre"] = fecha_de_cierre if fecha_de_cierre else ""
+                
+                # Check if "Fecha de cierre" is empty
+                if not fecha_de_cierre:
+                    empty_fecha_pages.append(page_data)
+                else:
+                    # Check if "Fecha de cierre" is between today and the end of the current month
+                    cierre_date = datetime.strptime(fecha_de_cierre, '%Y-%m-%d')
+                    if now <= cierre_date <= end_of_month:
+                        upcoming_pages.append(page_data)
+            else:
+                page_data["fecha_de_cierre"] = ""
+                empty_fecha_pages.append(page_data)
 
             pages.append(page_data)
 
     sorted_pages = sorted(pages, key=lambda page: page["fecha_de_cierre"], reverse=True)
-    return render_template("database.html", pages=sorted_pages)
+
+    # Print statements for debugging
+    print("Upcoming Cierres:", upcoming_pages)
+    print("Empty Fechas:", empty_fecha_pages)
+    
+    return render_template(
+        "database.html", 
+        pages=sorted_pages, 
+        current_month_pages=upcoming_pages, 
+        empty_fecha_pages=empty_fecha_pages
+    )
 
 
 @app.route("/update/<page_id>", methods=["GET", "POST"])
