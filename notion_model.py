@@ -582,7 +582,7 @@ def all_pages():
 
             pages.append(page_data)
 
-    sorted_pages = sorted(pages, key=lambda page: page["created_time"], reverse=True)
+    sorted_pages = sorted(pages, key=lambda page: page["fecha_de_cierre"], reverse=True)
     return render_template("database.html", pages=sorted_pages)
 
 
