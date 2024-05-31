@@ -22,6 +22,9 @@ from functools import wraps
 
 from typing_extensions import LiteralString
 from werkzeug.wrappers import response
+
+
+
 import requests
 import json
 import os
@@ -37,7 +40,9 @@ load_dotenv()
 print("Loaded AUTH0_DOMAIN:", os.environ.get("AUTH0_DOMAIN"))
 
 
-app: Flask = Flask(__name__)
+app: Flask = Flask(__name__, static_folder='static')
+
+
 
 app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", "default_fallback_secret_key")
 

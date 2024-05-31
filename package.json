@@ -7,12 +7,14 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:css": "tailwindcss build static/src/styles.css -o static/css/tailwind.css"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@area17/a17-tailwind-plugins": "^4.0.4"
+    "@area17/a17-tailwind-plugins": "^4.0.4",
+    "tailwindcss": "^3.4.3"
   }
 }
