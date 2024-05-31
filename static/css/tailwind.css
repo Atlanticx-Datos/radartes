@@ -601,8 +601,8 @@ video {
   display: block;
 }
 
-.p-4 {
-  padding: 1rem;
+.p-2 {
+  padding: 0.5rem;
 }
 
 .text-3xl {

@@ -5,7 +5,11 @@ module.exports = {
     './static/src/**/*.css', // Include your custom CSS files
   ],
   theme: {
-    extend: {},
+    extend: {
+      padding: {
+        'figma_mobile': '20px',
+      },
+    },
   },
   plugins: [],
 };
