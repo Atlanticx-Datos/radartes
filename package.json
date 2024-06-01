@@ -19,6 +19,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@area17/a17-tailwind-plugins": "^4.0.4"
+    "@area17/a17-tailwind-plugins": "^4.0.4",
+    "date-fns": "^3.6.0"
   }
 }

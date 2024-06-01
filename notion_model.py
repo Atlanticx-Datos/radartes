@@ -23,8 +23,6 @@ from functools import wraps
 from typing_extensions import LiteralString
 from werkzeug.wrappers import response
 
-
-
 import requests
 import json
 import os

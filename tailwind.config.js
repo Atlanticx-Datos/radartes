@@ -2,7 +2,8 @@
 module.exports = {
   content: [
     './templates/**/*.html', // Include all HTML files in the templates folder
-    './static/src/**/*.css', // Include your custom CSS files
+    './static/src/**/*.css', // Include your custom CSS files,
+    './templates/**/*.html',
   ],
   theme: {
     extend: {
@@ -13,4 +14,3 @@ module.exports = {
   },
   plugins: [],
 };
-

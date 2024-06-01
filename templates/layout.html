@@ -9,19 +9,31 @@
     <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/heroicons-css@2.1.0/dist/heroicons.min.css">
 
+  {% if config.LIVETW_DEV %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='.dev/tailwind_development.css') }}">
+    <script src="{{ url_for('static', filename='.dev/live_reload.js') }}" defer></script>
+  {% else %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='tailwind_production.css') }}">
+  {% endif %}
 </head>
 
 <body>
     <main class="container mx-auto p-2.5">
-        <h1 class="text-3xl font-bold underline"><a href="/">
-            Oportunidades App</a></h1>
-        <div class="">
-            <form action="{{ url_for('all_pages') }}" method="get">
-                <input type="text" name="search" placeholder="Search..." class="geist-input" />
-                <button type="submit" class="geist-button">Search</button>
-                <input type="reset" value="Clear" onclick="this.form.submit()" class="geist-button geist-button-secondary" />
-            </form>
-        </div>
+        <nav class="flex justify-center space-x-4">
+            <!-- Child 1: Home icon -->
+            <svg class="w-6" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path clipRule="evenodd" fillRule="evenodd" d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" />
+            </svg>
+        
+            <!-- Child 2: Text input field -->
+            <input type="text" placeholder="Type here" class="input w-full max-w-xs" />
+        
+            <!-- Child 3: Ellipsis vertical icon -->
+            <svg class="w-6" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M10 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM10 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM11.5 15.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z" />
+            </svg>
+        </nav>
+        
         {% block body %}{% endblock %}
     </main>
 </body>
