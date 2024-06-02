@@ -1,35 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flask App</title>
-    <link href="{{ url_for('static', filename='css/tailwind-built.css') }}" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flask App</title>
+  <link href="{{ url_for('static', filename='css/tailwind-built.css') }}" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
 </head>
-<body class="flex justify-center bg-gray-100">
-    <main class="w-full md:w-2/3 max-w-[1200px] p-2.5">
-        <nav class="flex justify-between items-center space-x-4 w-full bg-yellow-100 p-2">
-            <!-- Child 1: Home icon -->
-            <svg class="w-6 h-6" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path clipRule="evenodd" fillRule="evenodd" d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" />
-            </svg>
-        
-            <!-- Child 2: Text input field -->
-            <input class="w-full max-w-lg py-1 px-2 input input-ghost" type="text" placeholder="Type here"/>
-        
-            <!-- Child 3: Ellipsis vertical icon -->
-            <svg class="w-6 h-6" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M10 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM10 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM11.5 15.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z" />
-            </svg>
-        </nav>
-        {% block body %}{% endblock %}
-    </main>
-    <script>
-      var socket = io();
-      socket.on('connect', function() {
-          console.log('Connected to server');
-      });
+
+<body class="flex justify-center">
+  <main class="w-full md:w-2/3 max-w-[1200px] p-2.5">
+    <nav class="flex justify-between items-center space-x-4 w-full h-[34px] pt-1 pb-2 px-2">
+      <!-- Child 1: Home icon -->
+      <a href="/">
+        <svg class="w-6 h-6 md:hidden" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true">
+          <path clipRule="evenodd" fillRule="evenodd"
+            d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" />
+        </svg>
+      </a>
+      <!-- Child 2: Text input field -->
+      <input class="display:block md:hidden w-2/3 md:w-full max-w-lg border border-black rounded-full h-8 pl-3.5"
+        type="text" placeholder="Buscar oportunidades" />
+      <!-- Flex-grow element to push the logo to the right -->
+      <div class="flex-grow hidden md:block"></div>
+      <!-- Child 3: Logo -->
+      <img src="./static/public/Logo_Atlanticx.png" alt="Logo" class="hidden md:block h-8 mr-2">
+      <!-- Child 4: Ellipsis vertical icon with dropdown -->
+      <div class="dropdown dropdown-bottom dropdown-end">
+        <div tabindex="0" role="button">
+          <svg class="w-6 h-6" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path
+              d="M10 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM10 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM11.5 15.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z" />
+          </svg>
+        </div>
+        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+          <li><a>Oportunidades</a></li>
+          <li><a>Mis oportunidades</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    {% block body %}{% endblock %}
+  </main>
+  <script>
+    var socket = io();
+    socket.on('connect', function () {
+      console.log('Connected to server');
+    });
   </script>
 </body>
+
 </html>

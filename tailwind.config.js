@@ -1,7 +1,28 @@
 module.exports = {
   content: ['./templates/**/*.html', './static/js/**/*.js'],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'], // Setting Inter as the default sans-serif font
+      },
+      borderWidth: {
+        DEFAULT: '1px', // This sets the default border width to 1px
+      },
+    },
+  },
+  daisyui: {
+    themes: [
+      {
+        "mytheme": {  // Your custom theme name
+          "primary": "#0CC7C7",   // Light blue (main accent)
+          "secondary": "#FFA00F",  // Orange (secondary background)
+          "accent": "#F05A30",    // Red (secondary accent 1)
+          "neutral": "#000",   // Adjust if needed (default neutral)
+          "base-100": "#ffffff",  // White (base color)
+          "borderWidth": '1px', 
+        },
+      },
+    ],
   },
   plugins: [
     require('daisyui'),
