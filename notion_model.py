@@ -715,14 +715,7 @@ def save_page(page_id=None):
     # Redirect to the /database route to display all pages
     return redirect(url_for("all_pages"))
 
-def find_free_port():
-    s = py_socket.socket(py_socket.AF_INET, py_socket.SOCK_STREAM)
-    s.bind(('localhost', 0))
-    _, port = s.getsockname()
-    s.close()
-    return port
-
 if __name__ == '__main__':
-    port = find_free_port()
-    print(f"Running on port {port}")
-    socketio.run(app, debug=True, port=port)
+    port = 5000
+    print(f"Running on http://127.0.0.1:{port}")
+    socketio.run(app, debug=True, port=port, use_reloader=False)

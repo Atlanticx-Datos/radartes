@@ -1,13 +1,11 @@
-// tailwind.config.js
 module.exports = {
-  purge: ['./templates/**/*.html', './static/js/**/*.js'],
-  darkMode: false, // or 'media' or 'class'
+  content: ['./templates/**/*.html', './static/js/**/*.js'],
   theme: {
-      extend: {},
+    extend: {},
   },
-  variants: {
-      extend: {},
-  },
-  plugins: [],
+  plugins: [
+    require('daisyui'),
+  ],
 }
+
 
