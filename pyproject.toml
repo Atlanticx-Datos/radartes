@@ -6,3 +6,7 @@ templates_glob = "**/*.html"
 base_layout = "layout.html"
 livetw_folder = ".dev"
 flask_app = "notion_model.py"
+input = "./src/styles/tailwind.css"
+output = "./static/css/tailwind.css"
+watch = ["./templates/**/*.html", "./src/**/*.css"]
+port = 5678

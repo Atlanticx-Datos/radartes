@@ -8,6 +8,7 @@ from flask import (
     session,
     jsonify,
     make_response,
+    send_from_directory
 )
 from flask_jwt_extended import (
     get_jwt,
@@ -33,14 +34,15 @@ from authlib.integrations.flask_client import OAuth
 
 from datetime import datetime, timedelta
 
+from flask_socketio import SocketIO
+import socket as py_socket
 
 load_dotenv()
 print("Loaded AUTH0_DOMAIN:", os.environ.get("AUTH0_DOMAIN"))
 
 
-app: Flask = Flask(__name__, static_folder='static')
-
-
+app: Flask = Flask(__name__)
+socketio = SocketIO(app)
 
 app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", "default_fallback_secret_key")
 
@@ -712,3 +714,15 @@ def save_page(page_id=None):
 
     # Redirect to the /database route to display all pages
     return redirect(url_for("all_pages"))
+
+def find_free_port():
+    s = py_socket.socket(py_socket.AF_INET, py_socket.SOCK_STREAM)
+    s.bind(('localhost', 0))
+    _, port = s.getsockname()
+    s.close()
+    return port
+
+if __name__ == '__main__':
+    port = find_free_port()
+    print(f"Running on port {port}")
+    socketio.run(app, debug=True, port=port)

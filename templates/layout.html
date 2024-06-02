@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
-    <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/tailwind-built.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/heroicons-css@2.1.0/dist/heroicons.min.css">
 
   {% if config.LIVETW_DEV %}
@@ -19,14 +19,14 @@
 
 <body>
     <main class="container mx-auto p-2.5">
-        <nav class="flex justify-center space-x-4">
+        <nav class="flex justify-center space-x-6">
             <!-- Child 1: Home icon -->
-            <svg class="w-6" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <svg class="w-6 ml-2" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path clipRule="evenodd" fillRule="evenodd" d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" />
             </svg>
         
             <!-- Child 2: Text input field -->
-            <input type="text" placeholder="Type here" class="input w-full max-w-xs" />
+            <input type="text" placeholder="Type here" class="input w-2/3 pl-2" />
         
             <!-- Child 3: Ellipsis vertical icon -->
             <svg class="w-6" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -36,6 +36,12 @@
         
         {% block body %}{% endblock %}
     </main>
+    <script>
+      var socket = io();
+      socket.on('connect', function() {
+          console.log('Connected to server');
+      });
+  </script>
 </body>
 
 </html>
