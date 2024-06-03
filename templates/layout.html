@@ -12,7 +12,7 @@
 
 <body class="flex justify-center">
   <main class="w-full md:w-2/3 max-w-[1200px] p-2.5">
-    <nav class="flex justify-between items-center space-x-4 w-full h-[34px] pt-1 pb-2 px-2">
+    <nav class="flex justify-between items-center space-x-4 w-full h-[34px] md:h-[130px] pt-1 pb-2 px-2">
       <!-- Child 1: Home icon -->
       <a href="/">
         <svg class="w-6 h-6 md:hidden" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
@@ -37,13 +37,14 @@
               d="M10 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM10 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM11.5 15.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z" />
           </svg>
         </div>
-        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-          <li><a>Oportunidades</a></li>
-          <li><a>Mis oportunidades</a></li>
+        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 bg-base-100 rounded-md w-52 border border-black mt-3">
+          <li><a href="/database"><span class="border-l-4 border-accent pl-3">Oportunidades</span></a></li>
+          <li><a href="/saved_opportunities"><span class="border-l-4 border-secondary pl-3">Guardadas</span></a></li>
+          <li><a href="/"><span class="border-l-4 border-primary pl-3">Home</span></a></li>
+          <li><a href="/logout"><span class="border-l-4 border-base-200 pl-3">Cerrar</span></a></li>
         </ul>
       </div>
     </nav>
-
     {% block body %}{% endblock %}
   </main>
   <script>

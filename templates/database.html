@@ -3,22 +3,281 @@
 {% block body %}
 
 <body>
-    <div hx-boost="true" hx-target="main">
-        {% for page in pages %}
-        <div class="opportunity">
-            <p><strong>Name:</strong> {{ page.nombre }}</p>
-            <p><strong>Country:</strong> {{ page.país }}</p>
-            <p><strong>URL:</strong> <a href="{{ page.url }}" target="_blank">{{ page.url }}</a></p>
-            <p><strong>Recipients:</strong> {{ page.destinatarios }}</p>
-            <p><strong>Fecha de cierre:</strong> {{ page.fecha_de_cierre }}</p>
-            <a href="/update/{{ page.id }}" hx-get="/update/{{ page.id }}" hx-target="body">Update</a>
-            <a href="javascript:void(0);" onClick="console.log('Sending data: ', {'page_id': '{{ page.id|tojson }}'})"
-                hx-post="/save" hx-target="#toast-container" hx-swap="outerHTML" hx-trigger="click"
-                hx-vals='{"page_id": {{ page.id|tojson }}}' hx-ext='json-enc'>Save</a>
-                <div id="toast-container"></div>    
+    <main class="w-full  max-w-[1200px]">
+        <div class="grid grid-cols-1 lg:grid-cols-6 gap-12 mt-12">
+            <!-- Left Sidebar -->
+            <aside class="col-span-1 lg:col-span-2">
+                <div class="flex items-center -mb-3">
+                    <p class="font-black text-lg">144</p>
+                    <span class="inline mx-1 text-accent">|</span>
+                    <p class="text-4xl font-black inline">OPOR</p>
+                </div>
+                <p class="text-4xl font-black">TUNIDAD</p>
+                <p class="text-4xl -mt-3 font-black">ES.</p>
+                <div class="mb-12">
+                    <h2 class="font-bold text-lg mb-4">EXPLORÁ LOS RECURSOS.</h2>
+                    <p class="mb-4">Para artistas, investigadores y trabajadores de la cultura, principalmente para
+                        residentes de Argentina, aunque también hay información para Latinoamérica.</p>
+                    <input type="text" placeholder="This is my text" class="input input-bordered w-full mb-4">
+                    <button class="btn btn-primary w-full">Buscar</button>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="col-span-1 lg:col-span-4 space-y-12">
+                <div class="flex flex-col lg:flex-row justify-between mb-12 gap-12">
+                    <div class="w-full lg:w-1/2 space-y-4 mb-12 lg:mb-0">
+                        <div class="border-b-4 border-primary pb-2">
+                            <svg class="w-6" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0M3.124 7.5A8.969 8.969 0 0 1 5.292 3m13.416 0a8.969 8.969 0 0 1 2.168 4.5">
+                                </path>
+                            </svg>
+                        </div>
+                        <div class="join join-vertical w-full">
+                            <div class="collapse collapse-arrow join-item border border-neutral rounded-none">
+                                <input type="radio" name="my-accordion-1" checked="checked" />
+                                <div class="collapse-title text-xl font-medium">
+                                    CIERRAN ESTE MES
+                                </div>
+                                <div class="collapse-content">
+                                    <p>Option 1</p>
+                                    <p>Option 2</p>
+                                    <p>Option 3</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-1/2 space-y-4">
+                        <div class="border-b-4 border-secondary pb-2">
+                            <svg class="w-6" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13">
+                                </path>
+                            </svg>
+                        </div>
+                        <div class="join join-vertical w-full">
+                            <div class="collapse collapse-arrow join-item border border-neutral rounded-none">
+                                <input type="radio" name="my-accordion-1" />
+                                <div class="collapse-title text-xl font-medium">
+                                    DESTACADAS
+                                </div>
+                                <div class="collapse-content">
+                                    <p>Option 1</p>
+                                    <p>Option 2</p>
+                                    <p>Option 3</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-2 border-custom rounded-md p-4 overflow-x-auto mb-12">
+                    <table class="table w-full">
+                        <!-- head -->
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label>
+                                        <input type="checkbox" class="checkbox" />
+                                    </label>
+                                </th>
+                                <th>Name</th>
+                                <th>Job</th>
+                                <th>Favorite Color</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- row 1 -->
+                            <tr>
+                                <th>
+                                    <label>
+                                        <input type="checkbox" class="checkbox" />
+                                    </label>
+                                </th>
+                                <td>
+                                    <div class="flex items-center gap-3">
+                                        <div class="avatar">
+                                            <div class="mask mask-squircle w-12 h-12">
+                                                <img src="https://img.daisyui.com/tailwind-css-component-profile-2@56w.png"
+                                                    alt="Avatar Tailwind CSS Component" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold">Hart Hagerty</div>
+                                            <div class="text-sm opacity-50">United States</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    Zemlak, Daniel and Leannon
+                                    <br />
+                                    <span class="badge badge-ghost badge-sm">Desktop Support Technician</span>
+                                </td>
+                                <td>Purple</td>
+                                <th>
+                                    <button class="btn btn-ghost btn-xs">details</button>
+                                </th>
+                            </tr>
+                            <!-- row 2 -->
+                            <tr>
+                                <th>
+                                    <label>
+                                        <input type="checkbox" class="checkbox" />
+                                    </label>
+                                </th>
+                                <td>
+                                    <div class="flex items-center gap-3">
+                                        <div class="avatar">
+                                            <div class="mask mask-squircle w-12 h-12">
+                                                <img src="https://img.daisyui.com/tailwind-css-component-profile-3@56w.png"
+                                                    alt="Avatar Tailwind CSS Component" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold">Brice Swyre</div>
+                                            <div class="text-sm opacity-50">China</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    Carroll Group
+                                    <br />
+                                    <span class="badge badge-ghost badge-sm">Tax Accountant</span>
+                                </td>
+                                <td>Red</td>
+                                <th>
+                                    <button class="btn btn-ghost btn-xs">details</button>
+                                </th>
+                            </tr>
+                            <!-- row 3 -->
+                            <tr>
+                                <th>
+                                    <label>
+                                        <input type="checkbox" class="checkbox" />
+                                    </label>
+                                </th>
+                                <td>
+                                    <div class="flex items-center gap-3">
+                                        <div class="avatar">
+                                            <div class="mask mask-squircle w-12 h-12">
+                                                <img src="https://img.daisyui.com/tailwind-css-component-profile-4@56w.png"
+                                                    alt="Avatar Tailwind CSS Component" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold">Marjy Ferencz</div>
+                                            <div class="text-sm opacity-50">Russia</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    Rowe-Schoen
+                                    <br />
+                                    <span class="badge badge-ghost badge-sm">Office Assistant I</span>
+                                </td>
+                                <td>Crimson</td>
+                                <th>
+                                    <button class="btn btn-ghost btn-xs">details</button>
+                                </th>
+                            </tr>
+                            <!-- row 4 -->
+                            <tr>
+                                <th>
+                                    <label>
+                                        <input type="checkbox" class="checkbox" />
+                                    </label>
+                                </th>
+                                <td>
+                                    <div class="flex items-center gap-3">
+                                        <div class="avatar">
+                                            <div class="mask mask-squircle w-12 h-12">
+                                                <img src="https://img.daisyui.com/tailwind-css-component-profile-5@56w.png"
+                                                    alt="Avatar Tailwind CSS Component" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold">Yancy Tear</div>
+                                            <div class="text-sm opacity-50">Brazil</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    Wyman-Ledner
+                                    <br />
+                                    <span class="badge badge-ghost badge-sm">Community Outreach Specialist</span>
+                                </td>
+                                <td>Indigo</td>
+                                <th>
+                                    <button class="btn btn-ghost btn-xs">details</button>
+                                </th>
+                            </tr>
+                        </tbody>
+                        <!-- foot -->
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th>Name</th>
+                                <th>Job</th>
+                                <th>Favorite Color</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Form Section Below the Table -->
+                <div class="mt-12">
+                    <h2 class="font-bold text-lg mb-4">SUMÁ TU OPORTUNIDAD A NUESTRA BASE DE DATOS</h2>
+                    <p class="mb-4">Para artistas, investigadores y trabajadores de la cultura, principalmente para
+                        residentes de Argentina, aunque también hay información para Latinoamérica.</p>
+                    <form>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1" for="nombre">Nombre de la Oportunidad</label>
+                            <input id="nombre" type="text" class="input input-bordered w-full">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1" for="pais">País</label>
+                            <input id="pais" type="text" class="input input-bordered w-full">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1" for="destinatarios">Destinatarios</label>
+                            <input id="destinatarios" type="text" class="input input-bordered w-full">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1" for="input-label">Input Label</label>
+                            <input id="input-label" type="text" class="input input-bordered w-full">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1" for="date">Input Date</label>
+                            <input id="date" type="date" class="input input-bordered w-full">
+                        </div>
+                    </form>
+                </div>
+            </main>
         </div>
-        {% endfor %}
-    </div>
+
+        <div hx-boost="true" hx-target="main">
+            {% for page in pages %}
+            <div class="opportunity">
+                <p><strong>Name:</strong> {{ page.nombre }}</p>
+                <p><strong>Country:</strong> {{ page.país }}</p>
+                <p><strong>URL:</strong> <a href="{{ page.url }}" target="_blank">{{ page.url }}</a></p>
+                <p><strong>Recipients:</strong> {{ page.destinatarios }}</p>
+                <p><strong>Fecha de cierre:</strong> {{ page.fecha_de_cierre }}</p>
+                <a href="/update/{{ page.id }}" hx-get="/update/{{ page.id }}" hx-target="body">Update</a>
+                <a href="javascript:void(0);"
+                    onClick="console.log('Sending data: ', {'page_id': '{{ page.id|tojson }}'})" hx-post="/save"
+                    hx-target="#toast-container" hx-swap="outerHTML" hx-trigger="click"
+                    hx-vals='{"page_id": {{ page.id|tojson }}}' hx-ext='json-enc'>Save</a>
+                <div id="toast-container"></div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
 </body>
 
 {% endblock %}

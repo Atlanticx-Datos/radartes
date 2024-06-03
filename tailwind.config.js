@@ -16,10 +16,10 @@ module.exports = {
         "mytheme": {  // Your custom theme name
           "primary": "#0CC7C7",   // Light blue (main accent)
           "secondary": "#FFA00F",  // Orange (secondary background)
+          "green_accent" : "#10E07F", // Green 
           "accent": "#F05A30",    // Red (secondary accent 1)
           "neutral": "#000",   // Adjust if needed (default neutral)
           "base-100": "#ffffff",  // White (base color)
-          "borderWidth": '1px', 
         },
       },
     ],
