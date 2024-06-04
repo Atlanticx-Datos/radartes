@@ -7,27 +7,19 @@
         <div class="grid grid-cols-1 lg:grid-cols-6 gap-2">
             <!-- Left Sidebar -->
             <aside class="col-span-1 lg:col-span-2 mt-2 lg:ml-5 xl:ml-10 2xl:ml-20">
-                <div class="flex items-center -mb-3 mt-6">
-                    <p class="font-black text-lg">144</p>
-                    <span class="inline mx-1 text-accent">|</span>
-                    <p class="md:text-5xl 2xl:text-3xl font-black inline">OPOR</p>
-                </div>
-                <p class="md:text-5xl 2xl:text-3xl font-black">TUNIDAD</p>
-                <p class="md:text-5xl 2xl:text-3xl -mt-3 font-black">ES.</p>
                 <!-- Buscador -->
-                <div class="lg:col-span-2 w-5/6 mt-3">
-                    <h2 class="font-bold text-2xl leading-none tracking-tighter mb-2">EXPLORÁ LOS RECURSOS.</h2>
-                    <p class="mb-4 text-sm font-medium tracking-tighter">Para artistas, investigadores y trabajadores de
-                        la cultura, principalmente para
-                        residentes de Argentina, aunque también hay información para Latinoamérica.</p>
-                    <input type="text" placeholder="This is my text"
-                        class="input input-bordered rounded-none w-full mb-4 border-neutral">
-                    <button class="btn btn-primary w-full">Buscar</button>
+                <div class="lg:col-span-2 w-5/6 mt-6">
+                    <input type="text" id="search-input" placeholder="Buscar oportunidades"
+                        class="input input-bordered rounded-none w-full mb-4 border-neutral" name="search">
+                        <button id="search-button" class="btn btn-primary w-full" hx-get="/database"
+                        hx-target="#search-results" hx-swap="innerHTML" hx-include="[name=search]">
+                        Buscar
+                    </button>
                 </div>
             </aside>
 
             <!-- Main Content -->
-            <main class="col-span-1 lg:col-start-3 lg:col-span-4 space-y-3">
+            <main class="col-span-1 lg:col-start-3 lg:col-span-4 space-y-3 w-auto">
                 <div class="flex flex-col lg:flex-row justify-between gap-3">
                     <div class="w-full lg:w-1/2">
                         <div class="border-b-4 border-primary pb-2">
@@ -41,7 +33,7 @@
                         <div class="join join-vertical w-full">
                             <div class="collapse collapse-arrow join-item border border-neutral rounded-none">
                                 <input type="radio" name="my-accordion-1" checked="checked" />
-                                <div class="collapse-title text-xl font-medium">
+                                <div class="collapse-title text-base font-black tracking-tighter">
                                     CIERRAN ESTE MES
                                 </div>
                                 <div class="collapse-content">
@@ -68,7 +60,7 @@
                         <div class="join join-vertical w-full">
                             <div class="collapse collapse-arrow join-item border border-neutral rounded-none">
                                 <input type="radio" name="my-accordion-1" />
-                                <div class="collapse-title text-xl font-medium">
+                                <div class="collapse-title text-base font-black tracking-tighter">
                                     DESTACADAS
                                 </div>
                                 <div class="collapse-content">
@@ -86,7 +78,8 @@
                 </div>
 
                 <div class="border border-neutral rounded-none overflow-x-auto mb-12">
-                    <table class="table w-full">
+                    <!-- _initial_table.html -->
+                    <table id="searches" class="table w-full">
                         <!-- head -->
                         <thead>
                             <tr>
@@ -97,46 +90,14 @@
                                 </th>
                                 <th>Oportunidad</th>
                                 <th>Descripción</th>
-                                <th>Fecha de cierre</th>
+                                <th>Fecha de Cierre</th>
                                 <th></th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {% for page in pages %}
-                            <tr>
-                                <th>
-                                    <label>
-                                        <input type="checkbox" class="checkbox" />
-                                    </label>
-                                </th>
-                                <td>
-                                    <div class="flex items-center gap-3">
-                                        <div class="avatar">
-                                            <div class="mask mask-squircle w-12 h-12">
-                                                <img src="https://img.daisyui.com/tailwind-css-component-profile-2@56w.png"
-                                                    alt="Avatar Tailwind CSS Component" />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="font-bold">{{ page.nombre }}</div>
-                                            <div class="text-sm opacity-50">{{ page.país }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    {{ page.nombre_original }}
-                                    <br />
-                                    <span class="badge badge-ghost badge-sm">{{ page.ai_keywords }}</span>
-                                </td>
-                                <td>{{ page.fecha_de_cierre }}</td>
-                                <th>
-                                    <a href="{{ page.url }}" class="btn btn-ghost btn-xs">ver en origen</a>
-                                </th>
-                            </tr>
-                            {% endfor %}
+                        <tbody id="search-results">
+                            {% include "_search_results.html" %}
                         </tbody>
                     </table>
-
                 </div>
             </main>
         </div>
@@ -144,7 +105,6 @@
         <!-- New Row: Explorá los recursos and Form Section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-12">
             <div class="mb-12 w-4/5 mx-auto lg:mx-0">
-                <h2 class="font-bold text-lg mb-4">EXPLORÁ LOS RECURSOS.</h2>
                 <p class="mb-4">Para artistas, investigadores y trabajadores de la cultura, principalmente para
                     residentes de Argentina, aunque también hay información para Latinoamérica.</p>
                 <input type="text" placeholder="This is my text" class="input input-bordered w-full mb-4">
@@ -182,7 +142,6 @@
         </div>
     </main>
 
-
     <div hx-boost="true" hx-target="main">
         {% for page in pages %}
         <div class="opportunity">
@@ -199,7 +158,7 @@
         </div>
         {% endfor %}
     </div>
-    </main>
+    </main>  
 </body>
 
 {% endblock %}

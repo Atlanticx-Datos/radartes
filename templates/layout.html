@@ -8,11 +8,18 @@
   <link href="{{ url_for('static', filename='css/tailwind-built.css') }}" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+  <script src="https://unpkg.com/htmx.org@1.7.0/dist/htmx.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+</head>
 </head>
 
 <body class="flex justify-center">
-  <main class="w-full md:w-4/5 max-w-[1300px] p-2.5">
-    <nav class="flex justify-between items-center space-x-4 w-full h-[34px] md:h-[130px] pt-1 pb-2 px-2">
+  <main class="w-full md:w-4/5 max-w-[1350px] p-2.5">
+    <nav class="flex justify-between items-center space-x-4 h-[34px] md:h-[130px] pt-1 pb-2 px-2">
+      <!-- Child 0: LOGO -->
+      <a href="/">
+        <img src="{{ url_for('static', filename='/public/Logo_144.svg') }}" class="hidden md:block w-20 mt-1 subpixel-antialiased antialiased relative right-6">
+      </a>
       <!-- Child 1: Home icon -->
       <a href="/">
         <svg class="w-6 h-6 md:hidden" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
@@ -27,9 +34,9 @@
       <!-- Flex-grow element to push the logo to the right -->
       <div class="flex-grow hidden md:block"></div>
       <!-- Child 3: Logo -->
-      <img src="./static/public/Logo_Atlanticx.png" alt="Logo" class="hidden md:block h-8 mr-2">
+      <img src="./static/public/Logo_Atlanticx.png" alt="Logo" class="hidden md:block h-7 -mt-4 mr-2 relative left-12">
       <!-- Child 4: Ellipsis vertical icon with dropdown -->
-      <div class="dropdown dropdown-bottom dropdown-end">
+      <div class="dropdown dropdown-bottom dropdown-end relative left-12 -mt-4">
         <div tabindex="0" role="button">
           <svg class="w-6 h-6" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -48,7 +55,7 @@
     {% block body %}{% endblock %}
   </main>
   <script>
-    var socket = io();
+    var socket = io('http://127.0.0.1:5000');
     socket.on('connect', function () {
       console.log('Connected to server');
     });

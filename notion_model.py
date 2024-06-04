@@ -493,9 +493,7 @@ def create_page(data: dict):
 @app.route("/database", methods=["GET"])
 @login_required
 def all_pages():
-    search_query = request.args.get(
-        "search", ""
-    )  # Get search query from URL parameters
+    search_query = request.args.get("search", "")
     url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
     headers = {
         "Authorization": "Bearer " + NOTION_TOKEN,
@@ -509,18 +507,9 @@ def all_pages():
                     {"property": "Publicar", "checkbox": {"equals": True}},
                     {
                         "or": [
-                            {
-                                "property": "Resumen generado por la IA",
-                                "rich_text": {"contains": search_query},
-                            },
-                            {
-                                "property": "País",
-                                "rich_text": {"contains": search_query},
-                            },
-                            {
-                                "property": "Destinatarios",
-                                "rich_text": {"contains": search_query},
-                            },
+                            {"property": "Resumen generado por la IA", "rich_text": {"contains": search_query}},
+                            {"property": "País", "rich_text": {"contains": search_query}},
+                            {"property": "Destinatarios", "rich_text": {"contains": search_query}},
                         ]
                     },
                 ]
@@ -530,108 +519,109 @@ def all_pages():
         else {}
     )
 
-    print("Session Data:", session.get("user"))
-
     res = requests.post(url, headers=headers, json=json_body)
     data = res.json()
-    if not data or not data.get("results"):
-        return render_template("database.html", pages=[], current_month_pages=[], empty_fecha_pages=[])
 
     pages = []
     upcoming_pages = []
     empty_fecha_pages = []
 
-    now = datetime.now()
-    end_of_month = datetime(now.year, now.month + 1, 1) - timedelta(days=1)
+    if data and data.get("results"):
+        now = datetime.now()
+        end_of_month = datetime(now.year, now.month + 1, 1) - timedelta(days=1)
 
-    for page in data["results"]:
-        if "Publicar" in page["properties"] and page["properties"]["Publicar"]["checkbox"]:
-            page_data = {"id": page["id"], "created_time": page["created_time"]}
-            
-            # Extracting 'Nombre' assuming it is a 'title'
-            if "Resumen generado por la IA" in page["properties"]:
-                page_data["nombre"] = (
-                    page["properties"]["Resumen generado por la IA"]["rich_text"][0]["text"]["content"]
-                    if page["properties"]["Resumen generado por la IA"]["rich_text"]
-                    else ""
-                )
+        for page in data["results"]:
+            if "Publicar" in page["properties"] and page["properties"]["Publicar"]["checkbox"]:
+                page_data = {"id": page["id"], "created_time": page["created_time"]}
 
-            # Extracting 'País' assuming it is 'rich_text'
-            if "País" in page["properties"]:
-                page_data["país"] = (
-                    page["properties"]["País"]["rich_text"][0]["text"]["content"]
-                    if page["properties"]["País"]["rich_text"]
-                    else ""
-                )
+                if "Resumen generado por la IA" in page["properties"]:
+                    page_data["nombre"] = (
+                        page["properties"]["Resumen generado por la IA"]["rich_text"][0]["text"]["content"]
+                        if page["properties"]["Resumen generado por la IA"]["rich_text"]
+                        else ""
+                    )
 
-            # Extracting 'Destinatarios' assuming it is 'rich_text'
-            if "Destinatarios" in page["properties"]:
-                page_data["destinatarios"] = (
-                    page["properties"]["Destinatarios"]["rich_text"][0]["text"]["content"]
-                    if page["properties"]["Destinatarios"]["rich_text"]
-                    else ""
-                )
-            
-            # Extracting 'AI keywords' assuming it is 'multi_select'
-            if "AI keywords" in page["properties"]:
-                page_data["ai_keywords"] = (
-                    page["properties"]["AI keywords"]["multi_select"][0]["name"]
-                    if page["properties"]["AI keywords"]["multi_select"]
-                    else ""
-                )
+                if "País" in page["properties"]:
+                    page_data["país"] = (
+                        page["properties"]["País"]["rich_text"][0]["text"]["content"]
+                        if page["properties"]["País"]["rich_text"]
+                        else ""
+                    )
 
-            # Extracting 'URL' assuming it is a 'URL' type
-            if "URL" in page["properties"]:
-                page_data["url"] = (
-                    page["properties"]["URL"]["url"]
-                    if page["properties"]["URL"].get("url")
-                    else ""
-                )
-            
-            # Extracting 'Nombre' assuming it is a 'title'
-            if "Nombre" in page["properties"]:
-                page_data["nombre_original"] = (
-                    page["properties"]["Nombre"]["title"][0]["text"]["content"]
-                    if page["properties"]["Nombre"]["title"]
-                    else ""
-                )
+                if "Destinatarios" in page["properties"]:
+                    page_data["destinatarios"] = (
+                        page["properties"]["Destinatarios"]["rich_text"][0]["text"]["content"]
+                        if page["properties"]["Destinatarios"]["rich_text"]
+                        else ""
+                    )
 
-            # Extracting 'Fecha de cierre' assuming it is a 'date' type
-            if "Fecha de cierre" in page["properties"] and page["properties"]["Fecha de cierre"]["date"]:
-                fecha_de_cierre = page["properties"]["Fecha de cierre"]["date"]["start"]
-                if fecha_de_cierre:
-                    # Format the date to day/month
-                    cierre_date = datetime.strptime(fecha_de_cierre, '%Y-%m-%d')
-                    page_data["fecha_de_cierre"] = cierre_date.strftime('%d/%m')
+                if "AI keywords" in page["properties"]:
+                    page_data["ai_keywords"] = (
+                        page["properties"]["AI keywords"]["multi_select"][0]["name"]
+                        if page["properties"]["AI keywords"]["multi_select"]
+                        else ""
+                    )
+
+                if "URL" in page["properties"]:
+                    page_data["url"] = (
+                        page["properties"]["URL"]["url"]
+                        if page["properties"]["URL"].get("url")
+                        else ""
+                    )
+
+                if "Nombre" in page["properties"]:
+                    page_data["nombre_original"] = (
+                        page["properties"]["Nombre"]["title"][0]["text"]["content"]
+                        if page["properties"]["Nombre"]["title"]
+                        else ""
+                    )
+
+                if "Fecha de cierre" in page["properties"] and page["properties"]["Fecha de cierre"]["date"]:
+                    fecha_de_cierre = page["properties"]["Fecha de cierre"]["date"]["start"]
+                    page_data["fecha_de_cierre"] = fecha_de_cierre if fecha_de_cierre else ""
+
+                    if not fecha_de_cierre:
+                        empty_fecha_pages.append(page_data)
+                    else:
+                        cierre_date = datetime.strptime(fecha_de_cierre, '%Y-%m-%d')
+                        if now <= cierre_date <= end_of_month:
+                            upcoming_pages.append(page_data)
                 else:
                     page_data["fecha_de_cierre"] = ""
-                
-                # Check if "Fecha de cierre" is empty
-                if not fecha_de_cierre:
                     empty_fecha_pages.append(page_data)
-                else:
-                    # Check if "Fecha de cierre" is between today and the end of the current month
-                    if now <= cierre_date <= end_of_month:
-                        upcoming_pages.append(page_data)
-            else:
-                page_data["fecha_de_cierre"] = ""
-                empty_fecha_pages.append(page_data)
 
-            pages.append(page_data)
+                pages.append(page_data)
 
-    sorted_pages = sorted(pages, key=lambda page: page["fecha_de_cierre"], reverse=True)
+        sorted_pages = sorted(pages, key=lambda page: page["fecha_de_cierre"], reverse=True)
+    else:
+        sorted_pages = []
 
-    # Print statements for debugging
-    print("Upcoming Cierres:", upcoming_pages)
-    print("Empty Fechas:", empty_fecha_pages)
-    
-    return render_template(
-        "database.html", 
-        pages=sorted_pages, 
-        current_month_pages=upcoming_pages, 
-        empty_fecha_pages=empty_fecha_pages
-    )
+    # Debugging statements to ensure we correctly handle HTMX requests
+    print("Request Headers:", request.headers)
+    print("Is HX-Request:", request.headers.get('HX-Request', 'false').lower())
 
+    if request.headers.get('HX-Request', 'false').lower() == 'true':
+        print("HTMX request with search:", search_query)
+        return render_template("_search_results.html", pages=sorted_pages)
+    else:
+        print("Regular request")
+        return render_template(
+            "database.html", 
+            pages=sorted_pages, 
+            current_month_pages=upcoming_pages, 
+            empty_fecha_pages=empty_fecha_pages
+        )
+
+# Custom Jinja2 filter for date
+@app.template_filter('format_date')
+def format_date(value):
+    if not value:
+        return ''
+    try:
+        date_obj = datetime.strptime(value, '%Y-%m-%d')
+        return date_obj.strftime('%d/%m')
+    except ValueError:
+        return value  # Return the original value if it cannot be parsed
 
 @app.route("/update/<page_id>", methods=["GET", "POST"])
 @admin_required
@@ -738,4 +728,4 @@ def save_page(page_id=None):
 if __name__ == '__main__':
     port = 5000
     print(f"Running on http://127.0.0.1:{port}")
-    socketio.run(app, debug=True, port=port, use_reloader=False)
+    socketio.run(app, debug=True, port=port, use_reloader=True)
