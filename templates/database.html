@@ -11,7 +11,7 @@
                 <div class="lg:col-span-2 w-5/6 mt-6">
                     <input type="text" id="search-input" placeholder="Buscar oportunidades"
                         class="input input-bordered rounded-none w-full mb-4 border-neutral" name="search">
-                        <button id="search-button" class="btn btn-primary w-full" hx-get="/database"
+                    <button id="search-button" class="btn btn-primary w-full" hx-get="/database"
                         hx-target="#search-results" hx-swap="innerHTML" hx-include="[name=search]">
                         Buscar
                     </button>
@@ -77,27 +77,33 @@
                     </div>
                 </div>
 
+               
+
                 <div class="border border-neutral rounded-none overflow-x-auto mb-12">
-                    <!-- _initial_table.html -->
-                    <table id="searches" class="table w-full">
-                        <!-- head -->
-                        <thead>
-                            <tr>
-                                <th>
-                                    <label>
-                                        <input type="checkbox" class="checkbox" />
-                                    </label>
-                                </th>
-                                <th>Oportunidad</th>
-                                <th>Descripción</th>
-                                <th>Fecha de Cierre</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="search-results">
-                            {% include "_search_results.html" %}
-                        </tbody>
-                    </table>
+                     <!-- Alert container -->
+                <div id="alert-container"></div>
+                    <!-- Table as FORM -->
+                    <form id="save-form" hx-post="/save_user_opportunity" hx-trigger="submit" hx-swap="innerHTML" hx-target="#alert-container">
+                        <table id="search_results" class="table w-full">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <label>
+                                            <input type="checkbox" class="checkbox" id="select-all" />
+                                        </label>
+                                    </th>
+                                    <th>Oportunidad</th>
+                                    <th>Descripción</th>
+                                    <th>Fecha de Cierre</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="search-results">
+                                {% include "_search_results.html" %}
+                            </tbody>
+                        </table>
+                        <button type="submit" class="btn btn-primary mt-4">Guardar Seleccionados</button>
+                    </form>                    
                 </div>
             </main>
         </div>
@@ -158,7 +164,15 @@
         </div>
         {% endfor %}
     </div>
-    </main>  
+    </main>
+    <script>
+        document.getElementById('select-all').addEventListener('change', function() {
+            var checkboxes = document.querySelectorAll('input[name="selected_pages"]');
+            for (var checkbox of checkboxes) {
+                checkbox.checked = this.checked;
+            }
+        });
+    </script>
 </body>
 
 {% endblock %}

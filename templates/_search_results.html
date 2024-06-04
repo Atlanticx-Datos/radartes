@@ -1,37 +1,45 @@
 {% if pages %}
     {% for page in pages %}
-        <tr>
-            <th>
-                <label>
-                    <input type="checkbox" class="checkbox" />
-                </label>
-            </th>
-            <td>
-                <div class="flex items-center gap-3">
-                    <div class="avatar">
-                        <div class="mask mask-squircle w-12 h-12">
-                            <img src="https://img.daisyui.com/tailwind-css-component-profile-2@56w.png"
-                                alt="Avatar Tailwind CSS Component" />
-                        </div>
-                    </div>
-                    <div>
-                        <div class="font-bold">{{ page.nombre }}</div>
-                        <div class="text-sm opacity-50">{{ page.país }}</div>
+    <tr>
+        <th>
+            <label>
+                <input type="checkbox" class="checkbox" name="selected_pages" value="{{ page.id }}" />
+            </label>
+        </th>
+        <td>
+            <div class="flex items-center gap-3">
+                <div class="avatar">
+                    <div class="mask mask-squircle w-12 h-12">
+                        <img src="https://img.daisyui.com/tailwind-css-component-profile-2@56w.png"
+                            alt="Avatar Tailwind CSS Component" />
                     </div>
                 </div>
-            </td>
-            <td>
-                {{ page.nombre_original }}
-                <br />
-                <span class="badge badge-ghost badge-sm">{{ page.ai_keywords }}</span>
-            </td>
-            <td>{{ page.fecha_de_cierre | format_date }}</td>
-            <th>
-                <a href="{{ page.url }}" class="btn btn-ghost btn-xs">más info</a>
-            </th>
-        </tr>
+                <div>
+                    <div class="font-bold">{{ page.nombre }}</div>
+                    <div class="text-sm opacity-50">{{ page.país }}</div>
+                </div>
+            </div>
+            <!-- Hidden fields to store the data -->
+            <input type="hidden" name="page_id" value="{{ page.id }}">
+            <input type="hidden" name="name_{{ page.id }}" value="{{ page.nombre }}">
+            <input type="hidden" name="country_{{ page.id }}" value="{{ page.país }}">
+            <input type="hidden" name="url_{{ page.id }}" value="{{ page.url }}">
+            <input type="hidden" name="recipients_{{ page.id }}" value="{{ page.destinatarios }}">
+            <input type="hidden" name="fecha_de_cierre_{{ page.id }}" value="{{ page.fecha_de_cierre }}">
+        </td>
+        <td>
+            {{ page.nombre_original }}
+            <br />
+            <span class="badge badge-ghost badge-sm">{{ page.ai_keywords }}</span>
+        </td>
+        <td>{{ page.fecha_de_cierre | format_date }}</td>
+        <th>
+            <a href="{{ page.url }}" class="btn btn-ghost btn-xs">más info</a>
+        </th>
+    </tr>
     {% endfor %}
 {% else %}
-
+    <tr>
+        <td colspan="5">No se encontraron oportunidades.</td>
+    </tr>
 {% endif %}
-

@@ -183,25 +183,35 @@ def save_to_notion(user_id, page_id):
     response.raise_for_status()  # Raise an exception for HTTP errors
 
 
-@app.route("/save", methods=["POST"])
+@app.route("/save_user_opportunity", methods=["POST"])
 @login_required
-def save_opportunity():
+def save_user_opportunity():
     user_id = session["user"]["sub"]
 
     try:
-        page_id = request.json.get("page_id")  # Get page_id from JSON data
-        print(request.json)
-        if not page_id:
-            return jsonify({"error": "Page ID is required"}), 400
+        selected_pages = request.form.getlist("selected_pages")  # Get selected page IDs from form data
 
-        # Check if the opportunity is already saved
-        if is_opportunity_already_saved(user_id, page_id):
-            return jsonify({"message": "Opportunity is already saved"}), 200
+        if not selected_pages:
+            return jsonify({"error": "No pages selected"}), 400
 
-        # Save the opportunity to the user's saved opportunities in Notion
-        save_to_notion(user_id, page_id)
+        for page_id in selected_pages:
+            # Check if the opportunity is already saved
+            if is_opportunity_already_saved(user_id, page_id):
+                continue  # Skip already saved opportunities
 
-        return "Opportunity saved successfully", 200
+            # Save the opportunity to the user's saved opportunities in Notion
+            save_to_notion(user_id, page_id)
+
+        success_message = """
+        <div role="alert" class="alert alert-success w-1/2 m-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Oportunidad(es) guardada(s) exitosamente!</span>
+        </div>
+        """
+
+        return success_message, 200
     except Exception as e:
         print("Error:", str(e))
         return jsonify({"error": str(e)}), 400
