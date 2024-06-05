@@ -3,22 +3,49 @@
 {% block body %}
 
 <body>
-    <div>
-        <h2>Your Saved Opportunities</h2>
-        {% if opportunities %}
-        {% for opportunity in opportunities %}
-        <div class="opportunity" id="opportunity-{{ opportunity.id }}">
-            <p><strong>Name:</strong> {{ opportunity.nombre }}</p>
-            <p><strong>Country:</strong> {{ opportunity.país }}</p>
-            <p><strong>Recipients:</strong> {{ opportunity.destinatarios }}</p>
-            <p><strong>URL:</strong> <a href="{{ opportunity.url }}" target="_blank">{{ opportunity.url }}</a></p>
-            <button onclick="deleteOpportunity('{{ opportunity.id }}')">Delete</button>
+    <main class="w-full max-w-[1250px]">
+        <div class="grid grid-cols-1 lg:grid-cols-6 gap-2">
+            <!-- Left Sidebar -->
+            <aside class="col-span-1 lg:col-span-2 mt-2">
+                <!-- Buscador -->
+                <div class="lg:col-span-2 w-5/6 mt-6">
+                    <div class="lg:col-span-2 w-5/6 mt-6 border-l-4 border-primary">
+                        <p class="text-2xl font-black ml-4 leading-none tracking-tighter">OPORTUNIDADES GUARDADAS</p>
+                    </div>
+                </div>
+            </aside>
+            <main class="col-span-1 lg:col-start-3 lg:col-span-4 space-y-3 w-auto">
+                <div class="flex flex-col lg:flex-row justify-between gap-3">
+                    <div class="border border-neutral rounded-none overflow-x-auto mb-12">
+                        <!-- Alert container -->
+                        <div id="alert-container"></div>
+                        <!-- Table as FORM -->
+                        <form id="delete-form" hx-post="/delete_opportunity/' + pageId" hx-trigger="submit" hx-swap="innerHTML"
+                            hx-target="#alert-delete">
+                            <table id="my_results" class="table w-full">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <label>
+                                                <input type="checkbox" class="checkbox" id="select-all" />
+                                            </label>
+                                        </th>
+                                        <th>Oportunidad</th>
+                                        <th>Descripción</th>
+                                        <th>Fecha de Cierre</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="my-results">
+                                    {% include "_my_results.html" %}
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </main>
         </div>
-        {% endfor %}
-        {% else %}
-        <p>You have no saved opportunities.</p>
-        {% endif %}
-    </div>
+    </main>
 </body>
 <script>
     function deleteOpportunity(pageId) {

@@ -153,7 +153,7 @@ def logout():
         + "/v2/logout?"
         + urlencode(
             {
-                "returnTo": url_for("all_pages", _external=True),
+                "returnTo": url_for("index", _external=True),
                 "client_id": env.get("AUTH0_CLIENT_ID"),
             },
             quote_via=quote_plus,
@@ -293,29 +293,18 @@ def get_opportunity_by_id(opportunity_id):
 
     opportunity = {
         "id": data["id"],
-        "nombre": (
-            data["properties"]["Nombre"]["title"][0]["text"]["content"]
-            if data["properties"]["Nombre"]["title"]
-            else ""
-        ),
-        "país": (
-            data["properties"]["País"]["rich_text"][0]["text"]["content"]
-            if data["properties"]["País"]["rich_text"]
-            else ""
-        ),
-        "destinatarios": (
-            data["properties"]["Destinatarios"]["rich_text"][0]["text"]["content"]
-            if data["properties"]["Destinatarios"]["rich_text"]
-            else ""
-        ),
-        "url": (
-            data["properties"]["URL"]["url"]
-            if data["properties"]["URL"].get("url")
-            else ""
-        ),
+        "nombre": data["properties"].get("Nombre", {}).get("title", [{}])[0].get("text", {}).get("content", ""),
+        "país": data["properties"].get("País", {}).get("rich_text", [{}])[0].get("text", {}).get("content", ""),
+        "destinatarios": data["properties"].get("Destinatarios", {}).get("rich_text", [{}])[0].get("text", {}).get("content", ""),
+        "resumen_IA": data["properties"].get("Resumen generado por la IA", {}).get("rich_text", [{}])[0].get("text", {}).get("content", ""),
+        "url": data["properties"].get("URL", {}).get("url", ""),
+        "nombre_original": data["properties"].get("Nombre", {}).get("title", [{}])[0].get("text", {}).get("content", ""),
+        "ai_keywords": (data["properties"].get("AI keywords", {}).get("multi_select", [{}])[0].get("name") if data["properties"].get("AI keywords", {}).get("multi_select") else ""),
+        "fecha_de_cierre": data["properties"].get("Fecha de cierre", {}).get("date", {}).get("start", "")
     }
 
     return opportunity
+
 
 
 def delete_saved_opportunity(user_id, page_id):
