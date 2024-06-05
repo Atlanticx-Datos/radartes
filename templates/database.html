@@ -11,7 +11,7 @@
                 <div class="lg:col-span-2 w-5/6 mt-6">
                     <input type="text" id="search-input" placeholder="Buscar oportunidades"
                         class="input input-bordered rounded-none w-full mb-4 border-neutral" name="search">
-                    <button id="search-button" class="btn btn-primary w-full" hx-get="/database"
+                    <button id="search-button" class="btn btn-green_accent w-full" hx-get="/database"
                         hx-target="#search-results" hx-swap="innerHTML" hx-include="[name=search]">
                         Buscar
                     </button>
@@ -39,11 +39,12 @@
                                 <div class="collapse-content">
                                     {% if current_month_pages %}
                                     {% for page in current_month_pages %}
-                                    <p><a href="{{ page.url }}">{{ page.nombre }}</a></p>
+                                    <p><a href="{{ page.url }}" target="_blank">{{ page.nombre }}</a></p>
                                     {% endfor %}
                                     {% else %}
                                     <p>No hay oportunidades este mes.</p>
                                     {% endif %}
+
                                 </div>
                             </div>
                         </div>
@@ -66,7 +67,7 @@
                                 <div class="collapse-content">
                                     {% if empty_fecha_pages %}
                                     {% for page in empty_fecha_pages %}
-                                    <p><a href="{{ page.url }}">{{ page.nombre }}</a></p>
+                                    <p><a href="{{ page.url }}" target="_blank">{{ page.nombre }}</a></p>
                                     {% endfor %}
                                     {% else %}
                                     <p>No estamos destacando.</p>
@@ -77,13 +78,14 @@
                     </div>
                 </div>
 
-               
+
 
                 <div class="border border-neutral rounded-none overflow-x-auto mb-12">
-                     <!-- Alert container -->
-                <div id="alert-container"></div>
+                    <!-- Alert container -->
+                    <div id="alert-container"></div>
                     <!-- Table as FORM -->
-                    <form id="save-form" hx-post="/save_user_opportunity" hx-trigger="submit" hx-swap="innerHTML" hx-target="#alert-container">
+                    <form id="save-form" hx-post="/save_user_opportunity" hx-trigger="submit" hx-swap="innerHTML"
+                        hx-target="#alert-container">
                         <table id="search_results" class="table w-full">
                             <thead>
                                 <tr>
@@ -102,71 +104,63 @@
                                 {% include "_search_results.html" %}
                             </tbody>
                         </table>
-                        <button type="submit" class="btn btn-primary mt-4">Guardar Seleccionados</button>
-                    </form>                    
+                    </form>
+                </div>
+                <div class="flex justify-end mt-4">
+                    <button type="submit" class="btn btn-secondary">Guardar Seleccionados</button>
                 </div>
             </main>
         </div>
 
         <!-- New Row: Explorá los recursos and Form Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-12">
-            <div class="mb-12 w-4/5 mx-auto lg:mx-0">
-                <p class="mb-4">Para artistas, investigadores y trabajadores de la cultura, principalmente para
-                    residentes de Argentina, aunque también hay información para Latinoamérica.</p>
-                <input type="text" placeholder="This is my text" class="input input-bordered w-full mb-4">
-                <button class="btn btn-primary w-full">Buscar</button>
-            </div>
+        <div class="w-full max-w-[1250px]">
+            <div class="grid grid-cols-1 lg:grid-cols-6 gap-2">
+                <aside class="col-span-1 lg:col-span-2 mt-2 lg:ml-5 xl:ml-10 2xl:ml-20">
+                    <!-- Buscador -->
+                    <div class="lg:col-span-2 w-5/6 mt-6 border-l-4 border-primary">
+                        <p class="text-2xl font-black ml-4 leading-none tracking-tighter">SUMÁ TU OPORTUNIDAD</p>
+                    </div>
+                </aside>
 
-            <!-- Form Section Below the Table -->
-            <div class="mt-12 w-4/5 mx-auto lg:mx-0">
-                <h2 class="font-bold text-lg mb-4">SUMÁ TU OPORTUNIDAD A NUESTRA BASE DE DATOS</h2>
-                <p class="mb-4">Para artistas, investigadores y trabajadores de la cultura, principalmente para
-                    residentes de Argentina, aunque también hay información para Latinoamérica.</p>
-                <form>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium mb-1" for="nombre">Nombre de la Oportunidad</label>
-                        <input id="nombre" type="text" class="input input-bordered w-full">
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium mb-1" for="pais">País</label>
-                        <input id="pais" type="text" class="input input-bordered w-full">
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium mb-1" for="destinatarios">Destinatarios</label>
-                        <input id="destinatarios" type="text" class="input input-bordered w-full">
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium mb-1" for="input-label">Input Label</label>
-                        <input id="input-label" type="text" class="input input-bordered w-full">
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium mb-1" for="date">Input Date</label>
-                        <input id="date" type="date" class="input input-bordered w-full">
-                    </div>
-                </form>
+                <!-- Form Section Below the Table -->
+                <div class="mt-6 col-span-4 mx-auto lg:mx-0">
+                    <h2 class="font-bold text-lg mb-4 border-b-2 border-accent">TU OPORTUNIDAD EN NUESTRA BASE DE DATOS
+                    </h2>
+                    <p class="mb-4">Completá el formulario si te interesa contribuir con la difusión de becas, premios,
+                        movilidad y residencias para artistas, investigadores y trabajadores de la cultura en la
+                        Argentina y latinoamérica.</p>
+                    <form action="/save" method="POST">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1" for="nombre">Nombre de la Oportunidad</label>
+                            <input id="nombre" name="name" type="text" class="input input-bordered w-full">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1" for="pais">País</label>
+                            <input id="pais" name="country" type="text" class="input input-bordered w-full">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1" for="url">URL</label>
+                            <input id="url" name="url" type="text" class="input input-bordered w-full">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1" for="destinatarios">Destinatarios</label>
+                            <input id="destinatarios" name="recipients" type="text" class="input input-bordered w-full">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1" for="fecha_de_cierre">Fecha de cierre</label>
+                            <input id="fecha_de_cierre" name="fecha_de_cierre" type="date"
+                                class="input input-bordered w-full">
+                        </div>
+                        <div class="flex justify-end mt-4">
+                            <button type="submit" class="btn btn-secondary">Enviar oportunidad</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </main>
-
-    <div hx-boost="true" hx-target="main">
-        {% for page in pages %}
-        <div class="opportunity">
-            <p><strong>Name:</strong> {{ page.nombre }}</p>
-            <p><strong>Country:</strong> {{ page.país }}</p>
-            <p><strong>URL:</strong> <a href="{{ page.url }}" target="_blank">{{ page.url }}</a></p>
-            <p><strong>Recipients:</strong> {{ page.destinatarios }}</p>
-            <p><strong>Fecha de cierre:</strong> {{ page.fecha_de_cierre }}</p>
-            <a href="/update/{{ page.id }}" hx-get="/update/{{ page.id }}" hx-target="body">Update</a>
-            <a href="javascript:void(0);" onClick="console.log('Sending data: ', {'page_id': '{{ page.id|tojson }}'})"
-                hx-post="/save" hx-target="#toast-container" hx-swap="outerHTML" hx-trigger="click"
-                hx-vals='{"page_id": {{ page.id|tojson }}}' hx-ext='json-enc'>Save</a>
-            <div id="toast-container"></div>
-        </div>
-        {% endfor %}
-    </div>
     </main>
     <script>
-        document.getElementById('select-all').addEventListener('change', function() {
+        document.getElementById('select-all').addEventListener('change', function () {
             var checkboxes = document.querySelectorAll('input[name="selected_pages"]');
             for (var checkbox of checkboxes) {
                 checkbox.checked = this.checked;

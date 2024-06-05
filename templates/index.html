@@ -3,15 +3,47 @@
 {% block body %}
 
 <body>
-  {% if session['user'] %}
-  <h1>Welcome {{ session['user']['name'] }}</h1>
-  <p><a href="/database" hx-get="/database" hx-target="body" hx-push-url="true">Database</a></p>
-  <p><a href="/saved_opportunities" hx-get="/saved_opportunities" hx-target="body" hx-push-url="true">Oportunidades Guardadas</a></p>
-  <p><a href="/logout">Logout</a></p>
-  {% else %}
-  <h1>Welcome Guest</h1>
-  <p><a href="/login">Login</a></p>
-  {% endif %}
-</body>
 
-{% endblock %}
+  <body>
+    <main class="w-full max-w-[1250px]">
+      <div class="grid grid-cols-1 lg:grid-cols-6 gap-2 relative lg:left-8 xl:left-12">
+        <!-- Left Sidebar -->
+        <aside class="col-span-1 lg:col-span-2 mt-2 lg:ml-5 xl:ml-10 2xl:ml-20">
+          <!-- Buscador -->
+          <div class="lg:col-span-2 w-5/6 mt-6 space-y-3">
+            <div class="uppercase font-medium tracking-normal leading-none text-xl border-l-4 border-accent pl-6">
+              ExplorÁ las becas, premios, residencias y recursos <b>GLOBALES</b> que actualizamos cada semana. </div>
+              <div class="text-xs tracking-normal pl-7 leading-none w-5/6">
+                Para artistas, investigadores y trabajadores de la cultura, principalmente para Argentina y latinoamérica. 
+              </div>
+              <div class="flex justify-center ml-7 border border-neutral w-3/4 relative top-3 h-12 w-12">
+                <button type="submit" class="items-center"><a href="{{ url_for('login') }}">ENTRAR</a>
+                </button>
+              </div>
+              
+          </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="col-span-1 lg:col-start-3 lg:col-span-4 space-y-3 w-auto mt-6">
+          <div class="flex flex-col lg:flex-row justify-between gap-3">
+            <div class="flex items-center justify-center h-[525px] w-[640px] border border-neutral">
+              <div class="bg-secondary w-[473px] h-[390px]">
+                <div class="ml-6 w-2/5 leading-none -space-y-2">
+                  <div class="mt-12 flex relative top-4 font-black">144 <span class="text-primary relative bottom-[1.5px] ml-1">|</span>
+                    <div class="ml-1 font-black text-4xl relative bottom-3 left-1 tracking-tighter">OPOR</div></div> 
+                  <div class="font-black text-4xl tracking-tighter leading-none">TUNIDAD</div>
+                  <div class="font-black text-4xl tracking-tighter leading-none">ES PARA</div>
+                  <div class="font-black text-4xl tracking-tighter leading-none">ARTISTXS</div>
+                  <div class="font-black text-4xl tracking-tighter leading-none">E INVEST</div>
+                  <div class="font-black text-4xl tracking-tighter leading-none">GADORXS.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </main>
+  </body>
+
+  {% endblock %}

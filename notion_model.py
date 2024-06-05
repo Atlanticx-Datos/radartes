@@ -510,27 +510,37 @@ def all_pages():
         "Content-Type": "application/json",
         "Notion-Version": "2022-06-28",
     }
-    json_body = (
-        {
-            "filter": {
-                "and": [
-                    {"property": "Publicar", "checkbox": {"equals": True}},
-                    {
-                        "or": [
-                            {"property": "Resumen generado por la IA", "rich_text": {"contains": search_query}},
-                            {"property": "País", "rich_text": {"contains": search_query}},
-                            {"property": "Destinatarios", "rich_text": {"contains": search_query}},
-                        ]
-                    },
-                ]
-            }
+
+    # Expand the date range to cover the entire month of June 2024
+    expanded_date_filter = {
+        "property": "Fecha de cierre",
+        "date": {
+            "after": "2024-05-31",
+            "before": "2024-07-01"
         }
-        if search_query
-        else {}
-    )
+    }
+
+    json_body = {
+        "filter": {
+            "and": [
+                {"property": "Publicar", "checkbox": {"equals": True}},
+                {
+                    "or": [
+                        {"property": "Resumen generado por la IA", "rich_text": {"contains": search_query}},
+                        {"property": "País", "rich_text": {"contains": search_query}},
+                        {"property": "Destinatarios", "rich_text": {"contains": search_query}},
+                        expanded_date_filter
+                    ]
+                },
+            ]
+        }
+    }
 
     res = requests.post(url, headers=headers, json=json_body)
     data = res.json()
+
+    # Debugging statements to inspect the API response
+    print("API Response Results Count:", len(data.get("results", [])))
 
     pages = []
     upcoming_pages = []
@@ -590,12 +600,19 @@ def all_pages():
                     fecha_de_cierre = page["properties"]["Fecha de cierre"]["date"]["start"]
                     page_data["fecha_de_cierre"] = fecha_de_cierre if fecha_de_cierre else ""
 
-                    if not fecha_de_cierre:
-                        empty_fecha_pages.append(page_data)
-                    else:
+                    # Debugging statement to print each page's fecha_de_cierre value
+                    print("Page ID:", page["id"], "Fecha de Cierre:", fecha_de_cierre)
+
+                    if fecha_de_cierre:
                         cierre_date = datetime.strptime(fecha_de_cierre, '%Y-%m-%d')
+                        if cierre_date.strftime('%Y-%m-%d') == '2024-06-30':
+                            print("Page with 6/30/2024 Fecha de Cierre:", page_data)
+
                         if now <= cierre_date <= end_of_month:
                             upcoming_pages.append(page_data)
+                    else:
+                        empty_fecha_pages.append(page_data)
+
                 else:
                     page_data["fecha_de_cierre"] = ""
                     empty_fecha_pages.append(page_data)
@@ -606,9 +623,11 @@ def all_pages():
     else:
         sorted_pages = []
 
-    # Debugging statements to ensure we correctly handle HTMX requests
-    print("Request Headers:", request.headers)
-    print("Is HX-Request:", request.headers.get('HX-Request', 'false').lower())
+    # Debugging statements to inspect the lists before rendering
+    print("Pages List:", pages)
+    print("Sorted Pages:", sorted_pages)
+    print("Upcoming Pages:", upcoming_pages)
+    print("Empty Fecha Pages:", empty_fecha_pages)
 
     if request.headers.get('HX-Request', 'false').lower() == 'true':
         print("HTMX request with search:", search_query)
@@ -621,6 +640,9 @@ def all_pages():
             current_month_pages=upcoming_pages, 
             empty_fecha_pages=empty_fecha_pages
         )
+
+
+
 
 # Custom Jinja2 filter for date
 @app.template_filter('format_date')

@@ -20,7 +20,6 @@
                 </div>
             </div>
             <!-- Hidden fields to store the data -->
-            <input type="hidden" name="page_id" value="{{ page.id }}">
             <input type="hidden" name="name_{{ page.id }}" value="{{ page.nombre }}">
             <input type="hidden" name="country_{{ page.id }}" value="{{ page.país }}">
             <input type="hidden" name="url_{{ page.id }}" value="{{ page.url }}">
@@ -34,7 +33,7 @@
         </td>
         <td>{{ page.fecha_de_cierre | format_date }}</td>
         <th>
-            <a href="{{ page.url }}" class="btn btn-ghost btn-xs">más info</a>
+            <a href="{{ page.url }}" target="_blank" class="btn btn-ghost btn-xs">más info</a>
         </th>
     </tr>
     {% endfor %}
