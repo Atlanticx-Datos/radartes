@@ -136,7 +136,7 @@ def callback():
         # Extract user information from the response
         user_info = user_info_response.json()
         session["user"] = user_info
-        print("Session Data Set:", session["user"])
+        """ print("Session Data Set:", session["user"]) """
         # Redirect to the dashboard or another appropriate page
         return redirect(url_for("index"))
     except Exception as e:
@@ -191,6 +191,7 @@ def save_user_opportunity():
 
     try:
         selected_pages = request.form.getlist("selected_pages")  # Get selected page IDs from form data
+        """ print("Selected pages:", selected_pages)  # Debugging line """
 
         if not selected_pages:
             return jsonify({"error": "No pages selected"}), 400
@@ -225,13 +226,13 @@ def list_saved_opportunities():
 
     # Fetch saved opportunity IDs from Notion
     opportunity_ids = get_saved_opportunity_ids(user_id)
-    print("Fetched opportunity IDs:", opportunity_ids)  # Debugging statement
+    """ print("Fetched opportunity IDs:", opportunity_ids)  # Debugging statement """
 
     # Fetch detailed information for each opportunity
     opportunities = [
         get_opportunity_by_id(opportunity_id) for opportunity_id in opportunity_ids
     ]
-    print("Fetched opportunities:", opportunities)  # Debugging statement
+    """ print("Fetched opportunities:", opportunities)  # Debugging statement """
 
     return render_template("user_opportunities.html", opportunities=opportunities)
 
@@ -276,7 +277,7 @@ def get_saved_opportunity_ids(user_id):
         result["properties"]["Opportunity ID"]["rich_text"][0]["text"]["content"]
         for result in data["results"]
     ]
-    print("Opportunity IDs from Notion:", opportunity_ids)  # Debugging statement
+    """ print("Opportunity IDs from Notion:", opportunity_ids)  # Debugging statement """
     return opportunity_ids
 
 
@@ -558,7 +559,7 @@ def all_pages():
 
     # Debugging statements to inspect the API response
     print("API Response Results Count:", len(data.get("results", [])))
-    print("API Response Data Structure:", data)
+    """ print("API Response Data Structure:", data) """
 
     pages = []
     upcoming_pages = []
@@ -622,19 +623,19 @@ def all_pages():
                     fecha_de_cierre = fecha_de_cierre_prop["date"].get("start", None)
                 
                 # Debugging statement to print each page's fecha_de_cierre value
-                print("Page ID:", page["id"], "Fecha de Cierre:", fecha_de_cierre if fecha_de_cierre else "None")
+                """ print("Page ID:", page["id"], "Fecha de Cierre:", fecha_de_cierre if fecha_de_cierre else "None") """
                 
                 if fecha_de_cierre:
                     page_data["fecha_de_cierre"] = fecha_de_cierre
                     cierre_date = datetime.strptime(fecha_de_cierre, '%Y-%m-%d')
-                    if cierre_date.strftime('%Y-%m-%d') == '2024-06-30':
-                        print("Page with 6/30/2024 Fecha de Cierre:", page_data)
+                    """ if cierre_date.strftime('%Y-%m-%d') == '2024-06-30':
+                        print("Page with 6/30/2024 Fecha de Cierre:", page_data) """
 
                     if now_date <= cierre_date <= end_of_month:
                         upcoming_pages.append(page_data)
                 else:
                     # Assign placeholder date and append to empty_fecha_pages
-                    print("Page without Fecha de Cierre:", page_data)
+                    """ print("Page without Fecha de Cierre:", page_data) """
                     page_data["fecha_de_cierre"] = placeholder_date
                     empty_fecha_pages.append(page_data)
 
@@ -644,12 +645,6 @@ def all_pages():
         sorted_pages = sorted(pages, key=lambda page: (page["fecha_de_cierre"] == placeholder_date, page["fecha_de_cierre"]), reverse=True)
     else:
         sorted_pages = []
-
-    # Debugging statements to inspect the lists before rendering
-    print("Pages List:", pages)
-    print("Sorted Pages:", sorted_pages)
-    print("Upcoming Pages:", upcoming_pages)
-    print("Empty Fecha Pages:", empty_fecha_pages)
 
     if request.headers.get('HX-Request', 'false').lower() == 'true':
         print("HTMX request with search:", search_query)
@@ -664,14 +659,12 @@ def all_pages():
         )
 
 
-
-
-
 # Custom Jinja2 filter for date
 @app.template_filter('format_date')
 def format_date(value):
-    if not value:
-        return ''
+    placeholder_date = '1900-01-01'
+    if not value or value == placeholder_date:
+        return 'Sin Cierre'
     try:
         date_obj = datetime.strptime(value, '%Y-%m-%d')
         return date_obj.strftime('%d/%m')

@@ -9,7 +9,7 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
   <script src="https://unpkg.com/htmx.org@1.7.0/dist/htmx.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+<!--   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script> -->
 </head>
 </head>
 
@@ -57,12 +57,12 @@
         {% endif %}
         {% block body %}{% endblock %}
     </main>
-    <script>
+   <!--  <script>
       var socket = io('http://127.0.0.1:5000');
       socket.on('connect', function () {
         console.log('Connected to server');
       });
-    </script>
+    </script> -->
   </body>
   
   
