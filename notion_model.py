@@ -33,6 +33,7 @@ from urllib.parse import quote_plus, urlencode
 from authlib.integrations.flask_client import OAuth
 
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 from flask_socketio import SocketIO
 import socket as py_socket
@@ -489,6 +490,12 @@ def create_page(data: dict):
     return res.text
 
 
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
+
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
+
 @app.route("/database", methods=["GET"])
 @login_required
 def all_pages():
@@ -500,44 +507,67 @@ def all_pages():
         "Notion-Version": "2022-06-28",
     }
 
-    # Expand the date range to cover the entire month of June 2024
-    expanded_date_filter = {
-        "property": "Fecha de cierre",
-        "date": {
-            "after": "2024-05-31",
-            "before": "2024-07-01"
-        }
+    # Calculate the current date and the date 6 months from now
+    now = datetime.now().strftime('%Y-%m-%d')
+    six_months_from_now = (datetime.now() + relativedelta(months=6)).strftime('%Y-%m-%d')
+
+    # Define the date filter to cover the next 6 months and include empty dates
+    dynamic_date_filter = {
+        "or": [
+            {
+                "property": "Fecha de cierre",
+                "date": {
+                    "after": now,
+                    "before": six_months_from_now
+                }
+            },
+            {
+                "property": "Fecha de cierre",
+                "date": {
+                    "is_empty": True
+                }
+            }
+        ]
     }
 
-    json_body = {
-        "filter": {
-            "and": [
-                {"property": "Publicar", "checkbox": {"equals": True}},
-                {
-                    "or": [
-                        {"property": "Resumen generado por la IA", "rich_text": {"contains": search_query}},
-                        {"property": "País", "rich_text": {"contains": search_query}},
-                        {"property": "Destinatarios", "rich_text": {"contains": search_query}},
-                        expanded_date_filter
-                    ]
-                },
-            ]
-        }
+    # Define the search filter
+    search_filter = {
+        "or": [
+            {"property": "Resumen generado por la IA", "rich_text": {"contains": search_query}},
+            {"property": "País", "rich_text": {"contains": search_query}},
+            {"property": "Destinatarios", "rich_text": {"contains": search_query}}
+        ]
     }
+
+    # Construct the main filter
+    main_filter = {
+        "and": [
+            {"property": "Publicar", "checkbox": {"equals": True}},
+            dynamic_date_filter
+        ]
+    }
+
+    # If there is a search query, add the search filter to the main filter
+    if search_query:
+        main_filter["and"].append(search_filter)
+
+    json_body = {"filter": main_filter}
 
     res = requests.post(url, headers=headers, json=json_body)
     data = res.json()
 
     # Debugging statements to inspect the API response
     print("API Response Results Count:", len(data.get("results", [])))
+    print("API Response Data Structure:", data)
 
     pages = []
     upcoming_pages = []
     empty_fecha_pages = []
 
     if data and data.get("results"):
-        now = datetime.now()
-        end_of_month = datetime(now.year, now.month + 1, 1) - timedelta(days=1)
+        now_date = datetime.now()
+        end_of_month = datetime(now_date.year, now_date.month + 1, 1) - timedelta(days=1)
+        placeholder_date = '1900-01-01'  # Placeholder date for pages without fecha_de_cierre
 
         for page in data["results"]:
             if "Publicar" in page["properties"] and page["properties"]["Publicar"]["checkbox"]:
@@ -585,30 +615,33 @@ def all_pages():
                         else ""
                     )
 
-                if "Fecha de cierre" in page["properties"] and page["properties"]["Fecha de cierre"]["date"]:
-                    fecha_de_cierre = page["properties"]["Fecha de cierre"]["date"]["start"]
-                    page_data["fecha_de_cierre"] = fecha_de_cierre if fecha_de_cierre else ""
+                # Check if "Fecha de cierre" property exists and has a date
+                fecha_de_cierre_prop = page["properties"].get("Fecha de cierre", None)
+                fecha_de_cierre = None
+                if fecha_de_cierre_prop and "date" in fecha_de_cierre_prop and fecha_de_cierre_prop["date"]:
+                    fecha_de_cierre = fecha_de_cierre_prop["date"].get("start", None)
+                
+                # Debugging statement to print each page's fecha_de_cierre value
+                print("Page ID:", page["id"], "Fecha de Cierre:", fecha_de_cierre if fecha_de_cierre else "None")
+                
+                if fecha_de_cierre:
+                    page_data["fecha_de_cierre"] = fecha_de_cierre
+                    cierre_date = datetime.strptime(fecha_de_cierre, '%Y-%m-%d')
+                    if cierre_date.strftime('%Y-%m-%d') == '2024-06-30':
+                        print("Page with 6/30/2024 Fecha de Cierre:", page_data)
 
-                    # Debugging statement to print each page's fecha_de_cierre value
-                    print("Page ID:", page["id"], "Fecha de Cierre:", fecha_de_cierre)
-
-                    if fecha_de_cierre:
-                        cierre_date = datetime.strptime(fecha_de_cierre, '%Y-%m-%d')
-                        if cierre_date.strftime('%Y-%m-%d') == '2024-06-30':
-                            print("Page with 6/30/2024 Fecha de Cierre:", page_data)
-
-                        if now <= cierre_date <= end_of_month:
-                            upcoming_pages.append(page_data)
-                    else:
-                        empty_fecha_pages.append(page_data)
-
+                    if now_date <= cierre_date <= end_of_month:
+                        upcoming_pages.append(page_data)
                 else:
-                    page_data["fecha_de_cierre"] = ""
+                    # Assign placeholder date and append to empty_fecha_pages
+                    print("Page without Fecha de Cierre:", page_data)
+                    page_data["fecha_de_cierre"] = placeholder_date
                     empty_fecha_pages.append(page_data)
 
                 pages.append(page_data)
 
-        sorted_pages = sorted(pages, key=lambda page: page["fecha_de_cierre"], reverse=True)
+        # Sort pages by fecha_de_cierre, placing pages with placeholder fecha_de_cierre at the bottom
+        sorted_pages = sorted(pages, key=lambda page: (page["fecha_de_cierre"] == placeholder_date, page["fecha_de_cierre"]), reverse=True)
     else:
         sorted_pages = []
 
@@ -629,6 +662,7 @@ def all_pages():
             current_month_pages=upcoming_pages, 
             empty_fecha_pages=empty_fecha_pages
         )
+
 
 
 
