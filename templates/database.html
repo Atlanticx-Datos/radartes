@@ -44,10 +44,15 @@
                                     {% if current_month_pages %}
                                     {% for page in current_month_pages %}
                                     <p class="relative">
-                                        <a href="{{ page.url }}" target="_blank" class="border-l-4 pl-4 mb-3 block leading-none tracking-tighter hover:pr-6">
+                                        <a href="{{ page.url }}" target="_blank"
+                                            class="border-l-4 pl-4 mb-3 block leading-none tracking-tighter hover:pr-6">
                                             {{ page.nombre }}
-                                            <svg class="hover-icon w-3 h-3 absolute right-0 top-1/2 transform -translate-y-1/2" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"></path>
+                                            <svg class="hover-icon w-3 h-3 absolute right-0 top-1/2 transform -translate-y-1/2"
+                                                data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor"
+                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                                                aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"></path>
                                             </svg>
                                         </a>
                                     </p>
@@ -82,10 +87,15 @@
                                     {% if empty_fecha_pages %}
                                     {% for page in empty_fecha_pages %}
                                     <p class="relative">
-                                        <a href="{{ page.url }}" target="_blank" class="border-l-4 pl-2 mb-3 block leading-snug tracking-tighter hover:pr-6">
+                                        <a href="{{ page.url }}" target="_blank"
+                                            class="border-l-4 pl-2 mb-3 block leading-snug tracking-tighter hover:pr-6">
                                             {{ page.nombre }}
-                                            <svg class="hover-icon w-3 h-3 absolute right-0 top-1/2 transform -translate-y-1/2" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"></path>
+                                            <svg class="hover-icon w-3 h-3 absolute right-0 top-1/2 transform -translate-y-1/2"
+                                                data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor"
+                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                                                aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"></path>
                                             </svg>
                                         </a>
                                     </p>
@@ -108,11 +118,12 @@
                     </svg>
                     <p class="ml-6 border-l-4 pl-4 text-sm font-black tracking-tighter">TODAS LAS OPORTUNIDADES</p>
                 </div>
-                <div class="border border-neutral rounded-none overflow-auto mb-12 h-auto max-h-96">
-                    <!-- Alert container -->
-                    <div id="alert-container"></div>
-                    <!-- Table as FORM -->
-                    <form id="save-form" hx-post="/save_user_opportunity" hx-trigger="submit" hx-swap="innerHTML" hx-target="#alert-container">
+
+                <!-- Alert container -->
+                <div id="alert-container"></div>
+                <!-- Table as FORM -->
+                <form id="save-form" hx-post="/save_user_opportunity" hx-trigger="submit" hx-swap="innerHTML" hx-target="#alert-container">
+                    <div class="border border-neutral rounded-none overflow-auto mb-12 h-auto max-h-96">
                         <table id="search_results" class="table w-full">
                             <thead>
                                 <tr>
@@ -131,61 +142,62 @@
                                 {% include "_search_results.html" %}
                             </tbody>
                         </table>
-                        <div class="flex justify-end mt-4">
-                            <button type="submit" class="uppercase btn btn-secondary">Guardar Seleccionados</button>
-                        </div>
-                    </form>
-                </div>
-                
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="uppercase btn btn-secondary">Guardar Seleccionados</button>
+                    </div>
+                </form>                
             </main>
         </div>
+    </main>
+  
 
-        <!-- New Row: Explorá los recursos and Form Section -->
-        <div class="w-full max-w-[1250px] pt-10">
-            <div class="grid grid-cols-1 lg:grid-cols-6 gap-2">
-                <aside class="col-span-1 lg:col-span-2 mt-2 lg:ml-5 xl:ml-10 2xl:ml-20">
-                    <!-- Buscador -->
-                    <div class="lg:col-span-2 w-5/6 mt-6 border-l-4 border-primary">
-                        <p class="text-2xl font-black ml-4 leading-none tracking-tighter">SUMÁ TU OPORTUNIDAD</p>
-                    </div>
-                </aside>
-
-                <!-- Form Section Below the Table -->
-                <div class="mt-6 col-span-4 mx-auto lg:mx-0 pt-0">
-                    <h2 class="font-bold text-lg mb-4 border-b-2 border-accent">TU OPORTUNIDAD EN NUESTRA BASE DE DATOS
-                    </h2>
-                    <p class="mb-4">Completá el formulario si te interesa contribuir con la difusión de becas, premios,
-                        movilidad y residencias para artistas, investigadores y trabajadores de la cultura en la
-                        Argentina y latinoamérica.</p>
-                    <form action="/save" method="POST">
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-1" for="nombre">Nombre de la Oportunidad</label>
-                            <input id="nombre" name="name" type="text" class="input input-bordered w-full">
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-1" for="pais">País</label>
-                            <input id="pais" name="country" type="text" class="input input-bordered w-full">
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-1" for="url">URL</label>
-                            <input id="url" name="url" type="text" class="input input-bordered w-full">
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-1" for="destinatarios">Destinatarios</label>
-                            <input id="destinatarios" name="recipients" type="text" class="input input-bordered w-full">
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-1" for="fecha_de_cierre">Fecha de cierre</label>
-                            <input id="fecha_de_cierre" name="fecha_de_cierre" type="date"
-                                class="input input-bordered w-full">
-                        </div>
-                        <div class="flex justify-end mt-4">
-                            <button type="submit" class="uppercase btn btn-secondary">Enviar oportunidad</button>
-                        </div>
-                    </form>
+    <!-- New Row: Explorá los recursos and Form Section -->
+    <div class="w-full max-w-[1250px] pt-10">
+        <div class="grid grid-cols-1 lg:grid-cols-6 gap-2">
+            <aside class="col-span-1 lg:col-span-2 mt-2 lg:ml-5 xl:ml-10 2xl:ml-20">
+                <!-- Buscador -->
+                <div class="lg:col-span-2 w-5/6 mt-6 border-l-4 border-primary">
+                    <p class="text-2xl font-black ml-4 leading-none tracking-tighter">SUMÁ TU OPORTUNIDAD</p>
                 </div>
+            </aside>
+
+            <!-- Form Section Below the Table -->
+            <div class="mt-6 col-span-4 mx-auto lg:mx-0 pt-0">
+                <h2 class="font-bold text-lg mb-4 border-b-2 border-accent">TU OPORTUNIDAD EN NUESTRA BASE DE DATOS
+                </h2>
+                <p class="mb-4">Completá el formulario si te interesa contribuir con la difusión de becas, premios,
+                    movilidad y residencias para artistas, investigadores y trabajadores de la cultura en la
+                    Argentina y latinoamérica.</p>
+                <form action="/save" method="POST">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-1" for="nombre">Nombre de la Oportunidad</label>
+                        <input id="nombre" name="name" type="text" class="input input-bordered w-full">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-1" for="pais">País</label>
+                        <input id="pais" name="country" type="text" class="input input-bordered w-full">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-1" for="url">URL</label>
+                        <input id="url" name="url" type="text" class="input input-bordered w-full">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-1" for="destinatarios">Destinatarios</label>
+                        <input id="destinatarios" name="recipients" type="text" class="input input-bordered w-full">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-1" for="fecha_de_cierre">Fecha de cierre</label>
+                        <input id="fecha_de_cierre" name="fecha_de_cierre" type="date"
+                            class="input input-bordered w-full">
+                    </div>
+                    <div class="flex justify-end mt-4">
+                        <button type="submit" class="uppercase btn btn-secondary">Enviar oportunidad</button>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
     </main>
 
     <!-- Script for handling select all checkboxes -->
@@ -226,7 +238,7 @@
         });
     </script>
     <script>
-        document.getElementById('save-form').addEventListener('submit', function(event) {
+        document.getElementById('save-form').addEventListener('submit', function (event) {
             console.log('Form is being submitted');
         });
     </script>
