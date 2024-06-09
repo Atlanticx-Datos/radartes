@@ -3,52 +3,57 @@
 {% block body %}
 
 <body>
-
-  <body>
-    <main class="w-full max-w-[1250px] border border-black px-8 py-24">
-        <div class="grid grid-cols-1 lg:grid-cols-6">
-            <!-- Left Sidebar -->
-            <aside class="col-span-1 lg:col-span-2 lg:ml-5  lg:ml-12 xl:ml-20 2xl:ml-36">
-                <!-- Buscador -->
-                <div class="lg:col-span-2 space-y-1">
-                    <div class="uppercase font-bold tracking-tighter leading-none text-lg border-l-8 border-accent pl-5 w-4/5 xl:w-full">
-                        Explorá las becas, premios, residencias y recursos <b>GLOBALES</b> que actualizamos cada semana.
-                    </div>
-                    <div class="text-xs tracking-normal pl-7 leading-none w-4/5">
-                        Para artistas, investigadores y trabajadores de la cultura. Ingresá con tu correo para ver, guardar <b>y sumar tu oportunidad</b>. Es Gratis.
-                    </div>
-                    {% if 'user' not in session %}
-                    <div class="flex justify-center ml-7 border border-neutral w-2/4 relative top-2 h-7">
-                        <button type="submit" class="items-center text-sm"><a href="{{ url_for('login') }}">ENTRAR</a>
-                        </button>
-                    </div>
-                    {% endif %}
+    <main class="w-full max-w-[1250px] border border-black justify-center">
+        <div class="flex justify-center align-center border-b border-neutral h-56">
+            <div class="w-2/4 mx-auto border-r border-neutral pt-12">
+                <div class="uppercase font-black tracking-tighter leading-none text-4xl border-l-8 border-accent pl-16 align-center w-3/4">
+                    Becas, premios, residencias y recursos <u>GLOBALES</u>
                 </div>
-            </aside>
+            </div>
 
-            <!-- Main Content -->
-            <main class="col-span-1 lg:col-start-3 lg:col-span-4 space-y-3 w-auto">
-                <div class="flex flex-col lg:flex-row justify-between gap-3">
-                    <div class="flex items-center justify-center h-1/3 w-full">
-                        <div class="bg-secondary h-1/3 w-2/3">
-                            <div class="ml-6 mt-1 leading-none -space-y-2">
-                                <div class="flex relative top-5 font-black">100 <span
-                                        class="text-primary relative bottom-[1.5px] ml-1">|</span>
-                                    <div class="ml-1 font-black text-4xl relative bottom-3 left-2 tracking-tighter">OPOR</div>
-                                </div>
-                                <div class="font-black text-4xl tracking-tighter leading-none">TUNIDAD</div>
-                                <div class="font-black text-4xl tracking-tighter leading-none relative bottom-1 left-1">ES PARA</div>
-                                <div class="font-black text-4xl tracking-tighter leading-none relative bottom-2">ARTISTXS</div>
-                                <div class="font-black text-4xl tracking-tighter leading-none relative bottom-3">E INVEST</div>
-                                <div class="font-black text-4xl tracking-tighter leading-none pb-1 relative bottom-4">GADORXS.</div>
-                            </div>
+            <div class="w-1/4 mx-auto border-r border-neutral bg-secondary">
+
+            </div>
+
+            <div class="w-1/4 mx-auto bg-black"> 
+                
+               
+            </div>
+        </div>
+        <div class="flex justify-center align-center h-56">
+            <div class="w-2/4 mx-auto border-r border-neutral bg-primary">
+                
+            </div>
+
+            <div class="w-1/4 mx-auto border-r border-neutral">
+                <div class="">
+                    <div class="">
+                        <div
+                            class="uppercase font-black tracking-tighter leading-none text-xl pl-10 pt-10 w-3/4">
+                            Actualizamos  OPORTUNIDADES cada semana.
                         </div>
                     </div>
+
+                    <div class="text-xs tracking-tight pl-10 leading-none w-4/5 mt-2">
+                        Para artistas, investigadores y trabajadores de la cultura. Ingresá con tu correo para ver,
+                        guardar <b>y sumar tu oportunidad</b>. Es gratis.
+                    </div>
                 </div>
-            </main>
+            </div>
+
+            <div class="w-1/4 mx-auto bg-accent">
+
+            </div>
         </div>
+        
     </main>
+    {% if 'user' not in session %}
+    <div class="flex justify-center  border-r border-l border-b border-neutral w-2/4 relative h-10 hover:bg-slate-100">
+        <button type="submit" class="items-center text-sm "><a href="{{ url_for('login') }}" class="py-20 px-56 font-black">ENTRAR</a>
+        </button>
+    </div>
+    {% endif %}
 </body>
 
 
-  {% endblock %}
+{% endblock %}

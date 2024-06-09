@@ -293,16 +293,26 @@ def get_opportunity_by_id(opportunity_id):
     response.raise_for_status()  # Raise an exception for HTTP errors
     data = response.json()
 
+    def get_rich_text_content(prop):
+        if "rich_text" in prop and prop["rich_text"]:
+            return prop["rich_text"][0].get("text", {}).get("content", "")
+        return ""
+
+    def get_date_content(prop):
+        if "date" in prop and prop["date"] is not None:
+            return prop["date"].get("start", "")
+        return ""
+
     opportunity = {
         "id": data["id"],
-        "nombre": data["properties"].get("Nombre", {}).get("title", [{}])[0].get("text", {}).get("content", ""),
-        "país": data["properties"].get("País", {}).get("rich_text", [{}])[0].get("text", {}).get("content", ""),
-        "destinatarios": data["properties"].get("Destinatarios", {}).get("rich_text", [{}])[0].get("text", {}).get("content", ""),
-        "resumen_IA": data["properties"].get("Resumen generado por la IA", {}).get("rich_text", [{}])[0].get("text", {}).get("content", ""),
+        "nombre": get_rich_text_content(data["properties"].get("Nombre", {})),
+        "país": get_rich_text_content(data["properties"].get("País", {})),
+        "destinatarios": get_rich_text_content(data["properties"].get("Destinatarios", {})),
+        "resumen_IA": get_rich_text_content(data["properties"].get("Resumen generado por la IA", {})),
         "url": data["properties"].get("URL", {}).get("url", ""),
-        "nombre_original": data["properties"].get("Nombre", {}).get("title", [{}])[0].get("text", {}).get("content", ""),
+        "nombre_original": get_rich_text_content(data["properties"].get("Nombre", {})),
         "ai_keywords": (data["properties"].get("AI keywords", {}).get("multi_select", [{}])[0].get("name") if data["properties"].get("AI keywords", {}).get("multi_select") else ""),
-        "fecha_de_cierre": data["properties"].get("Fecha de cierre", {}).get("date", {}).get("start", "")
+        "fecha_de_cierre": get_date_content(data["properties"].get("Fecha de cierre", {})),
     }
 
     return opportunity
