@@ -1899,9 +1899,6 @@ details.collapse summary::-webkit-details-marker {
 .right-6 {
   right: 1.5rem;
 }
-.right-\[0\.8px\] {
-  right: 0.8px;
-}
 .top-1\/2 {
   top: 50%;
 }
@@ -1926,6 +1923,12 @@ details.collapse summary::-webkit-details-marker {
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
+}
+.-mr-1 {
+  margin-right: -0.25rem;
+}
+.-mr-2 {
+  margin-right: -0.5rem;
 }
 .-mt-2 {
   margin-top: -0.5rem;
@@ -1953,6 +1956,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .ml-6 {
   margin-left: 1.5rem;
+}
+.mr-2 {
+  margin-right: 0.5rem;
 }
 .mt-1 {
   margin-top: 0.25rem;

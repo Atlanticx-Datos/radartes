@@ -293,6 +293,11 @@ def get_opportunity_by_id(opportunity_id):
     response.raise_for_status()  # Raise an exception for HTTP errors
     data = response.json()
 
+    def get_title_content(property_data):
+        if "title" in property_data and property_data["title"]:
+            return "".join([text["plain_text"] for text in property_data["title"]])
+        return ""
+
     def get_rich_text_content(prop):
         if "rich_text" in prop and prop["rich_text"]:
             return prop["rich_text"][0].get("text", {}).get("content", "")
@@ -305,7 +310,7 @@ def get_opportunity_by_id(opportunity_id):
 
     opportunity = {
         "id": data["id"],
-        "nombre": get_rich_text_content(data["properties"].get("Nombre", {})),
+        "nombre": get_title_content(data["properties"].get("Nombre", {})),
         "país": get_rich_text_content(data["properties"].get("País", {})),
         "destinatarios": get_rich_text_content(data["properties"].get("Destinatarios", {})),
         "resumen_IA": get_rich_text_content(data["properties"].get("Resumen generado por la IA", {})),
