@@ -3,21 +3,27 @@
 {% block body %}
 
 <body>
-    <main class="w-full max-w-[1250px]">
-        <div class="grid grid-cols-1 lg:grid-cols-6 gap-2">
+    <main class="w-full max-w-[1250px] mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
             <!-- Left Sidebar -->
-            <aside class="col-span-1 lg:col-span-2 mt-2">
+            <aside class="col-span-1 md:col-start-4 lg:col-span-2 mt-2 lg:mt-6 ml-8">
                 <!-- Buscador -->
-                <div class="lg:col-span-2 w-5/6 mt-6">
-                    <div class="lg:col-span-2 w-5/6 mt-6 border-l-4 border-primary">
-                        <p class="text-2xl font-black ml-4 leading-none tracking-tighter">OPORTUNIDADES GUARDADAS</p>
+                <div class="lg:col-span-2 w-full mt-12">
+                    <div class="border-l-8 border-primary">
+                        <p class="text-2xl font-black leading-none tracking-tighter pl-4 w-full sm:w-3/4 md:w-2/3 mt-4 relative right-1 md:right-2">
+                            OPORTUNIDADES GUARDADAS
+                        </p>
+                    </div>
+                    <div class="text-sm sm:text-base w-full sm:w-3/4 md:w-2/3 mt-4 relative right-0" style="line-height: 0.8rem;">
+                        Si sos artistx, investigadorx y/o trabajadorx de la cultura ingresá con tu correo para ver y
+                        guardar enlaces sobre oportunidades en todo el mundo.
                     </div>
                 </div>
             </aside>
             <main class="col-span-1 lg:col-start-3 lg:col-span-4 space-y-3 w-auto mt-8">
                 <div class="pb-2">
-                    <div class="flex">
-                        <svg class="w-6 relative left-3" data-slot="icon" fill="none" stroke-width="1.5"
+                    <div class="flex border-r-4 border-accent w-16">
+                        <svg class="w-6 relative left-3 " data-slot="icon" fill="none" stroke-width="1.5"
                             stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
                             aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -37,11 +43,6 @@
                             <table id="my_results" class="table w-full">
                                 <thead>
                                     <tr>
-                                        <th>
-                                            <label>
-                                                <input type="checkbox" class="checkbox" id="select-all" />
-                                            </label>
-                                        </th>
                                         <th>Oportunidad</th>
                                         <th>Descripción</th>
                                         <th>Fecha de Cierre</th>
@@ -59,6 +60,7 @@
         </div>
     </main>
 </body>
+
 <script>
     function deleteOpportunity(pageId) {
         console.log('Deleting opportunity with ID:', pageId);  // Log the URL being constructed

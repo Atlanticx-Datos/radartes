@@ -3,57 +3,53 @@
 {% block body %}
 
 <body>
-    <main class="w-full max-w-[1250px] border border-black justify-center">
-        <div class="flex justify-center align-center border-b border-neutral h-auto 2xl:h-80">
-            <div class="w-2/4 mx-auto border-r-8 border-neutral pt-10">
-                <div class="uppercase font-bold tracking-tighter text-3xl border-l-8 border-accent pl-16 align-center w-1/2" style="line-height: 1.8rem;">
+    <main class="w-full max-w-[1250px] mx-auto border border-black justify-center mt-8 md:mt-2">
+        <div class="flex flex-wrap justify-center align-center border-b border-neutral h-auto 2xl:h-80">
+            <div class="w-full md:w-3/4 lg:w-2/4 mx-auto md:border-r-8 md:border-l-8 md:border-t-8 border-neutral pt-10 px-4 md:px-0">
+                <div class="uppercase font-bold tracking-tighter text-4xl md:text-3xl border-l-8 border-accent pl-4 sm:pl-8 md:pl-16 align-center w-full sm:w-3/4 md:w-1/2" style="line-height: 1.7rem;">
                     Becas, premios y residencias <span class="font-black">GLOBALES</span> para el arte.
                 </div>
-                <div class="text-base tracking-tight pl-20 leading-none w-2/3 mt-4 relative right-2">
+                <div class="text-sm sm:text-base pl-4 sm:pl-8 md:pl-20 w-full sm:w-3/4 md:w-2/3 mt-4 relative right-0 sm:right-2" style="line-height: 0.8rem;">
                     Si sos artistx, investigadorx y/o trabajadorx de la cultura ingresá con tu correo para ver y
                     guardar enlaces sobre oportunidades en todo el mundo.
                 </div>
-                <div class="text-xs tracking-tight leading-none w-1/2 mt-4 pl-20 relative right-2 mb-8">
+                <div class="text-xs tracking-tight leading-none w-full sm:w-3/4 md:w-1/2 mt-4 pl-4 sm:pl-8 md:pl-20 relative right-0 sm:right-2 mb-8">
                     <b>Podés colaborar sumando tus propios links.</b> Registrate. Es gratis.
                 </div>
             </div>
 
-            <div class="w-1/2 mx-auto border-t-8  border-r-8 border-black bg-secondary">
-
-            </div>
+            <div class="w-full md:w-1/2 mx-auto border-t-8 border-r-8 border-l-8 md:border-l-0 border-black bg-secondary h-40 md:h-auto"></div>
         </div>
-        <div class="flex justify-center align-center h-auto 2xl:h-72">
-            <div class="w-2/4 mx-auto border-8 border-neutral bg-primary"></div>
+        <div class="flex flex-wrap justify-center align-center h-auto 2xl:h-72">
+            <div class="hidden md:block w-full md:w-2/4 mx-auto border-8 border-neutral bg-primary h-40 md:h-auto"></div>
 
-            <div class="w-1/4 mx-auto border-t-8 border-b-8 border-neutral space-y-3">
+            <div class="w-full md:w-1/4 mx-auto border-t-8 md:border-b-8 border-neutral space-y-3 h-auto px-4 md:px-0">
                 <div class="">
                     <div class="">
-                        <div
-                            class="uppercase font-bold tracking-tighter leading-none text-xl pl-10 mt-10 w-3/4">
+                        <div class="uppercase font-bold leading-none text-lg sm:text-xl pl-4 sm:pl-8 md:pl-10 mt-10 w-full sm:w-3/4" style="line-height: 1rem;">
                             Actualizamos información todas las semanas.
                         </div>
                     </div>
 
-                    <div class="text-xs pl-10 leading-none mt-4 w-5/6 uppercase font-medium tracking-tighter pr-4">
+                    <div class="text-xs pl-4 sm:pl-8 md:pl-10 leading-none mt-4 w-full sm:w-5/6 uppercase font-medium tracking-tighter pr-4">
                         Scrapeamos sitios y redes para linkearte a oportunidades en todo el mundo, <b>por fecha de cierre y por DESTACADAS</b>.
                     </div>
-                    <div class="text-xs tracking-tight pl-10 leading-none mt-3 w-3/4 pb-10">
-                       También listamos recursos para investigadorxs: maestrías, doctorados y post-docs.
+                    <div class="text-xs tracking-tight pl-4 sm:pl-8 md:pl-10 leading-none mt-3 w-full sm:w-3/4 pb-10">
+                        También listamos recursos para investigadorxs: maestrías, doctorados y post-docs.
                     </div>
                 </div>
             </div>
 
-            <div class="w-1/4 mx-auto bg-accent border-t-8 border-b-8 border-l-8 border-r-8 border-neutral"></div>
+            <div class="w-full md:w-1/4 mx-auto bg-accent border-t-8 border-b-8 border-l-8 border-r-8 border-neutral h-40 md:h-auto"></div>
         </div>
-        
     </main>
     {% if 'user' not in session %}
-    <div class="flex justify-center  border-r border-l border-b border-neutral w-2/4 relative h-10 hover:bg-slate-100">
-        <button type="submit" class="items-center text-sm "><a href="{{ url_for('login') }}" class="py-20 px-56 font-black">ENTRAR</a>
+    <div class="flex justify-center border-r-2 border-l-2 border-b-2 border-neutral w-full md:w-3/5 relative h-10 hover:bg-slate-100">
+        <button type="submit" class="items-center text-sm">
+            <a href="{{ url_for('login') }}" class="px-8 md:py-20 md:px-56 font-black">ENTRAR</a>
         </button>
     </div>
     {% endif %}
 </body>
-
 
 {% endblock %}

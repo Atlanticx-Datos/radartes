@@ -1,11 +1,6 @@
 {% if opportunities %}
     {% for opportunity in opportunities %}
     <tr>
-        <th>
-            <label>
-                <input type="checkbox" class="checkbox" name="selected_pages" value="{{ opportunity.id }}" />
-            </label>
-        </th>
         <td>
             <div class="flex items-center gap-3">
                 <div>
@@ -15,7 +10,7 @@
             </div>
         </td>
         <td>
-            {{ opportunity.nombre }}
+            {{ opportunity.nombre_original }}
             <br />
             <span class="badge badge-ghost badge-sm">{{ opportunity.ai_keywords }}</span>
         </td>

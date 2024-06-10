@@ -27,10 +27,12 @@
         </td>
         <td>{{ page.fecha_de_cierre | format_date }}</td>
         <th>
-            <a href="{{ page.url }}" target="_blank" class="btn btn-ghost btn-sm"><svg class="w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"></path>
-              </svg></a>
-        </th>
+            <a href="{{ page.url }}" target="_blank" class="btn btn-ghost btn-sm">
+                <svg class="w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5L19.5 4.5M19.5 4.5H8.25M19.5 4.5V15.75"></path>
+                </svg>
+            </a>
+        </th>        
     </tr>
     {% endfor %}
 {% else %}
