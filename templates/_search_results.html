@@ -3,17 +3,11 @@
     <tr>
         <th>
             <label>
-                <input type="checkbox" class="checkbox" name="selected_pages" value="{{ page.id }}" />
+                <input type="checkbox" class="checkbox rounded-none h-4 w-4" name="selected_pages" value="{{ page.id }}" />
             </label>
         </th>
         <td>
             <div class="flex items-center gap-3">
-                <div class="avatar">
-                    <div class="mask mask-squircle w-12 h-12">
-                        <img src="https://img.daisyui.com/tailwind-css-component-profile-2@56w.png"
-                            alt="Avatar Tailwind CSS Component" />
-                    </div>
-                </div>
                 <div>
                     <div class="font-bold">{{ page.nombre }}</div>
                     <div class="text-sm opacity-50">{{ page.país }}</div>
@@ -29,11 +23,13 @@
         <td>
             {{ page.nombre_original }}
             <br />
-            <span class="badge badge-ghost badge-sm">{{ page.ai_keywords }}</span>
+            <span class="badge badge-ghost badge-sm h-auto">{{ page.ai_keywords }}</span>
         </td>
         <td>{{ page.fecha_de_cierre | format_date }}</td>
         <th>
-            <a href="{{ page.url }}" target="_blank" class="btn btn-ghost btn-xs">más info</a>
+            <a href="{{ page.url }}" target="_blank" class="btn btn-ghost btn-sm"><svg class="w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"></path>
+              </svg></a>
         </th>
     </tr>
     {% endfor %}

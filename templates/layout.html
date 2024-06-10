@@ -2,26 +2,26 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flask App</title>
-  <link href="{{ url_for('static', filename='css/tailwind-built.css') }}" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
-  <script src="https://unpkg.com/htmx.org@1.7.0/dist/htmx.min.js"></script>
-<!--   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script> -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask App</title>
+    <link href="{{ url_for('static', filename='css/tailwind-built.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+    <script src="https://unpkg.com/htmx.org@1.7.0/dist/htmx.min.js"></script>
+    <!--   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script> -->
 </head>
 </head>
 
 <body class="flex justify-center">
     <main class="w-full md:w-4/5 max-w-[1250px] p-2.5">
         {% if 'user' in session %}
-        <nav class="flex justify-between items-center space-x-4 h-[34px] md:h-[130px] pt-1 pb-2 px-2 z-50">
-            
+        <nav class="flex justify-between items-center space-x-4 h-[34px] md:h-20 pt-1 pb-2 px-2 z-50">
+
             <!-- Child 1: Home icon -->
             <a href="{{ url_for('index') }}">
-                <svg class="w-6 h-6 md:hidden" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true">
+                <svg class="w-6 h-6 md:hidden" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path clipRule="evenodd" fillRule="evenodd"
                         d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" />
                 </svg>
@@ -33,38 +33,36 @@
             <div class="flex-grow hidden md:block"></div>
             <!-- Child 3: Logo -->
             <a href="{{ url_for('index') }}">
-                <img src="{{ url_for('static', filename='public/Logo_100.svg') }}" class="hidden md:block w-20 mt-1 subpixel-antialiased antialiased relative right-6">
+                <img src="{{ url_for('static', filename='public/Logo_100.svg') }}"
+                    class="hidden md:block w-20 mt-1 subpixel-antialiased antialiased relative right-6">
             </a>
             <!-- Child 4: Ellipsis vertical icon with dropdown -->
-            <div class="dropdown dropdown-bottom dropdown-end -mt-4 z-50">
+            <div class="dropdown dropdown-bottom dropdown-end -mt-2 z-50">
                 <div tabindex="0" role="button">
-                    <svg class="w-6 h-6" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20"
+                    <svg class="w-7 h-7" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path
                             d="M10 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM10 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM11.5 15.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z" />
                     </svg>
                 </div>
-                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 bg-base-100 rounded-md w-52 border border-black mt-3">
-                    <li><a href="{{ url_for('all_pages') }}"><span class="border-l-4 border-accent pl-3">Oportunidades</span></a></li>
-                    <li><a href="{{ url_for('list_saved_opportunities') }}"><span class="border-l-4 border-secondary pl-3">Guardadas</span></a></li>
-                    <li><a href="{{ url_for('index') }}"><span class="border-l-4 border-primary pl-3">Home</span></a></li>
-                    <li><a href="{{ url_for('logout') }}"><span class="border-l-4 border-base-200 pl-3">Cerrar</span></a></li>
+                <ul tabindex="0"
+                    class="dropdown-content z-[1] menu p-2 bg-base-100 rounded-md w-52 border border-black mt-3">
+                    <li><a href="{{ url_for('all_pages') }}"><span
+                                class="border-l-4 border-accent pl-3">Oportunidades</span></a></li>
+                    <li><a href="{{ url_for('list_saved_opportunities') }}"><span
+                                class="border-l-4 border-secondary pl-3">Guardadas</span></a></li>
+                    <li><a href="{{ url_for('index') }}"><span class="border-l-4 border-primary pl-3">Home</span></a>
+                    </li>
+                    <li><a href="{{ url_for('logout') }}"><span
+                                class="border-l-4 border-base-200 pl-3">Cerrar</span></a></li>
                 </ul>
             </div>
         </nav>
         {% else %}
-        <div class="h-[34px] md:h-[130px]"></div>
+        <div class="h-[34px] md:h-20"></div>
         {% endif %}
         {% block body %}{% endblock %}
     </main>
-   <!--  <script>
-      var socket = io('http://127.0.0.1:5000');
-      socket.on('connect', function () {
-        console.log('Connected to server');
-      });
-    </script> -->
-  </body>
-  
-  
+</body>
 
 </html>
