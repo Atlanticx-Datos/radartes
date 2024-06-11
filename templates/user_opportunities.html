@@ -1,8 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-
-<body>
+<body onload="hideSpinner()">
     <main class="w-full max-w-[1250px] mx-auto">
         <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
             <!-- Left Sidebar -->
@@ -15,8 +14,7 @@
                         </p>
                     </div>
                     <div class="text-sm sm:text-base w-full sm:w-3/4 md:w-2/3 mt-4 relative right-0" style="line-height: 0.8rem;">
-                        Si sos artistx, investigadorx y/o trabajadorx de la cultura ingresá con tu correo para ver y
-                        guardar enlaces sobre oportunidades en todo el mundo.
+                        Aquí vas a encontrar las oportunidades que tenés guardadas. No pierdas enlaces, y, recordá, actualizamos vía scrapeo todas las semanas.
                     </div>
                 </div>
             </aside>
@@ -35,11 +33,12 @@
 
                 <div class="flex flex-col lg:flex-row justify-between gap-3">
                     <div class="border border-neutral rounded-none overflow-x-auto mb-12">
+                        <!-- Spinner -->
+                        <div class="spinner" id="spinner"></div>
                         <!-- Alert container -->
                         <div id="alert-container"></div>
                         <!-- Table as FORM -->
-                        <form id="delete-form" hx-post="/delete_opportunity/' + pageId" hx-trigger="submit"
-                            hx-swap="innerHTML" hx-target="#alert-delete">
+                        <form id="delete-form" hx-post="/delete_opportunity/' + pageId" hx-trigger="submit" hx-swap="innerHTML" hx-target="#alert-container">
                             <table id="my_results" class="table w-full">
                                 <thead>
                                     <tr>
@@ -61,6 +60,48 @@
     </main>
 </body>
 
+<style>
+    .spinner {
+        display: block; /* Visible by default */
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: 16px solid #f3f3f3;
+        border-top: 16px solid #3498db;
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initially show spinner
+        showSpinner();
+
+        // Hide spinner when content is loaded
+        hideSpinner();
+    });
+
+    function showSpinner() {
+        document.getElementById('spinner').style.display = 'block'; // Show spinner
+    }
+
+    function hideSpinner() {
+        document.getElementById('spinner').style.display = 'none'; // Hide spinner
+    }
+
+    window.onload = function() {
+        hideSpinner(); // Ensure spinner is hidden when page is fully loaded
+    };
+</script>
+
 <script>
     function deleteOpportunity(pageId) {
         console.log('Deleting opportunity with ID:', pageId);  // Log the URL being constructed
@@ -71,18 +112,18 @@
                 'Accept': 'application/json'
             }
         })
-            .then(response => {
-                if (response.ok) {
-                    window.location.href = '/saved_opportunities';
-                } else {
-                    return response.json().then(data => {
-                        alert('Error: ' + data.error);
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        .then(response => {
+            if (response.ok) {
+                window.location.href = '/saved_opportunities';
+            } else {
+                return response.json().then(data => {
+                    alert('Error: ' + data.error);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
     }
 </script>
 

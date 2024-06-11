@@ -38,6 +38,8 @@ from dateutil.relativedelta import relativedelta
 from flask_socketio import SocketIO
 import socket as py_socket
 
+from concurrent.futures import ThreadPoolExecutor
+
 load_dotenv()
 print("Loaded AUTH0_DOMAIN:", os.environ.get("AUTH0_DOMAIN"))
 
@@ -217,6 +219,10 @@ def save_user_opportunity():
         print("Error:", str(e))
         return jsonify({"error": str(e)}), 400
 
+def fetch_opportunity_details(opportunity_id):
+    return get_opportunity_by_id(opportunity_id)
+
+
 
 @app.route("/saved_opportunities", methods=["GET"])
 @login_required
@@ -225,13 +231,10 @@ def list_saved_opportunities():
 
     # Fetch saved opportunity IDs from Notion
     opportunity_ids = get_saved_opportunity_ids(user_id)
-    """ print("Fetched opportunity IDs:", opportunity_ids)  # Debugging statement """
 
-    # Fetch detailed information for each opportunity
-    opportunities = [
-        get_opportunity_by_id(opportunity_id) for opportunity_id in opportunity_ids
-    ]
-    """ print("Fetched opportunities:", opportunities)  # Debugging statement """
+    # Fetch detailed information for each opportunity concurrently
+    with ThreadPoolExecutor() as executor:
+        opportunities = list(executor.map(fetch_opportunity_details, opportunity_ids))
 
     return render_template("user_opportunities.html", opportunities=opportunities)
 
