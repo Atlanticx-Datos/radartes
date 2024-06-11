@@ -102,6 +102,16 @@ headers = {
 
 # Auth0 Integration
 
+AUTH0_CLIENT_ID = os.getenv("AUTH0_CLIENT_ID")
+AUTH0_CLIENT_SECRET = os.getenv("AUTH0_CLIENT_SECRET")
+AUTH0_DOMAIN = os.getenv("AUTH0_DOMAIN")
+
+if os.getenv("FLASK_ENV") == "production":
+    AUTH0_CALLBACK_URL = "https://oportunidades.onrender.com/callback"
+else:
+    AUTH0_CALLBACK_URL = "http://localhost:5000/callback"
+
+
 oauth = OAuth(app)
 
 oauth.register(
