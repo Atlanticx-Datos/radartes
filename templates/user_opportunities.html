@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<body onload="hideSpinner()">
+<body>
     <main class="w-full max-w-[1250px] mx-auto">
         <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
             <!-- Left Sidebar -->
@@ -33,8 +33,6 @@
 
                 <div class="flex flex-col lg:flex-row justify-between gap-3">
                     <div class="border border-neutral rounded-none overflow-x-auto mb-12">
-                        <!-- Spinner -->
-                        <div class="spinner" id="spinner"></div>
                         <!-- Alert container -->
                         <div id="alert-container"></div>
                         <!-- Table as FORM -->
@@ -60,50 +58,11 @@
     </main>
 </body>
 
-<style>
-    .spinner {
-        display: block; /* Visible by default */
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        border: 16px solid #f3f3f3;
-        border-top: 16px solid #3498db;
-        border-radius: 50%;
-        width: 120px;
-        height: 120px;
-        animation: spin 2s linear infinite;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-</style>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initially show spinner
-        showSpinner();
-
-        // Hide spinner when content is loaded
-        hideSpinner();
-    });
-
-    function showSpinner() {
-        document.getElementById('spinner').style.display = 'block'; // Show spinner
-    }
-
-    function hideSpinner() {
-        document.getElementById('spinner').style.display = 'none'; // Hide spinner
-    }
-
-    window.onload = function() {
-        hideSpinner(); // Ensure spinner is hidden when page is fully loaded
-    };
-</script>
-
 <script>
     function deleteOpportunity(pageId) {
+        // Show the spinner
+        document.getElementById('spinner').style.display = 'block';
+        
         console.log('Deleting opportunity with ID:', pageId);  // Log the URL being constructed
         fetch('/delete_opportunity/' + pageId, {
             method: 'DELETE',
@@ -118,11 +77,15 @@
             } else {
                 return response.json().then(data => {
                     alert('Error: ' + data.error);
+                    // Hide the spinner if there's an error
+                    document.getElementById('spinner').style.display = 'none';
                 });
             }
         })
         .catch(error => {
             console.error('Error:', error);
+            // Hide the spinner if there's an error
+            document.getElementById('spinner').style.display = 'none';
         });
     }
 </script>
