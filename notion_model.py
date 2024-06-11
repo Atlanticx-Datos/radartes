@@ -205,11 +205,10 @@ def save_user_opportunity():
             save_to_notion(user_id, page_id)
 
         success_message = """
-        <div role="alert" class="alert alert-success w-1/2 m-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <div role="alert" class="flex items-center alert alert-success p-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>Oportunidad(es) guardada(s) exitosamente!</span>
         </div>
         """
 
@@ -284,7 +283,7 @@ def get_saved_opportunity_ids(user_id):
 def get_opportunity_by_id(opportunity_id):
     url = f"https://api.notion.com/v1/pages/{opportunity_id}"
     headers = {
-        "Authorization": "Bearer " + NOTION_TOKEN,
+        "Authorization": f"Bearer {NOTION_TOKEN}",
         "Content-Type": "application/json",
         "Notion-Version": "2022-06-28",
     }
@@ -293,31 +292,43 @@ def get_opportunity_by_id(opportunity_id):
     response.raise_for_status()  # Raise an exception for HTTP errors
     data = response.json()
 
-    def get_title_content(property_data):
-        if "title" in property_data and property_data["title"]:
-            return "".join([text["plain_text"] for text in property_data["title"]])
-        return ""
-
-    def get_rich_text_content(prop):
-        if "rich_text" in prop and prop["rich_text"]:
-            return prop["rich_text"][0].get("text", {}).get("content", "")
-        return ""
-
-    def get_date_content(prop):
-        if "date" in prop and prop["date"] is not None:
-            return prop["date"].get("start", "")
-        return ""
-
     opportunity = {
         "id": data["id"],
-        "nombre": get_title_content(data["properties"].get("Nombre", {})),
-        "país": get_rich_text_content(data["properties"].get("País", {})),
-        "destinatarios": get_rich_text_content(data["properties"].get("Destinatarios", {})),
-        "resumen_IA": get_rich_text_content(data["properties"].get("Resumen generado por la IA", {})),
-        "url": data["properties"].get("URL", {}).get("url", ""),
-        "nombre_original": get_rich_text_content(data["properties"].get("Nombre", {})),
-        "ai_keywords": (data["properties"].get("AI keywords", {}).get("multi_select", [{}])[0].get("name") if data["properties"].get("AI keywords", {}).get("multi_select") else ""),
-        "fecha_de_cierre": get_date_content(data["properties"].get("Fecha de cierre", {})),
+        "nombre": (
+            data["properties"]["Nombre"]["title"][0]["text"]["content"]
+            if data["properties"]["Nombre"]["title"]
+            else ""
+        ),
+        "país": (
+            data["properties"]["País"]["rich_text"][0]["text"]["content"]
+            if data["properties"]["País"]["rich_text"]
+            else ""
+        ),
+        "destinatarios": (
+            data["properties"]["Destinatarios"]["rich_text"][0]["text"]["content"]
+            if data["properties"]["Destinatarios"]["rich_text"]
+            else ""
+        ),
+        "resumen_IA": (
+            data["properties"]["Resumen generado por la IA"]["rich_text"][0]["text"]["content"]
+            if data["properties"]["Resumen generado por la IA"]["rich_text"]
+            else ""
+        ),
+        "url": (
+            data["properties"]["URL"].get("url", "")
+            if data["properties"]["URL"]
+            else ""
+        ),
+        "ai_keywords": (
+            data["properties"]["AI keywords"]["multi_select"][0]["name"]
+            if data["properties"]["AI keywords"]["multi_select"]
+            else ""
+        ),
+        "fecha_de_cierre": (
+            data["properties"]["Fecha de cierre"]["date"]["start"]
+            if data["properties"]["Fecha de cierre"]["date"]
+            else ""
+        ),
     }
 
     return opportunity
