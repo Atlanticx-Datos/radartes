@@ -358,7 +358,6 @@ def delete_saved_opportunity(user_id, page_id):
     response.raise_for_status()  # Raise an exception for HTTP errors
     data = response.json()
 
-    # Delete the first matching result (assuming there is only one)
     if data["results"]:
         page_id_to_delete = data["results"][0]["id"]
         delete_url = f"https://api.notion.com/v1/pages/{page_id_to_delete}"
@@ -367,16 +366,13 @@ def delete_saved_opportunity(user_id, page_id):
         )
         delete_response.raise_for_status()  # Raise an exception for HTTP errors
 
-
 @app.route("/delete_opportunity/<page_id>", methods=["DELETE"])
 @login_required
 def delete_opportunity(page_id):
     user_id = session["user"]["sub"]
 
     try:
-        print(
-            "Attempting to delete saved opportunity with ID:", page_id
-        )  # Debugging statement
+        print("Attempting to delete saved opportunity with ID:", page_id)
 
         # Delete the saved opportunity from the user's saved opportunities
         delete_saved_opportunity(user_id, page_id)
@@ -388,7 +384,6 @@ def delete_opportunity(page_id):
     except Exception as e:
         print("Error:", str(e))
         return jsonify({"error": str(e)}), 400
-
 
 def get_similar_opportunities(keywords, exclude_ids):
     url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
