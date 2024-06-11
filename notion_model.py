@@ -810,5 +810,5 @@ def save_page(page_id=None):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     print(f"Running on http://127.0.0.1:{port}" if port == 5000 else f"Running on port {port}")
-    socketio.run(app, host="0.0.0.0", port=port, debug=True, use_reloader=True)
+    app.run(host="0.0.0.0", port=port, debug=True, use_reloader=True)
 
