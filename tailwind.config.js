@@ -9,7 +9,7 @@ module.exports = {
         DEFAULT: '1px', // This sets the default border width to 1px
       },
       lineHeight: {
-        'extra-tight': '0.5rem',
+        'custom': '1.7rem',
       }
     },
   },

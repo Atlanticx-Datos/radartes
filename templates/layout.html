@@ -18,10 +18,15 @@
             transform: translate(-50%, -50%);
             z-index: 1000;
         }
+        @media (min-width: 768px) {
+      .md-line-height {
+        line-height: 1.7rem !important;
+      }
+    }
     </style>
 </head>
 
-<body class="flex justify-center">
+<body class="flex justify-center bg-primary md:bg-white">
     <div id="spinner" class="spinner h-8 w-8">
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
     </div>
