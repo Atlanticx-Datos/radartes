@@ -5,16 +5,15 @@
 <body>
     <main class="w-full max-w-[1250px] mx-auto border border-black justify-center mt-8 md:mt-2">
         <div class="flex flex-wrap justify-center align-center border-b border-neutral h-auto 2xl:h-80">
-            <div class="w-full md:w-3/4 lg:w-2/4 mx-auto md:border-r-8 md:border-l-8 md:border-t-8 border-neutral pt-10 px-4 md:px-0">
+            <div class="w-full md:w-3/4 lg:w-2/4 mx-auto md:border-r-8 md:border-l-8 md:border-t-8 border-neutral pt-8 px-4 md:px-0">
                 <div class="uppercase font-bold tracking-tighter text-4xl md:text-3xl  sm:pl-8 md:pl-16 align-center w-full sm:w-3/4 md:w-1/2" style="line-height: 1.7rem;">
                     Becas, premios y residencias <span class="font-black">GLOBALES</span> para el arte.
                 </div>
-                <div class="text-sm sm:text-base pl-4 sm:pl-8 md:pl-20 w-full sm:w-3/4 md:w-2/3 mt-4 relative right-2 md:right-4" style="line-height: 0.8rem;">
-                    Si sos artistx, investigadorx y/o trabajadorx de la cultura ingresá con tu correo para ver y
-                    guardar enlaces sobre oportunidades en todo el mundo.
+                <div class="text-sm sm:text-base pl-4 sm:pl-8 md:pl-20 w-full sm:w-3/4 md:w-1/2 mt-4 relative right-2 md:right-4 tracking-tight" style="line-height: 0.9rem;">
+                    100 <span class="color-primary">︱</span> Oportunidades es una alianza de organizaciones de la cultura para compartir y actualizar <b> enlaces relevantes para artistxs, investigadorxs y trabajadorxs de la cultura</b>.
                 </div>
                 <div class="text-xs tracking-tight leading-none w-full sm:w-3/4 md:w-1/2 mt-4 pl-4 sm:pl-8 md:pl-20 relative right-0 md:right-4 mb-8">
-                    <b>Podés colaborar sumando tus propios links.</b> Registrate. Es gratis.
+                    <b>También vos podés sumar.</b><a href="mailto:info@atlanticx.org"> <u>Escribinos </u>o</a> registrate desde "entrar". <b>Es gratis</b>.
                 </div>
             </div>
 
@@ -26,16 +25,16 @@
             <div class="w-full md:w-2/6 mx-auto border-t-8 md:border-b-8 border-neutral space-y-3 h-auto px-4 md:px-0">
                 <div class="">
                     <div class="">
-                        <div class="uppercase font-bold leading-none text-lg sm:text-xl pl-4 sm:pl-8 md:pl-10 mt-10 w-full md:w-2/4" style="line-height: 1rem;">
+                        <div class="uppercase font-bold leading-none text-lg sm:text-xl pl-4 sm:pl-8 md:pl-10 pt-9 w-full md:w-2/4" style="line-height: 1rem;">
                             Actualizamos información todas las semanas.
                         </div>
                     </div>
 
-                    <div class="text-xs pl-4 sm:pl-8 md:pl-10 leading-none mt-4 w-full md:w-4/6 uppercase font-medium tracking-tighter pr-4">
-                        Scrapeamos sitios y redes para linkearte a oportunidades en todo el mundo, <b>por fecha de cierre y por DESTACADAS</b>.
+                    <div class="text-xs pl-4 sm:pl-8 md:pl-10 leading-none mt-4 w-full md:w-1/2 uppercase font-medium tracking-tighter pr-4">
+                        Scrapeamos sitios y redes para linkearte a convocatorias en todo el mundo. <b>Podés verlas por fecha y por DESTACADAS</b>.
                     </div>
-                    <div class="text-xs tracking-tight pl-4 sm:pl-8 md:pl-10 leading-none mt-3 w-full md:w-2/4 pb-10">
-                        También listamos recursos para investigadorxs: maestrías, doctorados y post-docs.
+                    <div class="text-xs tracking-tight pl-4 sm:pl-8 md:pl-10 leading-none mt-3 w-full md:w-2/4 pb-8">
+                        También podés guardar tus propios recursos. <b>No pierdas tu información, logueate!</b>
                     </div>
                 </div>
             </div>
@@ -44,7 +43,7 @@
         </div>
     </main>
     {% if 'user' not in session %}
-    <div class="flex justify-center border-r-2 border-l-2 border-b-2 border-neutral w-full md:w-3/5 relative h-10 hover:bg-slate-100 ml-2">
+    <div class="flex justify-center border-r-2 border-l-2 border-b-2 border-neutral w-full md:w-[47%] h-10 hover:bg-slate-100">
         <button type="submit" class="items-center text-sm">
             <a href="{{ url_for('login') }}" class="px-8 md:py-20 md:px-56 font-black">ENTRAR</a>
         </button>
