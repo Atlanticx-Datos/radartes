@@ -3,8 +3,8 @@
 {% block body %}
 
 <body>
-    <main class="w-full max-w-[1250px] mx-auto border-4 md:border border-black justify-center mt-0 md:mt-2 bg-white">
-        <div class="flex flex-wrap justify-center align-center border-b border-neutral h-auto 2xl:h-80">
+    <main class="w-full max-w-[1250px] mx-auto border-4 md:border border-neutral justify-center mt-0 md:mt-2 bg-white">
+        <div class="flex flex-wrap md:justify-center mobile-align-start align-center border-b-4 border-neutral h-auto 2xl:h-80">
             <div class="w-3/4 md:w-3/4 lg:w-2/4 mx-auto md:border-r-8 md:border-l-8 md:border-t-8 border-neutral pt-8 pl-4 relative right-8 md:right-0 md:pl-0">
                 <div class="uppercase font-bold tracking-tighter leading-none md-line-height text-4xl md:text-3xl  sm:pl-8 md:pl-16 align-center w-full sm:w-3/4 md:w-1/2">
                     Becas, premios y residencias <span class="font-black">GLOBALES</span> para el arte.
@@ -17,12 +17,14 @@
                 </div>
             </div>
 
-            <div class=" w-full md:w-3/6 mx-auto md:border-t-8 md:border-r-8 md:border-l-8 md:border-l-0 md:border-black bg-secondary h-20 md:h-auto"></div>
+            <div class="w-1/3 md:w-3/6 ml-8 mb-3 md:mb-0 md:mx-auto border-b-8 border-t-8 border-r-8 border-l-8 md:border-l-0 border-black bg-secondary h-20 md:h-auto"></div>
+
         </div>
-        <div class="flex flex-wrap justify-center align-center h-auto 2xl:h-72">
+        <div class="md:hidden h-4 bg-primary"></div>
+        <div class="flex flex-wrap md:justify-center mobile-align-start align-center h-auto 2xl:h-72">
             <div class="hidden md:block w-full md:w-2/4 mx-auto border-8 border-neutral bg-primary h-40 md:h-auto"></div>
 
-            <div class="w-full md:w-2/6 mx-auto border-t-8 md:border-b-8 border-neutral space-y-3 h-auto px-4 md:px-0">
+            <div class="w-full md:w-2/6 mx-auto border-t-4 md:border-t-8 md:border-b-8 border-neutral space-y-3 h-auto px-4 md:px-0">
                 <div class="">
                     <div class="">
                         <div class="uppercase font-bold leading-none text-lg sm:text-xl pl-4 sm:pl-8 md:pl-10 pt-9 w-1/2" style="line-height: 1rem;">
@@ -39,11 +41,11 @@
                 </div>
             </div>
 
-            <div class="w-full md:w-1/6 mx-auto bg-accent md:border-t-8 border-b-4 border-neutral md:border-b-8 md:border-l-8 md:border-r-8 md:border-neutral h-40 md:h-auto"></div>
+            <div class="w-1/3 md:w-1/6 mb-3 md:mb-0 ml-8 md:mx-auto bg-accent border-t-8 border-b-8 border-neutral border-l-8 border-r-8 border-neutral h-40 md:h-auto"></div>
         </div>
     </main>
     {% if 'user' not in session %}
-        <div class="flex justify-center border-r-2 border-l-2 border-b-2 border-neutral w-full md:w-[47%] h-10 hover:bg-slate-100 bg-white">
+        <div class="flex justify-center md:border-r-2 md:border-l-2 md:border-b-2 border-neutral border-3 w-full md:w-[47%] h-10 hover:bg-slate-100 bg-white mt-8 md:mt-0">
         <button type="submit" class="items-center text-sm ">
             <a href="{{ url_for('login') }}" class="px-8 md:py-20 md:px-56 font-black">ENTRAR</a>
         </button>
