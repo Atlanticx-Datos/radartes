@@ -3,13 +3,15 @@
 {% block body %}
 
 <body>
-    <main class="w-full max-w-[1250px] mx-auto border-4 md:border border-black justify-center mt-0 md:mt-2">
+    <main class="w-full max-w-[1250px] mx-auto border-4 md:border border-black justify-center mt-6 md:mt-2">
         <div class="flex flex-wrap md:justify-center mobile-align-start align-center border-b border-neutral h-auto">
-            <div class="w-3/4 md:w-3/4 mx-auto md:border-r-8 md:border-l-8 md:border-t-8 border-neutral md:pt-8 md:pl-4 md:pl-0">
+            <div
+                class="w-3/4 md:w-3/4 mx-auto md:border-r-8 md:border-l-8 md:border-t-8 border-neutral md:pt-8 md:pl-4 md:pl-0">
 
-                <div class="flex text-sm sm:text-base py-16 md:py-8 pl-2 md:pl-8 w-full mt-8 bg-black text-white md:ml-16">
+                <div
+                    class="flex text-sm sm:text-base py-16 md:py-8 pl-2 md:pl-8 w-full mt-8 bg-black text-white md:ml-16">
                     <div
-                        class="uppercase font-extralight tracking-tighter leading-none md-line-height text-4xl md:text-4xl md:pl-8 md:py-8 align-center w-full md:w-2/3">
+                        class="uppercase font-extralight tracking-tighter leading-none md-line-height text-4xl md:text-4xl md:pl-8 md:py-8 align-center w-2/3 md:w-2/3">
                         Becas, premios y residencias <span class="font-black">GLOBALES</span> para el arte.
                     </div>
                 </div>
@@ -26,7 +28,7 @@
 
         </div>
 
-        <div class="flex flex-wrap md:justify-center mobile-align-start align-center h-auto 2xl:h-72">
+        <div class="flex flex-wrap md:justify-center mobile-align-start align-center h-auto">
             <div class="hidden md:block w-full md:w-2/4 mx-auto border-8 border-neutral bg-primary h-40 md:h-auto">
             </div>
 
@@ -43,8 +45,7 @@
                     <div
                         class="text-base md:text-xs pl-2 md:pl-10 leading-none mt-4 w-2/3 md:w-1/2 uppercase font-medium tracking-tighter md:pr-0">
                         Somos una alianza de organizaciones culturales que linkea a convocatorias en todo el mundo.
-                        <b>Podés verlas por
-                            fecha y por DESTACADAS</b>.
+                        <b>Podés verlas por fecha y por DESTACADAS</b>.
                     </div>
                     <div class="text-sm md:text-xs tracking-tight pl-2 md:pl-10 leading-none mt-3 w-1/2 pb-8">
                         También podés guardar tus propios recursos. <b>No pierdas tu información, logueate!</b>
@@ -59,7 +60,7 @@
     </main>
     {% if 'user' not in session %}
     <div
-        class="flex justify-center md:border-r-2 md:border-l-2 md:border-b-2 border-neutral border-3 w-full md:w-[47%] h-12 hover:bg-slate-100 bg-white mt-8 md:mt-0">
+        class="flex justify-center md:border-r-2 md:border-l-2 md:border-b-2 border-neutral border-3 w-full h-12 hover:bg-slate-100 bg-white mt-10 md:mt-0">
         <button type="submit" class="items-center text-sm ">
             <a href="{{ url_for('login') }}" class="px-8 md:px-56 font-black relative md:top-1">ENTRAR</a>
         </button>
