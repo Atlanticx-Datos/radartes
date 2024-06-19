@@ -3,71 +3,54 @@
 {% block body %}
 
 <body>
-    <main class="w-full max-w-[1250px] mx-auto border-4 md:border border-black justify-center mt-6 md:mt-2">
-        <div class="flex flex-wrap md:justify-center mobile-align-start align-center border-b border-neutral h-auto">
-            <div
-                class="w-3/4 md:w-3/4 mx-auto md:border-r-4 md:border-l-4 md:border-t-4 border-neutral md:pt-8 md:pl-4 md:pl-0">
-
+    <main class="w-full max-w-[1250px] mx-auto md:border-none border-black justify-center mt-6 md:mt-2">
+        <!-- ROW 1 CONTAINER -->
+        <div
+            class="flex flex-wrap md:justify-center mobile-align-start align-center h-auto md:border-r md:border-l md:border-t md:border-b border-neutral">
+            <div class="w-full md:w-5/6 mx-auto md:pt-8 md:pl-4 md:pl-0 px-2 md:px-0">
                 <div
-                    class="flex text-sm sm:text-base py-16 md:py-8 pl-2 md:pl-8 w-full mt-8 bg-black text-white md:ml-16">
+                    class="flex text-sm sm:text-base py-32 md:py-8 pl-2 md:pl-8 w-full mt-8 bg-black text-white md:ml-16">
                     <div
                         class="uppercase font-extralight tracking-tighter leading-none md-line-height text-4xl md:text-4xl md:pl-8 md:py-8 align-center w-full md:w-2/3">
                         Becas, premios y residencias <span class="font-black">GLOBALES</span> para el arte.
                     </div>
                 </div>
                 <div
-                    class="text-sm md:text-xs tracking-tight leading-none w-full  pl-4 sm:pl-8 md:pl-20 relative right-4 md:right-4 mt-2 mb-16">
-                    <b>100 ︱ Oportunidades</b>.<a href="mailto:info@atlanticx.org"> <u>Escribinos</u> o</a>
-                    registrate con tu correo desde "entrar". <b>Es gratis</b>.
+                    class="h-20 md:h-auto md:border-none border-r border-black text-sm md:text-xs tracking-tight leading-none w-full pt-2 pl-2 pr-4 md:pl-20 relative md:right-4 md:mt-2 md:mb-16">
+                    <u>Escribinos</u> con tu correo para sumar. <b>Es gratis</b>.
                 </div>
             </div>
-
-            <div
-                class="hidden md:block w-1/3 md:w-1/4 ml-8 mb-3 md:mb-0 md:mx-auto border-b-4 md:border-b-0 border-t-4 border-r-4 border-l-4 md:border-l-0 border-black bg-secondary h-20 md:h-auto">
+            <div class="w-20 md:w-1/6 ml-2  md:mb-0 md:mx-auto md:border-l border-black bg-secondary h-16 md:h-auto">
             </div>
-
+            <div
+                class="md:hidden w-10 md:w-1/6 md:ml-2 md:mb-0 md:mx-auto md:border-l border-black bg-accent h-16 md:h-auto">
+            </div>
+            <div
+                class="md:hidden w-10 md:w-1/6 md:ml-2 md:mb-0 md:mx-auto md:border-l border-black bg-white border-t h-16 md:h-auto">
+            </div>
         </div>
-
-        <div class="flex flex-wrap md:justify-center mobile-align-start align-center h-auto">
-            <div class="hidden md:block w-full md:w-2/4 mx-auto border-4 border-neutral bg-primary h-40 md:h-auto">
+        <!-- ROW 2 CONTAINER -->
+        <div
+            class="flex flex-wrap md:justify-center mobile-align-start md:align-center h-auto md:border-r border-neutral">
+            <div class="w-full md:w-2/4 mx-auto bg-white h-10 ml-2 md:ml-0 border-neutral border-l">
             </div>
-
             <div
-                class="w-full md:w-2/6 mx-auto border-t-4 md:border-t-4 md:border-b-4 border-neutral space-y-3 h-auto px-4 md:px-0">
-                <div class="bg-secondary md:bg-white my-8 mx-8 md:mx-0 md:my-0 py">
-                    <div class="">
-                        <div class="uppercase font-bold leading-none text-xl md:text-lg pl-2 md:pl-10 pt-9 w-4/5 md:w-1/2"
-                            style="line-height: 1rem;">
-                            Actualizamos información todas las semanas.
-                        </div>
-                    </div>
-
-                    <div
-                        class="text-base md:text-xs pl-2 md:pl-10 leading-tighter mt-4 w-2/3 md:w-1/2 uppercase font-medium tracking-tighter md:pr-0"
-                        style="line-height: 0.8rem;">
+                class="w-full md:w-2/6 md:mx-auto space-y-6 h-auto md:px-0 md:border-r md:border-l md:border-r border-neutral">
+                <div class="mt-12 md:mt-0 bg-secondary md:bg-white py-16 md:py-0 mx-2 md:mx-0 md:border-b border-neutral">
+                    <div class="text-2xl md:text-xs pl-2 md:pl-10 pr-12 md:pr-0 mt-6 w-full md:w-1/2 uppercase font-bold leading-none tracking-tighter">
                         Somos una alianza de organizaciones culturales que linkea a convocatorias en todo el mundo.
-                        <b>Podés verlas por fecha y por DESTACADAS</b>.
+                        <b class="block mt-6 md:mt-0 md:inline text-xl md:text-xs leading-none md:w-full w-2/3 font-extralight">Podés verlas por fecha y por DESTACADAS.</b>
                     </div>
-                    <div class="text-sm md:text-xs tracking-tight pl-2 md:pl-10 leading-none mt-3 w-1/2 pb-8"
-                    style="line-height: 0.8rem;">
-                        También podés guardar tus propios recursos. <b>No pierdas tu información, logueate!</b>
+                    <div class="text-lg md:text-xs tracking-tighter pl-2 md:pl-10 pr-24 md:pr-0 leading-none md:leading-none mt-6 md:mt-3 w-2/3 md:w-1/2 pb-8">
+                        También podés <u>guardar y compartir los recursos</u>. <span class="block mt-6 md:mt-0 md:inline font-bold">No te pierdas la información, logueate!</span>
                     </div>
-                </div>
+                </div>                
             </div>
-
-            <div
-                class="hidden md:block w-1/3 md:w-1/6 mb-3 md:mb-0 ml-8 md:mx-auto bg-accent border-t-4 border-b-4 border-neutral border-l-4 border-r-4 border-neutral h-40 md:h-auto">
+            <div class="hidden md:block w-1/3 md:w-1/6 mb-3 md:mb-0 ml-8 md:mx-auto bg-accent h-40 md:h-auto">
             </div>
+            <div class="block md:hiiden w-full md:w-2/4 mx-auto bg-white h-16 ml-2 mr-2 md:ml-0 border-neutral border-r"></div>
         </div>
     </main>
-    {% if 'user' not in session %}
-    <div
-        class="flex justify-center md:border-r-2 md:border-l-2 md:border-b-2 border-neutral border-3 w-full h-12 hover:bg-slate-100 bg-white mt-10 md:mt-0">
-        <button type="submit" class="items-center text-sm ">
-            <a href="{{ url_for('login') }}" class="px-8 md:px-56 font-black relative">ENTRAR</a>
-        </button>
-    </div>
-    {% endif %}
 </body>
 
 {% endblock %}

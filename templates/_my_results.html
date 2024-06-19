@@ -16,18 +16,30 @@
         </td>
         <td>{{ opportunity.fecha_de_cierre | format_date }}</td>
         <th>
-            <div class="flex">
-            <a href="{{ opportunity.url }}" target="_blank" class="btn btn-ghost btn-xs">
-                <svg class="w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"></path>
-                  </svg>
-            </a>
-            <button type="button" onclick="deleteOpportunity('{{ opportunity.id }}')" class="btn btn-danger btn-xs ml-2">
-                <svg class="w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
-                  </svg>
-            </button>
-        </div>
+            <div class="flex items-center gap-2">
+                <a href="{{ opportunity.url }}" target="_blank" class="btn btn-ghost btn-xs">
+                    <svg class="w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"></path>
+                    </svg>
+                </a>
+                <div class="dropdown dropdown-bottom dropdown-end">
+                    <button tabindex="0" class="btn btn-ghost btn-xs">
+                        <svg class="w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"></path>
+                        </svg>
+                    </button>
+                    <ul tabindex="0" class="dropdown-content z-auto menu p-2 shadow bg-white border rounded-box w-52">
+                        <li><a href="#" onclick="shareOpportunity('{{ opportunity.url }}', '{{ opportunity.resumen_IA }}', 'whatsapp')">WhatsApp</a></li>
+                        <li><a href="#" onclick="shareOpportunity('{{ opportunity.url }}', '{{ opportunity.resumen_IA }}', 'telegram')">Telegram</a></li>
+                        <li><a href="#" onclick="shareOpportunity('{{ opportunity.url }}', '{{ opportunity.resumen_IA }}', 'email')">Email</a></li>
+                    </ul>
+                </div>
+                <button type="button" onclick="deleteOpportunity('{{ opportunity.id }}')" class="btn btn-danger btn-xs">
+                    <svg class="w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
         </th>
     </tr>
     {% endfor %}
@@ -36,3 +48,21 @@
         <td colspan="5">No se encontraron oportunidades.</td>
     </tr>
 {% endif %}
+
+<script>
+    function shareOpportunity(url, title, platform) {
+        const encodedUrl = encodeURIComponent(url);
+        const encodedTitle = encodeURIComponent(title);
+        let shareUrl = '';
+
+        if (platform === 'whatsapp') {
+            shareUrl = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
+        } else if (platform === 'telegram') {
+            shareUrl = `https://telegram.me/share/url?url=${encodedUrl}&text=${encodedTitle}`;
+        } else if (platform === 'email') {
+            shareUrl = `mailto:?subject=${encodedTitle}&body=${encodedUrl}`;
+        }
+
+        window.open(shareUrl, '_blank');
+    }
+</script>

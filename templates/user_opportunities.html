@@ -2,92 +2,95 @@
 
 {% block body %}
 <body>
-    <main class="w-full max-w-[1250px] mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
-            <!-- Left Sidebar -->
-            <aside class="col-span-1 md:col-start-4 lg:col-span-2 mt-2 lg:mt-6 ml-8">
-                <!-- Buscador -->
-                <div class="lg:col-span-2 w-full mt-12">
-                    <div class="border-l-8 border-primary">
-                        <p class="text-2xl font-black leading-none tracking-tighter pl-4 w-full sm:w-3/4 md:w-2/3 mt-4 relative right-1 md:right-2">
-                            OPORTUNIDADES GUARDADAS
-                        </p>
-                    </div>
-                    <div class="text-sm sm:text-base w-full sm:w-3/4 md:w-2/3 mt-4 relative right-0" style="line-height: 0.8rem;">
-                        Aquí vas a encontrar las oportunidades que tenés guardadas. No pierdas enlaces, y, recordá, actualizamos vía scrapeo todas las semanas.
+    <main class="w-full max-w-[1250px] mx-auto mt-2">
+        <div class="grid grid-cols-1 lg:grid-cols-6 gap-0">
+            <!-- First Column: Header for Saved Opportunities -->
+            <div class="col-span-1 lg:col-span-2 mt-2 lg:mt-0 border-r-0 border-neutral flex flex-col justify-between h-auto">
+                <div class="mt-4">
+                    <div class="md:py-6 pl-2 md:pl-8 w-2/3 mt-8 bg-black text-white font-black md:ml-10 ">
+                        GUARDADAS
                     </div>
                 </div>
-            </aside>
-            <main class="col-span-1 lg:col-start-3 lg:col-span-4 space-y-3 w-auto mt-8">
-                <div class="pb-2">
-                    <div class="flex border-r-4 border-accent w-16">
-                        <svg class="w-6 relative left-3 " data-slot="icon" fill="none" stroke-width="1.5"
-                            stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
-                            aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z">
-                            </path>
-                        </svg>
-                    </div>
-                </div>
+            </div>
 
-                <div class="flex flex-col lg:flex-row justify-between gap-3">
-                    <div class="border border-neutral rounded-none overflow-x-auto mb-12">
-                        <!-- Alert container -->
-                        <div id="alert-container"></div>
-                        <!-- Table as FORM -->
-                        <form id="delete-form" hx-post="/delete_opportunity/' + pageId" hx-trigger="submit" hx-swap="innerHTML" hx-target="#alert-container">
-                            <table id="my_results" class="table w-full">
-                                <thead>
-                                    <tr>
-                                        <th>Oportunidad</th>
-                                        <th>Descripción</th>
-                                        <th>Fecha de Cierre</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="my-results">
-                                    {% include "_my_results.html" %}
-                                </tbody>
-                            </table>
-                        </form>
-                    </div>
+            <!-- Second Column: Table -->
+            <div class="col-span-1 lg:col-span-3 mt-2 lg:mt-0 border-r-0 border-black">
+                <div id="spinner" class="spinner h-8 w-8 hidden">
+                    <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
                 </div>
-            </main>
+                <div class="border-b border-t border-neutral overflow-auto" style="max-height: 35rem;">
+                    <style>
+                        /* Hide scrollbar for WebKit-based browsers (Chrome, Safari) */
+                        ::-webkit-scrollbar {
+                            width: 0;
+                            height: 0;
+                        }
+                        /* Hide scrollbar for Firefox */
+                        table {
+                            scrollbar-width: none; /* Firefox */
+                        }
+                    </style>
+                    <div id="alert-container" class="mb-4"></div>
+                    <!-- Table as FORM -->
+                    <form id="delete-form" hx-post="/delete_opportunity" hx-trigger="submit" hx-swap="innerHTML"
+                          hx-target="#alert-container">
+                        <table id="my_results" class="table w-full">
+                            <thead>
+                                <tr>
+                                    <th>Oportunidad</th>
+                                    <th>Descripción</th>
+                                    <th>Fecha de Cierre</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="my-results">
+                                {% include "_my_results.html" %}
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Third Column: Empty Container for Visual Consistency -->
+            <div class="col-span-1 lg:col-span-1 mt-2 lg:mt-0 flex flex-col border-neutral bg-accent relative" style="height: calc(35rem + 20%);">
+                <div class="flex-1 border-b border-r border-t border-l border-neutral bg-secondary"></div>
+                <div class="flex-1 border-l border-r border-b border-black"></div>
+                <div class="w-full h-10 border-l border-neutral bg-white"></div>
+            </div>
         </div>
     </main>
+
+    <!-- Script for handling delete functionality -->
+    <script>
+        function deleteOpportunity(pageId) {
+            // Show the spinner
+            document.getElementById('spinner').style.display = 'block';
+            
+            console.log('Deleting opportunity with ID:', pageId);
+            fetch('/delete_opportunity/' + pageId, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/saved_opportunities';
+                } else {
+                    return response.json().then(data => {
+                        alert('Error: ' + data.error);
+                        // Hide the spinner if there's an error
+                        document.getElementById('spinner').style.display = 'none';
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Hide the spinner if there's an error
+                document.getElementById('spinner').style.display = 'none';
+            });
+        }
+    </script>
 </body>
-
-<script>
-    function deleteOpportunity(pageId) {
-        // Show the spinner
-        document.getElementById('spinner').style.display = 'block';
-        
-        console.log('Deleting opportunity with ID:', pageId);  // Log the URL being constructed
-        fetch('/delete_opportunity/' + pageId, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                window.location.href = '/saved_opportunities';
-            } else {
-                return response.json().then(data => {
-                    alert('Error: ' + data.error);
-                    // Hide the spinner if there's an error
-                    document.getElementById('spinner').style.display = 'none';
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // Hide the spinner if there's an error
-            document.getElementById('spinner').style.display = 'none';
-        });
-    }
-</script>
-
 {% endblock %}

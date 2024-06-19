@@ -18,25 +18,39 @@
             transform: translate(-50%, -50%);
             z-index: 1000;
         }
+
+        .dropdown-content {
+            position: absolute;
+            z-index: 9999;
+            /* Ensure it's on top of other content */
+            background-color: white;
+            /* Ensure background is white */
+        }
+
         @media (min-width: 768px) {
-      .md-line-height {
-        line-height: 1.8rem !important;
-      }
-      @media (max-width: 767px) {
-      .mobile-align-start {
-        justify-content: flex-start !important;
-      }
-    }
-    }
+            .md-line-height {
+                line-height: 1.8rem !important;
+            }
+        }
+
+        .border-extra {
+            border-right-width: 24px !important;
+
+        }
+
+        @media (max-width: 767px) {
+            .mobile-align-start {
+                justify-content: flex-start !important;
+            }
+        }
     </style>
 </head>
 
 <body class="flex justify-center">
-    <div id="spinner" class="spinner h-8 w-8">
+    <div id="spinner" class="spinner h-8 w-8" style="display: none;">
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
     </div>
     <main class="w-full md:w-4/5 max-w-[1250px] p-2.5">
-        {% if 'user' in session %}
         <nav class="flex justify-between items-center space-x-4 h-[34px] md:h-20 pt-4 md:pt-1 pb-2 px-2 z-50">
             <a href="{{ url_for('index') }}">
                 <svg class="w-6 h-6 md:hidden" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20"
@@ -61,28 +75,32 @@
                             </svg>
                         </span>
                         <span class="absolute top-0 right-0 flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                         </span>
                     </div>
                 </div>
                 <ul tabindex="0"
                     class="dropdown-content z-[1] menu p-2 bg-base-100 rounded-md w-52 border border-black mt-3">
+                    <li><a href="{{ url_for('all_pages') }}"><span
+                                class="border-l-4 border-accent pl-3">Oportunidades</span></a></li>
                     <li>
                         <a href="{{ url_for('list_saved_opportunities') }}" onclick="showSpinner(event)">
                             <span class="border-l-4 border-secondary pl-3">Guardadas</span>
                         </a>
                     </li>
-                    <li><a href="{{ url_for('all_pages') }}"><span class="border-l-4 border-accent pl-3">Oportunidades</span></a></li>
-                    <li><a href="{{ url_for('index') }}"><span class="border-l-4 border-primary pl-3">Home</span></a></li>
-                    <li><a href="{{ url_for('logout') }}"><span class="border-l-4 border-base-200 pl-3">Cerrar</span></a></li>
+                    <li><a href="{{ url_for('index') }}"><span class="border-l-4 border-primary pl-3">Home</span></a>
+                    </li>
+                    {% if session.get('user') %}
+                    <li><a href="{{ url_for('logout') }}"><span
+                                class="border-l-4 border-base-200 pl-3">Cerrar</span></a></li>
+                    {% endif %}
                 </ul>
             </div>
-        </nav>        
-        {% else %}
-        <div class="h-[34px] md:h-20"></div>
-        {% endif %}
+        </nav>
         {% block body %}{% endblock %}
+        {% include 'footer.html' %}
     </main>
     <script>
         function showSpinner(event) {

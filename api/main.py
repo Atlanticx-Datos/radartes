@@ -43,11 +43,16 @@ from concurrent.futures import ThreadPoolExecutor
 load_dotenv()
 print("Loaded AUTH0_DOMAIN:", os.environ.get("AUTH0_DOMAIN"))
 
-
-app: Flask = Flask(__name__)
-socketio = SocketIO(app)
-
+app = Flask(__name__, static_folder="../static", template_folder="../templates")
 app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", "default_fallback_secret_key")
+
+# Environment-specific configuration
+if os.getenv("FLASK_ENV") == "development":
+    app.config["ENV"] = "development"
+    app.config["DEBUG"] = True
+else:
+    app.config["ENV"] = "production"
+    app.config["DEBUG"] = False
 
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_COOKIE_SECURE"] = False
@@ -109,7 +114,7 @@ AUTH0_DOMAIN = os.getenv("AUTH0_DOMAIN")
 if os.getenv("FLASK_ENV") == "production":
     AUTH0_CALLBACK_URL = "https://oportunidades.onrender.com/callback"
 else:
-    AUTH0_CALLBACK_URL = "http://localhost:5000/callback"
+    AUTH0_CALLBACK_URL = "http://localhost:5001/callback"
 
 
 oauth = OAuth(app)
@@ -807,7 +812,8 @@ def save_page(page_id=None):
     return redirect(url_for("all_pages"))
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 5001))
     print(f"Running on http://127.0.0.1:{port}" if port == 5000 else f"Running on port {port}")
     app.run(host="0.0.0.0", port=port, debug=True, use_reloader=True)
+
 
