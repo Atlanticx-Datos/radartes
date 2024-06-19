@@ -18,7 +18,6 @@ from flask_jwt_extended import (
     JWTManager,
 )
 from dotenv import find_dotenv, load_dotenv
-from flask_session import Session
 from functools import wraps
 
 from typing_extensions import LiteralString
@@ -43,7 +42,8 @@ from concurrent.futures import ThreadPoolExecutor
 load_dotenv()
 print("Loaded AUTH0_DOMAIN:", os.environ.get("AUTH0_DOMAIN"))
 
-app = Flask(__name__, static_folder="../static", template_folder="../templates")
+
+app = Flask(__name__, static_folder='../static', static_url_path='/static', template_folder='../templates')
 app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", "default_fallback_secret_key")
 
 # Environment-specific configuration
@@ -55,21 +55,17 @@ else:
     app.config["DEBUG"] = False
 
 app.config["SESSION_TYPE"] = "filesystem"
-app.config["SESSION_COOKIE_SECURE"] = False
-app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"] = True  # Ensure cookies are sent over HTTPS
+app.config["SESSION_COOKIE_HTTPONLY"] = True  # Prevent JavaScript from accessing the cookies
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"  # Add CSRF protection by allowing cookies to be sent only on same-site requests
 app.config["SESSION_PERMANENT"] = True  # Ensure sessions don't expire immediately
 app.config["SESSION_USE_SIGNER"] = (
     True  # Optionally, enhance security by signing the session cookie
 )
 
-
-Session(app)  # Initialize session
-
 # Role-Base Access Mgmt
 app.config["JWT_SECRET_KEY"] = "daleboquita"  # Change this to your actual secret key
 jwt = JWTManager(app)
-
 
 def login_required(f):
     @wraps(f)
@@ -77,9 +73,7 @@ def login_required(f):
         if "user" not in session:
             return redirect(url_for("login"))
         return f(*args, **kwargs)
-
     return decorated_function
-
 
 def admin_required(f):
     @wraps(f)
@@ -89,12 +83,9 @@ def admin_required(f):
         ):
             return redirect(url_for("login"))  # or some other unauthorized page
         return f(*args, **kwargs)
-
     return decorated_function
 
-
 # Notion Integration
-
 NOTION_TOKEN = "secret_IVjx7fzy1C08BK3tecE3utwikJte72Mmgwhd5mUtzWv"
 DATABASE_ID = "b267157879d54cfc8f7106039d4ab221"
 OPORTUNIDADES_ID = "24112623fb4546238a2d907b40f1c2b5"
@@ -106,7 +97,6 @@ headers = {
 }
 
 # Auth0 Integration
-
 AUTH0_CLIENT_ID = os.getenv("AUTH0_CLIENT_ID")
 AUTH0_CLIENT_SECRET = os.getenv("AUTH0_CLIENT_SECRET")
 AUTH0_DOMAIN = os.getenv("AUTH0_DOMAIN")
@@ -114,8 +104,7 @@ AUTH0_DOMAIN = os.getenv("AUTH0_DOMAIN")
 if os.getenv("FLASK_ENV") == "production":
     AUTH0_CALLBACK_URL = "https://oportunidades.onrender.com/callback"
 else:
-    AUTH0_CALLBACK_URL = "http://localhost:5001/callback"
-
+    AUTH0_CALLBACK_URL = "http://localhost:5000/callback"
 
 oauth = OAuth(app)
 
@@ -129,38 +118,34 @@ oauth.register(
     server_metadata_url=f'https://{os.environ.get("AUTH0_DOMAIN")}/.well-known/openid-configuration',
 )
 
-
 @app.route("/login")
 def login():
+    # Store the original URL the user was trying to access before logging in
+    session["original_url"] = request.args.get("next") or url_for("index")
     return oauth.auth0.authorize_redirect(
         redirect_uri=url_for("callback", _external=True)
     )
-
 
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
     try:
         # Obtain the access token from Auth0
         token = oauth.auth0.authorize_access_token()
-
         # Store the token in the session
         session["jwt"] = token
-
         # User info endpoint - manually specified
-        user_info_endpoint = "https://dev-3klm8ed6qtx4zj6v.us.auth0.com/userinfo"
+        user_info_endpoint = f'https://{AUTH0_DOMAIN}/userinfo'
         user_info_response = oauth.auth0.get(user_info_endpoint)
-
         # Extract user information from the response
         user_info = user_info_response.json()
         session["user"] = user_info
-        """ print("Session Data Set:", session["user"]) """
-        # Redirect to the dashboard or another appropriate page
-        return redirect(url_for("index"))
+        # Retrieve the original URL from the session and redirect the user to it
+        original_url = session.get("original_url", url_for("index"))
+        return redirect(original_url)
     except Exception as e:
         # Handle errors and provide feedback
         print(f"Error during callback processing: {str(e)}")
         return f"An error occurred: {str(e)}"
-
 
 @app.route("/logout")
 def logout():
@@ -178,9 +163,7 @@ def logout():
         )
     )
 
-
 # User Opportunities save
-
 
 def save_to_notion(user_id, page_id):
     url = "https://api.notion.com/v1/pages"
@@ -199,7 +182,6 @@ def save_to_notion(user_id, page_id):
 
     response = requests.post(url, headers=headers, json=json_body)
     response.raise_for_status()  # Raise an exception for HTTP errors
-
 
 @app.route("/save_user_opportunity", methods=["POST"])
 @login_required
@@ -237,8 +219,6 @@ def save_user_opportunity():
 def fetch_opportunity_details(opportunity_id):
     return get_opportunity_by_id(opportunity_id)
 
-
-
 @app.route("/saved_opportunities", methods=["GET"])
 @login_required
 def list_saved_opportunities():
@@ -252,7 +232,6 @@ def list_saved_opportunities():
         opportunities = list(executor.map(fetch_opportunity_details, opportunity_ids))
 
     return render_template("user_opportunities.html", opportunities=opportunities)
-
 
 def is_opportunity_already_saved(user_id, page_id):
     url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
@@ -276,7 +255,6 @@ def is_opportunity_already_saved(user_id, page_id):
 
     return bool(data["results"])
 
-
 def get_saved_opportunity_ids(user_id):
     url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
     headers = {
@@ -296,7 +274,6 @@ def get_saved_opportunity_ids(user_id):
     ]
     """ print("Opportunity IDs from Notion:", opportunity_ids)  # Debugging statement """
     return opportunity_ids
-
 
 def get_opportunity_by_id(opportunity_id):
     url = f"https://api.notion.com/v1/pages/{opportunity_id}"
@@ -350,8 +327,6 @@ def get_opportunity_by_id(opportunity_id):
     }
 
     return opportunity
-
-
 
 def delete_saved_opportunity(user_id, page_id):
     url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
@@ -458,7 +433,6 @@ def get_similar_opportunities(keywords, exclude_ids):
 
     return opportunities
 
-
 @app.route("/find_similar_opportunities", methods=["GET"])
 @login_required
 def find_similar_opportunities():
@@ -487,9 +461,7 @@ def find_similar_opportunities():
         "_similar_opportunities.html", similar_opportunities=similar_opportunities
     )
 
-
 # App Logic
-
 
 @app.route("/")
 def index():
@@ -503,7 +475,6 @@ def index():
         )
     else:
         return render_template("index.html", user=None, pretty="No user data")
-
 
 @app.route("/create", methods=["GET", "POST"])
 @login_required
@@ -521,7 +492,6 @@ def handle_create():
 
     # For GET request, just show the form
     return render_template("form.html", properties={}, page_id=None)
-
 
 def create_page(data: dict):
     create_url = "https://api.notion.com/v1/pages"
@@ -695,8 +665,6 @@ def all_pages():
             empty_fecha_pages=empty_fecha_pages
         )
 
-
-
 # Custom Jinja2 filter for date
 @app.template_filter('format_date')
 def format_date(value):
@@ -760,7 +728,6 @@ def update_page(page_id):
 
     return render_template("form.html", properties=properties, page_id=page_id)
 
-
 @app.route("/save", methods=["POST"])
 @app.route("/save/<page_id>", methods=["POST"])
 @admin_required
@@ -813,7 +780,4 @@ def save_page(page_id=None):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5001))
-    print(f"Running on http://127.0.0.1:{port}" if port == 5000 else f"Running on port {port}")
-    app.run(host="0.0.0.0", port=port, debug=True, use_reloader=True)
-
-
+    app.run(host="0.0.0.0", port=port, debug=True)
