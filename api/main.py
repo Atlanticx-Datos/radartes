@@ -54,6 +54,9 @@ else:
     app.config["ENV"] = "production"
     app.config["DEBUG"] = False
 
+# Remove dependency on flask_session
+# Session(app)  # Comment this out if using the default Flask session management
+
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_COOKIE_SECURE"] = True  # Ensure cookies are sent over HTTPS
 app.config["SESSION_COOKIE_HTTPONLY"] = True  # Prevent JavaScript from accessing the cookies
@@ -71,9 +74,11 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if "user" not in session:
+            session["next"] = request.url
             return redirect(url_for("login"))
         return f(*args, **kwargs)
     return decorated_function
+
 
 def admin_required(f):
     @wraps(f)
@@ -131,21 +136,27 @@ def callback():
     try:
         # Obtain the access token from Auth0
         token = oauth.auth0.authorize_access_token()
+
         # Store the token in the session
         session["jwt"] = token
+
         # User info endpoint - manually specified
-        user_info_endpoint = f'https://{AUTH0_DOMAIN}/userinfo'
+        user_info_endpoint = "https://dev-3klm8ed6qtx4zj6v.us.auth0.com/userinfo"
         user_info_response = oauth.auth0.get(user_info_endpoint)
+
         # Extract user information from the response
         user_info = user_info_response.json()
         session["user"] = user_info
-        # Retrieve the original URL from the session and redirect the user to it
-        original_url = session.get("original_url", url_for("index"))
-        return redirect(original_url)
+        
+        # Redirect to the originally requested URL, or default to the index page
+        next_url = session.get("next", url_for("index"))
+        session.pop("next", None)  # Clear the stored URL
+        return redirect(next_url)
     except Exception as e:
         # Handle errors and provide feedback
         print(f"Error during callback processing: {str(e)}")
         return f"An error occurred: {str(e)}"
+
 
 @app.route("/logout")
 def logout():
