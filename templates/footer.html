@@ -1,38 +1,25 @@
 <!-- footer.html -->
-<footer class="w-full py-4 bg-white mt-20">
-    <div class="container mx-auto flex flex-col items-center space-y-4">
-        <!-- Row 1: Institution Logos -->
-        <div class="w-full flex justify-center items-center space-x-4 overflow-hidden">
-            <!-- Heroicons Chevron Left -->
-            <button id="prev-logo" class="hidden md:block">
-                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                     xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M15 19l-7-7 7-7"/>
-                </svg>
-            </button>
-            <div class="flex justify-center space-x-4" id="logo-container">
-                <!-- Example logos -->
-                <img src="logo1.png" alt="Logo 1" class="w-5 h-5 grayscale">
-                <img src="logo2.png" alt="Logo 2" class="w-5 h-5 grayscale">
-                <img src="logo3.png" alt="Logo 3" class="w-5 h-5 grayscale">
-                <img src="logo4.png" alt="Logo 4" class="w-5 h-5 grayscale">
-                <img src="logo5.png" alt="Logo 5" class="w-5 h-5 grayscale">
-                <img src="logo5.png" alt="Logo 5" class="w-5 h-5 grayscale">
+<footer class="w-full py-4 bg-white mt-28">
+    <div class="container mx-auto flex flex-col items-center">
+        <!-- Row 1: Main Logos and Support Text -->
+        <div class="w-full flex justify-center items-center space-x-20">
+            <a href="https://atlanticx.org" target="_blank" rel="noopener noreferrer">
+                <img src="{{ url_for('static', filename='public/Logo_Grande_Atx.png') }}" alt="Logo Grande Atx" class="w-20">
+            </a>
+            <a href="https://digitalpublicgoods.net/" target="_blank" rel="noopener noreferrer">
+                <img src="{{ url_for('static', filename='public/alliance.svg') }}" alt="DPGA" class="w-28 relative left-4">
+            </a>
+            <div class="flex flex-col items-center">
+                <span class="text-xs mb-1 scale-75 -mt-2 relative left-4">con el apoyo de:</span>
+                <a href="https://fundacionwilliams.org.ar/" target="_blank" rel="noopener noreferrer">
+                    <img src="{{ url_for('static', filename='public/logo-williams.png') }}" alt="Logo Williams" class="w-20 relative left-4 -mt-1">
+                </a>
             </div>
-            <!-- Heroicons Chevron Right -->
-            <button id="next-logo" class="hidden md:block">
-                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                     xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M9 5l7 7-7 7"/>
-                </svg>
-            </button>
         </div>
         <!-- Row 2: Copyright and Logo -->
-        <div class="w-full flex justify-center items-center space-x-2">
+        <div class="w-full flex justify-center items-center space-x-2 mt-12">
             <span class="text-xs">&copy; <span id="current-year"></span></span>
-            <img src="{{ url_for('static', filename='public/Logo_100.svg') }}" class="w-5 h-5">
+            <img src="{{ url_for('static', filename='public/Logo_100.svg') }}" class="w-8">
         </div>
     </div>
 </footer>
@@ -40,39 +27,5 @@
 <script>
     // Update current year
     document.getElementById('current-year').textContent = new Date().getFullYear();
-
-    // Pagination for logos
-    const logoContainer = document.getElementById('logo-container');
-    const logos = logoContainer.children;
-    let currentIndex = 0;
-    const maxVisibleLogos = window.innerWidth >= 768 ? 5 : 4;
-
-    function updateLogoVisibility() {
-        for (let i = 0; i < logos.length; i++) {
-            logos[i].style.display = i >= currentIndex && i < currentIndex + maxVisibleLogos ? 'inline-block' : 'none';
-        }
-        document.getElementById('prev-logo').style.display = currentIndex > 0 ? 'block' : 'none';
-        document.getElementById('next-logo').style.display = currentIndex + maxVisibleLogos < logos.length ? 'block' : 'none';
-    }
-
-    document.getElementById('prev-logo').addEventListener('click', () => {
-        if (currentIndex > 0) {
-            currentIndex--;
-            updateLogoVisibility();
-        }
-    });
-
-    document.getElementById('next-logo').addEventListener('click', () => {
-        if (currentIndex + maxVisibleLogos < logos.length) {
-            currentIndex++;
-            updateLogoVisibility();
-        }
-    });
-
-    updateLogoVisibility();
-
-    window.addEventListener('resize', () => {
-        currentIndex = 0;
-        updateLogoVisibility();
-    });
 </script>
+

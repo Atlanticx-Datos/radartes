@@ -1,57 +1,44 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-
 <body>
     <main class="w-full max-w-[1250px] mx-auto md:border-none border-black justify-center mt-6 md:mt-2">
         <!-- ROW 1 CONTAINER -->
-        <div
-            class="flex flex-wrap md:justify-center mobile-align-start align-center h-auto md:border-r md:border-l md:border-t md:border-b border-neutral">
+        <div class="flex flex-wrap md:justify-center mobile-align-start align-center h-auto md:border-r md:border-l md:border-t md:border-b border-neutral">
             <div class="w-full md:w-5/6 mx-auto md:pt-8 md:pl-4 md:pl-0 px-2 md:px-0">
-                <div
-                    class="flex text-sm sm:text-base py-32 md:py-8 pl-2 md:pl-8 w-full mt-8 bg-black text-white md:ml-16">
-                    <div
-                        class="uppercase font-extralight tracking-tighter leading-none md-line-height text-4xl md:text-4xl md:pl-8 md:py-8 align-center w-full md:w-2/3">
+                <div class="flex text-sm sm:text-base py-32 md:py-8 pl-2 md:pl-8 w-full mt-8 bg-black text-white md:ml-16">
+                    <div class="uppercase font-extralight tracking-tighter leading-none md-line-height text-4xl md:text-4xl md:pl-8 md:py-8 align-center w-full md:w-2/3">
                         Becas, premios y residencias <span class="font-black">GLOBALES</span> para el arte.
                     </div>
                 </div>
-                <div
-                    class="h-20 md:h-auto md:border-none border-r border-black text-sm md:text-xs tracking-tight leading-none w-full pt-1 pl-2 pr-4 md:pl-20 relative md:right-4 md:mt-2 md:mb-16">
+                <div class="h-20 md:h-auto md:border-none border-r border-black text-sm md:text-xs tracking-tight leading-none w-full pt-1 pl-2 pr-4 md:pl-20 relative md:right-4 md:mt-2 md:mb-16">
                     <u>Escribinos</u> con tu correo para sumar. <b>Es gratis</b>.
                 </div>
             </div>
-            <div class="w-20 md:w-1/6 ml-2  md:mb-0 md:mx-auto md:border-l border-black bg-secondary h-16 md:h-auto">
-            </div>
-            <div
-                class="md:hidden w-10 md:w-1/6 md:ml-2 md:mb-0 md:mx-auto md:border-l border-black bg-accent h-16 md:h-auto">
-            </div>
-            <div
-                class="md:hidden w-10 md:w-1/6 md:ml-2 md:mb-0 md:mx-auto md:border-l border-black bg-white border-t h-16 md:h-auto">
-            </div>
+            <div class="w-20 md:w-1/6 ml-2 md:mb-0 md:mx-auto md:border-l border-black bg-secondary h-16 md:h-auto"></div>
+            <div class="md:hidden w-10 md:w-1/6 md:ml-2 md:mb-0 md:mx-auto md:border-l border-black bg-accent h-16 md:h-auto"></div>
+            <div class="md:hidden w-10 md:w-1/6 md:ml-2 md:mb-0 md:mx-auto md:border-l border-black bg-white border-t h-16 md:h-auto"></div>
         </div>
         <!-- ROW 2 CONTAINER -->
-        <div
-            class="flex flex-wrap md:justify-center mobile-align-start md:align-center h-auto md:border-r border-neutral">
-            <div class="w-full md:w-2/4 mx-auto bg-white h-10 ml-2 md:ml-0 border-neutral border-l">
-            </div>
-            <div
-                class="w-full md:w-2/6 md:mx-auto space-y-6 h-auto md:px-0 md:border-r md:border-l md:border-r border-neutral">
+        <div class="flex flex-wrap md:justify-center mobile-align-start md:align-center h-auto md:border-r border-neutral">
+            <div class="w-full md:w-2/4 mx-auto bg-white h-10 ml-2 md:ml-0 border-neutral border-l"></div>
+            <div class="w-full md:w-2/6 md:mx-auto space-y-6 h-auto md:px-0 md:border-r md:border-l md:border-r border-neutral">
                 <div class="mt-12 md:mt-0 bg-secondary md:bg-white py-16 md:py-0 mx-2 md:mx-0 md:border-b border-neutral">
                     <div class="text-2xl md:text-xs pl-2 md:pl-10 pr-12 md:pr-0 mt-6 w-full md:w-2/3 uppercase font-bold leading-none tracking-tight">
                         Somos una alianza de organizaciones culturales que linkea a convocatorias en todo el mundo.
-                        
                     </div>
-                    <div class="text-2xl md:text-xs pl-2 md:pl-10 pr-12 md:pr-0 mt-2 w-full md:w-2/3 uppercase font-extralight leading-none tracking-tighter">Podés verlas por fecha y por destacadas, y compartirlas.</div>
+                    <div class="text-2xl md:text-xs pl-2 md:pl-10 pr-12 md:pr-0 mt-2 w-full md:w-2/3 uppercase font-extralight leading-none tracking-tighter">Podés buscar por fecha y por destacadas, y compartirlas.</div>
                     <div class="text-lg md:text-xs tracking-tighter pl-2 md:pl-10 pr-24 md:pr-0 leading-none md:leading-none mt-6 md:mt-3 w-2/3 md:w-1/2 pb-8">
-                 <span class="block mt-6 md:mt-0 md:inline font-bold"><a href="{{ url_for('login') }}">Entrar.</a></span>
+                        {% if session.get('user') is none %}
+                        <span class="block mt-6 md:mt-0 md:inline font-bold"><a href="{{ url_for('login') }}">Entrar.</a></span>
+                        {% else %}
+                        {% endif %}
                     </div>
-                </div>                
+                </div>
             </div>
-            <div class="hidden md:block w-1/3 md:w-1/6 mb-3 md:mb-0 ml-8 md:mx-auto bg-accent h-40 md:h-auto">
-            </div>
-            <div class="block md:hiiden w-full md:w-2/4 mx-auto bg-white h-16 ml-2 mr-2 md:ml-0 border-neutral border-r"></div>
+            <div class="hidden md:block w-1/3 md:w-1/6 mb-3 md:mb-0 ml-8 md:mx-auto bg-accent h-40 md:h-auto"></div>
+            <div class="block md:hidden w-full md:w-2/4 mx-auto bg-white h-16 ml-2 mr-2 md:ml-0 border-neutral border-r"></div>
         </div>
     </main>
 </body>
-
 {% endblock %}
