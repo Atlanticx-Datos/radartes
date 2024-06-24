@@ -10,7 +10,7 @@
                 <img src="{{ url_for('static', filename='public/alliance.svg') }}" alt="DPGA" class="w-20 relative left-4">
             </a>
             <div class="flex flex-col items-center">
-                <span class="text-[9px] mb-1 scale-75 -mt-2 relative left-4">con el apoyo de:</span>
+                <span class="mb-1 scale-75 -mt-2 relative left-4" style="font-size: 9px;">con el apoyo de:</span>
                 <a href="https://fundacionwilliams.org.ar/" target="_blank" rel="noopener noreferrer">
                     <img src="{{ url_for('static', filename='public/logo-williams.png') }}" alt="Logo Williams" class="w-20 relative left-4 -mt-1">
                 </a>
@@ -18,7 +18,7 @@
         </div>
         <!-- Row 2: Copyright and Logo -->
         <div class="w-full flex justify-center items-center space-x-1 md:space-x-2 mt-12">
-            <span class="text-[9px]">&copy; <span id="current-year"></span></span>
+            <span style="font-size: 9px;">&copy; <span id="current-year"></span></span>
             <img src="{{ url_for('static', filename='public/Logo_Atlanticx.png') }}" class="w-10">
         </div>
     </div>
@@ -28,4 +28,3 @@
     // Update current year
     document.getElementById('current-year').textContent = new Date().getFullYear();
 </script>
-
