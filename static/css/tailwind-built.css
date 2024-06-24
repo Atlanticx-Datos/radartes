@@ -2411,10 +2411,6 @@ details.collapse summary::-webkit-details-marker {
   width: 5rem;
 }
 
-.w-28 {
-  width: 7rem;
-}
-
 .w-3 {
   width: 0.75rem;
 }
@@ -2809,10 +2805,6 @@ details.collapse summary::-webkit-details-marker {
   line-height: 2.5rem;
 }
 
-.text-\[10px\] {
-  font-size: 10px;
-}
-
 .text-\[9px\] {
   font-size: 9px;
 }
@@ -2959,6 +2951,10 @@ details.collapse summary::-webkit-details-marker {
   .md\:mx-auto {
     margin-left: auto;
     margin-right: auto;
+  }
+
+  .md\:-mr-\[2px\] {
+    margin-right: -2px;
   }
 
   .md\:mb-0 {
