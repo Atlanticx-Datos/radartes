@@ -480,7 +480,7 @@ def inject_og_data():
         "title": "100 ︱ Oportunidades",
         "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
         "url": "http://oportunidades-vercel.vercel.app",
-        "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_Grande_Atx.png"
+        "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100.svg"
     }
     return dict(og_data=og_data)
 
