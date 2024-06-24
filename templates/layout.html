@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <title>{{ og_data.title }}</title>
     <meta property="og:title" content="{{ og_data.title }}">
     <meta property="og:description" content="{{ og_data.description }}">
@@ -17,6 +17,15 @@
     <meta name="twitter:title" content="{{ og_data.title }}">
     <meta name="twitter:description" content="{{ og_data.description }}">
     <meta name="twitter:image" content="{{ og_data.image }}">
+
+    <!-- Open Graph Tags for Facebook -->
+    <meta property="og:title" content="{{ og_data.title }}">
+    <meta property="og:description" content="{{ og_data.description }}">
+    <meta property="og:url" content="{{ og_data.url }}">
+    <meta property="og:image" content="{{ og_data.image }}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="100 ︱ Oportunidades">
+    <meta property="og:locale" content="en_US">
 
     <link href="{{ url_for('static', filename='css/tailwind-built.css') }}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
