@@ -497,6 +497,32 @@ def index():
 def static_proxy(path):
     return send_from_directory(app.static_folder, path)
 
+@app.route('/sitemap.xml', methods=['GET'])
+def sitemap():
+    pages = []
+    seven_days_ago = (datetime.now() - timedelta(days=7)).date().isoformat()
+    # Add static pages
+    static_pages = [
+        '/',
+        '/database',
+        '/user_opportunities',
+    ]
+    for page in static_pages:
+        pages.append([page, seven_days_ago])
+
+    # Add dynamic pages from your database or other sources here
+    # Example: Assuming you have a database of blog posts
+    # posts = Post.query.all()
+    # for post in posts:
+    #     url = f"/post/{post.slug}"
+    #     lastmod = post.updated_at.date().isoformat()
+    #     pages.append([url, lastmod])
+
+    sitemap_xml = render_template('sitemap_template.xml', pages=pages)
+    response = make_response(sitemap_xml)
+    response.headers["Content-Type"] = "application/xml"
+    return response
+
 @app.route("/create", methods=["GET", "POST"])
 @login_required
 def handle_create():
