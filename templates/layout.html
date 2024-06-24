@@ -4,7 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flask App</title>
+    
+    <title>{{ og_data.title }}</title>
+    <meta property="og:title" content="{{ og_data.title }}">
+    <meta property="og:description" content="{{ og_data.description }}">
+    <meta property="og:url" content="{{ og_data.url }}">
+    <meta property="og:image" content="{{ og_data.image }}">
+
     <link href="{{ url_for('static', filename='css/tailwind-built.css') }}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">

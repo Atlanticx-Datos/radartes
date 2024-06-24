@@ -474,18 +474,28 @@ def find_similar_opportunities():
 
 # App Logic
 
+@app.context_processor
+def inject_og_data():
+    og_data = {
+        "title": "100 ︱ Oportunidades",
+        "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
+        "url": "http://oportunidades-vercel.vercel.app",
+        "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_Grande_Atx.png"
+    }
+    return dict(og_data=og_data)
+
 @app.route("/")
 def index():
-    print(
-        "Current Session Data at Index:", session.get("user")
-    )  # Debug: print session data
+    print("Current Session Data at Index:", session.get("user"))  # Debug: print session data
     if "user" in session:
         user = session["user"]
-        return render_template(
-            "index.html", user=user, pretty=json.dumps(user, indent=4)
-        )
+        return render_template("index.html", user=user, pretty=json.dumps(user, indent=4))
     else:
         return render_template("index.html", user=None, pretty="No user data")
+
+@app.route('/<path:path>')
+def static_proxy(path):
+    return send_from_directory(app.static_folder, path)
 
 @app.route("/create", methods=["GET", "POST"])
 @login_required
