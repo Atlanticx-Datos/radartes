@@ -25,7 +25,7 @@
         <td class="w-2/12 text-xs p-2 fecha-de-cierre">{{ page.fecha_de_cierre | default("Sin cierre") | format_date }}</td>
         <th class="w-2/12 p-2">
             <div class="flex items-center gap-1">
-                <a href="{{ page.url }}" target="_blank" class="btn btn-ghost btn-xs p-1">
+                <a href="#" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'whatsapp')" class="btn btn-ghost btn-xs p-1">
                     <svg class="w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5L19.5 4.5M19.5 4.5H8.25M19.5 4.5V15.75"></path>
                     </svg>
@@ -54,20 +54,22 @@
 
 <script>
     function shareOpportunity(url, title, platform) {
-        const encodedUrl = encodeURIComponent(new URL(url, window.location.origin).href);
-        const encodedTitle = encodeURIComponent(title + ' - 100 ︱ Oportunidades');
-        let shareUrl = '';
+    const encodedUrl = encodeURIComponent(url);
+    const encodedTitle = 'Recurso compartido por --> 𝟭𝟬𝟬 ︱ 𝗢𝗽𝗼𝗿𝘁𝘂𝗻𝗶𝗱𝗮𝗱𝗲𝘀';
 
-        if (platform === 'whatsapp') {
-            shareUrl = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
-        } else if (platform === 'telegram') {
-            shareUrl = `https://telegram.me/share/url?url=${encodedUrl}&text=${encodedTitle}`;
-        } else if (platform === 'email') {
-            shareUrl = `mailto:?subject=${encodedTitle}&body=${encodedUrl}`;
-        }
+    let shareUrl = '';
 
-        window.open(shareUrl, '_blank');
+    if (platform === 'whatsapp') {
+        shareUrl = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
+    } else if (platform === 'telegram') {
+        shareUrl = `https://telegram.me/share/url?url=${encodedUrl}&text=${encodedTitle}`;
+    } else if (platform === 'email') {
+        shareUrl = `mailto:?subject=${encodedTitle}&body=${encodedUrl}`;
     }
+
+    window.open(shareUrl, '_blank');
+}
+
 
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.fecha-de-cierre').forEach(function (element) {

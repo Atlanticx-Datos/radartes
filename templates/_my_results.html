@@ -51,18 +51,19 @@
 
 <script>
     function shareOpportunity(url, title, platform) {
-        const encodedUrl = encodeURIComponent(url);
-        const encodedTitle = encodeURIComponent(title);
-        let shareUrl = '';
+    const encodedUrl = encodeURIComponent(url);
+    const encodedTitle = 'Recurso compartido por --> 𝟭𝟬𝟬 ︱ 𝗢𝗽𝗼𝗿𝘁𝘂𝗻𝗶𝗱𝗮𝗱𝗲𝘀';
 
-        if (platform === 'whatsapp') {
-            shareUrl = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
-        } else if (platform === 'telegram') {
-            shareUrl = `https://telegram.me/share/url?url=${encodedUrl}&text=${encodedTitle}`;
-        } else if (platform === 'email') {
-            shareUrl = `mailto:?subject=${encodedTitle}&body=${encodedUrl}`;
-        }
+    let shareUrl = '';
 
-        window.open(shareUrl, '_blank');
+    if (platform === 'whatsapp') {
+        shareUrl = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
+    } else if (platform === 'telegram') {
+        shareUrl = `https://telegram.me/share/url?url=${encodedUrl}&text=${encodedTitle}`;
+    } else if (platform === 'email') {
+        shareUrl = `mailto:?subject=${encodedTitle}&body=${encodedUrl}`;
+    }
+
+    window.open(shareUrl, '_blank');
     }
 </script>

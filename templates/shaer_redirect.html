@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <!-- OG meta tags with your site's OG data -->
+    <meta property="og:title" content="{{ og_data.title }}">
+    <meta property="og:description" content="{{ og_data.description }}">
+    <meta property="og:url" content="{{ og_data.url }}">
+    <meta property="og:image" content="{{ og_data.image }}">
+    <!-- Meta refresh to redirect to the original URL -->
+    <meta http-equiv="refresh" content="0; url={{ opportunity.url }}">
+{% endblock %}
+
+{% block content %}
+    <h1>{{ opportunity.nombre }}</h1>
+    <p>{{ opportunity.resumen_IA }}</p>
+    <p>Redirecting to <a href="{{ opportunity.url }}">the opportunity</a>...</p>
+{% endblock %}

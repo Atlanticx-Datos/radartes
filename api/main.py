@@ -242,7 +242,25 @@ def list_saved_opportunities():
     with ThreadPoolExecutor() as executor:
         opportunities = list(executor.map(fetch_opportunity_details, opportunity_ids))
 
-    return render_template("user_opportunities.html", opportunities=opportunities)
+    # Generate og_data based on the first saved opportunity or use default values
+    if opportunities:
+        first_opportunity = opportunities[0]
+        og_data = {
+            "title": first_opportunity["nombre"],
+            "description": first_opportunity["resumen_IA"],
+            "url": request.url,
+            "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
+        }
+    else:
+        og_data = {
+            "title": "100 ︱ Oportunidades",
+            "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
+            "url": request.url,
+            "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
+        }
+
+    return render_template("user_opportunities.html", opportunities=opportunities, og_data=og_data)
+
 
 def is_opportunity_already_saved(user_id, page_id):
     url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
@@ -472,17 +490,19 @@ def find_similar_opportunities():
         "_similar_opportunities.html", similar_opportunities=similar_opportunities
     )
 
-# App Logic
+# Context
 
 @app.context_processor
 def inject_og_data():
-    og_data = {
-        "title": "100 ︱ Oportunidades",
-        "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
-        "url": "http://oportunidades-vercel.vercel.app",
-        "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
-    }
-    return dict(og_data=og_data)
+    def get_og_data(title="100 ︱ Oportunidades", description="Convocatorias, Becas y Recursos Globales para Artistas.", url="http://oportunidades-vercel.vercel.app", image="http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"):
+        return {
+            "title": title,
+            "description": description,
+            "url": url,
+            "image": image
+        }
+    return dict(get_og_data=get_og_data)
+
 
 @app.route("/")
 def index():
@@ -545,6 +565,18 @@ def create_page(data: dict):
     payload = {"parent": {"database_id": DATABASE_ID}, "properties": data}
     res = requests.post(create_url, headers=headers, json=payload)
     return res.text
+
+@app.route("/share/<opportunity_id>")
+def share_opportunity(opportunity_id):
+    opportunity = get_opportunity_by_id(opportunity_id)
+    og_data = {
+        "title": opportunity["nombre"],
+        "description": opportunity["resumen_IA"],
+        "url": request.url,
+        "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
+    }
+    return render_template("share.html", opportunity=opportunity, og_data=og_data)
+
 
 @app.route("/database", methods=["GET"])
 @login_required
@@ -700,17 +732,26 @@ def all_pages():
     else:
         sorted_pages = []
 
+    og_data = {
+        "title": "100 ︱ Oportunidades",
+        "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
+        "url": request.url,
+        "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
+    }
+
     if request.headers.get('HX-Request', 'false').lower() == 'true':
         print("HTMX request with search:", search_query)
-        return render_template("_search_results.html", pages=sorted_pages)
+        return render_template("_search_results.html", pages=sorted_pages, og_data=og_data)
     else:
         print("Regular request")
         return render_template(
             "database.html", 
             pages=sorted_pages, 
             current_month_pages=upcoming_pages, 
-            empty_fecha_pages=empty_fecha_pages
+            empty_fecha_pages=empty_fecha_pages,
+            og_data=og_data
         )
+
 
 # Custom Jinja2 filter for date
 @app.template_filter('format_date')
