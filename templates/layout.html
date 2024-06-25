@@ -7,7 +7,7 @@
     <meta property="og:title" content="{{ og_data.title if og_data else '100 ︱ Oportunidades' }}">
     <meta property="og:description" content="{{ og_data.description if og_data else 'Convocatorias, Becas y Recursos Globales para Artistas.' }}">
     <meta property="og:url" content="{{ og_data.url if og_data else 'http://oportunidades-vercel.vercel.app' }}">
-    <meta property="og:image" content="{{ url_for('generate_og_image', opportunity_name=og_data.title) }}">
+    <meta property="og:image" content="{{ og_data.image if og_data else 'http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png' }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -16,13 +16,13 @@
     <meta name="twitter:site" content="@your_twitter_username">
     <meta name="twitter:title" content="{{ og_data.title if og_data else '100 ︱ Oportunidades' }}">
     <meta name="twitter:description" content="{{ og_data.description if og_data else 'Convocatorias, Becas y Recursos Globales para Artistas.' }}">
-    <meta name="twitter:image" content="{{ url_for('generate_og_image', opportunity_name=og_data.title) }}">
+    <meta name="twitter:image" content="{{ og_data.image if og_data else 'http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png' }}">
 
     <!-- Open Graph Tags for Facebook -->
     <meta property="og:title" content="{{ og_data.title if og_data else '100 ︱ Oportunidades' }}">
     <meta property="og:description" content="{{ og_data.description if og_data else 'Convocatorias, Becas y Recursos Globales para Artistas.' }}">
     <meta property="og:url" content="{{ og_data.url if og_data else 'http://oportunidades-vercel.vercel.app' }}">
-    <meta property="og:image" content="{{ url_for('generate_og_image', opportunity_name=og_data.title) }}">
+    <meta property="og:image" content="{{ og_data.image if og_data else 'http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png' }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:type" content="website">

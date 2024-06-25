@@ -39,7 +39,6 @@ import socket as py_socket
 
 from concurrent.futures import ThreadPoolExecutor
 
-from PIL import Image, ImageDraw, ImageFont
 
 load_dotenv()
 print("Loaded AUTH0_DOMAIN:", os.environ.get("AUTH0_DOMAIN"))
@@ -575,30 +574,9 @@ def share_opportunity(opportunity_id):
         "title": opportunity["nombre"],
         "description": opportunity["resumen_IA"],
         "url": opportunity["url"],
-        "image": url_for('generate_og_image', opportunity_name=opportunity["nombre"], _external=True)
+        "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
     }
     return render_template("share.html", opportunity=opportunity, og_data=og_data)
-
-
-@app.route('/og-image/<string:opportunity_name>')
-def generate_og_image(opportunity_name):
-    # Create a new image
-    img = Image.new('RGB', (1200, 630), color=(73, 109, 137))
-    
-    # Add text to the image
-    draw = ImageDraw.Draw(img)
-    font_path = 'path/to/your/font.ttf'  # Make sure this path is correct
-    font = ImageFont.truetype(font_path, size=60)
-    draw.text((50, 50), opportunity_name, font=font, fill=(255, 255, 255))
-    
-    # Save the image to a BytesIO object
-    import io
-    buf = io.BytesIO()
-    img.save(buf, format='PNG')
-    buf.seek(0)
-    
-    return send_file(buf, mimetype='image/png')
-
 
 @app.route("/database", methods=["GET"])
 @login_required
