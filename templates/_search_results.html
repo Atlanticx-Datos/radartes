@@ -54,22 +54,21 @@
 
 <script>
     function shareOpportunity(url, title, platform) {
-    const encodedUrl = encodeURIComponent(url);
-    const encodedTitle = 'Recurso compartido por --> 𝟭𝟬𝟬 ︱ 𝗢𝗽𝗼𝗿𝘁𝘂𝗻𝗶𝗱𝗮𝗱𝗲𝘀';
+        const encodedUrl = encodeURIComponent(url);
+        const encodedTitle = encodeURIComponent('\n- Recurso compartido por 𝟭𝟬𝟬 ︱ 𝗢𝗽𝗼𝗿𝘁𝘂𝗻𝗶𝗱𝗮𝗱𝗲𝘀');
 
-    let shareUrl = '';
+        let shareUrl = '';
 
-    if (platform === 'whatsapp') {
-        shareUrl = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
-    } else if (platform === 'telegram') {
-        shareUrl = `https://telegram.me/share/url?url=${encodedUrl}&text=${encodedTitle}`;
-    } else if (platform === 'email') {
-        shareUrl = `mailto:?subject=${encodedTitle}&body=${encodedUrl}`;
+        if (platform === 'whatsapp') {
+            shareUrl = `https://wa.me/?text=${encodedTitle}%0A${encodedUrl}`;
+        } else if (platform === 'telegram') {
+            shareUrl = `https://telegram.me/share/url?url=${encodedUrl}&text=${encodedTitle}`;
+        } else if (platform === 'email') {
+            shareUrl = `mailto:?subject=${encodedTitle}&body=${encodedUrl}`;
+        }
+
+        window.open(shareUrl, '_blank');
     }
-
-    window.open(shareUrl, '_blank');
-}
-
 
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.fecha-de-cierre').forEach(function (element) {
@@ -79,3 +78,4 @@
         });
     });
 </script>
+

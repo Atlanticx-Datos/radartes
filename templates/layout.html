@@ -1,27 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<meta charset="UTF-8">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>{{ og_data.title if og_data else "100 ︱ Oportunidades" }}</title>
     <meta property="og:title" content="{{ og_data.title if og_data else '100 ︱ Oportunidades' }}">
     <meta property="og:description" content="{{ og_data.description if og_data else 'Convocatorias, Becas y Recursos Globales para Artistas.' }}">
     <meta property="og:url" content="{{ og_data.url if og_data else 'http://oportunidades-vercel.vercel.app' }}">
-    <meta property="og:image" content="{{ og_data.image if og_data else 'http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png' }}">
+    <meta property="og:image" content="{{ url_for('generate_og_image', opportunity_name=og_data.title) }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
 
     <!-- Twitter Card Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@your_twitter_username">
     <meta name="twitter:title" content="{{ og_data.title if og_data else '100 ︱ Oportunidades' }}">
     <meta name="twitter:description" content="{{ og_data.description if og_data else 'Convocatorias, Becas y Recursos Globales para Artistas.' }}">
-    <meta name="twitter:image" content="{{ og_data.image if og_data else 'http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png' }}">
+    <meta name="twitter:image" content="{{ url_for('generate_og_image', opportunity_name=og_data.title) }}">
 
     <!-- Open Graph Tags for Facebook -->
     <meta property="og:title" content="{{ og_data.title if og_data else '100 ︱ Oportunidades' }}">
     <meta property="og:description" content="{{ og_data.description if og_data else 'Convocatorias, Becas y Recursos Globales para Artistas.' }}">
     <meta property="og:url" content="{{ og_data.url if og_data else 'http://oportunidades-vercel.vercel.app' }}">
-    <meta property="og:image" content="{{ og_data.image if og_data else 'http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png' }}">
+    <meta property="og:image" content="{{ url_for('generate_og_image', opportunity_name=og_data.title) }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="100 ︱ Oportunidades">
     <meta property="og:locale" content="en_US">
@@ -42,26 +45,19 @@
             transform: translate(-50%, -50%);
             z-index: 1000;
         }
-
         .dropdown-content {
             position: absolute;
             z-index: 9999;
-            /* Ensure it's on top of other content */
             background-color: white;
-            /* Ensure background is white */
         }
-
         @media (min-width: 768px) {
             .md-line-height {
                 line-height: 1.8rem !important;
             }
         }
-
         .border-extra {
             border-right-width: 24px !important;
-
         }
-
         @media (max-width: 767px) {
             .mobile-align-start {
                 justify-content: flex-start !important;
@@ -69,7 +65,6 @@
         }
     </style>
 </head>
-
 <body class="flex justify-center">
     <div id="spinner" class="spinner h-8 w-8" style="display: none;">
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
@@ -77,48 +72,34 @@
     <main class="w-full md:w-4/5 max-w-[1250px] p-2.5">
         <nav class="flex justify-between items-center space-x-4 h-[34px] md:h-20 pt-4 md:pt-1 pb-2 px-2 z-50">
             <a href="{{ url_for('index') }}">
-                <svg class="w-6 h-6 md:hidden" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path clipRule="evenodd" fillRule="evenodd"
-                        d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" />
+                <svg class="w-6 h-6 md:hidden" data-slot="icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path clip-rule="evenodd" fill-rule="evenodd" d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" />
                 </svg>
             </a>
             <div class="flex-grow hidden md:block"></div>
             <a href="{{ url_for('index') }}">
-                <img src="{{ url_for('static', filename='public/Logo_100.svg') }}"
-                    class="w-20 subpixel-antialiased antialiased relative right-1 md:right-6">
+                <img src="{{ url_for('static', filename='public/Logo_100.svg') }}" class="w-20 subpixel-antialiased antialiased relative right-1 md:right-6">
             </a>
             <div class="dropdown dropdown-bottom dropdown-end -mt-1 z-50">
                 <div tabindex="0" role="button" class="relative">
                     <div class="relative">
                         <span class="flex items-center justify-center w-8 h-8 bg-slate-100 rounded-full">
-                            <svg class="w-5 h-5" dataSlot="icon" fill="currentColor" viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                <path
-                                    d="M10 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM10 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM11.5 15.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z" />
+                            <svg class="w-5 h-5" data-slot="icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M10 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM10 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM11.5 15.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z" />
                             </svg>
                         </span>
                         <span class="absolute top-0 right-0 flex h-2 w-2">
-                            <span
-                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                         </span>
                     </div>
                 </div>
-                <ul tabindex="0"
-                    class="dropdown-content z-[1] menu p-2 bg-base-100 rounded-md w-52 border border-black mt-3">
-                    <li><a href="{{ url_for('all_pages') }}"><span
-                                class="border-l-4 border-accent pl-3">Oportunidades</span></a></li>
-                    <li>
-                        <a href="{{ url_for('list_saved_opportunities') }}" onclick="showSpinner(event)">
-                            <span class="border-l-4 border-secondary pl-3">Guardadas</span>
-                        </a>
-                    </li>
-                    <li><a href="{{ url_for('index') }}"><span class="border-l-4 border-primary pl-3">Home</span></a>
-                    </li>
+                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 bg-base-100 rounded-md w-52 border border-black mt-3">
+                    <li><a href="{{ url_for('all_pages') }}"><span class="border-l-4 border-accent pl-3">Oportunidades</span></a></li>
+                    <li><a href="{{ url_for('list_saved_opportunities') }}" onclick="showSpinner(event)"><span class="border-l-4 border-secondary pl-3">Guardadas</span></a></li>
+                    <li><a href="{{ url_for('index') }}"><span class="border-l-4 border-primary pl-3">Home</span></a></li>
                     {% if session.get('user') %}
-                    <li><a href="{{ url_for('logout') }}"><span
-                                class="border-l-4 border-base-200 pl-3">Cerrar</span></a></li>
+                    <li><a href="{{ url_for('logout') }}"><span class="border-l-4 border-base-200 pl-3">Cerrar</span></a></li>
                     {% endif %}
                 </ul>
             </div>
@@ -134,5 +115,4 @@
         }
     </script>
 </body>
-
 </html>
