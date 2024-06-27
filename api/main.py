@@ -635,23 +635,35 @@ def all_pages():
 
     json_body = {"filter": main_filter}
 
-    res = requests.post(url, headers=headers, json=json_body)
-    data = res.json()
+    all_pages = []
+    has_more = True
+    start_cursor = None
 
-    # Debugging statements to inspect the API response
-    print("API Response Results Count:", len(data.get("results", [])))
-    # print("API Response Data Structure:", data)
+    while has_more:
+        if start_cursor:
+            json_body["start_cursor"] = start_cursor
+
+        res = requests.post(url, headers=headers, json=json_body)
+        data = res.json()
+
+        # Debugging statements to inspect the API response
+        print("API Response Results Count:", len(data.get("results", [])))
+        print("API Response Data Structure:", json.dumps(data, indent=2))
+
+        all_pages.extend(data.get("results", []))
+        has_more = data.get("has_more", False)
+        start_cursor = data.get("next_cursor", None)
 
     pages = []
     upcoming_pages = []
     empty_fecha_pages = []
 
-    if data and data.get("results"):
+    if all_pages:
         now_date = datetime.now()
         end_of_month = datetime(now_date.year, now_date.month + 1, 1) - timedelta(days=1)
         placeholder_date = '1900-01-01'  # Placeholder date for pages without fecha_de_cierre
 
-        for page in data["results"]:
+        for page in all_pages:
             if "Publicar" in page["properties"] and page["properties"]["Publicar"]["checkbox"]:
                 page_data = {"id": page["id"], "created_time": page["created_time"]}
 
@@ -704,25 +716,19 @@ def all_pages():
                     fecha_de_cierre = fecha_de_cierre_prop["date"].get("start", None)
                 
                 # Debugging statement to print each page's fecha_de_cierre value
-                # print("Page ID:", page["id"], "Fecha de Cierre:", fecha_de_cierre if fecha_de_cierre else "None")
+                print("Page ID:", page["id"], "Fecha de Cierre:", fecha_de_cierre if fecha_de_cierre else "None")
                 
                 if fecha_de_cierre:
                     page_data["fecha_de_cierre"] = fecha_de_cierre
                     cierre_date = datetime.strptime(fecha_de_cierre, '%Y-%m-%d')
-                    # if cierre_date.strftime('%Y-%m-%d') == '2024-06-30':
-                    #     print("Page with 6/30/2024 Fecha de Cierre:", page_data)
-
                     if now_date <= cierre_date <= end_of_month:
                         upcoming_pages.append(page_data)
                 else:
                     # Check if "Destinatarios" property equals "Destacar"
-                    if page_data.get("destinatarios") == "Destacar":
-                        # Assign placeholder date and append to empty_fecha_pages
-                        # print("Page without Fecha de Cierre:", page_data)
+                    if page_data.get("destinatarios").lower() == "destacar":
                         page_data["fecha_de_cierre"] = placeholder_date
                         empty_fecha_pages.append(page_data)
                     else:
-                        # Ensure the key is present even if not adding to empty_fecha_pages
                         page_data["fecha_de_cierre"] = placeholder_date
 
                 pages.append(page_data)
@@ -751,7 +757,6 @@ def all_pages():
             empty_fecha_pages=empty_fecha_pages,
             og_data=og_data
         )
-
 
 # Custom Jinja2 filter for date
 @app.template_filter('format_date')
