@@ -578,6 +578,8 @@ def share_opportunity(opportunity_id):
     }
     return render_template("share.html", opportunity=opportunity, og_data=og_data)
 
+
+
 @app.route("/database", methods=["GET"])
 @login_required
 def all_pages():
@@ -589,154 +591,128 @@ def all_pages():
         "Notion-Version": "2022-06-28",
     }
 
-    # Calculate the current date and the date 6 months from now
-    now = datetime.now().strftime('%Y-%m-%d')
-    six_months_from_now = (datetime.now() + relativedelta(months=6)).strftime('%Y-%m-%d')
-
-    # Define the date filter to cover the next 6 months and include empty dates
-    dynamic_date_filter = {
-        "or": [
-            {
-                "property": "Fecha de cierre",
-                "date": {
-                    "after": now,
-                    "before": six_months_from_now
-                }
-            },
-            {
-                "property": "Fecha de cierre",
-                "date": {
-                    "is_empty": True
-                }
+    def fetch_all_pages():
+        json_body = {
+            "filter": {
+                "property": "Publicar",
+                "checkbox": {"equals": True}
             }
-        ]
-    }
+        }
 
-    # Define the search filter
-    search_filter = {
-        "or": [
-            {"property": "Resumen generado por la IA", "rich_text": {"contains": search_query}},
-            {"property": "País", "rich_text": {"contains": search_query}},
-            {"property": "Destinatarios", "rich_text": {"contains": search_query}}
-        ]
-    }
+        all_pages = []
+        has_more = True
+        start_cursor = None
 
-    # Construct the main filter
-    main_filter = {
-        "and": [
-            {"property": "Publicar", "checkbox": {"equals": True}},
-            dynamic_date_filter
-        ]
-    }
+        while has_more:
+            if start_cursor:
+                json_body["start_cursor"] = start_cursor
 
-    # If there is a search query, add the search filter to the main filter
-    if search_query:
-        main_filter["and"].append(search_filter)
+            res = requests.post(url, headers=headers, json=json_body)
+            data = res.json()
 
-    json_body = {"filter": main_filter}
+            print("API Response Results Count:", len(data.get("results", [])))
+            print("API Response Data Structure:", json.dumps(data, indent=2))
 
-    all_pages = []
-    has_more = True
-    start_cursor = None
+            all_pages.extend(data.get("results", []))
+            has_more = data.get("has_more", False)
+            start_cursor = data.get("next_cursor", None)
 
-    while has_more:
-        if start_cursor:
-            json_body["start_cursor"] = start_cursor
+        return all_pages
 
-        res = requests.post(url, headers=headers, json=json_body)
-        data = res.json()
+    all_pages = fetch_all_pages()
+    now_date = datetime.now()
+    seven_days_from_now = now_date + timedelta(days=7)
+    fifteen_days_from_now = now_date + timedelta(days=15)
+    placeholder_date = '1900-01-01'  # Placeholder date for pages without fecha_de_cierre
 
-        # Debugging statements to inspect the API response
-        print("API Response Results Count:", len(data.get("results", [])))
-        print("API Response Data Structure:", json.dumps(data, indent=2))
-
-        all_pages.extend(data.get("results", []))
-        has_more = data.get("has_more", False)
-        start_cursor = data.get("next_cursor", None)
-
+    closing_soon_pages = []
     pages = []
-    upcoming_pages = []
     empty_fecha_pages = []
 
-    if all_pages:
-        now_date = datetime.now()
-        end_of_month = datetime(now_date.year, now_date.month + 1, 1) - timedelta(days=1)
-        placeholder_date = '1900-01-01'  # Placeholder date for pages without fecha_de_cierre
+    for page in all_pages:
+        if "Publicar" in page["properties"] and page["properties"]["Publicar"]["checkbox"]:
+            page_data = {"id": page["id"], "created_time": page["created_time"]}
 
-        for page in all_pages:
-            if "Publicar" in page["properties"] and page["properties"]["Publicar"]["checkbox"]:
-                page_data = {"id": page["id"], "created_time": page["created_time"]}
+            if "Resumen generado por la IA" in page["properties"]:
+                page_data["nombre"] = (
+                    page["properties"]["Resumen generado por la IA"]["rich_text"][0]["text"]["content"]
+                    if page["properties"]["Resumen generado por la IA"]["rich_text"]
+                    else ""
+                )
 
-                if "Resumen generado por la IA" in page["properties"]:
-                    page_data["nombre"] = (
-                        page["properties"]["Resumen generado por la IA"]["rich_text"][0]["text"]["content"]
-                        if page["properties"]["Resumen generado por la IA"]["rich_text"]
-                        else ""
-                    )
+            if "País" in page["properties"]:
+                page_data["país"] = (
+                    page["properties"]["País"]["rich_text"][0]["text"]["content"]
+                    if page["properties"]["País"]["rich_text"]
+                    else ""
+                )
 
-                if "País" in page["properties"]:
-                    page_data["país"] = (
-                        page["properties"]["País"]["rich_text"][0]["text"]["content"]
-                        if page["properties"]["País"]["rich_text"]
-                        else ""
-                    )
+            if "Destinatarios" in page["properties"]:
+                page_data["destinatarios"] = (
+                    page["properties"]["Destinatarios"]["rich_text"][0]["text"]["content"]
+                    if page["properties"]["Destinatarios"]["rich_text"]
+                    else ""
+                )
 
-                if "Destinatarios" in page["properties"]:
-                    page_data["destinatarios"] = (
-                        page["properties"]["Destinatarios"]["rich_text"][0]["text"]["content"]
-                        if page["properties"]["Destinatarios"]["rich_text"]
-                        else ""
-                    )
+            if "AI keywords" in page["properties"]:
+                page_data["ai_keywords"] = (
+                    page["properties"]["AI keywords"]["multi_select"][0]["name"]
+                    if page["properties"]["AI keywords"]["multi_select"]
+                    else ""
+                )
 
-                if "AI keywords" in page["properties"]:
-                    page_data["ai_keywords"] = (
-                        page["properties"]["AI keywords"]["multi_select"][0]["name"]
-                        if page["properties"]["AI keywords"]["multi_select"]
-                        else ""
-                    )
+            if "URL" in page["properties"]:
+                page_data["url"] = (
+                    page["properties"]["URL"]["url"]
+                    if page["properties"]["URL"].get("url")
+                    else ""
+                )
 
-                if "URL" in page["properties"]:
-                    page_data["url"] = (
-                        page["properties"]["URL"]["url"]
-                        if page["properties"]["URL"].get("url")
-                        else ""
-                    )
+            if "Nombre" in page["properties"]:
+                page_data["nombre_original"] = (
+                    page["properties"]["Nombre"]["title"][0]["text"]["content"]
+                    if page["properties"]["Nombre"]["title"]
+                    else ""
+                )
 
-                if "Nombre" in page["properties"]:
-                    page_data["nombre_original"] = (
-                        page["properties"]["Nombre"]["title"][0]["text"]["content"]
-                        if page["properties"]["Nombre"]["title"]
-                        else ""
-                    )
+            # Check if "Fecha de cierre" property exists and has a date
+            fecha_de_cierre_prop = page["properties"].get("Fecha de cierre", None)
+            fecha_de_cierre = None
+            if fecha_de_cierre_prop and "date" in fecha_de_cierre_prop and fecha_de_cierre_prop["date"]:
+                fecha_de_cierre = fecha_de_cierre_prop["date"].get("start", None)
 
-                # Check if "Fecha de cierre" property exists and has a date
-                fecha_de_cierre_prop = page["properties"].get("Fecha de cierre", None)
-                fecha_de_cierre = None
-                if fecha_de_cierre_prop and "date" in fecha_de_cierre_prop and fecha_de_cierre_prop["date"]:
-                    fecha_de_cierre = fecha_de_cierre_prop["date"].get("start", None)
-                
-                # Debugging statement to print each page's fecha_de_cierre value
-                print("Page ID:", page["id"], "Fecha de Cierre:", fecha_de_cierre if fecha_de_cierre else "None")
-                
-                if fecha_de_cierre:
-                    page_data["fecha_de_cierre"] = fecha_de_cierre
-                    cierre_date = datetime.strptime(fecha_de_cierre, '%Y-%m-%d')
-                    if now_date <= cierre_date <= end_of_month:
-                        upcoming_pages.append(page_data)
+            print("Page ID:", page["id"], "Fecha de Cierre:", fecha_de_cierre if fecha_de_cierre else "None")
+
+            if fecha_de_cierre:
+                page_data["fecha_de_cierre"] = fecha_de_cierre
+                cierre_date = datetime.strptime(fecha_de_cierre, '%Y-%m-%d')
+                if now_date <= cierre_date <= seven_days_from_now:
+                    closing_soon_pages.append(page_data)
+                pages.append(page_data)
+            else:
+                if page_data.get("destinatarios", "").lower() == "destacar":
+                    page_data["fecha_de_cierre"] = placeholder_date
+                    empty_fecha_pages.append(page_data)
                 else:
-                    # Check if "Destinatarios" property equals "Destacar"
-                    if page_data.get("destinatarios").lower() == "destacar":
-                        page_data["fecha_de_cierre"] = placeholder_date
-                        empty_fecha_pages.append(page_data)
-                    else:
-                        page_data["fecha_de_cierre"] = placeholder_date
-
+                    page_data["fecha_de_cierre"] = placeholder_date
                 pages.append(page_data)
 
-        # Sort pages by fecha_de_cierre, placing pages with placeholder fecha_de_cierre at the bottom
-        sorted_pages = sorted(pages, key=lambda page: (page["fecha_de_cierre"] == placeholder_date, page["fecha_de_cierre"]), reverse=True)
-    else:
-        sorted_pages = []
+    # If less than 5 pages, extend to 15 days
+    if len(closing_soon_pages) < 5:
+        for page in pages:
+            if "fecha_de_cierre" in page:
+                cierre_date = datetime.strptime(page["fecha_de_cierre"], '%Y-%m-%d')
+                if seven_days_from_now < cierre_date <= fifteen_days_from_now:
+                    closing_soon_pages.append(page)
+                    if len(closing_soon_pages) >= 7:
+                        break
+
+    # Apply search filter
+    if search_query:
+        pages = [page for page in pages if search_query.lower() in page["nombre"].lower() or search_query.lower() in page["país"].lower()]
+
+    closing_soon_pages = sorted(closing_soon_pages, key=lambda page: page["fecha_de_cierre"])
+    sorted_pages = sorted(pages, key=lambda page: (page["fecha_de_cierre"] == placeholder_date, page["fecha_de_cierre"]), reverse=True)
 
     og_data = {
         "title": "100 ︱ Oportunidades",
@@ -753,10 +729,11 @@ def all_pages():
         return render_template(
             "database.html", 
             pages=sorted_pages, 
-            current_month_pages=upcoming_pages, 
+            closing_soon_pages=closing_soon_pages[:7],  # Limit to 7 pages
             empty_fecha_pages=empty_fecha_pages,
             og_data=og_data
         )
+
 
 # Custom Jinja2 filter for date
 @app.template_filter('format_date')

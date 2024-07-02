@@ -15,8 +15,8 @@
                                 CIERRAN ESTE MES
                             </div>
                             <div class="collapse-content">
-                                {% if current_month_pages %}
-                                {% for page in current_month_pages %}
+                                {% if closing_soon_pages %}
+                                {% for page in closing_soon_pages %}
                                 <p class="relative">
                                     <a href="{{ page.url }}" target="_blank"
                                         class="border-l-4 pl-4 mb-3 block leading-none tracking-tighter group md:w-5/6 truncate">
@@ -133,25 +133,19 @@
                 <div class="flex justify-center relative top-16 animate-bounce">
                     <svg class="w-6 h-6" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"></path>
-                      </svg>
+                    </svg>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Script for handling select all checkboxes -->
+    <!-- Script for handling HTMX search -->
     <script>
-        document.getElementById('select-all').addEventListener('change', function () {
-            var checkboxes = document.querySelectorAll('input[name="selected_pages"]');
-            for (var checkbox of checkboxes) {
-                checkbox.checked = this.checked;
-            }
-        });
-
         function handleKeyPress(event) {
             if (event.key === 'Enter') {
                 event.preventDefault();
                 const searchValue = document.getElementById('search-input').value;
+                console.log('Search Value:', searchValue);  // Debug log
                 htmx.ajax('GET', '/database', { target: '#search-results', swap: 'innerHTML', values: { search: searchValue } });
             }
         }
@@ -159,7 +153,35 @@
         function clearSearch() {
             document.getElementById('search-input').value = '';
             htmx.ajax('GET', '/database', { target: '#search-results', swap: 'innerHTML' });
-        }        
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('search-input').addEventListener('keypress', handleKeyPress);
+
+            const clearSearchButton = document.querySelector('.clear-search-button'); // Assuming you have a clear button with this class
+            if (clearSearchButton) {
+                clearSearchButton.addEventListener('click', clearSearch);
+            }
+        });
+    </script>
+
+    <!-- Debugging Network Requests -->
+    <script>
+        document.addEventListener('htmx:beforeRequest', (event) => {
+            console.log('HTMX Request:', event.detail.elt, event.detail.target, event.detail.xhr);
+        });
+
+        document.addEventListener('htmx:afterOnLoad', (event) => {
+            console.log('HTMX Response:', event.detail.elt, event.detail.target, event.detail.xhr);
+        });
+
+        document.addEventListener('htmx:beforeSwap', (event) => {
+            console.log('HTMX Swap:', event.detail.elt, event.detail.target, event.detail.xhr);
+        });
+
+        document.addEventListener('htmx:afterSwap', (event) => {
+            console.log('HTMX Swapped:', event.detail.elt, event.detail.target, event.detail.xhr);
+        });
     </script>
 </body>
 {% endblock %}
