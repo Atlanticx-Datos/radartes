@@ -10,8 +10,8 @@
                     Becas, premios y residencias <span class="font-black">GLOBALES</span> para el arte.
                 </div>
             </div>
-            <div class="h-20 md:h-auto md:border-none border-r border-black text-sm md:text-xs tracking-tight leading-none w-full pt-1 pl-2 pr-4 md:pl-20 relative md:right-4 md:mt-2 md:mb-16">
-                <u>Escribinos</u> con tu correo para sumar. <b>Es gratis</b>.
+            <div class="h-20 md:h-auto md:border-none border-r border-black text-sm md:text-xs tracking-tight leading-none w-full pt-1 pl-2 pr-4 md:pl-20 relative md:right-4 md:mt-0 md:mb-12">
+                <u>Escribinos</u> con tu correo para sumar tu oportunidad. <b>Es gratis</b>.
             </div>
         </div>
         <div class="w-20 md:w-1/6 ml-2 md:mb-0 md:mx-auto md:border-l md:border-r border-black bg-secondary h-16 md:h-auto"></div>
@@ -24,12 +24,12 @@
         <div class="w-full md:w-2/6 md:mx-auto space-y-6 h-auto md:px-0 md:border-r md:border-l md:border-r border-black">
             <div class="mt-12 md:mt-0 bg-secondary md:bg-white py-16 md:py-0 mx-2 md:mx-0 md:border-b border-black">
                 <div class="text-2xl md:text-xs pl-2 md:pl-10 pr-12 md:pr-0 mt-6 w-full md:w-2/3 uppercase font-bold leading-none tracking-tight">
-                    Somos una alianza de organizaciones culturales que linkea a convocatorias en todo el mundo.
+                    Una alianza de organizaciones culturales que enlaza a convocatorias en todo el mundo.
                 </div>
-                <div class="text-2xl md:text-xs pl-2 md:pl-10 pr-12 md:pr-0 mt-2 w-full md:w-2/3 uppercase font-extralight leading-none tracking-tighter">Podés buscar por fecha y por destacadas, y compartirlas.</div>
-                <div class="text-lg md:text-xs tracking-tighter pl-2 md:pl-10 pr-24 md:pr-0 leading-none md:leading-none mt-6 md:mt-3 w-2/3 md:w-1/2 pb-8">
+                <div class="text-2xl md:text-xs pl-2 md:pl-10 pr-12 md:pr-0 mt-2 w-full md:w-2/3 uppercase font-extralight leading-none tracking-tighter">Buscá más de 100 oportunidades para aplicar, guardar y compartir.</div>
+                <div class="text-lg md:text-xs tracking-tighter pl-2 md:pl-10 pr-24 md:pr-0 leading-none md:leading-none mt-6 md:mt-8 w-2/3 md:w-1/2 pb-8">
                     {% if session.get('user') is none %}
-                    <span class="block mt-6 md:mt-0 md:inline font-bold"><a href="{{ url_for('login') }}">Entrar.</a></span>
+                    <span class="block mt-6 md:mt-0 md:inline font-bold bg-black py-2 px-4 text-white"><a href="{{ url_for('login') }}">Entrar.</a></span>
                     {% else %}
                     {% endif %}
                 </div>
