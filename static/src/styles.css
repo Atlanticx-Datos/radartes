@@ -4,3 +4,16 @@
 @import 'tailwindcss/utilities';
 
 /* Your custom styles go here */
+
+@media (min-width: 768px) {
+    .md-height-custom {
+      height: calc(35rem + 20%);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .md-custom-width {
+        max-width: 58% !important;
+    }
+  }
+  

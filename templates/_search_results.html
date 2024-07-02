@@ -1,12 +1,12 @@
 {% if pages %}
 {% for page in pages %}
 <tr class="min-h-12 border-b">
-    <th class="w-2/12 p-2">
+    <th class="1/12 md:w-2/12 -mx-2">
         <label>
             <input type="checkbox" class="checkbox rounded-none h-4 w-4" name="selected_pages" value="{{ page.id }}" />
         </label>
     </th>
-    <td class="w-4/12 p-2">
+    <td class="w-4/12 pl-6 md:pl-2 md:pt-2">
         <div class="flex items-center">
             <div>
                 <div class="font-medium text-sm md:leading-none mb-1">{{ page.nombre }}</div>
@@ -56,7 +56,7 @@
 {% endfor %}
 {% else %}
 <tr>
-    <td colspan="5" class="p-2">No se encontraron oportunidades.</td>
+    <td colspan="5" class="p-2">No se encontraron oportunidades guardadas.</td>
 </tr>
 {% endif %}
 
