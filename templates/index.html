@@ -27,12 +27,13 @@
                     Una alianza de organizaciones culturales que enlaza a convocatorias en todo el mundo.
                 </div>
                 <div class="text-2xl md:text-xs pl-2 md:pl-10 pr-12 md:pr-0 mt-2 w-full md:w-2/3 uppercase font-extralight leading-none tracking-tighter">Buscá más de 100 oportunidades para aplicar, guardar y compartir.</div>
+                {% if session.get('user') is none %}
                 <div class="text-lg md:text-xs tracking-tighter pl-2 md:pl-10 pr-24 md:pr-0 leading-none md:leading-none mt-6 md:mt-8 w-2/3 md:w-1/2 pb-8">
-                    {% if session.get('user') is none %}
                     <span class="block mt-6 md:mt-0 md:inline font-bold bg-black py-2 px-4 text-white"><a href="{{ url_for('login') }}">Entrar.</a></span>
-                    {% else %}
-                    {% endif %}
                 </div>
+                {% else %}
+                <div class="mb-8"></div> <!-- Add margin-bottom when the "entrar" button is not present -->
+                {% endif %}
             </div>
         </div>
         <div class="hidden md:block w-1/3 md:w-1/6 mb-3 md:mb-0 ml-8 md:mx-auto bg-accent h-40 md:h-auto border-black md:border-r md:border-b"></div>
