@@ -709,7 +709,14 @@ def all_pages():
 
     # Apply search filter
     if search_query:
-        pages = [page for page in pages if search_query.lower() in page["nombre"].lower() or search_query.lower() in page["país"].lower()]
+        pages = [
+            page for page in pages 
+            if search_query.lower() in page.get("nombre", "").lower()
+            or search_query.lower() in page.get("país", "").lower()
+            or search_query.lower() in page.get("destinatarios", "").lower()
+            or search_query.lower() in page.get("ai_keywords", "").lower()
+            or search_query.lower() in page.get("nombre_original", "").lower()
+        ]
 
     closing_soon_pages = sorted(closing_soon_pages, key=lambda page: page["fecha_de_cierre"])
     sorted_pages = sorted(pages, key=lambda page: (page["fecha_de_cierre"] == placeholder_date, page["fecha_de_cierre"]), reverse=True)
@@ -733,6 +740,8 @@ def all_pages():
             empty_fecha_pages=empty_fecha_pages,
             og_data=og_data
         )
+
+
 
 
 # Custom Jinja2 filter for date

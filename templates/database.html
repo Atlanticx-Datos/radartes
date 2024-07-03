@@ -112,7 +112,7 @@
                                     <th class="text-left"></th>
                                 </tr>
                             </thead>
-                            <tbody id="search-results" class="relative top-4">
+                            <tbody id="search-results" class="relative top-2">
                                 {% include "_search_results.html" %}
                             </tbody>
                         </table>                                              
@@ -160,25 +160,6 @@
             if (clearSearchButton) {
                 clearSearchButton.addEventListener('click', clearSearch);
             }
-        });
-    </script>
-
-    <!-- Debugging Network Requests -->
-    <script>
-        document.addEventListener('htmx:beforeRequest', (event) => {
-            console.log('HTMX Request:', event.detail.elt, event.detail.target, event.detail.xhr);
-        });
-
-        document.addEventListener('htmx:afterOnLoad', (event) => {
-            console.log('HTMX Response:', event.detail.elt, event.detail.target, event.detail.xhr);
-        });
-
-        document.addEventListener('htmx:beforeSwap', (event) => {
-            console.log('HTMX Swap:', event.detail.elt, event.detail.target, event.detail.xhr);
-        });
-
-        document.addEventListener('htmx:afterSwap', (event) => {
-            console.log('HTMX Swapped:', event.detail.elt, event.detail.target, event.detail.xhr);
         });
     </script>
 </body>
