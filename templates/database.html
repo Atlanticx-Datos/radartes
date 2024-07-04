@@ -90,8 +90,8 @@
                     </div>
                 </div>
                 <!-- Spinner -->
-                <div id="spinner" class="absolute inset-0 flex items-center justify-center hidden">
-                    <div class="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full border-t-transparent border-blue-500"></div>
+                <div id="spinner" class="spinner h-8 w-8">
+                    <img src="/static/public/spinner.gif" alt="Loading...">
                 </div>
             </div>
 
@@ -99,7 +99,7 @@
             <div class="col-span-1 lg:col-span-3 mt-2 lg:mt-0 border-r border-neutral">
                 <form id="save-form" hx-post="/save_user_opportunity" hx-trigger="submit" hx-swap="innerHTML"
                             hx-target="#alert-container">
-                    <div class="border-b border-neutral overflow-auto" style="max-height: 35rem;">
+                    <div class="border-b border-neutral overflow-auto" style="max-height: 35rem;" id="results-container">
                         <style>
                             ::-webkit-scrollbar {
                                 width: 0;
@@ -141,6 +141,17 @@
         </div>
     </main>
 
+    <style>
+        .spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+    </style>
+
     <!-- Script for handling HTMX search -->
     <script>
         function handleKeyPress(event) {
@@ -150,6 +161,7 @@
                 console.log('Search Value:', searchValue);  // Debug log
                 toggleSpinner(true);
                 htmx.ajax('GET', '/database', { target: '#search-results', swap: 'innerHTML', values: { search: searchValue } })
+                    .then(() => scrollToTop('results-container'))
                     .finally(() => toggleSpinner(false));
             }
         }
@@ -158,15 +170,23 @@
             document.getElementById('search-input').value = '';
             toggleSpinner(true);
             htmx.ajax('GET', '/database', { target: '#search-results', swap: 'innerHTML' })
+                .then(() => scrollToTop('results-container'))
                 .finally(() => toggleSpinner(false));
         }
 
         function toggleSpinner(show) {
             const spinner = document.getElementById('spinner');
             if (show) {
-                spinner.classList.remove('hidden');
+                spinner.style.display = 'block';
             } else {
-                spinner.classList.add('hidden');
+                spinner.style.display = 'none';
+            }
+        }
+
+        function scrollToTop(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollTop = 0;
             }
         }
 
