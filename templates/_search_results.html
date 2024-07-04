@@ -9,8 +9,8 @@
     <td class="w-4/12 pl-6 md:pl-2 md:pt-2">
         <div class="flex items-center">
             <div>
-                <div class="font-medium text-sm md:leading-none mb-1">{{ page.nombre }}</div>
-                <div class="text-sm opacity-50">{{ page.país }}</div>
+                <div class="ml-1 md:ml-0 font-medium text-sm leading-3 md:leading-none mb-1 mt-1 md:mt-0">{{ page.nombre }}</div>
+                <div class="ml-1 md:ml-0 text-sm opacity-50">{{ page.país }}</div>
             </div>
         </div>
         <input type="hidden" name="name_{{ page.id }}" value="{{ page.nombre }}">
@@ -20,7 +20,7 @@
         <input type="hidden" name="fecha_de_cierre_{{ page.id }}" value="{{ page.fecha_de_cierre }}">
     </td>
     <td class="w-3/12 p-2">
-        <div class="border-l-4 text-sm h-auto px-4 py-2" style="line-height: 0.7rem;">{{ page.ai_keywords }}</div>
+        <div class="border-l-4 text-sm h-auto px-2 md:px-4 py-2 truncate" style="line-height: 0.7rem;">{{ page.ai_keywords | truncate(50) }}</div>
     </td>
     <td class="w-2/12 text-xs p-2 fecha-de-cierre">{{ page.fecha_de_cierre | default("Sin cierre") | format_date }}</td>
     <th class="w-2/12 p-2">
