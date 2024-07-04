@@ -66,7 +66,7 @@
     </style>
 </head>
 <body class="flex justify-center">
-    <div id="spinner" class="spinner h-8 w-8" style="display: none;">
+    <div id="layout-spinner" class="spinner h-8 w-8" style="display: none;">
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
     </div>
     <main class="w-full md:w-4/5 max-w-[1250px] p-2.5">
@@ -95,8 +95,8 @@
                     </div>
                 </div>
                 <ul tabindex="0" class="dropdown-content z-[1] menu p-2 bg-base-100 rounded-md w-52 border border-black mt-3">
-                    <li><a href="{{ url_for('all_pages') }}"><span class="border-l-4 border-accent pl-3">Oportunidades</span></a></li>
-                    <li><a href="{{ url_for('list_saved_opportunities') }}" onclick="showSpinner(event)"><span class="border-l-4 border-secondary pl-3">Guardadas</span></a></li>
+                    <li><a href="{{ url_for('all_pages') }}" onclick="layoutshowSpinner(event)"><span class="border-l-4 border-accent pl-3">Oportunidades</span></a></li>
+                    <li><a href="{{ url_for('list_saved_opportunities') }}" onclick="layoutshowSpinner(event)"><span class="border-l-4 border-secondary pl-3">Guardadas</span></a></li>
                     <li><a href="{{ url_for('index') }}"><span class="border-l-4 border-black pl-3">Home</span></a></li>
                     {% if session.get('user') %}
                     <li><a href="https://github.com/Atlanticx-Datos/100_Oportunidades" target="_blank" rel="noopener noreferrer"><span class="border-l-4 border-primary pl-3">GitHub</span></a></li>
@@ -109,9 +109,9 @@
         {% include 'footer.html' %}
     </main>
     <script>
-        function showSpinner(event) {
+        function layoutshowSpinner(event) {
             event.preventDefault();
-            document.getElementById('spinner').style.display = 'block';
+            document.getElementById('layout-spinner').style.display = 'block';
             window.location.href = event.currentTarget.href;
         }
     </script>

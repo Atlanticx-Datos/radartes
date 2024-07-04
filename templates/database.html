@@ -89,6 +89,10 @@
                         </svg>
                     </div>
                 </div>
+                <!-- Spinner -->
+                <div id="spinner" class="absolute inset-0 flex items-center justify-center hidden">
+                    <div class="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full border-t-transparent border-blue-500"></div>
+                </div>
             </div>
 
             <!-- Second Column: Table -->
@@ -144,13 +148,26 @@
                 event.preventDefault();
                 const searchValue = document.getElementById('search-input').value;
                 console.log('Search Value:', searchValue);  // Debug log
-                htmx.ajax('GET', '/database', { target: '#search-results', swap: 'innerHTML', values: { search: searchValue } });
+                toggleSpinner(true);
+                htmx.ajax('GET', '/database', { target: '#search-results', swap: 'innerHTML', values: { search: searchValue } })
+                    .finally(() => toggleSpinner(false));
             }
         }
 
         function clearSearch() {
             document.getElementById('search-input').value = '';
-            htmx.ajax('GET', '/database', { target: '#search-results', swap: 'innerHTML' });
+            toggleSpinner(true);
+            htmx.ajax('GET', '/database', { target: '#search-results', swap: 'innerHTML' })
+                .finally(() => toggleSpinner(false));
+        }
+
+        function toggleSpinner(show) {
+            const spinner = document.getElementById('spinner');
+            if (show) {
+                spinner.classList.remove('hidden');
+            } else {
+                spinner.classList.add('hidden');
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function () {
