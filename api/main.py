@@ -592,10 +592,19 @@ def all_pages():
     }
 
     def fetch_all_pages():
+        now_date_str = datetime.now().strftime('%Y-%m-%d')
+
         json_body = {
             "filter": {
-                "property": "Publicar",
-                "checkbox": {"equals": True}
+                "and": [
+                    {"property": "Publicar", "checkbox": {"equals": True}},
+                    {
+                        "or": [
+                            {"property": "Fecha de cierre", "date": {"is_empty": True}},
+                            {"property": "Fecha de cierre", "date": {"after": now_date_str}}
+                        ]
+                    }
+                ]
             }
         }
 
@@ -740,6 +749,7 @@ def all_pages():
             empty_fecha_pages=empty_fecha_pages,
             og_data=og_data
         )
+
 
 
 
