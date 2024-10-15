@@ -10,42 +10,51 @@ module.exports = {
       },
       lineHeight: {
         'custom': '1.7rem',
-      }
+      },
+      fontSize: {
+        '4xl': ['2.25rem', {
+          lineHeight: '0.5rem !important',
+          letterSpacing: '-0.01em',
+        }],
+      },
     },
   },
   screens: {
     'sm': '640px',
-    // => @media (min-width: 640px) { ... }
-
     'md': '768px',
-    // => @media (min-width: 768px) { ... }
-
     'lg': '1024px',
-    // => @media (min-width: 1024px) { ... }
-
     'xl': '1280px',
-    // => @media (min-width: 1280px) { ... }
-
     '2xl': '1336px',
-    // => @media (min-width: 1436px) { ... }
   },
   daisyui: {
     themes: [
       {
-        "mytheme": {  // Your custom theme name
-          "primary": "#0CC7C7",   // Light blue (main accent)
-          "secondary": "#FFA00F",  // Orange (secondary background)
-          "green" : "#10E07F", // Green 
-          "accent": "#F05A30",    // Red (secondary accent 1)
-          "neutral": "#000",   // Adjust if needed (default neutral)
-          "base-100": "#ffffff",  // White (base color)
+        "mytheme": {
+          "primary": "#0CC7C7",
+          "secondary": "#FFA00F",
+          "green" : "#10E07F",
+          "accent": "#F05A30",
+          "neutral": "#000",
+          "base-100": "#ffffff",
         },
       },
     ],
   },
   plugins: [
     require('daisyui'),
+    function({ addUtilities }) {
+      const newUtilities = {
+        '.text-4xl': {
+          fontSize: '2.25rem !important',
+          lineHeight: '0.5rem !important',
+        },
+        '.md\\:text-4xl': {
+          fontSize: '2.25rem !important',
+          lineHeight: '0.5rem !important',
+        },
+      }
+      addUtilities(newUtilities, ['responsive', 'hover'])
+    }
   ],
 }
-
 

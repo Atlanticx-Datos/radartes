@@ -2316,7 +2316,8 @@ details.collapse summary::-webkit-details-marker {
 }
 .text-4xl {
   font-size: 2.25rem;
-  line-height: 2.5rem;
+  line-height: 0.5rem !important;
+  letter-spacing: -0.01em;
 }
 .text-lg {
   font-size: 1.125rem;
@@ -2347,6 +2348,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .leading-3 {
   line-height: .75rem;
+}
+.leading-\[0\.55rem\] {
+  line-height: 0.55rem;
 }
 .leading-none {
   line-height: 1;
@@ -2404,6 +2408,10 @@ details.collapse summary::-webkit-details-marker {
 }
 .duration-200 {
   transition-duration: 200ms;
+}
+.text-4xl {
+  font-size: 2.25rem !important;
+  line-height: 0.5rem !important;
 }
 .focus\:ring-0:focus {
   --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
@@ -2561,9 +2569,9 @@ details.collapse summary::-webkit-details-marker {
     padding-left: 0px;
     padding-right: 0px;
   }
-  .md\:px-4 {
-    padding-left: 1rem;
-    padding-right: 1rem;
+  .md\:px-2 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
   }
   .md\:py-0 {
     padding-top: 0px;
@@ -2606,7 +2614,8 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:text-4xl {
     font-size: 2.25rem;
-    line-height: 2.5rem;
+    line-height: 0.5rem !important;
+    letter-spacing: -0.01em;
   }
   .md\:text-xs {
     font-size: 0.75rem;
@@ -2614,6 +2623,10 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:leading-none {
     line-height: 1;
+  }
+  .md\:text-4xl {
+    font-size: 2.25rem !important;
+    line-height: 0.5rem !important;
   }
 }
 @media (min-width: 1024px) {
