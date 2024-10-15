@@ -20,7 +20,7 @@
         <input type="hidden" name="fecha_de_cierre_{{ page.id }}" value="{{ page.fecha_de_cierre }}">
     </td>
     <td class="w-3/12 p-2">
-        <div class="border-l-4 text-sm h-auto px-2 md:px-4 py-2 truncate" style="line-height: 0.7rem;">{{ page.ai_keywords | truncate(50) }}</div>
+        <div class="border-l-4 text-sm h-auto px-2 md:px-2 py-2" style="line-height: 0.7rem;">{{ page.ai_keywords | truncate(50) }}</div>
     </td>
     <td class="w-2/12 text-xs p-2 md:p-0 fecha-de-cierre">{{ page.fecha_de_cierre | default("Sin cierre") | format_date }}</td>
     <th class="w-2/12 p-2">
