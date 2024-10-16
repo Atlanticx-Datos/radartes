@@ -1783,9 +1783,6 @@ details.collapse summary::-webkit-details-marker {
 .relative {
   position: relative;
 }
-.bottom-1 {
-  bottom: 0.25rem;
-}
 .bottom-\[1\.4px\] {
   bottom: 1.4px;
 }
@@ -2293,14 +2290,14 @@ details.collapse summary::-webkit-details-marker {
   font-size: 1.5rem;
   line-height: 2rem;
 }
-.text-3xl {
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-}
 .text-4xl {
   font-size: 2.25rem;
   line-height: 0.5rem !important;
   letter-spacing: -0.01em;
+}
+.text-6xl {
+  font-size: 3.75rem;
+  line-height: 1;
 }
 .text-lg {
   font-size: 1.125rem;
