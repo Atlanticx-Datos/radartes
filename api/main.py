@@ -42,12 +42,17 @@ from concurrent.futures import ThreadPoolExecutor
 import unicodedata
 import inflect
 
+from flask_caching import Cache
+
 load_dotenv()
 print("Loaded AUTH0_DOMAIN:", os.environ.get("AUTH0_DOMAIN"))
 
 
 app = Flask(__name__, static_folder='../static', static_url_path='/static', template_folder='../templates')
 app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", "default_fallback_secret_key")
+
+# Configure caching
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 # Environment-specific configuration
 if os.getenv("FLASK_ENV") == "development":
@@ -584,6 +589,7 @@ def share_opportunity(opportunity_id):
 
 @app.route("/database", methods=["GET"])
 @login_required
+@cache.cached(timeout=300)
 def all_pages():
     p = inflect.engine()
 
