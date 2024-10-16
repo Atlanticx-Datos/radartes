@@ -589,7 +589,7 @@ def share_opportunity(opportunity_id):
 
 @app.route("/database", methods=["GET"])
 @login_required
-@cache.cached(timeout=300)
+
 def all_pages():
     p = inflect.engine()
 

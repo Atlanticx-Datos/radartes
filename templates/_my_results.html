@@ -4,19 +4,19 @@
     <td>
         <div class="flex items-center gap-3">
             <div>
-                <div class="font-bold">{{ opportunity.resumen_IA }}</div>
-                <div class="text-sm opacity-50">{{ opportunity.país }}</div>
+                <div class="ml-1 md:ml-0 font-medium text-sm leading-3 md:leading-none mb-1 mt-1 md:mt-1">{{ opportunity.resumen_IA }}</div>
+                <div class="ml-1 md:ml-0 text-xs opacity-50 mb-2 leading-none">{{ opportunity.país }}</div>
             </div>
         </div>
     </td>
     <td>
-        {{ opportunity.nombre }}
-        <br />
-        <span class="badge badge-ghost badge-sm">{{ opportunity.ai_keywords }}</span>
+        <div class="border-left-custom text-sm px-2 md:pl-8 py-2 capitalize-first h-12 flex items-center" style="line-height: 0.8rem;">
+            {{ (opportunity.ai_keywords | truncate(27)).capitalize() }}
+        </div>
     </td>
     <td>{{ opportunity.fecha_de_cierre | format_date }}</td>
     <th>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 p-2 bg-slate-100">
             <a href="{{ opportunity.url }}" target="_blank" class="btn btn-ghost btn-xs">
                 <svg class="w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor"
                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -25,7 +25,7 @@
                 </svg>
             </a>
             <div class="dropdown dropdown-bottom dropdown-end">
-                <button tabindex="0" class="btn btn-ghost btn-xs">
+                <button tabindex="0" class="btn btn-ghost btn-xs relative right-1">
                     <svg class="w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor"
                         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
