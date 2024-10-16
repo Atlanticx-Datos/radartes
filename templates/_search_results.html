@@ -1,16 +1,16 @@
 {% if pages %}
 {% for page in pages %}
-<tr class="min-h-12 border-b">
-    <th class="1/12 md:w-2/12 -mx-2">
+<tr class="border-b">
+    <th class="w-2/12">
         <label>
             <input type="checkbox" class="checkbox rounded-none h-4 w-4" name="selected_pages" value="{{ page.id }}" />
         </label>
     </th>
-    <td class="w-4/12 pl-6 md:pl-0 md:pt-2">
+    <td class="w-4/12 pl-6 md:pl-0 md:pr-4 md:pt-2">
         <div class="flex items-center">
             <div>
-                <div class="ml-1 md:ml-0 font-medium text-sm leading-3 md:leading-none mb-1 mt-1 md:mt-0">{{ page.nombre }}</div>
-                <div class="ml-1 md:ml-0 text-sm opacity-50">{{ page.país }}</div>
+                <div class="ml-1 md:ml-0 font-medium text-sm leading-3 md:leading-none mb-1 mt-1 md:mt-1">{{ page.nombre }}</div>
+                <div class="ml-1 md:ml-0 text-xs opacity-50 mb-2 leading-none">{{ page.país }}</div>
             </div>
         </div>
         <input type="hidden" name="name_{{ page.id }}" value="{{ page.nombre }}">
@@ -19,13 +19,15 @@
         <input type="hidden" name="recipients_{{ page.id }}" value="{{ page.destinatarios }}">
         <input type="hidden" name="fecha_de_cierre_{{ page.id }}" value="{{ page.fecha_de_cierre }}">
     </td>
-    <td class="w-3/12 p-2">
-        <div class="border-l-4 text-sm h-auto px-2 md:px-2 py-2" style="line-height: 0.7rem;">{{ page.ai_keywords | truncate(50) }}</div>
+    <td class="w-3/12 p-2 relative">
+        <div class="border-left-custom text-sm px-2 md:pl-8 py-2 capitalize-first h-12 flex items-center" style="line-height: 0.8rem;">
+            {{ (page.ai_keywords | truncate(27)).capitalize() }}
+        </div>
     </td>
-    <td class="w-2/12 text-xs p-2 md:p-0 fecha-de-cierre">{{ page.fecha_de_cierre | default("Sin cierre") | format_date }}</td>
-    <th class="w-2/12 p-2">
-        <div class="flex items-center gap-1">
-            <a href="{{ page.url }}" target="_blank" class="btn btn-ghost btn-xs p-1 md:px-0">
+    <td class="w-2/12 text-xs p-2 md:p-0 relative md:right-2 fecha-de-cierre">{{ page.fecha_de_cierre | default("Sin cierre") | format_date }}</td>
+    <th class="w-2/12 p-2 md:pr-4">
+        <div class="flex items-center gap-1 bg-slate-100 p-2">
+            <a href="{{ page.url }}" target="_blank" class="btn btn-ghost btn-xs p-1">
                 <svg class="w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5L19.5 4.5M19.5 4.5H8.25M19.5 4.5V15.75"></path>
                 </svg>
@@ -59,6 +61,27 @@
     <td colspan="5" class="p-2 mb-2">No se encontraron oportunidades.</td>
 </tr>
 {% endif %}
+
+<style>
+    .border-left-custom {
+            position: relative;
+        }
+
+        .border-left-custom::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 70%;
+            background-color: #e5e7eb;
+        }
+
+        .capitalize-first::first-letter {
+            text-transform: uppercase !important;
+        }
+</style>
 
 <script>
     function shareOpportunity(url, title, platform) {
