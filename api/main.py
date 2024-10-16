@@ -39,6 +39,8 @@ import socket as py_socket
 
 from concurrent.futures import ThreadPoolExecutor
 
+import unicodedata
+import inflect
 
 load_dotenv()
 print("Loaded AUTH0_DOMAIN:", os.environ.get("AUTH0_DOMAIN"))
@@ -583,7 +585,24 @@ def share_opportunity(opportunity_id):
 @app.route("/database", methods=["GET"])
 @login_required
 def all_pages():
-    search_query = request.args.get("search", "")
+    p = inflect.engine()
+
+    def normalize_text(text):
+        return ''.join(
+            c for c in unicodedata.normalize('NFD', text)
+            if unicodedata.category(c) != 'Mn'
+        )
+
+    def singularize_text(text):
+        words = text.split()
+        return ' '.join(p.singular_noun(word) or word for word in words)
+
+    def preprocess_text(text):
+        normalized = normalize_text(text)
+        return singularize_text(normalized)
+
+    search_query = preprocess_text(request.args.get("search", ""))
+
     url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
     headers = {
         "Authorization": "Bearer " + NOTION_TOKEN,
@@ -720,11 +739,11 @@ def all_pages():
     if search_query:
         pages = [
             page for page in pages 
-            if search_query.lower() in page.get("nombre", "").lower()
-            or search_query.lower() in page.get("país", "").lower()
-            or search_query.lower() in page.get("destinatarios", "").lower()
-            or search_query.lower() in page.get("ai_keywords", "").lower()
-            or search_query.lower() in page.get("nombre_original", "").lower()
+            if search_query in preprocess_text(page.get("nombre", ""))
+            or search_query in preprocess_text(page.get("país", ""))
+            or search_query in preprocess_text(page.get("destinatarios", ""))
+            or search_query in preprocess_text(page.get("ai_keywords", ""))
+            or search_query in preprocess_text(page.get("nombre_original", ""))
         ]
 
     closing_soon_pages = sorted(closing_soon_pages, key=lambda page: page["fecha_de_cierre"])

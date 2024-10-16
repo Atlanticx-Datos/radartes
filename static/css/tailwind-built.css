@@ -1923,6 +1923,9 @@ details.collapse summary::-webkit-details-marker {
 .h-10 {
   height: 2.5rem;
 }
+.h-12 {
+  height: 3rem;
+}
 .h-16 {
   height: 4rem;
 }
@@ -2283,6 +2286,9 @@ details.collapse summary::-webkit-details-marker {
 .text-center {
   text-align: center;
 }
+.text-start {
+  text-align: start;
+}
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
@@ -2322,6 +2328,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .uppercase {
   text-transform: uppercase;
+}
+.capitalize {
+  text-transform: capitalize;
 }
 .leading-3 {
   line-height: .75rem;
@@ -2412,6 +2421,9 @@ details.collapse summary::-webkit-details-marker {
   }
 }
 @media (min-width: 768px) {
+  .md\:right-2 {
+    right: 0.5rem;
+  }
   .md\:right-3 {
     right: 0.75rem;
   }
