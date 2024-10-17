@@ -583,32 +583,6 @@ html {
   align-items: center;
   justify-content: center;
 }
-.badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
-  transition-duration: 200ms;
-  height: 1.25rem;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  width: -moz-fit-content;
-  width: fit-content;
-  padding-left: 0.563rem;
-  padding-right: 0.563rem;
-  border-radius: var(--rounded-badge, 1.9rem);
-  border-width: 1px;
-  --tw-border-opacity: 1;
-  border-color: var(--fallback-b2,oklch(var(--b2)/var(--tw-border-opacity)));
-  --tw-bg-opacity: 1;
-  background-color: var(--fallback-b1,oklch(var(--b1)/var(--tw-bg-opacity)));
-  --tw-text-opacity: 1;
-  color: var(--fallback-bc,oklch(var(--bc)/var(--tw-text-opacity)));
-}
 @media (hover:hover) {
   .label a:hover {
     --tw-text-opacity: 1;
@@ -1141,14 +1115,6 @@ html {
   color: var(--fallback-inc,oklch(var(--inc)/var(--tw-text-opacity)));
   --alert-bg: var(--fallback-in,oklch(var(--in)/1));
   --alert-bg-mix: var(--fallback-b1,oklch(var(--b1)/1));
-}
-.badge-ghost {
-  --tw-border-opacity: 1;
-  border-color: var(--fallback-b2,oklch(var(--b2)/var(--tw-border-opacity)));
-  --tw-bg-opacity: 1;
-  background-color: var(--fallback-b2,oklch(var(--b2)/var(--tw-bg-opacity)));
-  --tw-text-opacity: 1;
-  color: var(--fallback-bc,oklch(var(--bc)/var(--tw-text-opacity)));
 }
 .btm-nav > * .label {
   font-size: 1rem;
@@ -1698,13 +1664,6 @@ details.collapse summary::-webkit-details-marker {
     transform: scale(1);
     opacity: 1;
   }
-}
-.badge-sm {
-  height: 1rem;
-  font-size: 0.75rem;
-  line-height: 1rem;
-  padding-left: 0.438rem;
-  padding-right: 0.438rem;
 }
 .btn-xs {
   height: 1.5rem;
@@ -2323,6 +2282,9 @@ details.collapse summary::-webkit-details-marker {
 .font-medium {
   font-weight: 500;
 }
+.font-normal {
+  font-weight: 400;
+}
 .uppercase {
   text-transform: uppercase;
 }
@@ -2561,6 +2523,10 @@ details.collapse summary::-webkit-details-marker {
     padding-left: 0px;
     padding-right: 0px;
   }
+  .md\:px-2 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
   .md\:py-0 {
     padding-top: 0px;
     padding-bottom: 0px;
@@ -2596,6 +2562,12 @@ details.collapse summary::-webkit-details-marker {
   .md\:pt-8 {
     padding-top: 2rem;
   }
+  .md\:text-center {
+    text-align: center;
+  }
+  .md\:text-start {
+    text-align: start;
+  }
   .md\:text-4xl {
     font-size: 2.25rem;
     line-height: 0.5rem !important;
@@ -2605,8 +2577,14 @@ details.collapse summary::-webkit-details-marker {
     font-size: 0.75rem;
     line-height: 1rem;
   }
+  .md\:font-black {
+    font-weight: 900;
+  }
   .md\:leading-none {
     line-height: 1;
+  }
+  .md\:tracking-normal {
+    letter-spacing: 0em;
   }
   .md\:text-4xl {
     font-size: 2.25rem !important;
