@@ -2553,6 +2553,9 @@ details.collapse summary::-webkit-details-marker {
   .md\:pr-0 {
     padding-right: 0px;
   }
+  .md\:pr-32 {
+    padding-right: 8rem;
+  }
   .md\:pr-4 {
     padding-right: 1rem;
   }
@@ -2564,9 +2567,6 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:text-center {
     text-align: center;
-  }
-  .md\:text-start {
-    text-align: start;
   }
   .md\:text-4xl {
     font-size: 2.25rem;
