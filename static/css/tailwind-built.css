@@ -1787,6 +1787,10 @@ details.collapse summary::-webkit-details-marker {
 .col-span-1 {
   grid-column: span 1 / span 1;
 }
+.mx-1 {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
 .mx-2 {
   margin-left: 0.5rem;
   margin-right: 0.5rem;
@@ -2254,8 +2258,8 @@ details.collapse summary::-webkit-details-marker {
   line-height: 0.5rem !important;
   letter-spacing: -0.01em;
 }
-.text-6xl {
-  font-size: 3.75rem;
+.text-5xl {
+  font-size: 3rem;
   line-height: 1;
 }
 .text-lg {
@@ -2281,9 +2285,6 @@ details.collapse summary::-webkit-details-marker {
 }
 .font-medium {
   font-weight: 500;
-}
-.font-normal {
-  font-weight: 400;
 }
 .uppercase {
   text-transform: uppercase;
@@ -2398,6 +2399,10 @@ details.collapse summary::-webkit-details-marker {
   .md\:mx-0 {
     margin-left: 0px;
     margin-right: 0px;
+  }
+  .md\:mx-2 {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
   }
   .md\:mx-auto {
     margin-left: auto;
@@ -2572,6 +2577,10 @@ details.collapse summary::-webkit-details-marker {
     font-size: 2.25rem;
     line-height: 0.5rem !important;
     letter-spacing: -0.01em;
+  }
+  .md\:text-6xl {
+    font-size: 3.75rem;
+    line-height: 1;
   }
   .md\:text-xs {
     font-size: 0.75rem;

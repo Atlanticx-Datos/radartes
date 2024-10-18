@@ -589,7 +589,6 @@ def share_opportunity(opportunity_id):
 
 @app.route("/database", methods=["GET"])
 @login_required
-
 def all_pages():
     p = inflect.engine()
 
@@ -604,10 +603,12 @@ def all_pages():
         return ' '.join(p.singular_noun(word) or word for word in words)
 
     def preprocess_text(text):
+        # Convert text to lowercase for case-insensitive comparison
+        text = text.lower()
         normalized = normalize_text(text)
         return singularize_text(normalized)
 
-    search_query = preprocess_text(request.args.get("search", ""))
+    search_query = preprocess_text(request.args.get("search", "").strip())
 
     url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
     headers = {
