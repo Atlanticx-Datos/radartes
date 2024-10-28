@@ -718,12 +718,16 @@ def all_pages():
 
             print("Page ID:", page["id"], "Fecha de Cierre:", fecha_de_cierre if fecha_de_cierre else "None")
 
-            if fecha_de_cierre:
+            # Check if "Fecha de cierre" property exists and has a date
+            fecha_de_cierre_prop = page["properties"].get("Fecha de cierre", None)
+            fecha_de_cierre = None
+            if fecha_de_cierre_prop and "date" in fecha_de_cierre_prop and fecha_de_cierre_prop["date"]:
+                fecha_de_cierre = fecha_de_cierre_prop["date"].get("start", None)
                 page_data["fecha_de_cierre"] = fecha_de_cierre
                 cierre_date = datetime.strptime(fecha_de_cierre, '%Y-%m-%d')
+
                 if now_date <= cierre_date <= seven_days_from_now:
                     closing_soon_pages.append(page_data)
-                pages.append(page_data)
             else:
                 page_data["fecha_de_cierre"] = placeholder_date
 
@@ -731,7 +735,8 @@ def all_pages():
             if page_data.get("destinatarios", "").lower() == "destacar":
                 if not fecha_de_cierre or cierre_date >= now_date:
                     destacar_pages.append(page_data)
-            
+
+            # Ensure each page is added to pages only once
             pages.append(page_data)
 
     # If less than 5 pages, extend to 15 days
