@@ -662,7 +662,7 @@ def all_pages():
 
     closing_soon_pages = []
     pages = []
-    empty_fecha_pages = []
+    destacar_pages = []
 
     for page in all_pages:
         if "Publicar" in page["properties"] and page["properties"]["Publicar"]["checkbox"]:
@@ -727,10 +727,12 @@ def all_pages():
             else:
                 page_data["fecha_de_cierre"] = placeholder_date
 
-            # Add to empty_fecha_pages if "destacar" is in "destinatarios"
+            # Add to destacar_pages if "destacar" is in "destinatarios" and fecha_de_cierre is empty or not past today
             if page_data.get("destinatarios", "").lower() == "destacar":
-                empty_fecha_pages.append(page_data)
-                pages.append(page_data)
+                if not fecha_de_cierre or cierre_date >= now_date:
+                    destacar_pages.append(page_data)
+            
+            pages.append(page_data)
 
     # If less than 5 pages, extend to 15 days
     if len(closing_soon_pages) < 5:
@@ -772,7 +774,7 @@ def all_pages():
             "database.html", 
             pages=sorted_pages, 
             closing_soon_pages=closing_soon_pages[:7],  # Limit to 7 pages
-            empty_fecha_pages=empty_fecha_pages,
+            destacar_pages=destacar_pages,
             og_data=og_data
         )
 
