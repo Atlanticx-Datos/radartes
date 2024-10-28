@@ -591,6 +591,7 @@ def share_opportunity(opportunity_id):
 @login_required
 def all_pages():
     p = inflect.engine()
+    
 
     def normalize_text(text):
         return ''.join(
@@ -607,8 +608,25 @@ def all_pages():
         text = text.lower()
         normalized = normalize_text(text)
         return singularize_text(normalized)
+        
 
     search_query = preprocess_text(request.args.get("search", "").strip())
+
+    # Month mapping
+    month_mapping = {
+        "enero": 1, "febrero": 2, "marzo": 3, "abril": 4,
+        "mayo": 5, "junio": 6, "julio": 7, "agosto": 8,
+        "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
+    }
+
+    # Check for month or "sin cierre" before preprocessing the search query
+    month_number = month_mapping.get(search_query)
+    is_sin_cierre = search_query == "sin cierre"
+
+       # Only preprocess search query if it's not a month or "sin cierre"
+    if not month_number and not is_sin_cierre:
+        search_query = preprocess_text(search_query)
+
 
     url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
     headers = {
@@ -749,8 +767,15 @@ def all_pages():
                     if len(closing_soon_pages) >= 7:
                         break
 
-    # Apply search filter
-    if search_query:
+    # Apply month-based filter first
+    if month_number is not None or is_sin_cierre:
+        pages = [
+            page for page in pages 
+            if (is_sin_cierre and page.get("fecha_de_cierre") == placeholder_date)
+            or (month_number and datetime.strptime(page.get("fecha_de_cierre", placeholder_date), '%Y-%m-%d').month == month_number)
+        ]
+    # Then apply regular search filter if needed
+    elif search_query:
         pages = [
             page for page in pages 
             if search_query in preprocess_text(page.get("nombre", ""))
