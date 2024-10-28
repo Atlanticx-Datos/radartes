@@ -1976,6 +1976,9 @@ details.collapse summary::-webkit-details-marker {
 .w-full {
   width: 100%;
 }
+.max-w-5xl {
+  max-width: 64rem;
+}
 .max-w-\[1250px\] {
   max-width: 1250px;
 }
@@ -2439,11 +2442,11 @@ details.collapse summary::-webkit-details-marker {
   .md\:mb-0 {
     margin-bottom: 0px;
   }
-  .md\:mb-12 {
-    margin-bottom: 3rem;
-  }
   .md\:mb-2 {
     margin-bottom: 0.5rem;
+  }
+  .md\:mb-20 {
+    margin-bottom: 5rem;
   }
   .md\:ml-0 {
     margin-left: 0px;
@@ -2465,6 +2468,9 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:mt-1 {
     margin-top: 0.25rem;
+  }
+  .md\:mt-16 {
+    margin-top: 4rem;
   }
   .md\:mt-2 {
     margin-top: 0.5rem;
