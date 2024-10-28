@@ -725,11 +725,11 @@ def all_pages():
                     closing_soon_pages.append(page_data)
                 pages.append(page_data)
             else:
-                if page_data.get("destinatarios", "").lower() == "destacar":
-                    page_data["fecha_de_cierre"] = placeholder_date
-                    empty_fecha_pages.append(page_data)
-                else:
-                    page_data["fecha_de_cierre"] = placeholder_date
+                page_data["fecha_de_cierre"] = placeholder_date
+
+            # Add to empty_fecha_pages if "destacar" is in "destinatarios"
+            if page_data.get("destinatarios", "").lower() == "destacar":
+                empty_fecha_pages.append(page_data)
                 pages.append(page_data)
 
     # If less than 5 pages, extend to 15 days
