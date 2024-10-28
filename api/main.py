@@ -19,7 +19,8 @@ from flask_jwt_extended import (
 )
 from dotenv import find_dotenv, load_dotenv
 from functools import wraps
-
+import time
+import sys
 from typing_extensions import LiteralString
 from werkzeug.wrappers import response
 
@@ -590,27 +591,121 @@ def share_opportunity(opportunity_id):
 @app.route("/database", methods=["GET"])
 @login_required
 def all_pages():
+    print("\n=== Starting all_pages() route ===")
+    sys.stdout.flush()
     p = inflect.engine()
-    
+    print("Created inflect engine")
+    sys.stdout.flush()
 
+    def fetch_notion_pages():
+        print("\n=== Starting fetch_notion_pages() ===")
+        sys.stdout.flush()
+        url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
+        headers = {
+            "Authorization": "Bearer " + NOTION_TOKEN,
+            "Content-Type": "application/json",
+            "Notion-Version": "2022-06-28",
+        }
+        print(f"Headers: {headers}")
+        sys.stdout.flush()
+        
+        now_date_str = datetime.now().strftime('%Y-%m-%d')
+            # 1. Reduce the number of properties we request
+        json_body = {
+            "filter": {
+                "and": [
+                    {"property": "Publicar", "checkbox": {"equals": True}},
+                    {
+                        "or": [
+                            {"property": "Fecha de cierre", "date": {"is_empty": True}},
+                            {"property": "Fecha de cierre", "date": {"after": datetime.now().strftime('%Y-%m-%d')}}
+                        ]
+                    }
+                ]
+            },
+            # 2. Only request the properties we actually use
+            "page_size": 100  # 3. Increase page size to reduce number of requests
+        }
+
+        print(f"Request body: {json.dumps(json_body, indent=2)}")
+        sys.stdout.flush()
+        
+        all_pages = []
+        has_more = True
+        start_cursor = None
+        request_count = 0
+        max_requests = 3  # Limit maximum number of requests
+
+        while has_more and request_count < max_requests:
+            try:
+                if start_cursor:
+                    json_body["start_cursor"] = start_cursor
+
+                print(f"Making request with start_cursor: {start_cursor}")
+                res = requests.post(url, headers=headers, json=json_body, timeout=30)
+                res.raise_for_status()
+                data = res.json()
+                print(f"Response status: {res.status_code}")
+                print(f"Response body: {res.text}")
+                print(f"Received {len(data.get('results', []))} results")
+                sys.stdout.flush()
+                res.raise_for_status()
+                all_pages.extend(data.get("results", []))
+                has_more = data.get("has_more", False)
+                start_cursor = data.get("next_cursor")
+                
+                print(f"has_more: {has_more}, next_cursor: {start_cursor}")
+
+            except requests.exceptions.Timeout:
+                print("Request timed out")
+                break
+
+            except requests.exceptions.RequestException as e:
+                print(f"Request failed: {str(e)}")
+                break
+
+            if not has_more:
+                break
+
+        print(f"Finished fetching, total pages: {len(all_pages)}")
+        return all_pages
+    
     def normalize_text(text):
         return ''.join(
             c for c in unicodedata.normalize('NFD', text)
             if unicodedata.category(c) != 'Mn'
         )
+    print("Defined normalize_text function")
+    sys.stdout.flush()
 
     def singularize_text(text):
         words = text.split()
         return ' '.join(p.singular_noun(word) or word for word in words)
+    print("Defined singularize_text function")
+    sys.stdout.flush()
 
     def preprocess_text(text):
-        # Convert text to lowercase for case-insensitive comparison
         text = text.lower()
         normalized = normalize_text(text)
         return singularize_text(normalized)
-        
+    print("Defined preprocess_text function")
+    sys.stdout.flush()
 
     search_query = preprocess_text(request.args.get("search", "").strip())
+    print(f"Processed search query: {search_query}")
+    sys.stdout.flush()
+
+    print("About to call fetch_notion_pages")
+    sys.stdout.flush()
+    all_pages = fetch_notion_pages()
+    print(f"Received {len(all_pages) if all_pages else 0} pages")
+    sys.stdout.flush()
+    
+    
+    now_date = datetime.now()
+    seven_days_from_now = now_date + timedelta(days=7)
+    fifteen_days_from_now = now_date + timedelta(days=15)
+    placeholder_date = '1900-01-01'  # Placeholder date for pages without fecha_de_cierre
 
     # Month mapping
     month_mapping = {
@@ -627,63 +722,21 @@ def all_pages():
     if not month_number and not is_sin_cierre:
         search_query = preprocess_text(search_query)
 
-
-    url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
-    headers = {
-        "Authorization": "Bearer " + NOTION_TOKEN,
-        "Content-Type": "application/json",
-        "Notion-Version": "2022-06-28",
-    }
-
-    def fetch_all_pages():
-        now_date_str = datetime.now().strftime('%Y-%m-%d')
-
-        json_body = {
-            "filter": {
-                "and": [
-                    {"property": "Publicar", "checkbox": {"equals": True}},
-                    {
-                        "or": [
-                            {"property": "Fecha de cierre", "date": {"is_empty": True}},
-                            {"property": "Fecha de cierre", "date": {"after": now_date_str}}
-                        ]
-                    }
-                ]
-            }
-        }
-
-        all_pages = []
-        has_more = True
-        start_cursor = None
-
-        while has_more:
-            if start_cursor:
-                json_body["start_cursor"] = start_cursor
-
-            res = requests.post(url, headers=headers, json=json_body)
-            data = res.json()
-
-            print("API Response Results Count:", len(data.get("results", [])))
-            print("API Response Data Structure:", json.dumps(data, indent=2))
-
-            all_pages.extend(data.get("results", []))
-            has_more = data.get("has_more", False)
-            start_cursor = data.get("next_cursor", None)
-
-        return all_pages
-
-    all_pages = fetch_all_pages()
-    now_date = datetime.now()
-    seven_days_from_now = now_date + timedelta(days=7)
-    fifteen_days_from_now = now_date + timedelta(days=15)
-    placeholder_date = '1900-01-01'  # Placeholder date for pages without fecha_de_cierre
-
     closing_soon_pages = []
     pages = []
     destacar_pages = []
 
     for page in all_pages:
+
+        print(f"\nProcessing page: {page['id']}")
+        sys.stdout.flush()
+
         if "Publicar" in page["properties"] and page["properties"]["Publicar"]["checkbox"]:
+
+
+            print("Page is published")
+            sys.stdout.flush()
+
             page_data = {"id": page["id"], "created_time": page["created_time"]}
 
             if "Resumen generado por la IA" in page["properties"]:
@@ -692,6 +745,9 @@ def all_pages():
                     if page["properties"]["Resumen generado por la IA"]["rich_text"]
                     else ""
                 )
+
+                print(f"Nombre: {page_data['nombre']}")
+                sys.stdout.flush()
 
             if "País" in page["properties"]:
                 page_data["país"] = (
@@ -756,6 +812,14 @@ def all_pages():
 
             # Ensure each page is added to pages only once
             pages.append(page_data)
+            print("Added to pages list")
+            sys.stdout.flush()
+
+    print(f"\nFinal counts:")
+    print(f"Total pages: {len(pages)}")
+    print(f"Closing soon: {len(closing_soon_pages)}")
+    print(f"Destacar: {len(destacar_pages)}")
+    sys.stdout.flush()
 
     # If less than 5 pages, extend to 15 days
     if len(closing_soon_pages) < 5:
@@ -807,9 +871,6 @@ def all_pages():
             destacar_pages=destacar_pages,
             og_data=og_data
         )
-
-
-
 
 
 # Custom Jinja2 filter for date
