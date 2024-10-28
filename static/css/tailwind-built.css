@@ -1979,6 +1979,9 @@ details.collapse summary::-webkit-details-marker {
 .max-w-\[1250px\] {
   max-width: 1250px;
 }
+.max-w-screen-2xl {
+  max-width: 1536px;
+}
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -2180,9 +2183,6 @@ details.collapse summary::-webkit-details-marker {
 .p-2 {
   padding: 0.5rem;
 }
-.p-2\.5 {
-  padding: 0.625rem;
-}
 .px-2 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
@@ -2216,6 +2216,9 @@ details.collapse summary::-webkit-details-marker {
 .pb-8 {
   padding-bottom: 2rem;
 }
+.pl-1 {
+  padding-left: 0.25rem;
+}
 .pl-2 {
   padding-left: 0.5rem;
 }
@@ -2230,6 +2233,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .pr-12 {
   padding-right: 3rem;
+}
+.pr-2 {
+  padding-right: 0.5rem;
 }
 .pr-24 {
   padding-right: 6rem;
@@ -2375,12 +2381,25 @@ details.collapse summary::-webkit-details-marker {
   background-color: rgb(226 232 240 / var(--tw-bg-opacity));
 }
 @media (min-width: 640px) {
+  .sm\:px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .sm\:pl-2 {
+    padding-left: 0.5rem;
+  }
+  .sm\:pr-4 {
+    padding-right: 1rem;
+  }
   .sm\:text-base {
     font-size: 1rem;
     line-height: 1.5rem;
   }
 }
 @media (min-width: 768px) {
+  .md\:left-6 {
+    left: 1.5rem;
+  }
   .md\:right-2 {
     right: 0.5rem;
   }
@@ -2393,8 +2412,11 @@ details.collapse summary::-webkit-details-marker {
   .md\:col-span-2 {
     grid-column: span 2 / span 2;
   }
-  .md\:col-span-3 {
-    grid-column: span 3 / span 3;
+  .md\:col-span-4 {
+    grid-column: span 4 / span 4;
+  }
+  .md\:col-span-6 {
+    grid-column: span 6 / span 6;
   }
   .md\:mx-0 {
     margin-left: 0px;
@@ -2407,6 +2429,9 @@ details.collapse summary::-webkit-details-marker {
   .md\:mx-auto {
     margin-left: auto;
     margin-right: auto;
+  }
+  .md\:-mr-4 {
+    margin-right: -1rem;
   }
   .md\:-mt-1 {
     margin-top: -0.25rem;
@@ -2431,6 +2456,9 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:ml-2 {
     margin-left: 0.5rem;
+  }
+  .md\:ml-4 {
+    margin-left: 1rem;
   }
   .md\:mt-0 {
     margin-top: 0px;
@@ -2474,20 +2502,21 @@ details.collapse summary::-webkit-details-marker {
   .md\:w-2\/6 {
     width: 33.333333%;
   }
-  .md\:w-4\/5 {
-    width: 80%;
-  }
   .md\:w-5\/6 {
     width: 83.333333%;
   }
   .md\:flex-1 {
     flex: 1 1 0%;
   }
-  .md\:grid-cols-6 {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+  .md\:grid-cols-12 {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
   }
   .md\:justify-center {
     justify-content: center;
+  }
+  .md\:gap-x-8 {
+    -moz-column-gap: 2rem;
+         column-gap: 2rem;
   }
   .md\:space-x-2 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-x-reverse: 0;
@@ -2532,6 +2561,14 @@ details.collapse summary::-webkit-details-marker {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }
+  .md\:px-5 {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+  .md\:px-6 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
   .md\:py-0 {
     padding-top: 0px;
     padding-bottom: 0px;
@@ -2546,8 +2583,14 @@ details.collapse summary::-webkit-details-marker {
   .md\:pl-10 {
     padding-left: 2.5rem;
   }
+  .md\:pl-2 {
+    padding-left: 0.5rem;
+  }
   .md\:pl-20 {
     padding-left: 5rem;
+  }
+  .md\:pl-3 {
+    padding-left: 0.75rem;
   }
   .md\:pl-4 {
     padding-left: 1rem;
@@ -2558,11 +2601,14 @@ details.collapse summary::-webkit-details-marker {
   .md\:pr-0 {
     padding-right: 0px;
   }
-  .md\:pr-32 {
-    padding-right: 8rem;
+  .md\:pr-28 {
+    padding-right: 7rem;
   }
   .md\:pr-4 {
     padding-right: 1rem;
+  }
+  .md\:pr-6 {
+    padding-right: 1.5rem;
   }
   .md\:pt-2 {
     padding-top: 0.5rem;
@@ -2618,5 +2664,43 @@ details.collapse summary::-webkit-details-marker {
   }
   .lg\:grid-cols-6 {
     grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .lg\:px-8 {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  .lg\:pl-4 {
+    padding-left: 1rem;
+  }
+  .lg\:pr-8 {
+    padding-right: 2rem;
+  }
+}
+@media (min-width: 1280px) {
+  .xl\:px-12 {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+  .xl\:pl-5 {
+    padding-left: 1.25rem;
+  }
+  .xl\:pr-10 {
+    padding-right: 2.5rem;
+  }
+}
+@media (min-width: 1536px) {
+  .\32xl\:px-16 {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+  .\32xl\:px-8 {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  .\32xl\:pl-6 {
+    padding-left: 1.5rem;
+  }
+  .\32xl\:pr-12 {
+    padding-right: 3rem;
   }
 }
