@@ -600,6 +600,41 @@ def all_pages():
     print("Created inflect engine")
     sys.stdout.flush()
 
+    def process_notion_page(page):
+        """Extract only the essential properties from a Notion page"""
+        try:
+            return {
+                "id": page["id"],
+                "nombre": (
+                    page["properties"]["Nombre"]["title"][0]["text"]["content"]
+                    if page["properties"]["Nombre"]["title"]
+                    else ""
+                ),
+                "país": (
+                    page["properties"]["País"]["rich_text"][0]["text"]["content"]
+                    if page["properties"]["País"]["rich_text"]
+                    else ""
+                ),
+                "destinatarios": (
+                    page["properties"]["Destinatarios"]["rich_text"][0]["text"]["content"]
+                    if page["properties"]["Destinatarios"]["rich_text"]
+                    else ""
+                ),
+                "fecha_de_cierre": (
+                    page["properties"]["Fecha de cierre"]["date"]["start"]
+                    if page["properties"]["Fecha de cierre"]["date"]
+                    else "1900-01-01"
+                ),
+                "url": (
+                    page["properties"]["URL"]["url"]
+                    if page["properties"]["URL"].get("url")
+                    else ""
+                )
+            }
+        except Exception as e:
+            print(f"Error processing page {page.get('id', 'unknown')}: {str(e)}")
+            return None
+
     def fetch_notion_pages():
         print("\n=== Starting fetch_notion_pages() ===")
         sys.stdout.flush()
