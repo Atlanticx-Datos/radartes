@@ -40,6 +40,8 @@ import socket as py_socket
 
 from concurrent.futures import ThreadPoolExecutor
 
+from flask_caching import Cache
+
 import unicodedata
 import inflect
 
@@ -590,6 +592,7 @@ def share_opportunity(opportunity_id):
 
 @app.route("/database", methods=["GET"])
 @login_required
+@cache.cached(timeout=300)  # Cache for 5 minutes
 def all_pages():
     print("\n=== Starting all_pages() route ===")
     sys.stdout.flush()
