@@ -47,9 +47,12 @@ import inflect
 
 from flask_caching import Cache
 
+import logging
+
 load_dotenv()
 print("Loaded AUTH0_DOMAIN:", os.environ.get("AUTH0_DOMAIN"))
 
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__, static_folder='../static', static_url_path='/static', template_folder='../templates')
 app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", "default_fallback_secret_key")
@@ -594,6 +597,9 @@ def share_opportunity(opportunity_id):
 @login_required
 @cache.cached(timeout=300)  # Cache for 5 minutes
 def all_pages():
+    total_start_time = time.time()
+    logger.info("Starting database route")
+    
     print("\n=== Starting all_pages() route ===")
     sys.stdout.flush()
     p = inflect.engine()
@@ -602,6 +608,7 @@ def all_pages():
 
     def fetch_notion_pages():
         print("\n=== Starting fetch_notion_pages() ===")
+        fetch_start_time = time.time()
         sys.stdout.flush()
         url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
         headers = {
@@ -627,7 +634,7 @@ def all_pages():
                 ]
             },
             # 2. Only request the properties we actually use
-            "page_size": 200  # 3. Increase page size to reduce number of requests
+            "page_size": 100  # 3. Increase page size to reduce number of requests
         }
 
         print(f"Request body: {json.dumps(json_body, indent=2)}")
@@ -640,6 +647,8 @@ def all_pages():
         max_requests = 3  # Limit maximum number of requests
 
         while has_more and request_count < max_requests:
+            request_count += 1
+            request_start = time.time()
             try:
                 if start_cursor:
                     json_body["start_cursor"] = start_cursor
@@ -659,6 +668,8 @@ def all_pages():
                 
                 print(f"has_more: {has_more}, next_cursor: {start_cursor}")
 
+                logger.info(f"Notion API request #{request_count} took {time.time() - request_start:.2f}s")  # Add this line
+
             except requests.exceptions.Timeout:
                 print("Request timed out")
                 break
@@ -671,6 +682,7 @@ def all_pages():
                 break
 
         print(f"Finished fetching, total pages: {len(all_pages)}")
+        print(f"Total fetch time: {time.time() - fetch_start_time:.2f} seconds")
         return all_pages
     
     def normalize_text(text):
