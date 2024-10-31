@@ -27,6 +27,7 @@ from werkzeug.wrappers import response
 import requests
 import json
 import os
+from upstash_redis import Redis
 
 from os import environ as env
 from urllib.parse import quote_plus, urlencode
@@ -59,6 +60,10 @@ app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", "default_fallback_secre
 
 # Configure caching
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+
+# Initialize Redis with your Upstash credentials
+redis = Redis(url=os.environ.get('KV_REST_API_URL'),
+             token=os.environ.get('KV_REST_API_TOKEN'))
 
 # Environment-specific configuration
 if os.getenv("FLASK_ENV") == "development":
@@ -607,9 +612,21 @@ def all_pages():
     sys.stdout.flush()
 
     def fetch_notion_pages():
-        print("\n=== Starting fetch_notion_pages() ===")
+        cache_key = 'notion_pages'
+        
+        try:
+            # Try cache first
+            cached_data = redis.get(cache_key)
+            if cached_data:
+                print("\n=== CACHE HIT: Serving from Upstash KV ===")
+                return json.loads(cached_data)
+        except Exception as e:
+            print(f"\n=== CACHE ERROR: {str(e)} ===")
+        
+        print("\n=== CACHE MISS: Fetching from Notion API ===")
         fetch_start_time = time.time()
-        sys.stdout.flush()
+        
+        # Your existing code stays exactly the same, including all logging
         url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
         headers = {
             "Authorization": "Bearer " + NOTION_TOKEN,
@@ -639,6 +656,14 @@ def all_pages():
 
         print(f"Request body: {json.dumps(json_body, indent=2)}")
         sys.stdout.flush()
+
+        response = requests.post(url, headers=headers, json=json_body, timeout=30)
+        data = response.json()
+
+        # Add size check for raw response
+        raw_json = json.dumps(data)
+        response_size = sys.getsizeof(raw_json)
+        print(f"\nRaw response size: {response_size / 1024:.2f} KB")
         
         all_pages = []
         has_more = True
@@ -683,6 +708,19 @@ def all_pages():
 
         print(f"Finished fetching, total pages: {len(all_pages)}")
         print(f"Total fetch time: {time.time() - fetch_start_time:.2f} seconds")
+        raw_json = json.dumps(data)
+        response_size = sys.getsizeof(raw_json)
+        print(f"\nRaw response size: {response_size / 1024:.2f} KB")
+        processed_json = json.dumps(all_pages)
+        processed_size = sys.getsizeof(processed_json)
+        print(f"Processed data size: {processed_size / 1024:.2f} KB")
+        
+        try:
+            redis.set(cache_key, json.dumps(all_pages), ex=1800)  # Cache for 30 minutes
+            print("\n=== CACHE UPDATE: Stored new data in Upstash KV ===")
+        except Exception as e:
+            print(f"\n=== CACHE ERROR: {str(e)} ===")
+        
         return all_pages
     
     def normalize_text(text):
