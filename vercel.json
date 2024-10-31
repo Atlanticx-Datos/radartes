@@ -13,7 +13,7 @@
     ],
     "crons": [{
         "path": "/api/cron",
-        "schedule": "*/30 * * * *"  // Runs every 30 minutes
+        "schedule": "*/30 * * * *" 
     }]
 }
   
