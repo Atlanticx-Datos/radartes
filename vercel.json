@@ -10,6 +10,13 @@
             "src": "/(.*)",
             "dest": "api/main.py"
         }
-    ]
+    ],
+    "builds": [
+        {
+            "src": "api/main.py",
+            "use": "@vercel/python"
+        }
+    ],
+    "outputDirectory": "static/public"
 }
   
