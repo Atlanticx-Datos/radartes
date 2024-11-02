@@ -1803,6 +1803,9 @@ details.collapse summary::-webkit-details-marker {
 .mb-1 {
   margin-bottom: 0.25rem;
 }
+.mb-12 {
+  margin-bottom: 3rem;
+}
 .mb-2 {
   margin-bottom: 0.5rem;
 }
@@ -1890,8 +1893,8 @@ details.collapse summary::-webkit-details-marker {
 .h-\[34px\] {
   height: 34px;
 }
-.h-\[640px\] {
-  height: 640px;
+.h-\[900px\] {
+  height: 900px;
 }
 .h-auto {
   height: auto;
@@ -1940,9 +1943,6 @@ details.collapse summary::-webkit-details-marker {
 }
 .w-5 {
   width: 1.25rem;
-}
-.w-5\/12 {
-  width: 41.666667%;
 }
 .w-52 {
   width: 13rem;
@@ -2068,15 +2068,15 @@ details.collapse summary::-webkit-details-marker {
   margin-right: calc(2rem * var(--tw-space-x-reverse));
   margin-left: calc(2rem * calc(1 - var(--tw-space-x-reverse)));
 }
+.space-y-12 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(3rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(3rem * var(--tw-space-y-reverse));
+}
 .space-y-6 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
   margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(1.5rem * var(--tw-space-y-reverse));
-}
-.space-y-8 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-y-reverse: 0;
-  margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse)));
-  margin-bottom: calc(2rem * var(--tw-space-y-reverse));
 }
 .overflow-auto {
   overflow: auto;
@@ -2206,10 +2206,6 @@ details.collapse summary::-webkit-details-marker {
 .p-4 {
   padding: 1rem;
 }
-.px-16 {
-  padding-left: 4rem;
-  padding-right: 4rem;
-}
 .px-2 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
@@ -2217,6 +2213,14 @@ details.collapse summary::-webkit-details-marker {
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
+}
+.px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+.px-8 {
+  padding-left: 2rem;
+  padding-right: 2rem;
 }
 .py-0 {
   padding-top: 0px;
@@ -2268,11 +2272,11 @@ details.collapse summary::-webkit-details-marker {
 .pr-2 {
   padding-right: 0.5rem;
 }
-.pt-0 {
-  padding-top: 0px;
-}
 .pt-16 {
   padding-top: 4rem;
+}
+.pt-2 {
+  padding-top: 0.5rem;
 }
 .pt-8 {
   padding-top: 2rem;
@@ -2283,12 +2287,12 @@ details.collapse summary::-webkit-details-marker {
 .text-start {
   text-align: start;
 }
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
 .text-5xl {
   font-size: 3rem;
-  line-height: 1;
-}
-.text-6xl {
-  font-size: 3.75rem;
   line-height: 1;
 }
 .text-base {
@@ -2432,10 +2436,6 @@ details.collapse summary::-webkit-details-marker {
   background-color: rgb(226 232 240 / var(--tw-bg-opacity));
 }
 @media (min-width: 640px) {
-  .sm\:px-4 {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
   .sm\:pl-2 {
     padding-left: 0.5rem;
   }
@@ -2465,6 +2465,9 @@ details.collapse summary::-webkit-details-marker {
   .md\:-mr-4 {
     margin-right: -1rem;
   }
+  .md\:mb-0 {
+    margin-bottom: 0px;
+  }
   .md\:ml-0 {
     margin-left: 0px;
   }
@@ -2489,8 +2492,14 @@ details.collapse summary::-webkit-details-marker {
   .md\:h-20 {
     height: 5rem;
   }
+  .md\:h-\[640px\] {
+    height: 640px;
+  }
   .md\:h-auto {
     height: auto;
+  }
+  .md\:w-5\/12 {
+    width: 41.666667%;
   }
   .md\:w-5\/6 {
     width: 83.333333%;
@@ -2532,6 +2541,10 @@ details.collapse summary::-webkit-details-marker {
   .md\:p-0 {
     padding: 0px;
   }
+  .md\:px-16 {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
   .md\:px-2 {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
@@ -2547,6 +2560,9 @@ details.collapse summary::-webkit-details-marker {
   .md\:py-6 {
     padding-top: 1.5rem;
     padding-bottom: 1.5rem;
+  }
+  .md\:pb-0 {
+    padding-bottom: 0px;
   }
   .md\:pl-0 {
     padding-left: 0px;
@@ -2572,11 +2588,22 @@ details.collapse summary::-webkit-details-marker {
   .md\:pr-6 {
     padding-right: 1.5rem;
   }
+  .md\:pt-0 {
+    padding-top: 0px;
+  }
   .md\:pt-2 {
     padding-top: 0.5rem;
   }
   .md\:text-center {
     text-align: center;
+  }
+  .md\:text-5xl {
+    font-size: 3rem;
+    line-height: 1;
+  }
+  .md\:text-6xl {
+    font-size: 3.75rem;
+    line-height: 1;
   }
   .md\:leading-none {
     line-height: 1;
