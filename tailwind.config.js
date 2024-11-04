@@ -11,12 +11,6 @@ module.exports = {
       lineHeight: {
         'custom': '1.7rem',
       },
-      fontSize: {
-        '4xl': ['2.25rem', {
-          lineHeight: '0.5rem !important',
-          letterSpacing: '-0.01em',
-        }],
-      },
     },
   },
   screens: {
@@ -46,11 +40,11 @@ module.exports = {
       const newUtilities = {
         '.text-4xl': {
           fontSize: '2.25rem !important',
-          lineHeight: '0.5rem !important',
+          lineHeight: '2.5rem !important',
         },
         '.md\\:text-4xl': {
           fontSize: '2.25rem !important',
-          lineHeight: '0.5rem !important',
+          lineHeight: '2.5rem !important',
         },
       }
       addUtilities(newUtilities, ['responsive', 'hover'])
