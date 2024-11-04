@@ -18,11 +18,11 @@
     <div class="flex flex-col md:flex-row justify-between items-start space-y-12 md:space-y-0">
       <!-- Left Column - Hero -->
       <div class="w-full md:w-7/12">
-        <div class="space-y-6">
-          <p class="text-5xl md:text-6xl font-bold uppercase leading-custom tracking-tight md:tracking-normal ">
+        <div class="space-y-8">
+          <p class="text-5xl md:text-6xl font-bold uppercase leading-tighter tracking-tight md:tracking-widest ">
             Movilidad, residencias, concursos, premios, becas.
           </p>
-          <p class="md:pt-0 pt-2 md:pb-0 pb-2 text-base md:text-lg uppercase text-indigo-500">//////////////</p>
+          <p class="md:pt-0 md:pb-0 pb-2 text-base md:text-lg uppercase text-indigo-500">//////////////</p>
           <p class="text-xl md:text-4xl font-bold text-indigo-500 md:pt-0 tracking-wider md:tracking-tight md:w-4/5">
             INFORMACIÓN Y ACCESO TOTALMENTE GRATUITOS.
           </p>
@@ -31,12 +31,12 @@
       </div>
 
       <!-- Right Column -->
-      <div class="w-full md:w-5/12">
-        <div class="bg-white py-8 px-8 md:px-16 text-black rounded-md mb-12 md:mb-0">
-          <p class="text-sm font-bold uppercase text-left">
-            Si sos artista, investigador o gestor, entrá para descubrir más de 100 convocatorias vigentes.
+      <div class="w-full md:w-4/12">
+        <div class="bg-white py-8 px-8 md:px-12 text-black rounded-md mb-12 md:mb-0">
+          <p class="text-sm font-bold uppercase text-left leading-tight">
+            Si sos artista, investigador o gestor, entrá para descubrir más de 100 convocatorias.
           </p>
-          <p class="text-sm uppercase mt-4 text-left">
+          <p class="text-sm uppercase mt-4 text-left leading-tight">
             Sumate para poder buscar, guardar y compartir toda la información.
           </p>
           {% if session.get('user') is none %}
@@ -46,6 +46,7 @@
             </a>
           {% else %}
             <a href="{{ url_for('all_pages') }}" 
+               onclick="showSpinner(event)"
                class="inline-block mt-6 font-bold bg-black hover:bg-gray-800 py-2 px-4 text-white text-sm transition-colors duration-300 whitespace-nowrap">
               Ver oportunidades.
             </a>
@@ -122,6 +123,32 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- Add spinner after the main container div -->
+<div id="spinner" class="spinner h-8 w-8">
+  <img src="/static/public/spinner.gif" alt="Loading...">
+</div>
+
+<style>
+  .spinner {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+  }
+</style>
+
+<script>
+  function showSpinner(event) {
+    const spinner = document.getElementById('spinner');
+    if (spinner) {
+      spinner.style.display = 'block';
+    }
+  }
+</script>
 </div>
 </div>
 {% endblock %}
