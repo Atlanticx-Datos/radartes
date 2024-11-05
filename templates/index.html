@@ -2,7 +2,7 @@
 
 {% block body %}
 <div class="max-w-[1180px] mx-auto">
-<div class="relative h-[980px] md:h-[640px] bg-black text-white flex flex-col justify-between mt-8 md:mt-0 rounded-md mb-16">
+<div class="relative h-[980px] md:h-[600px] bg-black text-white flex flex-col justify-between mt-8 md:mt-0 rounded-md mb-16">
   <!-- Main Content Section -->
   <div class="px-4 md:px-16 pt-16 flex-grow">
     <!-- Header Section -->
@@ -17,15 +17,13 @@
     <!-- Hero and Card Section -->
     <div class="flex flex-col md:flex-row justify-between items-start space-y-12 md:space-y-0">
       <!-- Left Column - Hero -->
-      <div class="w-full md:w-7/12">
-        <div class="space-y-8">
-          <p class="text-5xl md:text-6xl font-bold uppercase leading-tighter tracking-tight md:tracking-widest ">
-            Movilidad, residencias, concursos, premios, becas.
+      <div class="w-full md:w-8/12">
+        <div class="space-y-2">
+          <p class="text-5xl md:text-7xl font-medium uppercase leading-tighter tracking-normal md:tracking-normal ">
+            Tu carrera, tu formación, tu data. 
           </p>
-          <p class="md:pt-0 md:pb-0 pb-2 text-base md:text-lg uppercase text-indigo-500">//////////////</p>
-          <p class="text-xl md:text-4xl font-bold text-indigo-500 md:pt-0 tracking-wider md:tracking-tight md:w-4/5">
-            INFORMACIÓN Y ACCESO TOTALMENTE GRATUITOS.
-          </p>
+          <p class="md:pt-0 md:pb-0 pb-2 text-base md:text-7xl uppercase text-indigo-500 tracking-tighter font-black">GRATIS.</p>
+
         </div>
         
       </div>
@@ -33,12 +31,21 @@
       <!-- Right Column -->
       <div class="w-full md:w-4/12">
         <div class="bg-white py-8 px-8 md:px-12 text-black rounded-md mb-12 md:mb-0">
+          <!-- Level 1: Primary message - Audience definition -->
           <p class="text-sm font-bold uppercase text-left leading-tight">
-            Si sos artista, investigador o gestor, entrá para descubrir más de 100 convocatorias.
+            Si sos artista, investigador o gestor cultural, entrá para informarte.
           </p>
-          <p class="text-sm uppercase mt-4 text-left leading-tight">
-            Sumate para poder buscar, guardar y compartir toda la información.
+
+          <!-- Level 2: Secondary message - Content types -->
+          <p class="text-sm text-neutral-700 mt-4 text-left leading-tight tracking-wide">
+            Actualizamos semanalmente enlaces a becas, convocatorias de movilidad, premios, concursos y formación.
           </p>
+
+          <!-- Level 3: Tertiary message - Action items -->
+          <p class="text-sm text-neutral-500 mt-4 text-left leading-tight tracking-normal">
+            Sumate para poder buscar, guardar y compartir las convocatorias vigentes.
+          </p>
+
           {% if session.get('user') is none %}
             <a href="{{ url_for('login') }}" 
                class="inline-block mt-6 font-bold bg-black hover:bg-gray-800 py-2 px-4 text-white text-sm transition-colors duration-300 whitespace-nowrap">
@@ -57,12 +64,12 @@
   </div>
 
   <!-- Footer Section -->
-  <div class="grid grid-cols-2 md:grid-cols-12 h-auto md:h-16 rounded-b-md md:overflow-hidden"> 
+  <div class="grid grid-cols-2 md:grid-cols-12 h-auto md:h-12 rounded-b-md md:overflow-hidden"> 
     <!-- Add Opportunity Column -->
     <div class="bg-orange-500 col-span-1 md:col-span-4 flex items-center justify-center p-4 md:p-3 group hover:bg-orange-600 transition-all duration-300">
       <a href="#" target="_blank" class="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-2">
-        <span class="text-2xl md:text-lg font-medium text-center text-black">Sumá tu convocatoria</span>
-        <svg class="w-6 h-6 md:w-5 md:h-5 transform rotate-[-45deg] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" 
+        <span class="text-2xl md:text-base font-medium text-center text-black">Sumá tu convocatoria</span>
+        <svg class="w-5 h-5 md:w-5 md:h-5 transform rotate-[-45deg] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" 
              fill="none" 
              stroke="black" 
              viewBox="0 0 24 24">
@@ -81,15 +88,9 @@
         <div class="flex items-center justify-center h-8 w-8 bg-slate-200 rounded-full">
           <span class="text-xs font-bold text-black">+25</span>
         </div>
-        
-        <!-- Arrow - vertical on mobile, horizontal on desktop -->
-        <svg class="w-4 h-4 text-white transform rotate-90 md:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-        </svg>
-
         <!-- Text with notification dot -->
         <div class="relative flex items-center justify-center w-full md:w-auto"> <!-- Added justify-center and width control -->
-          <span class="text-lg font-medium text-center text-black">Nuevas oportunidades</span>
+          <span class="text-base font-medium text-center text-black">Nuevas oportunidades</span>
           <!-- Blinking dot - hidden on mobile -->
           <div class="absolute -top-1 -right-3 hidden md:block">
             <span class="flex h-2 w-2">
@@ -111,12 +112,12 @@
           </svg>
         </a>
         <a href="#" class="text-black hover:text-white transition-all duration-300 hover:-translate-y-1">
-          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
           </svg>
         </a>
         <a href="https://instagram.com/your_handle" target="_blank" rel="noopener noreferrer" class="text-black hover:text-white transition-all duration-300 hover:-translate-y-1">
-          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
             <path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd"/>
           </svg>
         </a>
