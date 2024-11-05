@@ -11,6 +11,11 @@ module.exports = {
       lineHeight: {
         'custom': '1.7rem',
       },
+      fontSize: {
+        '7xl': ['4.5rem', {
+          lineHeight: '0.93',
+        }],
+      },
     },
   },
   screens: {
@@ -36,18 +41,18 @@ module.exports = {
   },
   plugins: [
     require('daisyui'),
-    function({ addUtilities }) {
+    function({ addUtilities, theme }) {
       const newUtilities = {
-        '.text-4xl': {
-          fontSize: '2.25rem !important',
-          lineHeight: '2.5rem !important',
-        },
-        '.md\\:text-4xl': {
-          fontSize: '2.25rem !important',
-          lineHeight: '2.5rem !important',
-        },
+        '.hero-title': {
+          fontSize: theme('fontSize.5xl'),
+          lineHeight: '0.93',
+          '@screen md': {
+            fontSize: '4.5rem',
+            lineHeight: '0.95',
+          }
+        }
       }
-      addUtilities(newUtilities, ['responsive', 'hover'])
+      addUtilities(newUtilities)
     }
   ],
 }

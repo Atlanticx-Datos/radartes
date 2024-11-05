@@ -2078,6 +2078,11 @@ details.collapse summary::-webkit-details-marker {
   margin-top: calc(3rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(3rem * var(--tw-space-y-reverse));
 }
+.space-y-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
+}
 .space-y-3 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
   margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
@@ -2288,10 +2293,6 @@ details.collapse summary::-webkit-details-marker {
   font-size: 1.5rem;
   line-height: 2rem;
 }
-.text-5xl {
-  font-size: 3rem;
-  line-height: 1;
-}
 .text-base {
   font-size: 1rem;
   line-height: 1.5rem;
@@ -2403,6 +2404,16 @@ details.collapse summary::-webkit-details-marker {
 }
 .duration-300 {
   transition-duration: 300ms;
+}
+.hero-title {
+  font-size: 3rem;
+  line-height: 0.93;
+}
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 4.5rem;
+    line-height: 0.95;
+  }
 }
 .hover\:-translate-y-1:hover {
   --tw-translate-y: -0.25rem;
@@ -2661,7 +2672,7 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:text-7xl {
     font-size: 4.5rem;
-    line-height: 1;
+    line-height: 0.93;
   }
   .md\:text-base {
     font-size: 1rem;
@@ -2669,9 +2680,6 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:leading-none {
     line-height: 1;
-  }
-  .md\:tracking-normal {
-    letter-spacing: 0em;
   }
 }
 @media (min-width: 1024px) {
