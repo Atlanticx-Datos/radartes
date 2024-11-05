@@ -44,11 +44,16 @@ module.exports = {
     function({ addUtilities, theme }) {
       const newUtilities = {
         '.hero-title': {
-          fontSize: theme('fontSize.5xl'),
-          lineHeight: '0.93',
+          fontSize: '3rem !important',
+          lineHeight: '0.93 !important',
+          fontWeight: '600 !important', // semibold for mobile
+          letterSpacing: '-0.025em !important', // tight tracking for mobile
+          textTransform: 'uppercase',
           '@screen md': {
-            fontSize: '4.5rem',
-            lineHeight: '0.95',
+            fontSize: '4.5rem !important',
+            lineHeight: '0.93 !important',
+            fontWeight: '500 !important', // medium for desktop
+            letterSpacing: '0 !important', // normal tracking for desktop
           }
         }
       }
