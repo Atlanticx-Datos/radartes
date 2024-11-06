@@ -2713,8 +2713,8 @@ details.collapse summary::-webkit-details-marker {
   .md\:leading-none {
     line-height: 1;
   }
-  .md\:tracking-normal {
-    letter-spacing: 0em;
+  .md\:tracking-wide {
+    letter-spacing: 0.025em;
   }
 }
 @media (min-width: 1024px) {

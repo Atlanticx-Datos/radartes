@@ -600,10 +600,17 @@ def share_opportunity(opportunity_id):
 
 @app.route("/database", methods=["GET"])
 @login_required
-@cache.cached(timeout=300)  # Cache for 5 minutes
 def all_pages():
     total_start_time = time.time()
     logger.info("Starting database route")
+    
+    # Check for clear parameter first
+    is_clear = request.args.get("clear", "false").lower() == "true"
+    if not is_clear:
+        cached_response = cache.get('all_pages_response')
+        if cached_response:
+            print("Serving from function cache")
+            return cached_response
     
     print("\n=== Starting all_pages() route ===")
     sys.stdout.flush()
@@ -722,6 +729,14 @@ def all_pages():
             print(f"\n=== CACHE ERROR: {str(e)} ===")
         
         return all_pages
+    
+    if request.args.get("clear", "false").lower() == "true":
+        cache.delete('notion_pages')
+        print("Cache cleared due to clear search request")
+        sys.stdout.flush()
+
+    # Rest of the existing code remains exactly the same
+    search_query = request.args.get("search", "").lower()
     
     def normalize_text(text):
         return ''.join(
@@ -913,17 +928,26 @@ def all_pages():
     }
 
     if request.headers.get('HX-Request', 'false').lower() == 'true':
-        print("HTMX request with search:", search_query)
-        return render_template("_search_results.html", pages=sorted_pages, og_data=og_data)
-    else:
-        print("Regular request")
+        print("HTMX request detected - returning only search results")
+        # Solo devolver el fragmento de resultados para peticiones HTMX
         return render_template(
+            "_search_results.html",  # Template parcial
+            pages=sorted_pages
+        )
+    else:
+        print("Regular request - returning full page")
+        response = render_template(
             "database.html", 
             pages=sorted_pages, 
-            closing_soon_pages=closing_soon_pages[:7],  # Limit to 7 pages
+            closing_soon_pages=closing_soon_pages[:7],
             destacar_pages=destacar_pages,
             og_data=og_data
         )
+        
+        if not is_clear:
+            cache.set('all_pages_response', response, timeout=300)
+        
+        return response
 
 
 # Custom Jinja2 filter for date

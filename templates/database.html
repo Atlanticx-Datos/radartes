@@ -110,15 +110,13 @@
                                 height: 0;
                             }
                         </style>
-                        <table id="search_results" class="w-full">
+                        <table class="w-full">
                             <thead>
                                 <tr>
                                     <th class="w-10">✓</th>
-                                    <!-- Add appropriate classes for other header columns, e.g.: -->
                                     <th class="w-1/4 text-xs tracking-tighter text-neutral-700 text-center md:pr-28 uppercase">Oportunidad</th>
                                     <th class="w-1/4 text-xs tracking-tighter text-neutral-700 uppercase text-start md:text-center pl-6 md:pl-0 md:pr-4">Descripción</th>
                                     <th class="flex-1"></th>
-                                    <!-- ... other header columns ... -->
                                 </tr>
                             </thead>
                             <tbody id="search-results" class="relative top-2">
@@ -182,9 +180,12 @@
         function clearSearch() {
             document.getElementById('search-input').value = '';
             toggleSpinner(true);
-            htmx.ajax('GET', '/database', { target: '#search-results', swap: 'innerHTML' })
-                .then(() => scrollToTop('results-container'))
-                .finally(() => toggleSpinner(false));
+            htmx.ajax('GET', '/database?clear=true', { 
+                target: '#search-results', 
+                swap: 'innerHTML'
+            })
+            .then(() => scrollToTop('results-container'))
+            .finally(() => toggleSpinner(false));
         }
 
         function toggleSpinner(show) {
