@@ -601,17 +601,18 @@ def share_opportunity(opportunity_id):
 @app.route("/database", methods=["GET"])
 @login_required
 def all_pages():
-    total_start_time = time.time()
-    logger.info("Starting database route")
-    
-    # Check for clear parameter first
+    # Check for HTMX request first
+    is_htmx = request.headers.get('HX-Request', 'false').lower() == 'true'
     is_clear = request.args.get("clear", "false").lower() == "true"
-    if not is_clear:
+    search_query = request.args.get("search", "").lower()
+
+    # Don't use cache for HTMX requests
+    if not is_htmx:
         cached_response = cache.get('all_pages_response')
-        if cached_response:
+        if cached_response and not is_clear:
             print("Serving from function cache")
             return cached_response
-    
+
     print("\n=== Starting all_pages() route ===")
     sys.stdout.flush()
     p = inflect.engine()
@@ -927,15 +928,11 @@ def all_pages():
         "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
     }
 
-    if request.headers.get('HX-Request', 'false').lower() == 'true':
-        print("HTMX request detected - returning only search results")
-        # Solo devolver el fragmento de resultados para peticiones HTMX
-        return render_template(
-            "_search_results.html",  # Template parcial
-            pages=sorted_pages
-        )
+    if is_htmx:
+        print("HTMX request - bypassing cache")
+        return render_template("_search_results.html", pages=sorted_pages)
     else:
-        print("Regular request - returning full page")
+        print("Regular request")
         response = render_template(
             "database.html", 
             pages=sorted_pages, 
@@ -944,6 +941,7 @@ def all_pages():
             og_data=og_data
         )
         
+        # Only cache non-HTMX, non-clear responses
         if not is_clear:
             cache.set('all_pages_response', response, timeout=300)
         
