@@ -15,6 +15,9 @@ module.exports = {
         '7xl': ['4.5rem', {
           lineHeight: '0.93',
         }],
+        'hero': ['8.5rem', {
+          lineHeight: '1',
+        }],
       },
     },
   },

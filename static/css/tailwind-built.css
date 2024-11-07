@@ -2635,10 +2635,6 @@ details.collapse summary::-webkit-details-marker {
     padding-left: 3rem;
     padding-right: 3rem;
   }
-  .md\:px-16 {
-    padding-left: 4rem;
-    padding-right: 4rem;
-  }
   .md\:px-2 {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
@@ -2668,6 +2664,9 @@ details.collapse summary::-webkit-details-marker {
   .md\:pl-2 {
     padding-left: 0.5rem;
   }
+  .md\:pl-24 {
+    padding-left: 6rem;
+  }
   .md\:pl-3 {
     padding-left: 0.75rem;
   }
@@ -2676,6 +2675,9 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:pr-0 {
     padding-right: 0px;
+  }
+  .md\:pr-16 {
+    padding-right: 4rem;
   }
   .md\:pr-28 {
     padding-right: 7rem;
