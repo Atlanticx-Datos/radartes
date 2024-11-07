@@ -3,7 +3,7 @@
 {% block body %}
 <div class="max-w-[1180px] mx-auto">
   <div
-    class="relative h-[960px] md:h-[600px] bg-black text-white flex flex-col justify-between mt-8 md:mt-0 rounded-md mb-16">
+    class="relative h-[960px] md:h-[600px] bg-black text-white flex flex-col justify-between mt-8 md:mt-0 rounded-xl mb-16">
     <!-- Main Content Section -->
     <div class="px-8 md:px-4 md:pl-24 md:pr-28 pt-16 flex-grow">
       <!-- Header Section -->
@@ -21,15 +21,14 @@
         <div class="w-5/6 md:w-9/12">
           <div class="space-y-8 md:space-y-4">
             <!-- Mobile version -->
-            <p class="text-6xl font-semibold tracking-tighter hero-text md:hidden uppercase">
+            <p class="text-6xl font-semibold tracking-tighter hero-mobile md:hidden uppercase">
               Becas, Movilidad, Premios, Llamados...
             </p>
             <!-- Desktop version -->
-            <p
-              class="hidden md:block text-6xl font-semibold tracking-tighter hero-text md:font-medium md:tracking-wider uppercase">
+            <p class="hidden md:block hero-text md:font-medium md:tracking-normal">
               Tu carrera en la cultura y las artes...
             </p>
-            <p class="pt-4 md:pt-0 md:pb-0 pb-8 hero-text uppercase text-indigo-500 tracking-tighter font-black">
+            <p class="pt-4 md:pt-4 md:pb-0 pb-8 gratis-text uppercase text-indigo-500 tracking-tight font-black">
               GRATIS.</p>
 
           </div>
@@ -38,33 +37,32 @@
 
         <!-- Right Column -->
         <div class="w-full md:w-3/ md:hidden">
-          <div class="bg-white py-8 px-8 md:px-12 text-black rounded-md mb-20 md:mb-0">
+          <div class="bg-white py-8 px-8 md:px-12 text-black rounded-xl mb-20 md:mb-0">
             <!-- Level 1: Primary message - Audience definition -->
             <p class="text-sm font-bold uppercase text-left leading-tight">
               Si sos artista, investigador o gestor cultural, entrá para informarte.
             </p>
-  
+
             <!-- Level 2: Secondary message - Content types -->
             <p class="text-sm text-neutral-700 mt-4 text-left leading-tight tracking-wide">
               Actualizamos semanalmente enlaces a becas, convocatorias de movilidad, premios, concursos y formación.
             </p>
-  
+
             <!-- Level 3: Tertiary message - Action items -->
             <p class="text-sm text-neutral-500 mt-4 text-left leading-tight tracking-normal">
               Sumate para poder buscar, guardar y compartir las convocatorias vigentes.
             </p>
-  
+
             {% if session.get('user') is none %}
-              <a href="{{ url_for('login') }}" 
-                 class="inline-block mt-6 font-bold bg-black hover:bg-gray-800 py-2 px-4 text-white text-sm transition-colors duration-300 whitespace-nowrap">
-                Entrar.
-              </a>
+            <a href="{{ url_for('login') }}"
+              class="inline-block mt-6 font-bold bg-black hover:bg-gray-800 py-2 px-4 text-white text-sm transition-colors duration-300 whitespace-nowrap">
+              Entrar.
+            </a>
             {% else %}
-              <a href="{{ url_for('all_pages') }}" 
-                 onclick="showSpinner(event)"
-                 class="inline-block mt-6 font-bold bg-black hover:bg-gray-800 py-2 px-4 text-white text-sm transition-colors duration-300 whitespace-nowrap">
-                Ver oportunidades.
-              </a>
+            <a href="{{ url_for('all_pages') }}" onclick="showSpinner(event)"
+              class="inline-block mt-6 font-bold bg-black hover:bg-gray-800 py-2 px-4 text-white text-sm transition-colors duration-300 whitespace-nowrap">
+              Ver oportunidades.
+            </a>
             {% endif %}
           </div>
         </div>
@@ -72,12 +70,13 @@
     </div>
 
     <!-- Footer Section -->
-    <div class="grid grid-cols-2 md:grid-cols-12 h-3 md:h-16 overflow-hidden rounded-b-md">
+    <div class="grid grid-cols-2 md:grid-cols-12 h-3 md:h-16 overflow-hidden rounded-b-xl">
       <!-- Add Opportunity Column -->
       <div
         class="bg-orange-500 col-span-1 md:col-span-4 flex items-center justify-center p-4 md:p-3 group hover:bg-orange-600 transition-all duration-300">
         <a href="#" target="_blank" class="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-2">
-          <span class="hidden md:block text-2xl md:text-base font-medium text-center text-black">Sumá tu convocatoria</span>
+          <span class="hidden md:block text-2xl md:text-base font-medium text-center text-black">Sumá tu
+            convocatoria</span>
           <svg
             class="hidden md:block w-5 h-5 md:w-5 md:h-5 transform rotate-[-45deg] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
             fill="none" stroke="black" viewBox="0 0 24 24">
@@ -111,7 +110,7 @@
 
       <!-- Social Media Column -->
       <div
-        class="bg-[#10e07f] col-span-2 md:col-span-3 flex items-center justify-center p-4 md:p-3 rounded-b-md md:rounded-none">
+        class="bg-[#10e07f] col-span-2 md:col-span-3 flex items-center justify-center p-4 md:p-3 rounded-b-xl md:rounded-none">
         <div class="flex space-x-6">
           <a href="mailto:your@email.com"
             class="text-black hover:text-white transition-all duration-300 hover:-translate-y-1">
@@ -155,15 +154,48 @@
       z-index: 1000;
     }
 
+    .gratis-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 5.2rem;
+      line-height: 0.88;
+      color: #6366F1;
+      font-weight: 900;
+    }
+
+    @media (max-width: 768px) {
+      .gratis-text {
+        font-size: 3.6rem;
+        line-height: 0.88;
+        font-weight: 900;
+      }
+    }
+
     .hero-text {
+      font-family: 'Poppins', sans-serif;
       font-size: 3.1rem;
-      /* Default size */
+      line-height: 0.88;
+      font-weight: 700;
     }
 
     @media (min-width: 768px) {
       .hero-text {
         font-size: 5.2rem;
         line-height: 0.88;
+        font-weight: 500;
+      }
+    }
+    .hero-mobile {
+      font-family: 'Poppins', sans-serif;
+      font-size: 3.1rem;
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    @media (min-width: 768px) {
+      .hero-mobile {
+        font-size: 5.2rem;
+        line-height: 0.88;
+        font-weight: 500;
       }
     }
   </style>
