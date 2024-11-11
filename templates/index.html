@@ -5,7 +5,7 @@
   <div
     class="relative h-[960px] md:h-[600px] bg-black text-white flex flex-col justify-between mt-8 md:mt-0 rounded-xl mb-16">
     <!-- Main Content Section -->
-    <div class="px-8 md:px-4 md:pl-24 md:pr-28 pt-16 flex-grow">
+    <div class="px-8 md:px-4 md:pl-24 md:pr-28 pt-20 flex-grow">
       <!-- Header Section -->
       <div class="mb-2 w-[110%]">
         <div class="flex items-center space-x-2">
@@ -18,16 +18,16 @@
       <!-- Hero and Card Section -->
       <div class="flex flex-col md:flex-row justify-between items-start space-y-12 md:space-y-0">
         <!-- Left Column - Hero -->
-        <div class="w-5/6 md:w-9/12">
-          <div class="space-y-8 md:space-y-4">
+        <div class="w-5/6 md:w-6/12">
+          <div class="space-y-8 md:space-y-3">
             <!-- Mobile version -->
             <p class="text-6xl font-semibold tracking-tighter hero-mobile md:hidden uppercase">
               Becas, Movilidad, Premios, Llamados...
             </p>
             <!-- Desktop version -->
-            <p class="hidden md:block hero-text md:font-medium md:tracking-normal
+            <p class="hidden md:block hero-text md:font-medium md:tracking-normal mr-8
                       hero-break:leading-[1.1]">
-              Tu <span class="font-black">impulso</span> en la cultura y las artes...
+              Tu <span class="font-black mr-3">impulso</span><br>en artes y cultura...
             </p>
             <p class="pt-4 md:pt-4 md:pb-0 pb-8 gratis-text uppercase text-indigo-500 tracking-tight font-black">
               GRATIS.</p>
@@ -36,8 +36,19 @@
 
         </div>
 
+        <!-- Add GIF container - hidden until lg -->
+        <div class="hidden lg:block lg:w-6/12  md:pt-2">
+          <div class="relative w-full rounded-xl overflow-hidden" style="padding-bottom: 56.25%;">
+            <img 
+              src="{{ url_for('static', filename='public/playing-with-hair-black-and-white.gif') }}"
+              alt="Black and white artistic portrait"
+              class="absolute top-0 left-0 w-full h-full object-cover rounded-xl"
+            />
+          </div>
+        </div>
+
         <!-- Right Column -->
-        <div class="w-full md:w-3/ md:hidden">
+        <div class="w-full md:w-3/4 md:hidden">
           <div class="bg-white py-8 px-8 md:px-12 text-black rounded-xl mb-20 md:mb-0">
             <!-- Level 1: Primary message - Audience definition -->
             <p class="text-sm font-bold uppercase text-left leading-tight">
@@ -152,7 +163,7 @@
 
     .gratis-text {
       font-family: 'Inter', sans-serif;
-      font-size: 4rem;
+      font-size: 3.5rem;
       line-height: 0.88;
       color: #6366F1;
       font-weight: 900;
@@ -183,7 +194,7 @@
 
     @media (min-width: 958px) {
       .hero-text {
-        font-size: 5.2rem;
+        font-size: 3.7rem;
         line-height: 0.93;
         font-weight: 300;
       }
