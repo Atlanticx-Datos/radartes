@@ -81,11 +81,11 @@
       </div>
     </div>
 
-    <!-- Footer Section -->
-    <div class="grid grid-cols-2 md:grid-cols-12 h-3 md:h-16 overflow-hidden rounded-b-xl">
+    <!-- Footer Section - Modified for Safari compatibility -->
+    <div class="grid grid-cols-2 md:grid-cols-12 md:h-16 overflow-hidden rounded-b-xl relative flex-shrink-0 debug-footer">
       <!-- Add Opportunity Column -->
       <div
-        class="bg-orange-500 col-span-1 md:col-span-3 flex items-center justify-center p-4 md:p-3 group hover:bg-orange-600 transition-all duration-300">
+        class="bg-orange-500 col-span-1 md:col-span-3 flex items-center justify-center p-4 md:p-3 group hover:bg-orange-600 transition-all duration-300 min-h-[4rem]">
         <a href="#" target="_blank" class="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-2">
           <span class="hidden md:block updates-text text-black">Sumá tu convocatoria</span>
           <svg
@@ -96,8 +96,7 @@
       </div>
 
       <!-- Updates Column -->
-      <div class="bg-[#0cc7c7] col-span-1 md:col-span-8 flex items-center justify-center py-16 md:py-0 px-6
-                  updates-fix:min-h-[4rem]">
+      <div class="bg-[#0cc7c7] col-span-1 md:col-span-8 flex items-center justify-center py-16 md:py-0 px-6 min-h-[4rem]">
         <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
           <!-- Counter with notification dot -->
           <div class="relative flex items-center">
@@ -123,7 +122,7 @@
 
       <!-- Social Media Column -->
       <div
-        class="bg-[#10e07f] col-span-2 md:col-span-1 flex items-center justify-center p-4 md:p-3 rounded-b-xl md:rounded-none">
+        class="bg-[#10e07f] col-span-2 md:col-span-1 flex items-center justify-center p-4 md:p-3 rounded-b-xl md:rounded-none min-h-[4rem]">
         <div class="flex space-x-6 md:space-x-2">
           <a href="mailto:your@email.com"
             class="text-black hover:text-white transition-all duration-300 hover:-translate-y-1">
@@ -243,6 +242,19 @@
     }
 
     /* Remove the larger breakpoint styles since we want default behavior after lg */
+
+    @media screen {
+      .debug-footer {
+        outline: 2px solid red;  /* This will help us see if styles are loading */
+      }
+    }
+
+    /* Force footer visibility */
+    @media (min-width: 768px) {
+      .md\:h-16 {
+        height: 4rem !important;
+      }
+    }
   </style>
 
   <script>
