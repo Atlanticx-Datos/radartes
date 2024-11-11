@@ -176,7 +176,13 @@
             if (event.key === 'Enter' && !searchInProgress) {
                 event.preventDefault();
                 const searchValue = document.getElementById('search-input').value;
-                console.log('Search Value:', searchValue);
+                
+                // GA4 Search Event
+                gtag('event', 'opportunity_search', {
+                    'search_term': searchValue,
+                    'page_location': window.location.href,
+                    'page_title': document.title
+                });
                 
                 searchInProgress = true;
                 toggleSpinner(true);
@@ -188,12 +194,16 @@
                 })
                 .then(response => response.text())
                 .then(html => {
-                    console.log('Response received, updating search-results');
                     document.getElementById('search-results').innerHTML = html;
                     scrollToTop('results-container');
                 })
                 .catch(error => {
                     console.error('Search error:', error);
+                    // Track search errors
+                    gtag('event', 'search_error', {
+                        'search_term': searchValue,
+                        'error_type': 'fetch_error'
+                    });
                 })
                 .finally(() => {
                     searchInProgress = false;
@@ -204,6 +214,11 @@
 
         function clearSearch() {
             if (!searchInProgress) {
+                gtag('event', 'clear_opportunity_search', {
+                    'page_location': window.location.href,
+                    'page_title': document.title
+                });
+                
                 document.getElementById('search-input').value = '';
                 searchInProgress = true;
                 toggleSpinner(true);
@@ -215,7 +230,6 @@
                 })
                 .then(response => response.text())
                 .then(html => {
-                    console.log('Clear response received, updating search-results');
                     document.getElementById('search-results').innerHTML = html;
                     scrollToTop('results-container');
                 })
