@@ -310,6 +310,7 @@
                         // Get and clean keywords
                         let keywords = link.dataset.keywords;
                         try {
+                            // Remove extra quotes and decode Unicode
                             keywords = JSON.parse(keywords.replace(/^"(.*)"$/, '$1'));
                         } catch (e) {
                             console.warn('Failed to parse keywords:', keywords);
@@ -319,19 +320,19 @@
                         const name = link.dataset.name;
                         const url = link.href;
 
-                        // Modificado para usar opportunity_type en lugar de opportunity_keywords
-                        gtag('event', 'opportunity_click', {
-                            send_to: 'G-36M4V4L5RX',
-                            opportunity_type: keywords,  // Cambiado de opportunity_keywords a opportunity_type
-                            opportunity_name: name,
-                            opportunity_url: url
-                        });
-
-                        console.log('GA4 Event Sent:', {
-                            event: 'opportunity_click',
-                            opportunity_type: keywords,  // Actualizado aquí también
+                        console.log('Processing click:', {
+                            raw_keywords: link.dataset.keywords,
+                            cleaned_keywords: keywords,
                             name: name,
                             url: url
+                        });
+
+                        gtag('event', 'opportunity_click', {
+                            send_to: 'G-36M4V4L5RX',
+                            opportunity_name: name,
+                            opportunity_keywords: keywords,
+                            opportunity_url: url,
+                            event_category: 'Oportunidad'
                         });
 
                         setTimeout(() => {
@@ -339,6 +340,7 @@
                         }, 150);
                     } catch (error) {
                         console.error('Error tracking opportunity click:', error);
+                        console.error('Raw data:', link.dataset);
                         window.open(link.href, '_blank');
                     }
                 }
