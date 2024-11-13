@@ -175,62 +175,61 @@
     <!-- Script for handling HTMX search -->
     <script>
         let searchInProgress = false;
+        let searchTimeout;
 
+        // Function to handle search input
+        function handleSearchInput(event) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const searchTerm = event.target.value.trim();
+                if (searchTerm.length >= 3) {
+                    trackSearch(searchTerm);
+                }
+            }, 1000);
+        }
+
+        // Function to handle search submission
         function handleKeyPress(event) {
             if (event.key === 'Enter' && !searchInProgress) {
                 event.preventDefault();
-                const searchValue = document.getElementById('search-input').value;
-                
-                // GA4 Search Event
-                gtag('event', 'opportunity_search', {
-                    'search_term': searchValue,
-                    'page_location': window.location.href,
-                    'page_title': document.title
-                });
-                
-                searchInProgress = true;
-                toggleSpinner(true);
-                
-                fetch(`/database?search=${encodeURIComponent(searchValue)}`, {
-                    headers: {
-                        'HX-Request': 'true'
-                    }
-                })
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById('search-results').innerHTML = html;
-                    scrollToTop('results-container');
-                })
-                .catch(error => {
-                    console.error('Search error:', error);
-                    // Track search errors
-                    gtag('event', 'search_error', {
-                        'search_term': searchValue,
-                        'error_type': 'fetch_error'
-                    });
-                })
-                .finally(() => {
-                    searchInProgress = false;
-                    toggleSpinner(false);
-                });
+                const searchValue = document.getElementById('search-input').value.trim();
+                if (searchValue.length >= 3) {
+                    searchInProgress = true;
+                    toggleSpinner(true);
+                    trackSearch(searchValue);
+                    fetchSearchResults(searchValue);
+                }
             }
         }
 
+        // Function to fetch search results
+        function fetchSearchResults(searchValue) {
+            fetch(`/database?search=${encodeURIComponent(searchValue)}`, {
+                headers: { 'HX-Request': 'true' }
+            })
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('search-results').innerHTML = html;
+                scrollToTop('results-container');
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                trackSearchError(searchValue, 'fetch_error');
+            })
+            .finally(() => {
+                searchInProgress = false;
+                toggleSpinner(false);
+            });
+        }
+
+        // Function to clear search
         function clearSearch() {
             if (!searchInProgress) {
-                gtag('event', 'clear_opportunity_search', {
-                    'page_location': window.location.href,
-                    'page_title': document.title
-                });
-                
                 document.getElementById('search-input').value = '';
                 searchInProgress = true;
                 toggleSpinner(true);
-                
                 fetch('/database?clear=true', {
-                    headers: {
-                        'HX-Request': 'true'
-                    }
+                    headers: { 'HX-Request': 'true' }
                 })
                 .then(response => response.text())
                 .then(html => {
@@ -247,15 +246,13 @@
             }
         }
 
+        // Function to toggle spinner visibility
         function toggleSpinner(show) {
             const spinner = document.getElementById('spinner');
-            if (show) {
-                spinner.style.display = 'block';
-            } else {
-                spinner.style.display = 'none';
-            }
+            spinner.style.display = show ? 'block' : 'none';
         }
 
+        // Function to scroll to top of an element
         function scrollToTop(id) {
             const element = document.getElementById(id);
             if (element) {
@@ -263,119 +260,83 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
-            document.getElementById('search-input').addEventListener('keypress', handleKeyPress);
+        // Function to track search events
+        function trackSearch(searchTerm) {
+            gtag('event', 'opportunity_search', {
+                send_to: 'G-36M4V4L5RX',
+                search_term: searchTerm,
+                search_type: 'opportunity'
+            });
+        }
 
-            const clearSearchButton = document.querySelector('.clear-search-button'); // Assuming you have a clear button with this class
+        // Function to track search errors
+        function trackSearchError(searchTerm, errorType) {
+            gtag('event', 'search_error', {
+                search_term: searchTerm,
+                error_type: errorType
+            });
+        }
+
+        // Function to track opportunity clicks
+        function trackOpportunityClick(link) {
+            try {
+                let keywords = link.dataset.keywords;
+                try {
+                    keywords = JSON.parse(keywords.replace(/^"(.*)"$/, '$1'));
+                } catch (e) {
+                    keywords = keywords.replace(/^"(.*)"$/, '$1');
+                }
+
+                const name = link.dataset.name;
+                const url = link.href;
+
+                gtag('event', 'opportunity_click', {
+                    send_to: 'G-36M4V4L5RX',
+                    opportunity_keywords: keywords,
+                    opportunity_name: name,
+                    opportunity_url: url,
+                    event_category: 'Oportunidad'
+                });
+
+                setTimeout(() => {
+                    window.open(url, '_blank');
+                }, 150);
+            } catch (error) {
+                console.error('Error tracking opportunity click:', error);
+                window.open(link.href, '_blank');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', handleSearchInput);
+            searchInput.addEventListener('keypress', handleKeyPress);
+
+            document.addEventListener('click', function(event) {
+                const link = event.target.closest('.opportunity-link');
+                if (link) {
+                    event.preventDefault();
+                    trackOpportunityClick(link);
+                }
+            });
+
+            const clearSearchButton = document.querySelector('.clear-search-button');
             if (clearSearchButton) {
                 clearSearchButton.addEventListener('click', clearSearch);
             }
         });
 
-        // Un solo listener para el evento afterRequest
+        // HTMX event handlers
         document.body.addEventListener('htmx:afterRequest', function(evt) {
-            console.log('Single HTMX request completed');
             searchInProgress = false;
             toggleSpinner(false);
             scrollToTop('results-container');
         });
 
-        // Manejar errores
         document.body.addEventListener('htmx:error', function(evt) {
             console.error('HTMX error:', evt.detail.error);
             searchInProgress = false;
             toggleSpinner(false);
-        });
-
-        function trackOpportunityClick(aiKeywords, nombre, url) {
-            // Send event to Google Analytics 4
-            gtag('event', 'opportunity_click', {
-                'event_category': 'Oportunidad',
-                'event_label': nombre,
-                'opportunity_type': aiKeywords
-            });
-
-            // Open URL in new tab
-            window.open(url, '_blank');
-            return false; // Prevent default link behavior
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            document.addEventListener('click', function(event) {
-                const link = event.target.closest('.opportunity-link');
-                if (link) {
-                    event.preventDefault();
-                    
-                    try {
-                        // Get and clean keywords
-                        let keywords = link.dataset.keywords;
-                        try {
-                            // Remove extra quotes and decode Unicode
-                            keywords = JSON.parse(keywords.replace(/^"(.*)"$/, '$1'));
-                        } catch (e) {
-                            console.warn('Failed to parse keywords:', keywords);
-                            keywords = keywords.replace(/^"(.*)"$/, '$1');
-                        }
-
-                        const name = link.dataset.name;
-                        const url = link.href;
-
-                        console.log('Processing click:', {
-                            raw_keywords: link.dataset.keywords,
-                            cleaned_keywords: keywords,
-                            name: name,
-                            url: url
-                        });
-
-                        gtag('event', 'opportunity_click', {
-                            send_to: 'G-36M4V4L5RX',
-                            opportunity_name: name,
-                            opportunity_keywords: keywords,
-                            opportunity_url: url,
-                            event_category: 'Oportunidad'
-                        });
-
-                        setTimeout(() => {
-                            window.open(url, '_blank');
-                        }, 150);
-                    } catch (error) {
-                        console.error('Error tracking opportunity click:', error);
-                        console.error('Raw data:', link.dataset);
-                        window.open(link.href, '_blank');
-                    }
-                }
-            });
-        });
-
-        // Tracking de búsquedas
-        let searchTimeout;
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
-            
-            searchInput.addEventListener('input', function(e) {
-                // Limpiar el timeout anterior
-                clearTimeout(searchTimeout);
-                
-                // Crear un nuevo timeout para evitar demasiados eventos
-                searchTimeout = setTimeout(() => {
-                    const searchTerm = e.target.value.trim();
-                    
-                    // Solo trackear si hay 3 o más caracteres
-                    if (searchTerm.length >= 3) {
-                        gtag('event', 'opportunity_search', {
-                            send_to: 'G-36M4V4L5RX',
-                            search_term: searchTerm,
-                            search_type: 'opportunity'
-                        });
-
-                        console.log('Search tracked:', {
-                            term: searchTerm,
-                            type: 'opportunity'
-                        });
-                    }
-                }, 1000); // Esperar 1 segundo después de que el usuario deje de escribir
-            });
         });
     </script>
 </body>
