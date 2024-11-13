@@ -346,6 +346,37 @@
                 }
             });
         });
+
+        // Tracking de búsquedas
+        let searchTimeout;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            
+            searchInput.addEventListener('input', function(e) {
+                // Limpiar el timeout anterior
+                clearTimeout(searchTimeout);
+                
+                // Crear un nuevo timeout para evitar demasiados eventos
+                searchTimeout = setTimeout(() => {
+                    const searchTerm = e.target.value.trim();
+                    
+                    // Solo trackear si hay 3 o más caracteres
+                    if (searchTerm.length >= 3) {
+                        gtag('event', 'opportunity_search', {
+                            send_to: 'G-36M4V4L5RX',
+                            search_term: searchTerm,
+                            search_type: 'opportunity'
+                        });
+
+                        console.log('Search tracked:', {
+                            term: searchTerm,
+                            type: 'opportunity'
+                        });
+                    }
+                }, 1000); // Esperar 1 segundo después de que el usuario deje de escribir
+            });
+        });
     </script>
 </body>
 {% endblock %}
