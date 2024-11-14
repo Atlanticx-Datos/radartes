@@ -277,34 +277,61 @@
             });
         }
 
-        // Function to track opportunity clicks
-        function trackOpportunityClick(link) {
+        // Function to sanitize keywords
+        function sanitizeKeywords(keywords) {
+            if (!keywords) return '';
+            
+            // Si keywords es un string JSON, parsearlo primero
             try {
-                let keywords = link.dataset.keywords;
-                try {
-                    keywords = JSON.parse(keywords.replace(/^"(.*)"$/, '$1'));
-                } catch (e) {
-                    keywords = keywords.replace(/^"(.*)"$/, '$1');
+                if (typeof keywords === 'string') {
+                    keywords = JSON.parse(keywords);
                 }
-
-                const name = link.dataset.name;
-                const url = link.href;
-
-                gtag('event', 'opportunity_click', {
-                    send_to: 'G-36M4V4L5RX',
-                    opportunity_keywords: keywords,
-                    opportunity_name: name,
-                    opportunity_url: url,
-                    event_category: 'Oportunidad'
-                });
-
-                setTimeout(() => {
-                    window.open(url, '_blank');
-                }, 150);
-            } catch (error) {
-                console.error('Error tracking opportunity click:', error);
-                window.open(link.href, '_blank');
+            } catch (e) {
+                console.warn('Error parsing keywords:', e);
             }
+
+            // Mapa de reemplazo de caracteres especiales
+            const replacements = {
+                '\u00ed': 'í',
+                '\u00e1': 'á',
+                '\u00e9': 'é',
+                '\u00f3': 'ó',
+                '\u00fa': 'ú',
+                '\u00f1': 'ñ'
+            };
+
+            // Si keywords es un string, aplicar reemplazos
+            if (typeof keywords === 'string') {
+                Object.entries(replacements).forEach(([code, char]) => {
+                    keywords = keywords.replace(new RegExp(code, 'g'), char);
+                });
+                return keywords;
+            }
+
+            // Si keywords es un array, aplicar a cada elemento
+            if (Array.isArray(keywords)) {
+                return keywords.map(k => {
+                    if (typeof k === 'string') {
+                        Object.entries(replacements).forEach(([code, char]) => {
+                            k = k.replace(new RegExp(code, 'g'), char);
+                        });
+                    }
+                    return k;
+                });
+            }
+
+            return keywords;
+        }
+
+        // Function to track opportunity clicks
+        function trackOpportunityClick(keywords, name, url) {
+            gtag('event', 'opportunity_click', {
+                send_to: 'G-36M4V4L5RX',
+                opportunity_value: sanitizeKeywords(keywords),  // Aplicar sanitización
+                opportunity_name: name,
+                opportunity_url: url,
+                event_category: 'Oportunidad'
+            });
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -316,7 +343,7 @@
                 const link = event.target.closest('.opportunity-link');
                 if (link) {
                     event.preventDefault();
-                    trackOpportunityClick(link);
+                    trackOpportunityClick(link.dataset.keywords, link.dataset.name, link.href);
                 }
             });
 
