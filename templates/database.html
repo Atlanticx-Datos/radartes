@@ -331,25 +331,91 @@
             enhanced_measurement: false
         });
 
-        // Función de tracking
-        function handleOpportunityClick(element) {
-            // Debug
-            console.log('Click handler executed with:', {
-                keywords: element.dataset.keywords,
-                url: element.dataset.url
-            });
+        // Función de análisis de categorías
+        function analyzeKeywords(keywords) {
+            const normalizedKeywords = keywords.toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
             
-            // Enviar evento a GA4
+            const categories = {
+                // Tipos de Financiación/Apoyo
+                beca: ['beca', 'scholarship', 'fellowship', 'grant'],
+                residencia: ['residencia', 'residency', 'artist in residence'],
+                premio: ['premio', 'award', 'concurso', 'certamen'],
+                convocatoria: ['convocatoria', 'open call', 'call for'],
+                
+                // Disciplinas Artísticas
+                fotografia: ['fotografia', 'photo', 'photoespana'],
+                artes_visuales: ['arte visual', 'pintura', 'escultura', 'artes plasticas'],
+                audiovisual: ['cine', 'film', 'video', 'documental'],
+                escenicos: ['teatro', 'danza', 'performance', 'escenicas'],
+                literatura: ['literatura', 'escritura', 'ensayo', 'libro'],
+                musica: ['musica', 'opera', 'sonoro', 'sound'],
+                
+                // Formatos
+                exposicion: ['exposicion', 'exhibition', 'muestra'],
+                festival: ['festival', 'bienal', 'feria'],
+                laboratorio: ['laboratorio', 'lab', 'taller', 'workshop'],
+                
+                // Académico/Investigación
+                investigacion: ['investigacion', 'research', 'conservacion', 'estudio'],
+                formacion: ['formacion', 'maestria', 'doctorado', 'posgrado'],
+                
+                // Otros
+                movilidad: ['movilidad', 'mobility', 'intercambio', 'viaje'],
+                digital: ['digital', 'virtual', 'online', 'tecnologia']
+            };
+            
+            const matchedCategories = [];
+            for (const [category, keywords] of Object.entries(categories)) {
+                if (keywords.some(keyword => normalizedKeywords.includes(keyword))) {
+                    matchedCategories.push(category);
+                }
+            }
+            
+            return matchedCategories;
+        }
+
+        // Función de tracking modificada con log detallado
+        function handleOpportunityClick(element) {
+            const keywords = element.dataset.keywords || '';
+            const categories = analyzeKeywords(keywords);
+            const opportunityName = element.dataset.name || '';
+            const url = element.dataset.url || '';
+            
+            // Log detallado
+            console.log('Opportunity Click Details:', {
+                element: element,
+                dataAttributes: {
+                    name: opportunityName,
+                    keywords: keywords,
+                    url: url
+                },
+                rawDataset: element.dataset,
+                categoriesAnalysis: {
+                    inputKeywords: keywords,
+                    categoriesFound: categories
+                },
+                elementInfo: {
+                    tagName: element.tagName,
+                    className: element.className,
+                    id: element.id,
+                    textContent: element.textContent.trim()
+                }
+            });
+
+            // Enviar evento a GA4 con categorías
             gtag('event', 'opportunity_click', {
                 send_to: 'G-36M4V4L5RX',
-                opportunity_keywords: element.dataset.keywords,
+                opportunity_name: opportunityName,
+                opportunity_keywords: keywords,
+                opportunity_categories: categories.join(','),
+                opportunity_type: categories[0] || 'undefined',
                 event_category: 'Oportunidad'
             });
 
-            // Abrir en nueva pestaña después de un breve delay
-            setTimeout(() => {
-                window.open(element.dataset.url, '_blank');
-            }, 100);
+            window.open(url, '_blank');
+            return false;
         }
 
         // Event listeners
