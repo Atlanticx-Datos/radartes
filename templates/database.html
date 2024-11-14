@@ -20,9 +20,9 @@
                                 {% for page in closing_soon_pages %}
                                 <p class="relative">
                                     <a href="{{ page.url }}" target="_blank"
-                                        data-keywords="{{ page.ai_keywords | tojson }}"
                                         data-name="{{ page.nombre }}"
-                                        class="opportunity-link border-l-4 pl-4 mb-3 block leading-none tracking-tighter group md:w-5/6 truncate">
+                                        class="accordion-link"
+                                        onclick="trackAccordionClick('cierranPronto', '{{ page.nombre }}', '{{ page.url }}')">
                                         {{ page.nombre | truncate(50) }}
                                         <span
                                             class="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center -mr-1">
@@ -57,9 +57,9 @@
                                 {% for page in destacar_pages %}
                                 <p class="relative">
                                     <a href="{{ page.url }}" target="_blank"
-                                        data-keywords="{{ page.ai_keywords | tojson }}"
                                         data-name="{{ page.nombre }}"
-                                        class="opportunity-link border-l-4 pl-4 mb-3 block leading-none tracking-tighter group truncate">
+                                        class="accordion-link"
+                                        onclick="trackAccordionClick('destacadas', '{{ page.nombre }}', '{{ page.url }}')">
                                         {{ page.nombre | truncate(30) }}
                                         <span
                                             class="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center -mr-2">
@@ -338,6 +338,15 @@
             searchInProgress = false;
             toggleSpinner(false);
         });
+
+        function trackAccordionClick(type, name, url) {
+            gtag('event', `${type}_click`, {
+                send_to: 'G-36M4V4L5RX',
+                opportunity_name: name,
+                opportunity_url: url,
+                event_category: 'Accordion'
+            });
+        }
     </script>
 </body>
 {% endblock %}
