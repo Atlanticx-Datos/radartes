@@ -323,29 +323,42 @@
             return keywords;
         }
 
-        // Function to track opportunity clicks
-        function trackOpportunityClick(keywords, name, url) {
+        // Configurar GA4 con opciones restrictivas
+        gtag('config', 'G-36M4V4L5RX', {
+            send_page_view: true,
+            link_attribution: false,
+            enhanced_link_attribution: false,
+            enhanced_measurement: false
+        });
+
+        // Función de tracking
+        function handleOpportunityClick(element) {
+            // Debug
+            console.log('Click handler executed with:', {
+                keywords: element.dataset.keywords,
+                url: element.dataset.url
+            });
+            
+            // Enviar evento a GA4
             gtag('event', 'opportunity_click', {
                 send_to: 'G-36M4V4L5RX',
-                opportunity_value: sanitizeKeywords(keywords),  // Aplicar sanitización
-                opportunity_name: name,
-                opportunity_url: url,
+                opportunity_keywords: element.dataset.keywords,
                 event_category: 'Oportunidad'
             });
+
+            // Abrir en nueva pestaña después de un breve delay
+            setTimeout(() => {
+                window.open(element.dataset.url, '_blank');
+            }, 100);
         }
 
+        // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('search-input');
-            searchInput.addEventListener('input', handleSearchInput);
-            searchInput.addEventListener('keypress', handleKeyPress);
-
-            document.addEventListener('click', function(event) {
-                const link = event.target.closest('.opportunity-link');
-                if (link) {
-                    event.preventDefault();
-                    trackOpportunityClick(link.dataset.keywords, link.dataset.name, link.href);
-                }
-            });
+            if (searchInput) {
+                searchInput.addEventListener('input', handleSearchInput);
+                searchInput.addEventListener('keypress', handleKeyPress);
+            }
 
             const clearSearchButton = document.querySelector('.clear-search-button');
             if (clearSearchButton) {
