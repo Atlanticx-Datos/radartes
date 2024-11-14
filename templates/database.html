@@ -339,31 +339,114 @@
             
             const categories = {
                 // Tipos de Financiación/Apoyo
-                beca: ['beca', 'scholarship', 'fellowship', 'grant'],
-                residencia: ['residencia', 'residency', 'artist in residence'],
-                premio: ['premio', 'award', 'concurso', 'certamen'],
-                convocatoria: ['convocatoria', 'open call', 'call for'],
+                beca: [
+                    'beca', 'becas', 'scholarship', 'fellowship', 'grant',
+                    'estatal', 'estatales', 'financiacion', 'financiamiento',
+                    'apoyo economico', 'stipend', 'allowance', 'aid'
+                ],
+                
+                residencia: [
+                    'residencia', 'residency', 'artist in residence', 'estancia',
+                    'alojamiento', 'hospedaje', 'studio space', 'workspace',
+                    'espacio de trabajo', 'artist housing'
+                ],
+                
+                premio: [
+                    'premio', 'award', 'concurso', 'certamen', 'competition',
+                    'reconocimiento', 'distinction', 'prize', 'contest',
+                    'galardón', 'premiación'
+                ],
+                
+                convocatoria: [
+                    'convocatoria', 'open call', 'call for', 'llamado',
+                    'aplicacion', 'postulacion', 'submission', 'applications',
+                    'proposals', 'entries'
+                ],
                 
                 // Disciplinas Artísticas
-                fotografia: ['fotografia', 'photo', 'photoespana'],
-                artes_visuales: ['arte visual', 'pintura', 'escultura', 'artes plasticas'],
-                audiovisual: ['cine', 'film', 'video', 'documental'],
-                escenicos: ['teatro', 'danza', 'performance', 'escenicas'],
-                literatura: ['literatura', 'escritura', 'ensayo', 'libro'],
-                musica: ['musica', 'opera', 'sonoro', 'sound'],
+                fotografia: [
+                    'fotografia', 'photo', 'photoespana', 'fotografica',
+                    'imagen', 'camara', 'lens', 'photographic', 'photography',
+                    'fotorreportaje', 'fotoperiodismo'
+                ],
+                
+                artes_visuales: [
+                    'arte visual', 'pintura', 'escultura', 'artes plasticas',
+                    'dibujo', 'grabado', 'instalacion', 'mixed media',
+                    'arte contemporaneo', 'visual art', 'fine arts',
+                    'ceramica', 'textil', 'grafico'
+                ],
+                
+                audiovisual: [
+                    'cine', 'film', 'video', 'documental', 'cortometraje',
+                    'largometraje', 'cinematografia', 'audiovisual',
+                    'animacion', 'motion', 'screenplay', 'guion'
+                ],
+                
+                escenicos: [
+                    'teatro', 'danza', 'performance', 'escenicas',
+                    'coreografia', 'dramaturgia', 'theatrical',
+                    'performing arts', 'stage', 'escenario', 'circo',
+                    'opera', 'ballet'
+                ],
+                
+                literatura: [
+                    'literatura', 'escritura', 'ensayo', 'libro',
+                    'novela', 'poesia', 'cuento', 'narrativa',
+                    'editorial', 'publicacion', 'letras', 'writing',
+                    'literary'
+                ],
+                
+                musica: [
+                    'musica', 'opera', 'sonoro', 'sound', 'musical',
+                    'composicion', 'orchestra', 'concierto', 'jazz',
+                    'clasica', 'contemporanea', 'experimental'
+                ],
                 
                 // Formatos
-                exposicion: ['exposicion', 'exhibition', 'muestra'],
-                festival: ['festival', 'bienal', 'feria'],
-                laboratorio: ['laboratorio', 'lab', 'taller', 'workshop'],
+                exposicion: [
+                    'exposicion', 'exhibition', 'muestra', 'exhibicion',
+                    'galeria', 'display', 'showcase', 'presentacion'
+                ],
+                
+                festival: [
+                    'festival', 'bienal', 'feria', 'encuentro',
+                    'muestra', 'salon', 'trienal', 'fair', 'biennial'
+                ],
+                
+                laboratorio: [
+                    'laboratorio', 'lab', 'taller', 'workshop',
+                    'seminario', 'clinica', 'masterclass', 'formacion',
+                    'capacitacion', 'training'
+                ],
                 
                 // Académico/Investigación
-                investigacion: ['investigacion', 'research', 'conservacion', 'estudio'],
-                formacion: ['formacion', 'maestria', 'doctorado', 'posgrado'],
+                investigacion: [
+                    'investigacion', 'research', 'conservacion', 'estudio',
+                    'academic', 'cientifica', 'desarrollo', 'phd',
+                    'doctorado', 'tesis', 'proyecto de investigacion'
+                ],
+                
+                formacion: [
+                    'formacion', 'maestria', 'doctorado', 'posgrado',
+                    'grado', 'undergraduate', 'graduate', 'master',
+                    'curso', 'diploma', 'certificacion', 'estudios',
+                    'academico', 'universitario'
+                ],
                 
                 // Otros
-                movilidad: ['movilidad', 'mobility', 'intercambio', 'viaje'],
-                digital: ['digital', 'virtual', 'online', 'tecnologia']
+                movilidad: [
+                    'movilidad', 'mobility', 'intercambio', 'viaje',
+                    'visitas', 'estudio en', 'travel', 'exchange',
+                    'internacional', 'estancia', 'abroad', 'overseas',
+                    'foreign', 'international'
+                ],
+                
+                digital: [
+                    'digital', 'virtual', 'online', 'tecnologia',
+                    'web', 'internet', 'remote', 'plataforma',
+                    'software', 'multimedia', 'new media', 'net art'
+                ]
             };
             
             const matchedCategories = [];
