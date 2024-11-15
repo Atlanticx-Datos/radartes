@@ -460,7 +460,8 @@
         }
 
         // Función de tracking modificada con log detallado
-        function handleOpportunityClick(element) {
+        function handleOpportunityClick(element, event) {
+            // Primero manejamos el tracking
             const dataAttributes = {
                 name: element.dataset.name || '',
                 keywords: element.dataset.keywords || '',
@@ -478,11 +479,14 @@
             gtag('event', 'opportunity_click', {
                 'opportunity_name': dataAttributes.name,
                 'opportunity_keywords': dataAttributes.keywords,
-                'opportunity_primary_category': primaryCategory,    // Nueva forma
-                'opportunity_secondary_category': secondaryCategory,  // Nueva forma
-                'opportunity_type': primaryCategory,  // Mantenemos type para compatibilidad
+                'opportunity_primary_category': primaryCategory,
+                'opportunity_secondary_category': secondaryCategory,
+                'opportunity_type': primaryCategory,
                 'event_category': 'Oportunidad'
             });
+
+            // Abrimos el link en nueva pestaña
+            window.open(dataAttributes.url, '_blank');
         }
 
         // Event listeners
