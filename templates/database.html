@@ -21,8 +21,9 @@
                                 <p class="relative">
                                     <a href="{{ page.url }}" target="_blank"
                                         data-name="{{ page.nombre }}"
+                                        data-url="{{ page.url }}"
                                         class="accordion-link"
-                                        onclick="trackAccordionClick('cierranPronto', '{{ page.nombre }}', '{{ page.url }}')">
+                                        onclick="handleCierranProntoClick(this)">
                                         {{ page.nombre | truncate(50) }}
                                         <span
                                             class="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center -mr-1">
@@ -58,8 +59,9 @@
                                 <p class="relative">
                                     <a href="{{ page.url }}" target="_blank"
                                         data-name="{{ page.nombre }}"
+                                        data-url="{{ page.url }}"
                                         class="accordion-link"
-                                        onclick="trackAccordionClick('destacadas', '{{ page.nombre }}', '{{ page.url }}')">
+                                        onclick="handleDestacadaClick(this)">
                                         {{ page.nombre | truncate(30) }}
                                         <span
                                             class="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center -mr-2">
@@ -472,7 +474,7 @@
             const categoriesAnalysis = analyzeKeywords(dataAttributes.keywords, dataAttributes.name);
             
             // Separamos en principal y secundaria
-            const primaryCategory = categoriesAnalysis[0] || '';
+            const primaryCategory = categoriesAnalysis[0] || 'sin_categorizar';
             const secondaryCategory = categoriesAnalysis[1] || '';
 
             // Enviamos el evento a GA4
@@ -516,13 +518,30 @@
             toggleSpinner(false);
         });
 
-        function trackAccordionClick(type, name, url) {
-            gtag('event', `${type}_click`, {
-                send_to: 'G-36M4V4L5RX',
-                opportunity_name: name,
-                opportunity_url: url,
-                event_category: 'Accordion'
+        function handleDestacadaClick(element) {
+            const opportunityName = element.dataset.name || '';
+            const opportunityUrl = element.dataset.url || '';
+            
+            gtag('event', 'destacadas_click', {
+                'opportunity_name': opportunityName,
+                'section': 'destacadas',
+                'event_category': 'Accordion'
             });
+
+            window.open(opportunityUrl, '_blank');
+        }
+
+        function handleCierranProntoClick(element) {
+            const opportunityName = element.dataset.name || '';
+            const opportunityUrl = element.dataset.url || '';
+            
+            gtag('event', 'cierranPronto_click', {
+                'opportunity_name': opportunityName,
+                'section': 'cierran_pronto',
+                'event_category': 'Accordion'
+            });
+
+            window.open(opportunityUrl, '_blank');
         }
     </script>
 </body>
