@@ -919,7 +919,10 @@ def all_pages():
         ]
 
     closing_soon_pages = sorted(closing_soon_pages, key=lambda page: page["fecha_de_cierre"])
-    sorted_pages = sorted(pages, key=lambda page: (page["fecha_de_cierre"] == placeholder_date, page["fecha_de_cierre"]), reverse=True)
+    sorted_pages = sorted(pages, key=lambda page: (
+        not page["fecha_de_cierre"] == placeholder_date,  # Cambiado: negamos la condición para invertir el orden
+        datetime.strptime(page["fecha_de_cierre"], '%Y-%m-%d') if page["fecha_de_cierre"] != placeholder_date else datetime.max  # Segundo: orden por fecha
+    ), reverse=True)
 
     og_data = {
         "title": "100 ︱ Oportunidades",

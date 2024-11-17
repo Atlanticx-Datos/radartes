@@ -109,7 +109,10 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.fecha-de-cierre').forEach(function (element) {
-            if (element.textContent.trim() !== 'Sin cierre') {
+            if (element.textContent.trim() === 'Sin Cierre') {
+                element.textContent = 'Confirmar';
+            }
+            if (element.textContent.trim() !== 'Confirmar') {
                 element.classList.add('text-center');
             }
         });
