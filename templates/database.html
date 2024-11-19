@@ -62,7 +62,7 @@
                                         data-url="{{ page.url }}"
                                         class="accordion-link"
                                         onclick="handleDestacadaClick(this)">
-                                        {{ page.nombre | truncate(30) }}
+                                        {{ page.nombre | truncate(30) }}{% if page.entidad %} / {{ page.entidad | truncate(20) }}{% endif %}
                                         <span
                                             class="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center -mr-2">
                                             <span

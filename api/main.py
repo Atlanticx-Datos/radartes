@@ -853,6 +853,13 @@ def all_pages():
                     else ""
                 )
 
+            if "Entidad" in page["properties"]:
+                page_data["entidad"] = (
+                    page["properties"]["Entidad"]["rich_text"][0]["text"]["content"]
+                    if page["properties"]["Entidad"]["rich_text"]
+                    else ""
+        )
+
             # Check if "Fecha de cierre" property exists and has a date
             fecha_de_cierre_prop = page["properties"].get("Fecha de cierre", None)
             fecha_de_cierre = None
@@ -916,6 +923,7 @@ def all_pages():
             or search_query in preprocess_text(page.get("destinatarios", ""))
             or search_query in preprocess_text(page.get("ai_keywords", ""))
             or search_query in preprocess_text(page.get("nombre_original", ""))
+            or search_query in preprocess_text(page.get("entidad", ""))
         ]
 
     closing_soon_pages = sorted(closing_soon_pages, key=lambda page: page["fecha_de_cierre"])
