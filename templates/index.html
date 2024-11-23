@@ -26,10 +26,10 @@
             </p>
             <!-- Desktop version -->
             <p class="hidden md:block hero-text md:font-medium md:tracking-normal mr-8
-                      hero-break:leading-[1.1]">
+                      hero-break:leading-[1.1] uppercase pr-2">
               Tu <span class="font-black mr-3">impulso</span><br>en artes y cultura...
             </p>
-            <p class="pt-4 md:pt-4 md:pb-0 pb-8 gratis-text uppercase text-indigo-500 tracking-tight font-black">
+            <p class="pt-4 md:pt-16 md:pb-0 pb-8 gratis-text uppercase text-indigo-500 tracking-tight font-black">
               GRATIS.</p>
 
           </div>
@@ -37,7 +37,7 @@
         </div>
 
         <!-- Add GIF container - hidden until lg -->
-        <div class="hidden lg:block lg:w-6/12  md:pt-2">
+        <div class="hidden lg:block lg:w-7/12  md:pt-2">
           <div class="relative w-full rounded-xl overflow-hidden" style="padding-bottom: 56.25%;">
             <video
                 src="{{ url_for('static', filename='public/render1.mp4') }}"
@@ -199,7 +199,7 @@
 
     @media (min-width: 958px) {
       .hero-text {
-        font-size: 3.7rem;
+        font-size: 3.5rem;
         line-height: 0.93;
         font-weight: 300;
       }
