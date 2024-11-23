@@ -119,7 +119,7 @@
                 <form id="save-form" hx-post="/save_user_opportunity" hx-trigger="submit" hx-swap="innerHTML"
                     hx-target="#alert-container">
                     <div class="border-b border-neutral" id="results-container">
-                        <div class="max-h-[35rem] min-h-[20rem] overflow-y-auto">
+                        <div class="max-h-[35rem] min-h-[20rem] overflow-auto pl-4 md:pl-0">
                             <table class="w-full h-full">
                                 <thead class="sticky top-0 bg-white">
                                     <tr>
@@ -170,7 +170,16 @@
             z-index: 1000;
         }
 
-       
+        /* Improve touch scrolling behavior */
+        #results-container > div {
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+
+        /* Ensure the container can be scrolled in both directions */
+        .overflow-auto {
+            overscroll-behavior: auto;
+        }
     </style>
  
 
@@ -543,6 +552,21 @@
 
             window.open(opportunityUrl, '_blank');
         }
+
+        // Add this to your existing JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            const resultsContainer = document.querySelector('#results-container > div');
+            
+            // Reset scroll position when switching between vertical and horizontal scrolling
+            let lastScrollLeft = 0;
+            
+            resultsContainer.addEventListener('scroll', function() {
+                if (lastScrollLeft !== this.scrollLeft) {
+                    // User is scrolling horizontally
+                    lastScrollLeft = this.scrollLeft;
+                }
+            });
+        });
     </script>
 </body>
 {% endblock %}
