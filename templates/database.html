@@ -3,7 +3,7 @@
 {% block body %}
 
 <body>
-    <main class="w-full mx-auto pl-0 pr-0 md:pr-6 lg:pr-8 xl:pr-10 2xl:pr-12 md:pl-3 lg:pl-4 xl:pl-5 2xl:pl-6 mt-2 max-w-screen-2xl">
+    <main class="w-full mx-auto pl-0 pr-0 md:pr-6 lg:pr-8 xl:pr-10 2xl:pr-12 md:pl-3 lg:pl-4 xl:pl-5 2xl:pl-6 mt-2 max-w-screen-2xl relative">
         <div class="grid grid-cols-1 md:grid-cols-12 md:gap-x-8 gap-0">
             <!-- First Column: Accordions -->
             <div class="col-span-1 md:col-span-4 md:-mr-4 mt-2 md:mt-0 md:border-r border-neutral flex flex-col justify-between">
@@ -62,7 +62,12 @@
                                         data-url="{{ page.url }}"
                                         class="accordion-link"
                                         onclick="handleDestacadaClick(this)">
-                                        {{ page.nombre | truncate(25) }}{% if page.entidad %} / {{ page.entidad | truncate(20) }}{% endif %}
+                                        <span class="md:hidden">
+                                            {{ page.nombre | truncate(18, true, "...") }}{% if page.entidad %} / {{ page.entidad | truncate(12, true, "...") }}{% endif %}
+                                        </span>
+                                        <span class="hidden md:inline">
+                                            {{ page.nombre | truncate(25, true, "...") }}{% if page.entidad %} / {{ page.entidad | truncate(20, true, "...") }}{% endif %}
+                                        </span>
                                         <span
                                             class="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center -mr-2">
                                             <span
@@ -113,27 +118,22 @@
             <div class="col-span-1 md:col-span-6 md:ml-4 mt-2 lg:mt-0 border-neutral">
                 <form id="save-form" hx-post="/save_user_opportunity" hx-trigger="submit" hx-swap="innerHTML"
                     hx-target="#alert-container">
-                    <div class="border-b border-neutral overflow-auto" style="max-height: 35rem;"
-                        id="results-container">
-                        <style>
-                            ::-webkit-scrollbar {
-                                width: 0;
-                                height: 0;
-                            }
-                        </style>
-                        <table class="w-full">
-                            <thead>
-                                <tr>
-                                    <th class="w-10">✓</th>
-                                    <th class="w-1/4 text-xs tracking-tighter text-neutral-700 text-center md:pr-28 uppercase">Oportunidad</th>
-                                    <th class="w-1/4 text-xs tracking-tighter text-neutral-700 uppercase text-start md:text-center pl-6 md:pl-0 md:pr-4">Descripción</th>
-                                    <th class="flex-1"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="search-results" class="relative top-2">
-                                {% include "_search_results.html" %}
-                            </tbody>
-                        </table>
+                    <div class="border-b border-neutral" id="results-container">
+                        <div class="max-h-[35rem] min-h-[20rem] overflow-y-auto">
+                            <table class="w-full h-full">
+                                <thead class="sticky top-0 bg-white">
+                                    <tr>
+                                        <th class="w-10">✓</th>
+                                        <th class="w-1/4 text-xs tracking-tighter text-neutral-700 text-center md:pr-28 uppercase">Oportunidad</th>
+                                        <th class="w-1/4 text-xs tracking-tighter text-neutral-700 uppercase text-start md:text-center pl-6 md:pl-0 md:pr-4">Descripción</th>
+                                        <th class="flex-1"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="search-results" class="relative top-2">
+                                    {% include "_search_results.html" %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div class="flex justify-center items-center space-x-2 mt-6 mb-4">
                         <div id="alert-container" class="flex items-center"></div>

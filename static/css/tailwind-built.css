@@ -1839,6 +1839,9 @@ details.collapse summary::-webkit-details-marker {
 .relative {
   position: relative;
 }
+.sticky {
+  position: sticky;
+}
 .-right-2 {
   right: -0.5rem;
 }
@@ -1917,6 +1920,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .mb-20 {
   margin-bottom: 5rem;
+}
+.mb-32 {
+  margin-bottom: 8rem;
 }
 .mb-4 {
   margin-bottom: 1rem;
@@ -2022,6 +2028,12 @@ details.collapse summary::-webkit-details-marker {
 }
 .h-full {
   height: 100%;
+}
+.max-h-\[35rem\] {
+  max-height: 35rem;
+}
+.min-h-\[20rem\] {
+  min-height: 20rem;
 }
 .min-h-\[4rem\] {
   min-height: 4rem;
@@ -2231,6 +2243,9 @@ details.collapse summary::-webkit-details-marker {
 .overflow-hidden {
   overflow: hidden;
 }
+.overflow-y-auto {
+  overflow-y: auto;
+}
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2367,10 +2382,6 @@ details.collapse summary::-webkit-details-marker {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
 }
-.px-3 {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
@@ -2401,6 +2412,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .pb-2 {
   padding-bottom: 0.5rem;
+}
+.pb-32 {
+  padding-bottom: 8rem;
 }
 .pb-36 {
   padding-bottom: 9rem;
@@ -2672,6 +2686,9 @@ details.collapse summary::-webkit-details-marker {
   .md\:block {
     display: block;
   }
+  .md\:inline {
+    display: inline;
+  }
   .md\:hidden {
     display: none;
   }
@@ -2746,6 +2763,9 @@ details.collapse summary::-webkit-details-marker {
   .md\:rounded-none {
     border-radius: 0px;
   }
+  .md\:border-r {
+    border-right-width: 1px;
+  }
   .md\:border-r-0 {
     border-right-width: 0px;
   }
@@ -2770,10 +2790,6 @@ details.collapse summary::-webkit-details-marker {
   .md\:px-5 {
     padding-left: 1.25rem;
     padding-right: 1.25rem;
-  }
-  .md\:px-6 {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
   }
   .md\:py-0 {
     padding-top: 0px;
@@ -2855,10 +2871,6 @@ details.collapse summary::-webkit-details-marker {
   .lg\:grid-cols-6 {
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }
-  .lg\:px-8 {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
   .lg\:pl-4 {
     padding-left: 1rem;
   }
@@ -2867,10 +2879,6 @@ details.collapse summary::-webkit-details-marker {
   }
 }
 @media (min-width: 1280px) {
-  .xl\:px-12 {
-    padding-left: 3rem;
-    padding-right: 3rem;
-  }
   .xl\:pl-5 {
     padding-left: 1.25rem;
   }
@@ -2879,10 +2887,6 @@ details.collapse summary::-webkit-details-marker {
   }
 }
 @media (min-width: 1536px) {
-  .\32xl\:px-16 {
-    padding-left: 4rem;
-    padding-right: 4rem;
-  }
   .\32xl\:px-8 {
     padding-left: 2rem;
     padding-right: 2rem;
