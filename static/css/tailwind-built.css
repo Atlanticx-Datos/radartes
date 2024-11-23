@@ -2367,6 +2367,10 @@ details.collapse summary::-webkit-details-marker {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
 }
+.px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
@@ -2401,8 +2405,8 @@ details.collapse summary::-webkit-details-marker {
 .pb-36 {
   padding-bottom: 9rem;
 }
-.pl-1 {
-  padding-left: 0.25rem;
+.pl-0 {
+  padding-left: 0px;
 }
 .pl-2 {
   padding-left: 0.5rem;
@@ -2415,6 +2419,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .pl-6 {
   padding-left: 1.5rem;
+}
+.pr-0 {
+  padding-right: 0px;
 }
 .pr-2 {
   padding-right: 0.5rem;
@@ -2606,14 +2613,6 @@ details.collapse summary::-webkit-details-marker {
 .group:hover .group-hover\:bg-slate-200 {
   --tw-bg-opacity: 1;
   background-color: rgb(226 232 240 / var(--tw-bg-opacity));
-}
-@media (min-width: 640px) {
-  .sm\:pl-2 {
-    padding-left: 0.5rem;
-  }
-  .sm\:pr-4 {
-    padding-right: 1rem;
-  }
 }
 @media (min-width: 768px) {
   .md\:left-6 {

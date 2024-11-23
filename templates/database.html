@@ -3,10 +3,10 @@
 {% block body %}
 
 <body>
-    <main class="w-full mx-auto pr-2 sm:pr-4 md:pr-6 lg:pr-8 xl:pr-10 2xl:pr-12 pl-1 sm:pl-2 md:pl-3 lg:pl-4 xl:pl-5 2xl:pl-6 mt-2 max-w-screen-2xl">
+    <main class="w-full mx-auto pl-0 pr-0 md:pr-6 lg:pr-8 xl:pr-10 2xl:pr-12 md:pl-3 lg:pl-4 xl:pl-5 2xl:pl-6 mt-2 max-w-screen-2xl">
         <div class="grid grid-cols-1 md:grid-cols-12 md:gap-x-8 gap-0">
             <!-- First Column: Accordions -->
-            <div class="col-span-1 md:col-span-4 md:-mr-4 mt-2 md:mt-0 border-r border-neutral flex flex-col justify-between">
+            <div class="col-span-1 md:col-span-4 md:-mr-4 mt-2 md:mt-0 md:border-r border-neutral flex flex-col justify-between">
                 <div class="flex flex-col gap-2">
                     <!-- Accordion 1 -->
                     <div class="join join-vertical w-full">
@@ -62,7 +62,7 @@
                                         data-url="{{ page.url }}"
                                         class="accordion-link"
                                         onclick="handleDestacadaClick(this)">
-                                        {{ page.nombre | truncate(30) }}{% if page.entidad %} / {{ page.entidad | truncate(20) }}{% endif %}
+                                        {{ page.nombre | truncate(25) }}{% if page.entidad %} / {{ page.entidad | truncate(20) }}{% endif %}
                                         <span
                                             class="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center -mr-2">
                                             <span
