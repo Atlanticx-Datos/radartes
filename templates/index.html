@@ -39,11 +39,17 @@
         <!-- Add GIF container - hidden until lg -->
         <div class="hidden lg:block lg:w-6/12  md:pt-2">
           <div class="relative w-full rounded-xl overflow-hidden" style="padding-bottom: 56.25%;">
-            <img 
-              src="{{ url_for('static', filename='public/playing-with-hair-black-and-white.gif') }}"
-              alt="Black and white artistic portrait"
-              class="absolute top-0 left-0 w-full h-full object-cover rounded-xl"
-            />
+            <video
+                src="{{ url_for('static', filename='public/render1.mp4') }}"
+                autoplay
+                loop
+                muted
+                playsinline
+                class="absolute top-0 left-0 w-full h-full object-cover rounded-xl"
+            >
+                <!-- Fallback text if video fails to load -->
+                Your browser does not support the video tag.
+            </video>
           </div>
         </div>
 
