@@ -345,56 +345,89 @@
 
         // Enhanced categories based on actual data patterns
         function analyzeKeywords(keywords) {
-            const normalizedKeywords = keywords.toLowerCase()
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "");
-            
             const categories = {
-                // Core Funding Types
+                // Funding Types (Tipos de Financiación)
                 beca: [
                     'beca', 'becas', 'scholarship', 'fellowship', 'grant',
-                    'estatal', 'financiacion', 'financiamiento'
+                    'financiacion', 'financiamiento', 'apoyo economico', 'stipend'
                 ],
                 
                 residencia: [
-                    'residencia', 'residency', 'artist in residence', 'estancia'
+                    'residencia', 'residency', 'artist in residence', 
+                    'estancia artistica', 'art residency', 'creative residency'
                 ],
                 
                 premio: [
-                    'premio', 'award', 'concurso', 'certamen', 'competition'
+                    'premio', 'award', 'concurso', 'certamen', 'competition',
+                    'reconocimiento', 'prize', 'contest'
+                ],
+
+                // Artistic Fields (Campos Artísticos)
+                artes_visuales: [
+                    'arte visual', 'pintura', 'escultura', 'artes plasticas',
+                    'visual art', 'fine arts', 'arte contemporaneo',
+                    'contemporary art', 'mixed media'
                 ],
                 
-                convocatoria: [
-                    'convocatoria', 'open call', 'call for', 'llamado',
-                    'aplicacion', 'postulacion'
+                fotografia: [
+                    'fotografia', 'photography', 'photo', 'fotografica',
+                    'photoespana', 'fotorreportaje', 'fotoperiodismo'
+                ],
+                
+                audiovisual: [
+                    'cine', 'film', 'video', 'documental', 'cortometraje',
+                    'cinematografia', 'audiovisual', 'animacion'
+                ],
+                
+                performing_arts: [
+                    'teatro', 'danza', 'performance', 'escenicas',
+                    'performing arts', 'theatre', 'dance', 'circo'
                 ],
 
-                // Professional Development
-                gestion_cultural: [
-                    'curador', 'curator', 'gestión', 'dirección artística',
-                    'producción cultural'
-                ],
-
-                // Academic
+                // Academic/Professional Development
                 formacion: [
-                    'formacion', 'maestria', 'doctorado', 'posgrado',
-                    'grado', 'master', 'curso'
+                    'formacion', 'curso', 'taller', 'workshop', 'masterclass',
+                    'training', 'education', 'professional development'
                 ],
                 
                 investigacion: [
-                    'investigacion', 'research', 'estudio',
-                    'academic', 'cientifica', 'desarrollo'
+                    'investigacion', 'research', 'academic', 'estudio',
+                    'desarrollo', 'phd', 'doctorado', 'thesis'
+                ],
+
+                // Format/Platform
+                digital: [
+                    'digital', 'virtual', 'online', 'tecnologia',
+                    'new media', 'net art', 'digital art'
+                ],
+                
+                exposicion: [
+                    'exposicion', 'exhibition', 'muestra', 'gallery',
+                    'exhibicion', 'galeria'
+                ],
+                
+                festival: [
+                    'festival', 'bienal', 'feria', 'biennial',
+                    'fair', 'encuentro', 'trienal'
                 ]
             };
-            
+
+            const normalizedKeywords = keywords.toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, ""); // Remove diacritics
+
             const matchedCategories = [];
-            for (const [category, keywords] of Object.entries(categories)) {
-                if (keywords.some(keyword => normalizedKeywords.includes(keyword))) {
+            for (const [category, keywordList] of Object.entries(categories)) {
+                if (keywordList.some(keyword => normalizedKeywords.includes(keyword))) {
                     matchedCategories.push(category);
                 }
             }
-            
-            return matchedCategories;
+
+            return {
+                primaryCategory: matchedCategories[0] || 'sin_categorizar',
+                secondaryCategory: matchedCategories[1] || '',
+                allCategories: matchedCategories // Useful for deeper analysis
+            };
         }
 
         // GA4 country tracking
@@ -406,55 +439,53 @@
             });
         }
 
-        // Track opportunity clicks
+        // Add debug logging
         document.addEventListener('DOMContentLoaded', function() {
-            const opportunityLinks = document.querySelectorAll('.opportunity-link, .accordion-link, .table-link, .cierran-pronto-link');
+            console.log('Attaching click handlers...');
             
-            opportunityLinks.forEach(link => {
+            // Remove any existing handlers first
+            document.querySelectorAll('.opportunity-link').forEach(link => {
+                const clone = link.cloneNode(true);
+                link.parentNode.replaceChild(clone, link);
+            });
+            
+            // Attach new handlers
+            document.querySelectorAll('.opportunity-link').forEach(link => {
+                console.log('Attaching handler to:', link.dataset.name);
+                
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     
-                    // Base event data
+                    console.log('Click handler fired for:', this.dataset.name);
+                    
+                    const keywords = this.dataset.keywords || '';
+                    const categoryAnalysis = analyzeKeywords(keywords);
+                    
                     const eventData = {
                         'opportunity_name': this.dataset.name,
                         'country': this.dataset.country || 'sin país',
+                        'opportunity_keywords': keywords,
+                        'opportunity_type': categoryAnalysis.primaryCategory,
+                        'opportunity_secondary_type': categoryAnalysis.secondaryCategory,
+                        'event_category': 'Oportunidad',
+                        'section': 'main'
                     };
-
-                    // Event type specific data
-                    if (this.classList.contains('cierran-pronto-link')) {
-                        Object.assign(eventData, {
-                            'event_type': 'cierranPronto_click',
-                            'section': 'cierran_pronto',
-                            'event_category': 'Accordion'
-                        });
-                    } else if (this.classList.contains('accordion-link')) {
-                        Object.assign(eventData, {
-                            'event_type': 'destacadas_click',
-                            'section': 'destacadas',
-                            'event_category': 'Accordion'
-                        });
-                    } else {
-                        // Main table opportunities
-                        Object.assign(eventData, {
-                            'event_type': 'opportunity_click',
-                            'opportunity_keywords': this.dataset.keywords || '',
-                            'opportunity_type': this.dataset.categories || '',
-                            'event_category': 'Oportunidad',
-                            'section': 'main'
-                        });
-                    }
-
-                    // Send event
-                    gtag('event', eventData.event_type, eventData);
-
-                    // Navigate after tracking is sent
+                    
+                    console.log('Sending event data:', eventData);
+                    gtag('event', 'opportunity_click', eventData);
+                    
                     setTimeout(() => {
-                        window.open(this.href, '_blank');
+                        window.open(this.dataset.url, '_blank');
                     }, 100);
                 });
             });
         });
+
+        // Remove any other click handlers
+        if (typeof handleOpportunityClick === 'function') {
+            delete window.handleOpportunityClick;
+        }
 
         // Add validation function
         function validateCategories(opportunity) {
@@ -468,6 +499,39 @@
             if (uncategorizedKeywords.length > 0) {
                 console.warn(`Potential new keywords found: ${uncategorizedKeywords.join(', ')}`);
             }
+        }
+
+        function handleOpportunityClick(element) {
+            // Get data from element
+            const keywords = element.dataset.keywords || '';
+            const name = element.dataset.name || '';
+            const country = element.dataset.country || 'sin país';
+            const url = element.dataset.url;
+
+            // Analyze categories from keywords
+            const categoryAnalysis = analyzeKeywords(keywords);
+
+            // Prepare event data for GA4
+            const eventData = {
+                'opportunity_name': name,
+                'country': country,
+                'opportunity_keywords': keywords,
+                'opportunity_type': categoryAnalysis.primaryCategory,      // Primary category
+                'opportunity_secondary_type': categoryAnalysis.secondaryCategory,  // Secondary category
+                'event_category': 'Oportunidad',
+                'section': 'main'
+            };
+
+            // Log for debugging
+            console.log('Sending to GA4:', eventData);
+
+            // Send to GA4
+            gtag('event', 'opportunity_click', eventData);
+
+            // Navigate after tracking
+            setTimeout(() => {
+                window.open(url, '_blank');
+            }, 100);
         }
     </script>
 </body>
