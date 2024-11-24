@@ -21,9 +21,9 @@
                                 <p class="relative">
                                     <a href="{{ page.url }}" target="_blank"
                                         data-name="{{ page.nombre }}"
+                                        data-country="{{ page.País }}"
                                         data-url="{{ page.url }}"
-                                        class="accordion-link"
-                                        onclick="handleCierranProntoClick(this)">
+                                        class="cierran-pronto-link">
                                         {{ page.nombre | truncate(50) }}
                                         <span
                                             class="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center -mr-1">
@@ -59,6 +59,7 @@
                                 <p class="relative">
                                     <a href="{{ page.url }}" target="_blank"
                                         data-name="{{ page.nombre }}"
+                                        data-country="{{ page.País }}"
                                         data-url="{{ page.url }}"
                                         class="accordion-link"
                                         onclick="handleDestacadaClick(this)">
@@ -342,121 +343,47 @@
             enhanced_measurement: false
         });
 
-        // Función de análisis de categorías
+        // Enhanced categories based on actual data patterns
         function analyzeKeywords(keywords) {
             const normalizedKeywords = keywords.toLowerCase()
                 .normalize("NFD")
                 .replace(/[\u0300-\u036f]/g, "");
             
             const categories = {
-                // Tipos de Financiación/Apoyo
+                // Core Funding Types
                 beca: [
                     'beca', 'becas', 'scholarship', 'fellowship', 'grant',
-                    'estatal', 'estatales', 'financiacion', 'financiamiento',
-                    'apoyo economico', 'stipend', 'allowance', 'aid'
+                    'estatal', 'financiacion', 'financiamiento'
                 ],
                 
                 residencia: [
-                    'residencia', 'residency', 'artist in residence', 'estancia',
-                    'alojamiento', 'hospedaje', 'studio space', 'workspace',
-                    'espacio de trabajo', 'artist housing'
+                    'residencia', 'residency', 'artist in residence', 'estancia'
                 ],
                 
                 premio: [
-                    'premio', 'award', 'concurso', 'certamen', 'competition',
-                    'reconocimiento', 'distinction', 'prize', 'contest',
-                    'galardón', 'premiación'
+                    'premio', 'award', 'concurso', 'certamen', 'competition'
                 ],
                 
                 convocatoria: [
                     'convocatoria', 'open call', 'call for', 'llamado',
-                    'aplicacion', 'postulacion', 'submission', 'applications',
-                    'proposals', 'entries'
+                    'aplicacion', 'postulacion'
                 ],
-                
-                // Disciplinas Artísticas
-                fotografia: [
-                    'fotografia', 'photo', 'photoespana', 'fotografica',
-                    'imagen', 'camara', 'lens', 'photographic', 'photography',
-                    'fotorreportaje', 'fotoperiodismo'
+
+                // Professional Development
+                gestion_cultural: [
+                    'curador', 'curator', 'gestión', 'dirección artística',
+                    'producción cultural'
                 ],
-                
-                artes_visuales: [
-                    'arte visual', 'pintura', 'escultura', 'artes plasticas',
-                    'dibujo', 'grabado', 'instalacion', 'mixed media',
-                    'arte contemporaneo', 'visual art', 'fine arts',
-                    'ceramica', 'textil', 'grafico'
-                ],
-                
-                audiovisual: [
-                    'cine', 'film', 'video', 'documental', 'cortometraje',
-                    'largometraje', 'cinematografia', 'audiovisual',
-                    'animacion', 'motion', 'screenplay', 'guion'
-                ],
-                
-                escenicos: [
-                    'teatro', 'danza', 'performance', 'escenicas',
-                    'coreografia', 'dramaturgia', 'theatrical',
-                    'performing arts', 'stage', 'escenario', 'circo',
-                    'opera', 'ballet'
-                ],
-                
-                literatura: [
-                    'literatura', 'escritura', 'ensayo', 'libro',
-                    'novela', 'poesia', 'cuento', 'narrativa',
-                    'editorial', 'publicacion', 'letras', 'writing',
-                    'literary'
-                ],
-                
-                musica: [
-                    'musica', 'opera', 'sonoro', 'sound', 'musical',
-                    'composicion', 'orchestra', 'concierto', 'jazz',
-                    'clasica', 'contemporanea', 'experimental'
-                ],
-                
-                // Formatos
-                exposicion: [
-                    'exposicion', 'exhibition', 'muestra', 'exhibicion',
-                    'galeria', 'display', 'showcase', 'presentacion'
-                ],
-                
-                festival: [
-                    'festival', 'bienal', 'feria', 'encuentro',
-                    'muestra', 'salon', 'trienal', 'fair', 'biennial'
-                ],
-                
-                laboratorio: [
-                    'laboratorio', 'lab', 'taller', 'workshop',
-                    'seminario', 'clinica', 'masterclass', 'formacion',
-                    'capacitacion', 'training'
-                ],
-                
-                // Académico/Investigación
-                investigacion: [
-                    'investigacion', 'research', 'conservacion', 'estudio',
-                    'academic', 'cientifica', 'desarrollo', 'phd',
-                    'doctorado', 'tesis', 'proyecto de investigacion'
-                ],
-                
+
+                // Academic
                 formacion: [
                     'formacion', 'maestria', 'doctorado', 'posgrado',
-                    'grado', 'undergraduate', 'graduate', 'master',
-                    'curso', 'diploma', 'certificacion', 'estudios',
-                    'academico', 'universitario'
+                    'grado', 'master', 'curso'
                 ],
                 
-                // Otros
-                movilidad: [
-                    'movilidad', 'mobility', 'intercambio', 'viaje',
-                    'visitas', 'estudio en', 'travel', 'exchange',
-                    'internacional', 'estancia', 'abroad', 'overseas',
-                    'foreign', 'international'
-                ],
-                
-                digital: [
-                    'digital', 'virtual', 'online', 'tecnologia',
-                    'web', 'internet', 'remote', 'plataforma',
-                    'software', 'multimedia', 'new media', 'net art'
+                investigacion: [
+                    'investigacion', 'research', 'estudio',
+                    'academic', 'cientifica', 'desarrollo'
                 ]
             };
             
@@ -470,103 +397,78 @@
             return matchedCategories;
         }
 
-        // Función de tracking modificada con log detallado
-        function handleOpportunityClick(element, event) {
-            // Primero manejamos el tracking
-            const dataAttributes = {
-                name: element.dataset.name || '',
-                keywords: element.dataset.keywords || '',
-                url: element.dataset.url || ''
-            };
-
-            // Analizamos las categorías
-            const categoriesAnalysis = analyzeKeywords(dataAttributes.keywords, dataAttributes.name);
-            
-            // Separamos en principal y secundaria
-            const primaryCategory = categoriesAnalysis[0] || 'sin_categorizar';
-            const secondaryCategory = categoriesAnalysis[1] || '';
-
-            // Enviamos el evento a GA4
-            gtag('event', 'opportunity_click', {
-                'opportunity_name': dataAttributes.name,
-                'opportunity_keywords': dataAttributes.keywords,
-                'opportunity_primary_category': primaryCategory,
-                'opportunity_secondary_category': secondaryCategory,
-                'opportunity_type': primaryCategory,
-                'event_category': 'Oportunidad'
+        // GA4 country tracking
+        function trackOpportunityView(opportunity) {
+            gtag('event', 'view_opportunity', {
+                'page_title': opportunity.nombre,
+                'country': opportunity.País,
+                'opportunity_type': opportunity.matchedCategories.join(',')
             });
-
-            // Abrimos el link en nueva pestaña
-            window.open(dataAttributes.url, '_blank');
         }
 
-        // Event listeners
+        // Track opportunity clicks
         document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) {
-                searchInput.addEventListener('input', handleSearchInput);
-                searchInput.addEventListener('keypress', handleKeyPress);
+            const opportunityLinks = document.querySelectorAll('.opportunity-link, .accordion-link, .table-link, .cierran-pronto-link');
+            
+            opportunityLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Base event data
+                    const eventData = {
+                        'opportunity_name': this.dataset.name,
+                        'country': this.dataset.country || 'sin país',
+                    };
+
+                    // Event type specific data
+                    if (this.classList.contains('cierran-pronto-link')) {
+                        Object.assign(eventData, {
+                            'event_type': 'cierranPronto_click',
+                            'section': 'cierran_pronto',
+                            'event_category': 'Accordion'
+                        });
+                    } else if (this.classList.contains('accordion-link')) {
+                        Object.assign(eventData, {
+                            'event_type': 'destacadas_click',
+                            'section': 'destacadas',
+                            'event_category': 'Accordion'
+                        });
+                    } else {
+                        // Main table opportunities
+                        Object.assign(eventData, {
+                            'event_type': 'opportunity_click',
+                            'opportunity_keywords': this.dataset.keywords || '',
+                            'opportunity_type': this.dataset.categories || '',
+                            'event_category': 'Oportunidad',
+                            'section': 'main'
+                        });
+                    }
+
+                    // Send event
+                    gtag('event', eventData.event_type, eventData);
+
+                    // Navigate after tracking is sent
+                    setTimeout(() => {
+                        window.open(this.href, '_blank');
+                    }, 100);
+                });
+            });
+        });
+
+        // Add validation function
+        function validateCategories(opportunity) {
+            if (!opportunity.matchedCategories || opportunity.matchedCategories.length === 0) {
+                console.warn(`Warning: No categories matched for opportunity: ${opportunity.title}`);
             }
-
-            const clearSearchButton = document.querySelector('.clear-search-button');
-            if (clearSearchButton) {
-                clearSearchButton.addEventListener('click', clearSearch);
+            
+            // Check for potentially missing categories
+            const keywords = opportunity.keywords.toLowerCase();
+            const uncategorizedKeywords = findUncategorizedKeywords(keywords);
+            if (uncategorizedKeywords.length > 0) {
+                console.warn(`Potential new keywords found: ${uncategorizedKeywords.join(', ')}`);
             }
-        });
-
-        // HTMX event handlers
-        document.body.addEventListener('htmx:afterRequest', function(evt) {
-            searchInProgress = false;
-            toggleSpinner(false);
-            scrollToTop('results-container');
-        });
-
-        document.body.addEventListener('htmx:error', function(evt) {
-            console.error('HTMX error:', evt.detail.error);
-            searchInProgress = false;
-            toggleSpinner(false);
-        });
-
-        function handleDestacadaClick(element) {
-            const opportunityName = element.dataset.name || '';
-            const opportunityUrl = element.dataset.url || '';
-            
-            gtag('event', 'destacadas_click', {
-                'opportunity_name': opportunityName,
-                'section': 'destacadas',
-                'event_category': 'Accordion'
-            });
-
-            window.open(opportunityUrl, '_blank');
         }
-
-        function handleCierranProntoClick(element) {
-            const opportunityName = element.dataset.name || '';
-            const opportunityUrl = element.dataset.url || '';
-            
-            gtag('event', 'cierranPronto_click', {
-                'opportunity_name': opportunityName,
-                'section': 'cierran_pronto',
-                'event_category': 'Accordion'
-            });
-
-            window.open(opportunityUrl, '_blank');
-        }
-
-        // Add this to your existing JavaScript
-        document.addEventListener('DOMContentLoaded', function() {
-            const resultsContainer = document.querySelector('#results-container > div');
-            
-            // Reset scroll position when switching between vertical and horizontal scrolling
-            let lastScrollLeft = 0;
-            
-            resultsContainer.addEventListener('scroll', function() {
-                if (lastScrollLeft !== this.scrollLeft) {
-                    // User is scrolling horizontally
-                    lastScrollLeft = this.scrollLeft;
-                }
-            });
-        });
     </script>
 </body>
 {% endblock %}
