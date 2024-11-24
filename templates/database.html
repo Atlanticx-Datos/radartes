@@ -533,6 +533,103 @@
                 window.open(url, '_blank');
             }, 100);
         }
+
+        function handleDestacadaClick(element) {
+            const eventData = {
+                'opportunity_name': element.dataset.name,
+                'country': element.dataset.country || 'sin país',
+                'section': 'destacadas',
+                'event_category': 'Accordion'
+            };
+            
+            gtag('event', 'destacadas_click', eventData);  // This specific event name
+            
+            window.open(element.dataset.url, '_blank');
+        }
+
+        function handleCierranProntoClick(element) {
+            const eventData = {
+                'opportunity_name': element.dataset.name,
+                'country': element.dataset.country || 'sin país',
+                'section': 'cierran_pronto',
+                'event_category': 'Accordion'
+            };
+            
+            gtag('event', 'cierranPronto_click', eventData);  // This specific event name
+            
+            window.open(element.dataset.url, '_blank');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // For Cierran Pronto links
+            document.querySelectorAll('.cierran-pronto-link').forEach(link => {
+                // Remove any existing click handlers
+                const newLink = link.cloneNode(true);
+                link.parentNode.replaceChild(newLink, link);
+                
+                newLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();  // Stop other handlers
+                    
+                    const eventData = {
+                        'opportunity_name': this.dataset.name,
+                        'country': this.dataset.country || 'sin país',
+                        'section': 'cierran_pronto',
+                        'event_category': 'Accordion',
+                        'opportunity_keywords': this.dataset.keywords || ''
+                    };
+                    
+                    // Send our custom event
+                    gtag('event', 'cierranPronto_click', eventData);
+                    
+                    // Navigate after tracking
+                    setTimeout(() => {
+                        window.open(this.dataset.url, '_blank');
+                    }, 100);
+                    
+                    return false;  // Prevent bubbling
+                }, true);  // Use capture phase
+            });
+
+            // For Destacadas links
+            document.querySelectorAll('.accordion-link').forEach(link => {
+                // Remove any existing click handlers
+                const newLink = link.cloneNode(true);
+                link.parentNode.replaceChild(newLink, link);
+                
+                newLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();  // Stop other handlers
+                    
+                    const eventData = {
+                        'opportunity_name': this.dataset.name,
+                        'country': this.dataset.country || 'sin país',
+                        'section': 'destacadas',
+                        'event_category': 'Accordion',
+                        'opportunity_keywords': this.dataset.keywords || ''
+                    };
+                    
+                    // Send our custom event
+                    gtag('event', 'destacadas_click', eventData);
+                    
+                    // Navigate after tracking
+                    setTimeout(() => {
+                        window.open(this.dataset.url, '_blank');
+                    }, 100);
+                    
+                    return false;  // Prevent bubbling
+                }, true);  // Use capture phase
+            });
+        });
+
+        // Disable GA4's automatic link tracking
+        gtag('config', 'G-36M4V4L5RX', {
+            send_page_view: true,
+            link_attribution: false,
+            enhanced_link_attribution: false
+        });
     </script>
 </body>
 {% endblock %}
