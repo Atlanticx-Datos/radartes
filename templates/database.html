@@ -697,9 +697,11 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            // For general opportunity links
+            // Get total opportunities count
+            const totalOpportunities = document.querySelectorAll('.opportunity-link').length;
+            console.log('Total opportunities:', totalOpportunities); // Debug log
+            
             document.querySelectorAll('.opportunity-link').forEach(link => {
-                // Remove any existing click handlers
                 const newLink = link.cloneNode(true);
                 link.parentNode.replaceChild(newLink, link);
 
@@ -717,10 +719,11 @@
                         'opportunity_type': categoryAnalysis.primaryCategory,
                         'opportunity_secondary_type': categoryAnalysis.secondaryCategory,
                         'event_category': 'Oportunidad',
-                        'section': 'main'
+                        'section': 'main',
+                        'total_opportunities': totalOpportunities
                     };
 
-                    console.log('Sending event data:', eventData);
+                    console.log('Sending event data with total:', eventData);
                     gtag('event', 'opportunity_click', eventData);
 
                     // Create and trigger a hidden link
@@ -730,10 +733,8 @@
                     a.target = '_blank';
                     document.body.appendChild(a);
                     
-                    // Trigger click
                     a.click();
                     
-                    // Remove the element and force focus back to current window
                     requestAnimationFrame(() => {
                         document.body.removeChild(a);
                         window.focus();
