@@ -64,10 +64,20 @@
                                         class="accordion-link"
                                         onclick="handleDestacadaClick(this)">
                                         <span class="md:hidden">
-                                            {{ page.nombre | truncate(18, true, "...") }}{% if page.entidad %} / {{ page.entidad | truncate(12, true, "...") }}{% endif %}
+                                            {{ page.nombre | truncate(18, true, "...") }}
+                                            {% if page.entidad %}
+                                                / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1">
+                                                    {{ page.entidad | truncate(12, true, "...") }}
+                                                </span>
+                                            {% endif %}
                                         </span>
                                         <span class="hidden md:inline">
-                                            {{ page.nombre | truncate(25, true, "...") }}{% if page.entidad %} / {{ page.entidad | truncate(20, true, "...") }}{% endif %}
+                                            {{ page.nombre | truncate(25, true, "...") }}
+                                            {% if page.entidad %}
+                                                / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1">
+                                                    {{ page.entidad | truncate(20, true, "...") }}
+                                                </span>
+                                            {% endif %}
                                         </span>
                                         <span
                                             class="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center -mr-2">
@@ -122,8 +132,8 @@
                     <div class="border-b border-neutral" id="results-container">
                         <div class="max-h-[35rem] min-h-[20rem] overflow-auto pl-4 md:pl-0">
                             <table class="w-full h-full">
-                                <thead class="sticky top-0 bg-white">
-                                    <tr>
+                                <thead style="position: sticky; top: 0; background-color: rgba(243, 244, 246, 0.75); backdrop-filter: blur(40px);">
+                                    <tr class="my-4">
                                         <th class="w-10">✓</th>
                                         <th class="w-1/4 text-xs tracking-tighter text-neutral-700 text-center md:pr-28 uppercase">Oportunidad</th>
                                         <th class="w-1/4 text-xs tracking-tighter text-neutral-700 uppercase text-start md:text-center pl-6 md:pl-0 md:pr-4">Descripción</th>

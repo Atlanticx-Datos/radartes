@@ -44,6 +44,7 @@ module.exports = {
   },
   plugins: [
     require('daisyui'),
+    require('tailwindcss-filters'),
     function({ addUtilities, theme }) {
       const newUtilities = {
         '.hero-title': {
