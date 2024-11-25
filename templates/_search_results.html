@@ -24,7 +24,9 @@
             {{ (page.ai_keywords | truncate(27)).capitalize() }}
         </div>
     </td>
-    <td class="w-2/12 text-xs p-2 md:p-0 relative md:right-2 fecha-de-cierre">{{ page.fecha_de_cierre | default("Sin cierre") | format_date }}</td>
+    <td class="w-2/12 text-xs p-2 md:p-0 relative md:right-2 fecha-de-cierre">
+        {{ page.fecha_de_cierre | default("Sin cierre") | format_date }}
+    </td>
     <th class="w-2/12 p-2 md:pr-4 static">
         <div class="flex items-center gap-1 bg-slate-100 p-2">
             <div role="button"
@@ -95,12 +97,20 @@
     #search-results {
         padding-bottom: 8rem;
     }
+
+    .fecha-de-cierre {
+        text-align: center;
+    }
+
+    .fecha-de-cierre.confirmar {
+        padding-left: 6px; /* Adjusts the text slightly to the right */
+    }
 </style>
 
 <script>
     function shareOpportunity(url, title, platform) {
         const encodedUrl = encodeURIComponent(url);
-        const encodedTitle = encodeURIComponent('\n- 𝟭𝟬𝟬 ︱ 𝗢𝗽𝗼𝗿𝘁𝘂𝗻𝗶𝗱𝗮𝗱𝗲𝘀');
+        const encodedTitle = encodeURIComponent('\n- 𝟭����𝟬 ︱ 𝗢𝗽𝗼𝗿𝘁𝘂𝗻𝗶𝗱𝗮𝗱𝗲𝘀');
 
         let shareUrl = '';
 
@@ -118,10 +128,10 @@
         document.querySelectorAll('.fecha-de-cierre').forEach(function (element) {
             if (element.textContent.trim() === 'Sin Cierre') {
                 element.textContent = 'Confirmar';
+                element.classList.add('confirmar'); // Add class to apply specific styles
             }
-            if (element.textContent.trim() !== 'Confirmar') {
-                element.classList.add('text-center');
-            }
+            // Ensure all fecha-de-cierre elements are centered
+            element.classList.add('text-center');
         });
     });
 </script>

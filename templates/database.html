@@ -63,18 +63,18 @@
                                         data-url="{{ page.url }}"
                                         class="accordion-link"
                                         onclick="handleDestacadaClick(this)">
-                                        <span class="md:hidden">
+                                        <span class="md:hidden whitespace-nowrap">
                                             {{ page.nombre | truncate(18, true, "...") }}
                                             {% if page.entidad %}
-                                                / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1">
+                                                / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
                                                     {{ page.entidad | truncate(12, true, "...") }}
                                                 </span>
                                             {% endif %}
                                         </span>
-                                        <span class="hidden md:inline">
+                                        <span class="hidden md:inline whitespace-nowrap">
                                             {{ page.nombre | truncate(25, true, "...") }}
                                             {% if page.entidad %}
-                                                / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1">
+                                                / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
                                                     {{ page.entidad | truncate(20, true, "...") }}
                                                 </span>
                                             {% endif %}
