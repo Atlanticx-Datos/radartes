@@ -55,6 +55,9 @@
     
     <script src="https://unpkg.com/htmx.org@1.7.0/dist/htmx.min.js"></script>
     <style>
+        /* Add a comment with timestamp to force cache invalidation */
+        /* Version: 2024-03-XX-001 */
+        
         .spinner {
             display: none;
             position: fixed;
@@ -84,19 +87,49 @@
                 justify-content: flex-start !important;
             }
         }
+
+        /* Specific positioning for database route */
+        .database-logo {
+            position: relative;
+            right: 5.5rem !important; /* Adjust this value as needed */
+        }
+
+        @media (min-width: 768px) {
+            .database-logo {
+                right: 3.5rem !important; /* Adjust for medium screens */
+            }
+        }
+
+        /* Custom scrollbar styles */
+        .custom-scrollbar {
+            scrollbar-width: none; /* Hide the default scrollbar in Firefox */
+        }
+
+        /* Chrome, Edge, and Safari */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 0; /* Hide the default scrollbar */
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #6366f1; /* indigo-500 */
+            border-radius: 50%; /* Fully rounded */
+            width: 8px; /* Circle size */
+            height: 8px; /* Circle size */
+            border: 1px solid black; /* To ensure visibility against the track */
+        }
     </style>
 
     <!-- Preload the poster image -->
     <link rel="preload" href="{{ url_for('static', filename='public/PosterCande.jpg') }}" as="image">
 </head>
 
-<body class="flex justify-center">
+<body class="flex justify-center" data-route="{{ request.endpoint }}">
     <div id="layout-spinner" class="spinner h-8 w-8" style="display: none;">
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
     </div>
     <main class="w-full mx-auto pl-0 pr-0 md:pr-6 lg:pr-8 xl:pr-10 2xl:pr-12 md:pl-3 lg:pl-4 xl:pl-5 2xl:pl-6 mt-2 max-w-screen-2xl relative">
         <div class="max-w-[1180px] mx-auto {% if request.endpoint == 'all_pages' %}md:-mr-1{% endif %}"> 
-            <nav class="flex justify-between items-center space-x-4 h-[34px] md:h-24 pt-8 md:pt-2 pb-2 px-2 md:px-5 2xl:px-8 z-50">
+            <nav class="flex justify-between items-center space-x-4 h-[34px] md:h-24 pt-8 md:pt-2 pb-2 px-4 md:px-12 2xl:px-28 z-50">
                 <a href="/">
                     <svg class="w-6 h-6 md:hidden" data-slot="icon" fill="currentColor" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -105,17 +138,10 @@
                     </svg>
                 </a>
                 <div class="flex-grow hidden md:block"></div>
-                <a href="/">
+                <a href="/" class="logo-container {% if request.endpoint == 'database' %}database-logo{% endif %}">
                     <img src="{{ url_for('static', filename='public/Logo_100.svg') }}"
                         class="w-16 subpixel-antialiased antialiased relative right-1 top-1 md:right-3">
                 </a>
-                
-                {% if request.endpoint == 'database' %}
-                <div class="hidden md:flex items-center bg-yellow-100 border-l-4 border-yellow-500 px-4 py-2">
-                    <p class="text-sm text-yellow-700">Vista administrativa</p>
-                </div>
-                {% endif %}
-                
                 <div class="dropdown dropdown-bottom dropdown-end mt-2 z-50 md:pr-0">
                     <div tabindex="0" role="button" class="relative">
                         <div class="relative">
