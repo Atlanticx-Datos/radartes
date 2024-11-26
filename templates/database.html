@@ -143,12 +143,13 @@
                     <div class="border-b border-neutral" id="results-container">
                         <div class="max-h-[35rem] min-h-[20rem] overflow-auto pl-4 md:pl-0 custom-scrollbar md:border-t border-black" style="border-right: 1px solid black;">
                             <table class="w-full h-full relative md:top-3">
-                                <thead style="position: sticky; top: 0; background-color: rgba(243, 244, 246, 0.75); backdrop-filter: blur(40px);">
-                                    <tr class="my-4">
-                                        <th class="w-10">✓</th>
+                                <thead style="background-color: rgba(243, 244, 246, 0.75); backdrop-filter: blur(80px);">
+                                    <tr class="my-4 relative overflow-hidden">
+                                        <th class="w-10 sticky left-0 bg-white z-10">✓</th>
                                         <th class="w-1/4 text-xs tracking-tighter text-neutral-700 text-center md:pr-28 uppercase">Oportunidad</th>
                                         <th class="w-1/4 text-xs tracking-tighter text-neutral-700 uppercase text-start md:text-center pl-6 md:pl-0 md:pr-4">Descripción</th>
                                         <th class="flex-1"></th>
+                                        <div class="absolute inset-0 bg-white bg-opacity-70" style="backdrop-filter: blur(10px) !important; -webkit-backdrop-filter: blur(10px) !important; z-index: -1;"></div>
                                     </tr>
                                 </thead>
                                 <tbody id="search-results" class="relative top-2">
