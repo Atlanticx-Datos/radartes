@@ -1893,9 +1893,17 @@ details.collapse summary::-webkit-details-marker {
 .col-span-2 {
   grid-column: span 2 / span 2;
 }
+.mx-4 {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
+}
+.my-0 {
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 .my-4 {
   margin-top: 1rem;
@@ -2322,6 +2330,10 @@ details.collapse summary::-webkit-details-marker {
   --tw-border-opacity: 1;
   border-color: var(--fallback-s,oklch(var(--s)/var(--tw-border-opacity)));
 }
+.border-yellow-500 {
+  --tw-border-opacity: 1;
+  border-color: rgb(234 179 8 / var(--tw-border-opacity));
+}
 .bg-\[\#0cc7c7\] {
   --tw-bg-opacity: 1;
   background-color: rgb(12 199 199 / var(--tw-bg-opacity));
@@ -2373,6 +2385,10 @@ details.collapse summary::-webkit-details-marker {
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+}
+.bg-yellow-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 249 195 / var(--tw-bg-opacity));
 }
 .bg-opacity-75 {
   --tw-bg-opacity: 0.75;
@@ -2430,6 +2446,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .pb-36 {
   padding-bottom: 9rem;
+}
+.pb-8 {
+  padding-bottom: 2rem;
 }
 .pl-0 {
   padding-left: 0px;
@@ -2517,6 +2536,9 @@ details.collapse summary::-webkit-details-marker {
 .tracking-normal {
   letter-spacing: 0em;
 }
+.tracking-tight {
+  letter-spacing: -0.025em;
+}
 .tracking-tighter {
   letter-spacing: -0.05em;
 }
@@ -2546,6 +2568,10 @@ details.collapse summary::-webkit-details-marker {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+.text-yellow-700 {
+  --tw-text-opacity: 1;
+  color: rgb(161 98 7 / var(--tw-text-opacity));
 }
 .antialiased {
   -webkit-font-smoothing: antialiased;
@@ -2663,6 +2689,9 @@ details.collapse summary::-webkit-details-marker {
   .md\:right-3 {
     right: 0.75rem;
   }
+  .md\:top-3 {
+    top: 0.75rem;
+  }
   .md\:col-span-1 {
     grid-column: span 1 / span 1;
   }
@@ -2713,6 +2742,9 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:inline {
     display: inline;
+  }
+  .md\:flex {
+    display: flex;
   }
   .md\:hidden {
     display: none;
@@ -2856,6 +2888,10 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:text-center {
     text-align: center;
+  }
+  .md\:text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
   }
   .md\:text-base {
     font-size: 1rem;

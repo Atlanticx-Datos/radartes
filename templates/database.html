@@ -3,6 +3,13 @@
 {% block body %}
 
 <body>
+    <div class="px-4 pb-8 mx-4 my-0">
+        <div class="flex items-center">
+            <h1 class="text-xl md:text-4xl font-bold text-black tracking-tight">
+                Informate, compartí y guardá oportunidades, gratis. 
+            </h1>
+        </div>
+    </div>
     <main class="w-full mx-auto pl-0 pr-0 md:pr-6 lg:pr-8 xl:pr-10 2xl:pr-12 md:pl-3 lg:pl-4 xl:pl-5 2xl:pl-6 mt-2 max-w-screen-2xl relative">
         <div class="grid grid-cols-1 md:grid-cols-12 md:gap-x-8 gap-0">
             <!-- First Column: Accordions -->
@@ -131,7 +138,7 @@
                     hx-target="#alert-container">
                     <div class="border-b border-neutral" id="results-container">
                         <div class="max-h-[35rem] min-h-[20rem] overflow-auto pl-4 md:pl-0">
-                            <table class="w-full h-full">
+                            <table class="w-full h-full relative md:top-3">
                                 <thead style="position: sticky; top: 0; background-color: rgba(243, 244, 246, 0.75); backdrop-filter: blur(40px);">
                                     <tr class="my-4">
                                         <th class="w-10">✓</th>
