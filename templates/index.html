@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<div class="max-w-[1180px] mx-auto">
+<div class="max-w-[1180px] mx-3 md:mx-auto">
   <div
     class="relative h-[960px] md:h-[600px] bg-black text-white flex flex-col justify-between mt-8 md:mt-0 rounded-xl mb-16">
     <!-- Main Content Section -->
@@ -40,7 +40,7 @@
           <div class="video-container">
             <video
               id="hero-video"
-              src="/static/public/render1.mp4"
+              src="/static/public/renderVioleta.mp4"
               autoplay
               loop
               muted
@@ -92,7 +92,7 @@
     <div class="grid grid-cols-2 md:grid-cols-12 md:h-16 overflow-hidden rounded-b-xl relative flex-shrink-0">
       <!-- Add Opportunity Column -->
       <div
-        class="bg-orange-500 col-span-1 md:col-span-3 flex items-center justify-center p-4 md:p-3 group hover:bg-orange-600 transition-all duration-300 min-h-[4rem]">
+        class="bg-orange-500 col-span-1 md:col-span-3 flex items-center justify-center p-4 md:p-3 group hover:bg-orange-600 transition-all duration-300 md:min-h-[4rem] h-8 md:h-auto">
         <a href="#" target="_blank" class="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-2">
           <span class="hidden md:block updates-text text-black">Sumá tu convocatoria</span>
           <svg
@@ -103,7 +103,7 @@
       </div>
 
       <!-- Updates Column -->
-      <div class="bg-[#0cc7c7] col-span-1 md:col-span-8 flex items-center justify-center py-16 md:py-0 px-6 min-h-[4rem]">
+      <div class="bg-[#0cc7c7] col-span-1 md:col-span-8 flex items-center justify-center py-2 md:py-0 px-6 md:min-h-[4rem] h-8 md:h-auto">
         <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
           <!-- Counter with notification dot -->
           <div class="relative flex items-center">
