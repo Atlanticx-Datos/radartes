@@ -47,7 +47,7 @@
               playsinline
               preload="auto"
               poster="/static/public/PosterCande.jpg"
-              class="video-element rounded-md"
+              class="video-element rounded-md video-effect"
             >
               Your browser does not support the video tag.
             </video>
@@ -261,6 +261,15 @@
       .md\:h-16 {
         height: 4rem !important;
       }
+    }
+
+    .video-effect {
+      filter: blur(1px); /* Adjust the blur intensity as needed */
+      transition: filter 0.3s ease-in-out;
+    }
+
+    .video-container:hover .video-effect {
+      filter: blur(0); /* Remove blur on hover */
     }
   </style>
 
