@@ -1,11 +1,11 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<div class="max-w-[1180px] mx-3 md:mx-auto">
+<div class="max-w-[1180px] mx-3 md:mx-auto bg-slate-100">
   <div
-    class="relative h-[960px] md:h-[450px] bg-black text-white flex flex-col justify-between mt-8 md:mt-0 rounded-xl mb-12">
+    class="relative h-[960px] md:h-96 bg-black text-white flex flex-col justify-between mt-8 md:mt-0 rounded-xl mb-12">
     <!-- Main Content Section -->
-    <div class="px-8 md:px-4 md:pl-24 md:pr-28 pt-20 md:pt-20 flex-grow">
+    <div class="px-8 md:px-4 md:pl-24 md:pr-28 pt-20 md:pt-16 flex-grow">
       <!-- Header Section -->
       <div class="mb-2 w-[110%]">
         <div class="flex items-center space-x-2">
@@ -37,18 +37,18 @@
 
         <!-- Add GIF container - hidden until lg -->
         <div class="hidden lg:block lg:w-11/12">
-          <div class="video-container flex flex-col space-y-4 md:relative md:bottom-12 left-6">
+          <div class="video-container flex flex-col space-y-4 md:relative md:bottom-20 left-6">
             <!-- First Row -->
             <div class="flex space-x-4">
               <div class="w-1/2">
                 <video id="hero-video-1" src="/static/public/pop1.mp4" autoplay loop muted playsinline preload="auto"
-                  poster="/static/public/PosterCande.jpg" class="video-element video-effect rounded-md w-full h-[105px] object-cover">
+                  poster="/static/public/PosterCande.jpg" class="video-element video-effect rounded-md w-full h-[115px] object-cover">
                   Your browser does not support the video tag.
                 </video>
               </div>
               <div class="w-1/2">
                 <video id="hero-video-2" src="/static/public/pop1.mp4" autoplay loop muted playsinline preload="auto"
-                  poster="/static/public/PosterCande.jpg" class="video-element video-effect rounded-md w-full h-[105px] object-cover">
+                  poster="/static/public/PosterCande.jpg" class="video-element video-effect rounded-md w-full h-[115px] object-cover">
                   Your browser does not support the video tag.
                 </video>
               </div>
@@ -57,13 +57,13 @@
             <div class="flex space-x-4">
               <div class="w-1/2">
                 <video id="hero-video-3" src="/static/public/pop1.mp4" autoplay loop muted playsinline preload="auto"
-                  poster="/static/public/PosterCande.jpg" class="video-element video-effect rounded-md w-full h-[105px] object-cover">
+                  poster="/static/public/PosterCande.jpg" class="video-element video-effect rounded-md w-full h-[115px] object-cover">
                   Your browser does not support the video tag.
                 </video>
               </div>
               <div class="w-1/2">
                 <video id="hero-video-4" src="/static/public/pop1.mp4" autoplay loop muted playsinline preload="auto"
-                  poster="/static/public/PosterCande.jpg" class="video-element video-effect rounded-md w-full h-[105px] object-cover">
+                  poster="/static/public/PosterCande.jpg" class="video-element video-effect rounded-md w-full h-[115px] object-cover">
                   Your browser does not support the video tag.
                 </video>
               </div>
@@ -73,7 +73,7 @@
 
         <!-- Right Column -->
         <div class="w-full md:w-3/4 md:hidden">
-          <div class="bg-white py-8 px-8 md:px-12 text-black rounded-xl mb-20 md:mb-0">
+          <div class="py-8 px-8 md:px-12 text-black rounded-xl mb-20 md:mb-0">
             <!-- Level 1: Primary message - Audience definition -->
             <p class="text-sm font-bold uppercase text-left leading-tight">
               Si sos artista, investigador o gestor cultural, entrá para informarte.
@@ -106,7 +106,7 @@
     </div>
 
     <!-- Footer Section - Modified for Safari compatibility -->
-    <div class="grid grid-cols-2 md:grid-cols-12 md:h-16 overflow-hidden relative md:top-28 flex-shrink-0">
+    <div class="grid grid-cols-2 md:grid-cols-12 md:h-16 overflow-hidden relative md:bottom-8 flex-shrink-0">
       <!-- Add Opportunity Column -->
       <div
         class="bg-orange-500 col-span-1 md:col-span-3 flex items-center justify-center p-4 md:p-3 group hover:bg-orange-600 md:h-auto transition-all duration-300 md:relative md:left-6 rounded-l-xl">
@@ -213,7 +213,7 @@
 
     @media (min-width: 768px) and (max-width: 958px) {
       .hero-text {
-        font-size: 4.3rem;
+        font-size: 4rem;
         /* Slightly smaller to prevent 5th line wrap */
         line-height: 0.95;
         font-weight: 300;
@@ -222,7 +222,7 @@
 
     @media (min-width: 958px) {
       .hero-text {
-        font-size: 4.5rem;
+        font-size: 4rem;
         line-height: 0.98;
         font-weight: 600;
       }
