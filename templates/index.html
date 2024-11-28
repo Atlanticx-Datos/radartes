@@ -3,9 +3,9 @@
 {% block body %}
 <div class="max-w-[1180px] mx-3 md:mx-auto">
   <div
-    class="relative h-[960px] md:h-[600px] bg-black text-white flex flex-col justify-between mt-8 md:mt-0 rounded-xl mb-16">
+    class="relative h-[960px] md:h-[675px] bg-black text-white flex flex-col justify-between mt-8 md:mt-0 rounded-xl mb-16">
     <!-- Main Content Section -->
-    <div class="px-8 md:px-4 md:pl-24 md:pr-28 pt-20 md:pt-16 flex-grow">
+    <div class="px-8 md:px-4 md:pl-24 md:pr-28 pt-20 md:pt-12 flex-grow">
       <!-- Header Section -->
       <div class="mb-2 w-[110%]">
         <div class="flex items-center space-x-2">
@@ -16,10 +16,10 @@
       </div>
 
       <!-- Hero and Card Section -->
-      <div class="flex flex-col md:flex-row justify-between items-start space-y-12 md:space-y-0">
+      <div class="flex flex-col md:flex-row justify-between items-start space-y-12">
         <!-- Left Column - Hero -->
-        <div class="w-5/6 md:w-6/12">
-          <div class="space-y-8 md:space-y-3">
+        <div class="w-5/6 md:w-11/12">
+          <div class="space-y-8 md:space-y-0">
             <!-- Mobile version -->
             <p class="text-6xl font-semibold tracking-tighter hero-mobile md:hidden uppercase">
               Becas, Movilidad, Premios, Llamados...
@@ -35,10 +35,10 @@
         </div>
 
         <!-- Add GIF container - hidden until lg -->
-        <div class="hidden lg:block lg:w-8/12 md:pt-2">
-          <div class="video-container">
+        <div class="hidden lg:block lg:w-5/12">
+          <div class="video-container md:relative md:bottom-52">
             <video
-              id="hero-video"
+              id="hero-video-2"
               src="/static/public/pop1.mp4"
               autoplay
               loop
@@ -46,7 +46,46 @@
               playsinline
               preload="auto"
               poster="/static/public/PosterCande.jpg"
-              class="video-element rounded-md video-effect"
+              class="video-element video-effect rounded-t-md"
+            >
+              Your browser does not support the video tag.
+            </video>
+            <video
+              id="hero-video-1"
+              src="/static/public/renderVioleta.mp4"
+              autoplay
+              loop
+              muted
+              playsinline
+              preload="auto"
+              poster="/static/public/PosterCande.jpg"
+              class="video-element video-effect"
+            >
+              Your browser does not support the video tag.
+            </video>
+            <video
+              id="hero-video-2"
+              src="/static/public/pop1.mp4"
+              autoplay
+              loop
+              muted
+              playsinline
+              preload="auto"
+              poster="/static/public/PosterCande.jpg"
+              class="video-element video-effect"
+            >
+              Your browser does not support the video tag.
+            </video>
+            <video
+              id="hero-video-3"
+              src="/static/public/render1.mp4"
+              autoplay
+              loop
+              muted
+              playsinline
+              preload="auto"
+              poster="/static/public/PosterCande.jpg"
+              class="video-element video-effect rounded-b-md"
             >
               Your browser does not support the video tag.
             </video>
@@ -88,7 +127,7 @@
     </div>
 
     <!-- Footer Section - Modified for Safari compatibility -->
-    <div class="grid grid-cols-2 md:grid-cols-12 md:h-16 overflow-hidden rounded-b-xl relative flex-shrink-0">
+    <div class="grid grid-cols-2 md:grid-cols-12 md:h-16 overflow-hidden relative rounded-xl flex-shrink-0 md:relative">
       <!-- Add Opportunity Column -->
       <div
         class="bg-orange-500 col-span-1 md:col-span-3 flex items-center justify-center p-4 md:p-3 group hover:bg-orange-600 transition-all duration-300 md:min-h-[4rem] h-8 md:h-auto">
@@ -199,7 +238,7 @@
 
     @media (min-width: 958px) {
       .hero-text {
-        font-size: 3.7rem;
+        font-size: 5rem;
         line-height: 0.93;
         font-weight: 600;
       }
@@ -273,6 +312,18 @@
 
     .impulso-text {
       font-weight: 900; /* Ensures the font-weight is 900 */
+    }
+
+    .video-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0rem; /* Space between videos */
+    }
+
+    .video-element {
+      width: 100%; /* Adjust width as needed */
+      max-width: 400px; /* Optional: limit */
     }
   </style>
 
