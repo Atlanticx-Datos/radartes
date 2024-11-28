@@ -5,7 +5,7 @@
   <div
     class="relative h-[960px] md:h-[600px] bg-black text-white flex flex-col justify-between mt-8 md:mt-0 rounded-xl mb-16">
     <!-- Main Content Section -->
-    <div class="px-8 md:px-4 md:pl-24 md:pr-28 pt-20 flex-grow">
+    <div class="px-8 md:px-4 md:pl-24 md:pr-28 pt-20 md:pt-16 flex-grow">
       <!-- Header Section -->
       <div class="mb-2 w-[110%]">
         <div class="flex items-center space-x-2">
@@ -35,11 +35,11 @@
         </div>
 
         <!-- Add GIF container - hidden until lg -->
-        <div class="hidden lg:block lg:w-7/12 md:pt-2">
+        <div class="hidden lg:block lg:w-8/12 md:pt-2">
           <div class="video-container">
             <video
               id="hero-video"
-              src="/static/public/renderVioleta.mp4"
+              src="/static/public/pop1.mp4"
               autoplay
               loop
               muted
@@ -263,12 +263,12 @@
     }
 
     .video-effect {
-      filter: blur(1.5px) grayscale(25%) opacity(0.9);
+      filter: contrast(200%) saturate(200%) brightness(0.8);
       transition: filter 0.3s ease-in-out;
     }
 
     .video-container:hover .video-effect {
-      filter: blur(0) grayscale(0) opacity(1);
+      filter: contrast(100%) saturate(100%) brightness(1);
     }
 
     .impulso-text {
