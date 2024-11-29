@@ -5,9 +5,9 @@
 {% endblock %}
 
 {% block body %}
-<div class="w-full max-w-[1180px] mx-auto px-3 md:px-8 mt-8 md:mt-[-4rem] relative">
+<div class="w-full max-w-[1180px] mx-auto px-3 md:px-8 mt-8 md:mt-0 relative">
   <!-- Main Content Section -->
-  <div class="relative h-[840px] md:h-96 bg-black text-white flex flex-col rounded-xl">
+  <div class="relative min-h-[840px] md:min-h-[56vh] bg-black text-white flex flex-col rounded-xl">
     <!-- Navigation for Index Page -->
     <nav class="absolute top-[-1.2rem] right-[-0.4rem] md:right-[-1.2rem] z-50">
       <div class="dropdown dropdown-bottom dropdown-end">
@@ -46,7 +46,7 @@
       </div>
     </nav>
 
-    <div class="px-8 md:px-4 md:pl-24 md:pr-28 pt-20 md:pt-16 flex-grow">
+    <div class="px-8 md:px-4 md:pl-24 md:pr-28 pt-20 md:pt-[10vh] flex-grow">
       <!-- Header Section -->
       <div class="mb-2 w-[110%]">
         <div class="flex items-center space-x-2">
@@ -75,7 +75,7 @@
 
         <!-- Add GIF container - hidden until lg -->
         <div class="hidden lg:block lg:w-11/12">
-          <div class="video-container flex flex-col space-y-4 md:relative md:bottom-20 left-6">
+          <div class="video-container flex flex-col space-y-4 md:relative md:top-[calc(-10vh)] left-6">
             <!-- First Row -->
             <div class="flex space-x-4">
               <div class="w-1/2">
@@ -147,7 +147,7 @@
     </div>
 
     <!-- Services Section -->
-    <div class="absolute top-[calc(100%-1.5rem)] left-1/2 transform -translate-x-1/2 w-[95%] z-10">
+    <div class="absolute bottom-[-1.5rem] left-1/2 transform -translate-x-1/2 w-[95%] z-10">
       <div class="grid grid-cols-2 md:grid-cols-12 h-auto md:h-14 [&>*]:z-10 gap-0 overflow-hidden">
         <!-- Add Opportunity Column -->
         <div class="hidden md:flex bg-orange-500 col-span-1 md:col-span-3 items-center justify-center p-4 md:p-3 group hover:bg-orange-600 transition-all duration-300 rounded-l-xl relative">
