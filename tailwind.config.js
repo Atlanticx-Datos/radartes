@@ -19,6 +19,9 @@ module.exports = {
           lineHeight: '1',
         }],
       },
+      screens: {
+        'laptop': {'raw': '(min-height: 600px) and (max-height: 900px)'},
+      }
     },
   },
   screens: {

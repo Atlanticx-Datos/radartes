@@ -5,11 +5,11 @@
 {% endblock %}
 
 {% block body %}
-<div class="w-full max-w-[1180px] mx-auto px-3 md:px-8 mt-8 md:mt-0 relative">
+<div class="w-full max-w-[1180px] mx-auto px-3 md:px-8 mt-[-4rem] laptop:mt-0 relative">
   <!-- Main Content Section -->
-  <div class="relative min-h-[840px] md:min-h-[56vh] bg-black text-white flex flex-col rounded-xl">
+  <div class="relative h-[960px] md:h-96 bg-black text-white flex flex-col rounded-xl">
     <!-- Navigation for Index Page -->
-    <nav class="absolute top-[-1.2rem] right-[-0.4rem] md:right-[-1.2rem] z-50">
+    <nav class="absolute top-[-1.2rem] right-[-1.2rem] z-[100]">
       <div class="dropdown dropdown-bottom dropdown-end">
         <div tabindex="0" role="button" class="relative">
           <div class="relative">
@@ -46,7 +46,7 @@
       </div>
     </nav>
 
-    <div class="px-8 md:px-4 md:pl-24 md:pr-28 pt-20 md:pt-[10vh] flex-grow">
+    <div class="px-8 md:px-4 md:pl-24 md:pr-28 pt-20 md:pt-16 flex-grow">
       <!-- Header Section -->
       <div class="mb-2 w-[110%]">
         <div class="flex items-center space-x-2">
@@ -75,36 +75,36 @@
 
         <!-- Add GIF container - hidden until lg -->
         <div class="hidden lg:block lg:w-11/12">
-          <div class="video-container flex flex-col space-y-4 md:relative md:top-[calc(-9.7vh)] left-6">
+          <div class="video-container flex flex-col space-y-4 transform -translate-y-24 translate-x-6">
             <!-- First Row -->
             <div class="flex space-x-4">
-              <div class="w-1/2">
+              <div class="w-1/2 aspect-video">
                 <video id="hero-video-1" 
                        data-src="/static/public/pop1.mp4" 
                        poster="/static/public/PosterCande.jpg" 
-                       class="video-element video-effect rounded-md w-full h-[115px] object-cover lazy-video"
+                       class="video-element video-effect rounded-md w-full h-full object-cover lazy-video"
                        playsinline>
                   Your browser does not support the video tag.
                 </video>
               </div>
-              <div class="w-1/2">
+              <div class="w-1/2 aspect-video">
                 <video id="hero-video-2" src="/static/public/pop1.mp4" autoplay loop muted playsinline preload="auto"
-                  poster="/static/public/PosterCande.jpg" class="video-element video-effect rounded-md w-full h-[115px] object-cover">
+                  poster="/static/public/PosterCande.jpg" class="video-element video-effect rounded-md w-full h-full object-cover">
                   Your browser does not support the video tag.
                 </video>
               </div>
             </div>
             <!-- Second Row -->
             <div class="flex space-x-4">
-              <div class="w-1/2">
+              <div class="w-1/2 aspect-video">
                 <video id="hero-video-3" src="/static/public/pop1.mp4" autoplay loop muted playsinline preload="auto"
-                  poster="/static/public/PosterCande.jpg" class="video-element video-effect rounded-md w-full h-[115px] object-cover">
+                  poster="/static/public/PosterCande.jpg" class="video-element video-effect rounded-md w-full h-full object-cover">
                   Your browser does not support the video tag.
                 </video>
               </div>
-              <div class="w-1/2">
+              <div class="w-1/2 aspect-video">
                 <video id="hero-video-4" src="/static/public/pop1.mp4" autoplay loop muted playsinline preload="auto"
-                  poster="/static/public/PosterCande.jpg" class="video-element video-effect rounded-md w-full h-[115px] object-cover">
+                  poster="/static/public/PosterCande.jpg" class="video-element video-effect rounded-md w-full h-full object-cover">
                   Your browser does not support the video tag.
                 </video>
               </div>
@@ -146,11 +146,11 @@
       </div>
     </div>
 
-    <!-- Services Section -->
-    <div class="absolute bottom-[-1.5rem] left-1/2 transform -translate-x-1/2 w-[95%] z-10">
-      <div class="grid grid-cols-2 md:grid-cols-12 h-auto md:h-14 [&>*]:z-10 gap-0 overflow-hidden">
+    <!-- Services Section - Updated positioning and z-index -->
+    <div class="absolute top-[calc(100%-1.5rem)] left-1/2 transform -translate-x-1/2 w-[95%] z-10">
+      <div class="grid grid-cols-2 md:grid-cols-12 min-h-[3.5rem] gap-0 overflow-visible">
         <!-- Add Opportunity Column -->
-        <div class="hidden md:flex bg-orange-500 col-span-1 md:col-span-3 items-center justify-center p-4 md:p-3 group hover:bg-orange-600 transition-all duration-300 rounded-l-xl relative">
+        <div class="hidden md:flex bg-orange-500 col-span-1 md:col-span-3 items-center justify-center p-4 md:p-3 group hover:bg-orange-600 transition-all duration-300 rounded-l-xl relative z-20">
           <a href="#" target="_blank" class="flex items-center space-x-2 text-center">
             <span class="updates-text text-black">Sumá tu convocatoria</span>
             <svg class="w-5 h-5 transform rotate-[-45deg] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5">
@@ -160,7 +160,7 @@
         </div>
 
         <!-- Updates Column -->
-        <div class="hidden md:flex bg-[#0cc7c7] col-span-1 md:col-span-8 items-center justify-center py-2 md:py-0 px-6 relative -mx-[1px]">
+        <div class="hidden md:flex bg-[#0cc7c7] col-span-1 md:col-span-8 items-center justify-center py-2 md:py-0 px-6 relative z-20">
           <div class="flex items-center space-x-4">
             <!-- Counter with notification dot -->
             <div class="relative flex items-center">
@@ -183,7 +183,7 @@
         </div>
 
         <!-- Social Media Column -->
-        <div class="bg-[#10e07f] col-span-2 md:col-span-1 flex items-center justify-center p-4 md:p-3 rounded-xl md:rounded-l-none md:rounded-r-xl relative z-[10]">
+        <div class="bg-[#10e07f] col-span-2 md:col-span-1 flex items-center justify-center p-4 md:p-3 rounded-xl md:rounded-l-none md:rounded-r-xl relative z-20">
           <div class="flex space-x-6 md:space-x-2">
             <a href="mailto:your@email.com"
               class="text-black hover:text-indigo-700 transition-all duration-300 hover:-translate-y-1">
