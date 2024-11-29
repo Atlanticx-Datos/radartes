@@ -5,9 +5,47 @@
 {% endblock %}
 
 {% block body %}
-<div class="max-w-[1180px] mx-3 md:mx-auto">
-  <div class="relative h-[960px] md:h-96 bg-black text-white flex flex-col mt-8 md:mt-0 rounded-xl">
-    <!-- Main Content Section -->
+<div class="w-full max-w-[1180px] mx-auto px-3 md:px-8 mt-8 md:mt-[-4rem] relative">
+  <!-- Main Content Section -->
+  <div class="relative h-[840px] md:h-96 bg-black text-white flex flex-col rounded-xl">
+    <!-- Navigation for Index Page -->
+    <nav class="absolute top-[-1.2rem] right-[-0.4rem] md:right-[-1.2rem] z-50">
+      <div class="dropdown dropdown-bottom dropdown-end">
+        <div tabindex="0" role="button" class="relative">
+          <div class="relative">
+            <span class="flex items-center justify-center w-10 h-10 bg-slate-400 rounded-full">
+              <svg class="w-5 h-5" data-slot="icon" fill="currentColor" viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path
+                    d="M10 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM10 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM11.5 15.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z" />
+              </svg>
+            </span>
+            <span class="absolute top-0 right-0 flex h-2 w-2">
+              <span
+                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+            </span>
+          </div>
+        </div>
+        <ul tabindex="0"
+            class="dropdown-content z-[1] menu p-2 bg-base-100 rounded-md w-52 border border-black border-4 mt-3 text-black bg-gray-200">
+          <li><a href="{{ url_for('all_pages') }}" onclick="showSpinner(event)"><span
+                  class="border-l-4 border-accent pl-3">Oportunidades</span></a></li>
+          <li><a href="{{ url_for('list_saved_opportunities') }}" onclick="showSpinner(event)"><span
+                  class="border-l-4 border-secondary pl-3">Guardadas</span></a></li>
+          <li><a href="{{ url_for('index') }}"><span class="border-l-4 border-black pl-3">Home</span></a>
+          </li>
+          {% if session.get('user') %}
+          <li><a href="https://github.com/Atlanticx-Datos/100_Oportunidades" target="_blank"
+                  rel="noopener noreferrer"><span class="border-l-4 border-primary pl-3">GitHub</span></a>
+          </li>
+          <li><a href="{{ url_for('logout') }}"><span
+                  class="border-l-4 border-base-200 pl-3">Cerrar</span></a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </nav>
+
     <div class="px-8 md:px-4 md:pl-24 md:pr-28 pt-20 md:pt-16 flex-grow">
       <!-- Header Section -->
       <div class="mb-2 w-[110%]">
@@ -32,10 +70,7 @@
               class="hidden md:block hero-text md:font-extrabold md:tracking-normal mr-8 hero-break:leading-[1.1] uppercase pr-2 relative top-1">
               Tu <span class="mr-3 text-indigo-500 impulso-text">impulso</span><br>en artes y cultura.
             </p>
-
-
           </div>
-
         </div>
 
         <!-- Add GIF container - hidden until lg -->
@@ -78,8 +113,8 @@
         </div>
 
         <!-- Right Column -->
-        <div class="w-full md:w-3/4 md:hidden">
-          <div class="py-8 px-8 md:px-12 text-black rounded-xl mb-20 md:mb-0">
+        <div class="w-full md:w-3/4 md:hidden bg-white">
+          <div class="py-8 px-8 md:px-12 text-black rounded-xl mb-4 md:mb-0">
             <!-- Level 1: Primary message - Audience definition -->
             <p class="text-sm font-bold uppercase text-left leading-tight">
               Si sos artista, investigador o gestor cultural, entrá para informarte.
@@ -111,26 +146,26 @@
       </div>
     </div>
 
-    <!-- Services Section - Modified to eliminate gaps -->
+    <!-- Services Section -->
     <div class="absolute top-[calc(100%-1.5rem)] left-1/2 transform -translate-x-1/2 w-[95%] z-10">
       <div class="grid grid-cols-2 md:grid-cols-12 h-auto md:h-14 [&>*]:z-10 gap-0 overflow-hidden">
         <!-- Add Opportunity Column -->
-        <div class="bg-orange-500 col-span-1 md:col-span-3 flex items-center justify-center p-4 md:p-3 group hover:bg-orange-600 transition-all duration-300 rounded-l-xl relative">
-          <a href="#" target="_blank" class="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-2 text-center">
-            <span class="hidden md:block updates-text text-black">Sumá tu convocatoria</span>
-            <svg class="hidden md:block w-5 h-5 md:w-5 md:h-5 transform rotate-[-45deg] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 arrow-md">
+        <div class="hidden md:flex bg-orange-500 col-span-1 md:col-span-3 items-center justify-center p-4 md:p-3 group hover:bg-orange-600 transition-all duration-300 rounded-l-xl relative">
+          <a href="#" target="_blank" class="flex items-center space-x-2 text-center">
+            <span class="updates-text text-black">Sumá tu convocatoria</span>
+            <svg class="w-5 h-5 transform rotate-[-45deg] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19l14-14m0 0h-9m9 0v9" />
             </svg>
           </a>
         </div>
 
-        <!-- Updates Column - Added negative margins to overlap borders -->
-        <div class="bg-[#0cc7c7] col-span-1 md:col-span-8 flex items-center justify-center py-2 md:py-0 px-6 relative -mx-[1px]">
-          <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+        <!-- Updates Column -->
+        <div class="hidden md:flex bg-[#0cc7c7] col-span-1 md:col-span-8 items-center justify-center py-2 md:py-0 px-6 relative -mx-[1px]">
+          <div class="flex items-center space-x-4">
             <!-- Counter with notification dot -->
             <div class="relative flex items-center">
-              <span class="hidden md:block counter-md md:text-base text-xl font-medium text-black border-b-2 border-black">+25</span>
-              <div class="absolute -right-2 top-0 hidden md:block notification-dot-md">
+              <span class="text-base font-medium text-black border-b-2 border-black">+25</span>
+              <div class="absolute -right-2 top-0">
                 <span class="flex h-1.5 w-1.5">
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                   <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
@@ -138,18 +173,17 @@
               </div>
             </div>
             <!-- Text -->
-            <div class="flex items-center justify-center w-full md:w-auto text-center">
-              <span class="hidden md:block updates-text text-black">
-                <span class="mr-2 separator-md">⎸</span>
-                <span class="updates-text-full">Actualizamos y verificamos.</span>
-                <span class="updates-text-truncated hidden">{{ "Actualizamos y verificamos becas, movilidad, premios" | truncate(65, true, "...") }}</span>
+            <div class="flex items-center justify-center">
+              <span class="updates-text text-black">
+                <span class="mr-2">⎸</span>
+                <span>Actualizamos y verificamos.</span>
               </span>
             </div>
           </div>
         </div>
 
         <!-- Social Media Column -->
-        <div class="bg-[#10e07f] col-span-2 md:col-span-1 flex items-center justify-center p-4 md:p-3 rounded-r-xl relative z-[10]">
+        <div class="bg-[#10e07f] col-span-2 md:col-span-1 flex items-center justify-center p-4 md:p-3 rounded-xl md:rounded-l-none md:rounded-r-xl relative z-[10]">
           <div class="flex space-x-6 md:space-x-2">
             <a href="mailto:your@email.com"
               class="text-black hover:text-indigo-700 transition-all duration-300 hover:-translate-y-1">
@@ -172,186 +206,191 @@
         </div>
       </div>
     </div>
+
+    <!-- Footer Section - Positioned relative to main content -->
+    <div class="w-full mt-8 z-20 relative">
+      {% include 'footer.html' %}
+    </div>
   </div>
+</div>
 
-  <!-- Spinner -->
-  <div id="spinner" class="spinner h-8 w-8">
-    <img src="/static/public/spinner.gif" alt="Loading...">
-  </div>
+<!-- Spinner -->
+<div id="spinner" class="spinner h-8 w-8">
+  <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
+</div>
 
-  <style>
-    .spinner {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 1000;
-    }
+<style>
+  .spinner {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+  }
 
+  .gratis-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 3.5rem;
+    line-height: 0.88;
+    color: #6366F1;
+    font-weight: 900;
+  }
+
+  @media (max-width: 768px) {
     .gratis-text {
-      font-family: 'Inter', sans-serif;
-      font-size: 3.5rem;
+      font-size: 3.6rem;
       line-height: 0.88;
-      color: #6366F1;
       font-weight: 900;
     }
+  }
 
-    @media (max-width: 768px) {
-      .gratis-text {
-        font-size: 3.6rem;
-        line-height: 0.88;
-        font-weight: 900;
-      }
-    }
+  .hero-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 3.1rem;
+    line-height: 0.88;
+    font-weight: 700;
+  }
 
+  @media (min-width: 768px) and (max-width: 958px) {
     .hero-text {
-      font-family: 'Poppins', sans-serif;
-      font-size: 3.1rem;
-      line-height: 0.88;
-      font-weight: 700;
+      font-size: 4rem;
+      /* Slightly smaller to prevent 5th line wrap */
+      line-height: 0.95;
+      font-weight: 300;
     }
+  }
 
-    @media (min-width: 768px) and (max-width: 958px) {
-      .hero-text {
-        font-size: 4rem;
-        /* Slightly smaller to prevent 5th line wrap */
-        line-height: 0.95;
-        font-weight: 300;
-      }
+  @media (min-width: 958px) {
+    .hero-text {
+      font-size: 4rem;
+      line-height: 0.98;
+      font-weight: 600;
     }
+  }
 
-    @media (min-width: 958px) {
-      .hero-text {
-        font-size: 4rem;
-        line-height: 0.98;
-        font-weight: 600;
-      }
-    }
+  .hero-mobile {
+    font-family: 'Poppins', sans-serif;
+    font-size: 3.1rem;
+    line-height: 1;
+    font-weight: 700;
+  }
 
+  @media (min-width: 768px) {
     .hero-mobile {
-      font-family: 'Poppins', sans-serif;
-      font-size: 3.1rem;
-      line-height: 1;
-      font-weight: 700;
-    }
-
-    @media (min-width: 768px) {
-      .hero-mobile {
-        font-size: 5.2rem;
-        line-height: 0.88;
-        font-weight: 500;
-      }
-    }
-
-    .updates-text {
-      font-size: 1rem;
-      line-height: 1.5;
+      font-size: 5.2rem;
+      line-height: 0.88;
       font-weight: 500;
     }
+  }
 
-    @media (min-width: 768px) and (max-width: 1023px) {
-      .updates-text {
-        white-space: nowrap;
-        font-size: 0.875rem;
-        letter-spacing: -0.01em;
+  .updates-text {
+    font-size: 1rem;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .updates-text {
+      white-space: nowrap;
+      font-size: 0.875rem;
+      letter-spacing: -0.01em;
+    }
+
+    /* Hide elements between md and lg */
+    .counter-md,
+    .arrow-md,
+    .notification-dot-md,
+    .separator-md,
+    .updates-text-full {
+      display: none;
+    }
+
+    /* Show truncated version */
+    .updates-text-truncated {
+      display: block;
+    }
+  }
+
+  /* Remove the larger breakpoint styles since we want default behavior after lg */
+
+  @media screen {
+    .debug-footer {
+      outline: 2px solid red;
+      /* This will help us see if styles are loading */
+    }
+  }
+
+  /* Force footer visibility */
+  @media (min-width: 768px) {
+    .md\:h-16 {
+      height: 4rem !important;
+    }
+  }
+
+  .video-effect {
+    filter: contrast(200%) saturate(200%) brightness(0.8);
+    transition: filter 0.3s ease-in-out;
+  }
+
+  .video-container:hover .video-effect {
+    filter: contrast(100%) saturate(100%) brightness(1);
+  }
+
+  .impulso-text {
+    font-weight: 900;
+    /* Ensures the font-weight is 900 */
+  }
+
+  .video-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0rem;
+    /* Space between videos */
+  }
+
+  .video-element {
+    width: 100%;
+    /* Adjust width as needed */
+    max-width: 400px;
+    /* Optional: limit */
+  }
+</style>
+
+<script>
+  // Lazy load videos
+  document.addEventListener('DOMContentLoaded', function() {
+      const lazyVideos = document.querySelectorAll('.lazy-video');
+      
+      const videoObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                  const video = entry.target;
+                  video.src = video.dataset.src;
+                  video.load();
+                  video.play();
+                  video.setAttribute('autoplay', '');
+                  video.setAttribute('loop', '');
+                  video.setAttribute('muted', '');
+                  observer.unobserve(video);
+              }
+          });
+      });
+
+      lazyVideos.forEach(video => videoObserver.observe(video));
+  });
+
+  // Optimize spinner behavior
+  function showSpinner(event) {
+      const spinner = document.getElementById('spinner');
+      if (spinner) {
+          spinner.style.display = 'block';
+          // Add timeout to prevent infinite loading state
+          setTimeout(() => {
+              spinner.style.display = 'none';
+          }, 10000);
       }
-
-      /* Hide elements between md and lg */
-      .counter-md,
-      .arrow-md,
-      .notification-dot-md,
-      .separator-md,
-      .updates-text-full {
-        display: none;
-      }
-
-      /* Show truncated version */
-      .updates-text-truncated {
-        display: block;
-      }
-    }
-
-    /* Remove the larger breakpoint styles since we want default behavior after lg */
-
-    @media screen {
-      .debug-footer {
-        outline: 2px solid red;
-        /* This will help us see if styles are loading */
-      }
-    }
-
-    /* Force footer visibility */
-    @media (min-width: 768px) {
-      .md\:h-16 {
-        height: 4rem !important;
-      }
-    }
-
-    .video-effect {
-      filter: contrast(200%) saturate(200%) brightness(0.8);
-      transition: filter 0.3s ease-in-out;
-    }
-
-    .video-container:hover .video-effect {
-      filter: contrast(100%) saturate(100%) brightness(1);
-    }
-
-    .impulso-text {
-      font-weight: 900;
-      /* Ensures the font-weight is 900 */
-    }
-
-    .video-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0rem;
-      /* Space between videos */
-    }
-
-    .video-element {
-      width: 100%;
-      /* Adjust width as needed */
-      max-width: 400px;
-      /* Optional: limit */
-    }
-  </style>
-
-  <script>
-    // Lazy load videos
-    document.addEventListener('DOMContentLoaded', function() {
-        const lazyVideos = document.querySelectorAll('.lazy-video');
-        
-        const videoObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const video = entry.target;
-                    video.src = video.dataset.src;
-                    video.load();
-                    video.play();
-                    video.setAttribute('autoplay', '');
-                    video.setAttribute('loop', '');
-                    video.setAttribute('muted', '');
-                    observer.unobserve(video);
-                }
-            });
-        });
-
-        lazyVideos.forEach(video => videoObserver.observe(video));
-    });
-
-    // Optimize spinner behavior
-    function showSpinner(event) {
-        const spinner = document.getElementById('spinner');
-        if (spinner) {
-            spinner.style.display = 'block';
-            // Add timeout to prevent infinite loading state
-            setTimeout(() => {
-                spinner.style.display = 'none';
-            }, 10000);
-        }
-    }
-  </script>
-</div>
+  }
+</script>
 {% endblock %}

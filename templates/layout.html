@@ -146,60 +146,68 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind-built.css') }}" media="print" onload="this.media='all'">
 </head>
 
-<body class="flex justify-center bg-slate-100 min-h-screen" data-route="{{ request.endpoint }}">
+<body class="flex justify-center items-center bg-slate-100 min-h-screen" data-route="{{ request.endpoint }}">
     <div id="layout-spinner" class="spinner h-8 w-8" style="display: none;">
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
     </div>
-    <main class="w-full min-h-screen bg-slate-100">
-        <div class="max-w-[1180px] mx-auto {% if request.endpoint == 'all_pages' %}md:-mr-1{% endif %} md:mt-8"> 
-            <nav class="flex justify-between items-center space-x-4 h-[34px] md:h-24 pt-8 md:pt-2 pb-2 px-4 md:px-12 2xl:px-28 z-50">
-                <a href="/">
-                    <svg class="w-6 h-6 md:hidden" data-slot="icon" fill="currentColor" viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path clip-rule="evenodd" fill-rule="evenodd"
-                            d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" />
-                    </svg>
-                </a>
-                <div class="flex-grow hidden md:block"></div>
-                
-                <div class="dropdown dropdown-bottom dropdown-end mt-2 z-50 md:pr-0">
-                    <div tabindex="0" role="button" class="relative">
-                        <div class="relative">
-                            <span class="flex items-center justify-center w-10 h-10 bg-slate-200 rounded-full">
-                                <svg class="w-5 h-5" data-slot="icon" fill="currentColor" viewBox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                    <path
-                                        d="M10 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM10 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM11.5 15.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z" />
-                                </svg>
-                            </span>
-                            <span class="absolute top-0 right-0 flex h-2 w-2">
-                                <span
-                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                            </span>
+    <main class="w-full min-h-screen bg-slate-100 flex flex-col">
+        <!-- Navigation - only show on non-index pages -->
+        {% if request.endpoint != 'index' %}
+        <div class="w-full flex-shrink-0">
+            <div class="max-w-[1400px] mx-auto px-4">
+                <nav class="flex justify-between items-center h-[34px] md:h-16 pt-4 md:pt-8 z-50 md:pr-4">
+                    <a href="/">
+                        <svg class="w-6 h-6 md:hidden" data-slot="icon" fill="currentColor" viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path clip-rule="evenodd" fill-rule="evenodd"
+                                d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" />
+                        </svg>
+                    </a>
+                    <div class="flex-grow hidden md:block"></div>
+                    
+                    <div class="dropdown dropdown-bottom dropdown-end z-50 relative">
+                        <div tabindex="0" role="button" class="relative">
+                            <div class="relative">
+                                <span class="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full">
+                                    <svg class="w-5 h-5" data-slot="icon" fill="currentColor" viewBox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path
+                                            d="M10 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM10 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM11.5 15.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z" />
+                                    </svg>
+                                </span>
+                                <span class="absolute top-0 right-0 flex h-2 w-2">
+                                    <span
+                                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                </span>
+                            </div>
                         </div>
+                        <ul tabindex="0"
+                            class="dropdown-content z-[1] menu p-2 bg-base-100 rounded-md w-52 border border-black mt-3">
+                            <li><a href="{{ url_for('all_pages') }}" onclick="layoutshowSpinner(event)"><span
+                                        class="border-l-4 border-accent pl-3">Oportunidades</span></a></li>
+                            <li><a href="{{ url_for('list_saved_opportunities') }}" onclick="layoutshowSpinner(event)"><span
+                                        class="border-l-4 border-secondary pl-3">Guardadas</span></a></li>
+                            <li><a href="{{ url_for('index') }}"><span class="border-l-4 border-black pl-3">Home</span></a>
+                            </li>
+                            {% if session.get('user') %}
+                            <li><a href="https://github.com/Atlanticx-Datos/100_Oportunidades" target="_blank"
+                                    rel="noopener noreferrer"><span class="border-l-4 border-primary pl-3">GitHub</span></a>
+                            </li>
+                            <li><a href="{{ url_for('logout') }}"><span
+                                        class="border-l-4 border-base-200 pl-3">Cerrar</span></a></li>
+                            {% endif %}
+                        </ul>
                     </div>
-                    <ul tabindex="0"
-                        class="dropdown-content z-[1] menu p-2 bg-base-100 rounded-md w-52 border border-black mt-3">
-                        <li><a href="{{ url_for('all_pages') }}" onclick="layoutshowSpinner(event)"><span
-                                    class="border-l-4 border-accent pl-3">Oportunidades</span></a></li>
-                        <li><a href="{{ url_for('list_saved_opportunities') }}" onclick="layoutshowSpinner(event)"><span
-                                    class="border-l-4 border-secondary pl-3">Guardadas</span></a></li>
-                        <li><a href="{{ url_for('index') }}"><span class="border-l-4 border-black pl-3">Home</span></a>
-                        </li>
-                        {% if session.get('user') %}
-                        <li><a href="https://github.com/Atlanticx-Datos/100_Oportunidades" target="_blank"
-                                rel="noopener noreferrer"><span class="border-l-4 border-primary pl-3">GitHub</span></a>
-                        </li>
-                        <li><a href="{{ url_for('logout') }}"><span
-                                    class="border-l-4 border-base-200 pl-3">Cerrar</span></a></li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </nav>
+                </nav>
+            </div>
         </div>
-        {% block body %}{% endblock %}
-        {% include 'footer.html' %}
+        {% endif %}
+
+        <!-- Content wrapper -->
+        <div class="flex-grow flex items-center justify-center">
+            {% block body %}{% endblock %}
+        </div>
     </main>
     <script>
         function layoutshowSpinner(event) {
