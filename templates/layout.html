@@ -40,12 +40,15 @@
     <meta property="fb:app_id" content="your_facebook_app_id"> <!-- If you have a Facebook app -->
 
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=YOUR-GA4-ID"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-36M4V4L5RX"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', 'G-36M4V4L5RX');
+        gtag('config', 'G-36M4V4L5RX', {
+            'anonymize_ip': true,
+            'cookie_flags': 'SameSite=None;Secure'
+        });
     </script>
 
     <link href="{{ url_for('static', filename='css/tailwind-built.css') }}" rel="stylesheet">
@@ -70,6 +73,7 @@
         .dropdown-content {
             position: fixed;
             z-index: 999999 !important;
+            background-color: azure;
         }
 
         @media (min-width: 768px) {
@@ -121,14 +125,33 @@
 
     <!-- Preload the poster image -->
     <link rel="preload" href="{{ url_for('static', filename='public/PosterCande.jpg') }}" as="image">
+
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" as="style">
+    
+    <!-- Move critical CSS inline -->
+    <style>
+        /* Critical CSS */
+        body { opacity: 0; animation: fadeIn 0.3s ease-in forwards; }
+        @keyframes fadeIn { to { opacity: 1; } }
+        
+        /* Optimize loading behavior */
+        .js-loading * {
+            transition: none !important;
+        }
+    </style>
+    
+    <!-- Defer non-critical CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind-built.css') }}" media="print" onload="this.media='all'">
 </head>
 
-<body class="flex justify-center bg-slate-100" data-route="{{ request.endpoint }}">
+<body class="flex justify-center bg-slate-100 min-h-screen" data-route="{{ request.endpoint }}">
     <div id="layout-spinner" class="spinner h-8 w-8" style="display: none;">
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
     </div>
-    <main class="w-full mx-auto pl-0 pr-0 md:pr-6 lg:pr-8 xl:pr-10 2xl:pr-12 md:pl-3 lg:pl-4 xl:pl-5 2xl:pl-6 mt-8 max-w-screen-2xl relative">
-        <div class="max-w-[1180px] mx-auto {% if request.endpoint == 'all_pages' %}md:-mr-1{% endif %}"> 
+    <main class="w-full min-h-screen bg-slate-100">
+        <div class="max-w-[1180px] mx-auto {% if request.endpoint == 'all_pages' %}md:-mr-1{% endif %} md:mt-8"> 
             <nav class="flex justify-between items-center space-x-4 h-[34px] md:h-24 pt-8 md:pt-2 pb-2 px-4 md:px-12 2xl:px-28 z-50">
                 <a href="/">
                     <svg class="w-6 h-6 md:hidden" data-slot="icon" fill="currentColor" viewBox="0 0 20 20"
