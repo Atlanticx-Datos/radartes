@@ -2713,8 +2713,8 @@ details.collapse summary::-webkit-details-marker {
   .md\:top-3 {
     top: 0.75rem;
   }
-  .md\:top-\[calc\(-10vh\)\] {
-    top: calc(-10vh);
+  .md\:top-\[calc\(-9\.7vh\)\] {
+    top: calc(-9.7vh);
   }
   .md\:col-span-1 {
     grid-column: span 1 / span 1;
