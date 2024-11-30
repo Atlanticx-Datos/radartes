@@ -5,11 +5,11 @@
 {% endblock %}
 
 {% block body %}
-<div class="w-full max-w-[1180px] mx-auto px-3 md:px-8 mt-[-4rem] laptop:mt-10 relative">
+<div class="w-full max-w-[1180px] mx-auto px-3 md:px-8 mt-[-4rem] laptop:mt-16 relative">
   <!-- Main Content Section -->
-  <div class="relative h-[960px] md:h-[600px] bg-black text-white flex flex-col rounded-xl">
+  <div class="relative h-[800px] md:h-[600px] bg-black text-white flex flex-col rounded-xl">
     <!-- Navigation for Index Page -->
-    <nav class="absolute top-[-1.2rem] right-[-1.2rem] z-[100]">
+    <nav class="absolute top-[-1.2rem] right-[-0.5rem] md:right-[-1.2rem] z-[100]">
       <div class="dropdown dropdown-bottom dropdown-end">
         <div tabindex="0" role="button" class="relative">
           <div class="relative">
@@ -29,18 +29,32 @@
         </div>
         <ul tabindex="0"
             class="dropdown-content z-[1] menu p-2 bg-base-100 rounded-md w-52 border border-black border-4 mt-3 text-black bg-gray-200">
-          <li><a href="{{ url_for('all_pages') }}" onclick="showSpinner(event)"><span
-                  class="border-l-4 border-accent pl-3">Oportunidades</span></a></li>
-          <li><a href="{{ url_for('list_saved_opportunities') }}" onclick="showSpinner(event)"><span
-                  class="border-l-4 border-secondary pl-3">Guardadas</span></a></li>
-          <li><a href="{{ url_for('index') }}"><span class="border-l-4 border-black pl-3">Home</span></a>
+          <li>
+            <a href="{{ url_for('all_pages') }}" onclick="showSpinner(event)">
+              <span class="border-l-4 border-accent pl-3 uppercase font-semibold">Oportunidades</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('list_saved_opportunities') }}" onclick="showSpinner(event)">
+              <span class="border-l-4 border-secondary pl-3 uppercase font-semibold">Guardadas</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('index') }}">
+              <span class="border-l-4 border-black pl-3 uppercase font-semibold">Home</span>
+            </a>
           </li>
           {% if session.get('user') %}
-          <li><a href="https://github.com/Atlanticx-Datos/100_Oportunidades" target="_blank"
-                  rel="noopener noreferrer"><span class="border-l-4 border-primary pl-3">GitHub</span></a>
+          <li>
+            <a href="https://github.com/Atlanticx-Datos/100_Oportunidades" target="_blank" rel="noopener noreferrer">
+              <span class="border-l-4 border-primary pl-3 uppercase font-semibold">GitHub</span>
+            </a>
           </li>
-          <li><a href="{{ url_for('logout') }}"><span
-                  class="border-l-4 border-base-200 pl-3">Cerrar</span></a></li>
+          <li>
+            <a href="{{ url_for('logout') }}">
+              <span class="border-l-4 border-base-200 pl-3 uppercase font-semibold">Cerrar</span>
+            </a>
+          </li>
           {% endif %}
         </ul>
       </div>
@@ -60,16 +74,13 @@
         </p>
       </div>
 
-      <!-- Right Column - Single Video -->
+      <!-- Right Column - Static Image -->
       <div class="h-[50vh] md:h-full w-full md:w-1/2">
-        <video 
-          id="hero-video-1" 
-          data-src="/static/public/pop1.mp4" 
-          poster="/static/public/PosterCande.jpg" 
-          class="w-full h-full object-cover video-effect lazy-video"
-          playsinline>
-          Your browser does not support the video tag.
-        </video>
+        <img 
+          src="/static/public/PosterCande.jpg" 
+          alt="Hero Image"
+          class="w-full h-full object-cover video-effect"
+        >
       </div>
     </div>
 
