@@ -5,9 +5,9 @@
 {% endblock %}
 
 {% block body %}
-<div class="w-full max-w-[1180px] mx-auto px-3 md:px-8 mt-[-4rem] laptop:mt-0 relative">
+<div class="w-full max-w-[1180px] mx-auto px-3 md:px-8 mt-[-4rem] laptop:mt-10 relative">
   <!-- Main Content Section -->
-  <div class="relative h-[960px] md:h-96 bg-black text-white flex flex-col rounded-xl">
+  <div class="relative h-[960px] md:h-[450px] bg-black text-white flex flex-col rounded-xl">
     <!-- Navigation for Index Page -->
     <nav class="absolute top-[-1.2rem] right-[-1.2rem] z-[100]">
       <div class="dropdown dropdown-bottom dropdown-end">
@@ -46,7 +46,7 @@
       </div>
     </nav>
 
-    <div class="px-8 md:px-4 md:pl-24 md:pr-28 pt-20 md:pt-12 flex-grow">
+    <div class="px-8 md:px-4 md:pl-24 md:pr-28 pt-20 md:pt-10 flex-grow">
       <!-- Header Section -->
       <div class="mb-2 w-[110%]">
         <div class="flex items-center space-x-2">
@@ -74,8 +74,8 @@
         </div>
 
         <!-- Add GIF container - hidden until lg -->
-        <div class="hidden lg:block lg:w-11/12">
-          <div class="video-container flex flex-col space-y-4 transform -translate-y-20 translate-x-6">
+        <div class="hidden lg:block lg:w-9/12">
+          <div class="video-container flex flex-col space-y-4 transform -translate-y-12 translate-x-6">
             <!-- First Row -->
             <div class="flex space-x-4">
               <div class="w-1/2 aspect-video">
@@ -175,8 +175,8 @@
             <!-- Text -->
             <div class="flex items-center justify-center">
               <span class="updates-text text-black">
-                <span class="mr-2">⎸</span>
-                <span>Actualizamos y verificamos.</span>
+                <span class="mr-2"></span>
+                <span>Actualizamos y verificamos becas, premios, convocatorias y movilidad.</span>
               </span>
             </div>
           </div>
@@ -263,8 +263,8 @@
 
   @media (min-width: 958px) {
     .hero-text {
-      font-size: 4rem;
-      line-height: 0.98;
+      font-size: 4.7rem;
+      line-height: 0.78;
       font-weight: 600;
     }
   }
@@ -355,6 +355,26 @@
     /* Adjust width as needed */
     max-width: 400px;
     /* Optional: limit */
+  }
+
+  @media (min-width: 1024px) and (max-width: 1279px) {
+    .hero-text {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 3.8rem;  /* Slightly smaller than the default 4.7rem */
+      line-height: 1;     /* Adjusted line height for better fit */
+    }
+  }
+
+  /* Keep original size for larger screens */
+  @media (min-width: 1280px) {
+    .hero-text {
+      font-size: 4.7rem;
+      line-height: 0.98;
+    }
   }
 </style>
 
