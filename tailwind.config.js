@@ -1,6 +1,17 @@
 module.exports = {
   content: ['./templates/**/*.html', './static/js/**/*.js'],
   theme: {
+    screens: {
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1336px',
+      'small-phone': {'raw': '(max-height: 667px)'},
+      'mid-phone': {'raw': '(min-height: 668px) and (max-height: 800px)'},
+      'tall-phone': {'raw': '(min-height: 801px) and (max-height: 900px)'},
+      'laptop': {'raw': '(min-height: 901px)'},
+    },
     extend: {
       fontFamily: {
         sans: ['Inter', 'sans-serif'], // Setting Inter as the default sans-serif font
@@ -19,17 +30,7 @@ module.exports = {
           lineHeight: '1',
         }],
       },
-      screens: {
-        'laptop': {'raw': '(min-height: 600px) and (max-height: 900px)'},
-      }
     },
-  },
-  screens: {
-    'sm': '640px',
-    'md': '768px',
-    'lg': '1024px',
-    'xl': '1280px',
-    '2xl': '1336px',
   },
   daisyui: {
     themes: [

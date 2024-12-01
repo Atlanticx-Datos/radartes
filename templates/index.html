@@ -5,11 +5,19 @@
 {% endblock %}
 
 {% block body %}
-<div class="w-full max-w-[1180px] mx-auto px-3 md:px-8 mt-[-4rem] laptop:mt-16 relative">
+<div class="w-full max-w-[1180px] mx-auto px-3 md:px-8 relative">
   <!-- Main Content Section -->
-  <div class="relative h-[800px] md:h-[600px] bg-black text-white flex flex-col rounded-xl">
+  <div class="relative bg-black text-white flex flex-col rounded-xl
+              h-[800px]                    /* Default height */
+              h-[667px]:h-[700px]          /* Shorter for small phones */
+              h-[800px]:h-[800px]          /* Standard for mid phones */
+              h-[900px]:h-[960px]          /* Taller for large phones */
+              md:h-[600px]">               
     <!-- Navigation for Index Page -->
-    <nav class="absolute top-[-1.2rem] right-[-0.5rem] md:right-[-1.2rem] z-[100]">
+    <nav class="absolute 
+                top-[-1.2rem]
+                right-[-0.5rem] md:right-[-1.2rem] 
+                z-[100]">
       <div class="dropdown dropdown-bottom dropdown-end">
         <div tabindex="0" role="button" class="relative">
           <div class="relative">
@@ -247,11 +255,19 @@
     font-weight: 700;
   }
 
+  /* Small phones (iPhone SE, 6, 7, 8) */
+  @media (max-height: 667px) {
+    .hero-mobile {
+        font-size: 2.5rem;
+        line-height: 1;
+    }
+  }
+
   @media (min-width: 768px) {
     .hero-mobile {
-      font-size: 4rem;
-      line-height: 0.88;
-      font-weight: 500;
+        font-size: 4rem;
+        line-height: 0.88;
+        font-weight: 500;
     }
   }
 
@@ -328,6 +344,13 @@
 
   .translate-x-neg {
     transform: translateX(-100%);
+  }
+
+  /* Base wrapper positioning */
+  @media (min-height: 896px) and (max-width: 428px) {
+    .w-full.max-w-\[1180px\] {
+      margin-top: 4rem !important; /* Ensure this overrides other margins for tall phones */
+    }
   }
 </style>
 

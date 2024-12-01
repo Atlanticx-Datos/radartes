@@ -121,6 +121,19 @@
             height: 8px; /* Circle size */
             border: 1px solid black; /* To ensure visibility against the track */
         }
+
+        /* Add to your existing styles */
+        @media (min-height: 926px) and (max-width: 428px) {
+            main .flex-grow.flex {
+                padding-top: 5rem !important;
+            }
+        }
+
+        @media (min-height: 896px) and (max-height: 925px) and (max-width: 428px) {
+            main .flex-grow.flex {
+                padding-top: 3rem !important;
+            }
+        }
     </style>
 
     <!-- Preload the poster image -->
@@ -146,7 +159,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind-built.css') }}" media="print" onload="this.media='all'">
 </head>
 
-<body class="flex justify-center items-center bg-slate-100 min-h-screen" data-route="{{ request.endpoint }}">
+<body class="flex justify-center items-center bg-slate-100 min-h-screen">
     <div id="layout-spinner" class="spinner h-8 w-8" style="display: none;">
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
     </div>
@@ -205,7 +218,12 @@
         {% endif %}
 
         <!-- Content wrapper -->
-        <div class="flex-grow flex items-center justify-center">
+        <div class="flex-grow flex items-center justify-center 
+                    pt-8                     /* Default/mobile padding */
+                    h-[667px]:pt-6          /* Smaller phones */
+                    h-[896px]:pt-10         /* iPhone XR */
+                    h-[926px]:pt-12         /* iPhone 13 Pro Max */
+                    md:pt-16">            
             {% block body %}{% endblock %}
         </div>
     </main>
