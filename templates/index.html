@@ -74,13 +74,30 @@
         </p>
       </div>
 
-      <!-- Right Column - Static Image -->
-      <div class="h-[50vh] md:h-full w-full md:w-1/2">
-        <img 
-          src="/static/public/PosterCande.jpg" 
-          alt="Hero Image"
-          class="w-full h-full object-cover video-effect"
-        >
+      <!-- Right Column - Image Gallery -->
+      <div class="h-[50vh] md:h-full w-full md:w-1/2 overflow-hidden relative">
+        <div class="gallery-container w-full h-full">
+          <img 
+            src="/static/public/Pao.png" 
+            alt="Hero Image 1"
+            class="gallery-image w-full h-full object-cover effect-level-1"
+          >
+          <img 
+            src="/static/public/Manu.png" 
+            alt="Hero Image 2"
+            class="gallery-image w-full h-full object-cover effect-level-1 translate-x-full"
+          >
+          <img 
+            src="/static/public/Boquita_Still.png" 
+            alt="Hero Image 2"
+            class="gallery-image w-full h-full object-cover effect-level-1 translate-x-full"
+          >
+          <img 
+            src="/static/public/Gaia.png" 
+            alt="Hero Image 2"
+            class="gallery-image w-full h-full object-cover effect-level-1 translate-x-full"
+          >
+        </div>
       </div>
     </div>
 
@@ -282,31 +299,35 @@
     }
   }
 
-  .video-effect {
-    filter: contrast(200%) saturate(200%) brightness(0.8);
-    transition: filter 0.3s ease-in-out;
+  .gallery-container {
+    position: relative;
   }
 
-  .video-container:hover .video-effect {
-    filter: contrast(100%) saturate(100%) brightness(1);
+  .gallery-image {
+    position: absolute;
+    transition: transform 1.5s ease-in-out, opacity 0.3s ease-in-out;
   }
 
-  .impulso-text {
-    font-weight: 900;
-    /* Ensures the font-weight is 900 */
+  /* Original effect */
+  .effect-level-1 {
+    filter: contrast(200%) saturate(200%) brightness(0.9);
   }
 
-  .video-container {
-    display: block;
-    line-height: 0;
+  /* Brighter and more colorful - final effect */
+  .effect-level-2 {
+    filter: contrast(220%) saturate(250%) brightness(1);
   }
 
-  .video-element {
-    width: 65%;
-    max-width: 280px;
-    display: block;
-    margin: 0;
-    padding: 0;
+  .translate-x-full {
+    transform: translateX(100%);
+  }
+
+  .translate-x-zero {
+    transform: translateX(0);
+  }
+
+  .translate-x-neg {
+    transform: translateX(-100%);
   }
 </style>
 
@@ -344,5 +365,39 @@
           }, 10000);
       }
   }
+
+  // Simple JavaScript to test image switching
+  document.addEventListener('DOMContentLoaded', function() {
+    const images = document.querySelectorAll('.gallery-image');
+    let currentIndex = 0;
+
+    function switchImage() {
+      const currentImage = images[currentIndex];
+      const nextIndex = (currentIndex + 1) % images.length;
+      const nextImage = images[nextIndex];
+
+      // Move current image to the left
+      currentImage.classList.remove('translate-x-zero');
+      currentImage.classList.add('translate-x-neg');
+
+      // Move next image from right to center
+      nextImage.classList.remove('translate-x-full');
+      nextImage.classList.add('translate-x-zero');
+
+      // After animation, reset positions
+      setTimeout(() => {
+        currentImage.classList.remove('translate-x-neg');
+        currentImage.classList.add('translate-x-full');
+      }, 1500);
+
+      currentIndex = nextIndex;
+    }
+
+    // Initialize first image
+    images[0].classList.add('translate-x-zero');
+
+    // Switch every 5 seconds
+    setInterval(switchImage, 5000);
+  });
 </script>
 {% endblock %}
