@@ -724,7 +724,7 @@ def all_pages():
         print(f"Processed data size: {processed_size / 1024:.2f} KB")
         
         try:
-            redis.set(cache_key, json.dumps(all_pages), ex=1800)  # Cache for 30 minutes
+            redis.set(cache_key, json.dumps(all_pages), ex=21600)  # Cache for 30 minutes
             print("\n=== CACHE UPDATE: Stored new data in Upstash KV ===")
         except Exception as e:
             print(f"\n=== CACHE ERROR: {str(e)} ===")

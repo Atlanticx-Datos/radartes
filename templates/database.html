@@ -145,7 +145,7 @@
                         <div class="border-b border-neutral" id="results-container">
                             <div class="max-h-[35rem] min-h-[20rem] overflow-auto pl-4 md:pl-0 custom-scrollbar md:border-t border-black" style="border-right: 1px solid black;">
                                 <table class="w-full h-full relative md:top-3">
-                                    <thead style="top: 0; background-color: rgba(243, 244, 246, 1); backdrop-filter: blur(40px);">
+                                    <thead>
                                         <tr class="my-4">
                                             <th class="w-10">✓</th>
                                             <th class="w-1/4 text-xs tracking-tighter text-neutral-700 text-center md:pr-28 uppercase">Oportunidad</th>
@@ -416,12 +416,13 @@
             return keywords;
         }
 
-        // Configurar GA4 con opciones restrictivas
+        // Simplified GA4 configuration for production domain only
         gtag('config', 'G-36M4V4L5RX', {
             send_page_view: true,
             link_attribution: false,
             enhanced_link_attribution: false,
-            enhanced_measurement: false
+            enhanced_measurement: false,
+            cookie_domain: 'oportunidades.lat'
         });
 
         // Enhanced categories based on actual data patterns
