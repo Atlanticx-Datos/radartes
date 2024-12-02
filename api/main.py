@@ -58,8 +58,11 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__, static_folder='../static', static_url_path='/static', template_folder='../templates')
 app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", "default_fallback_secret_key")
 
-# Configure caching
-cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+# Configure caching with longer timeout
+cache = Cache(app, config={
+    'CACHE_TYPE': 'simple',
+    'CACHE_DEFAULT_TIMEOUT': 7200  # Increase to 2 hours
+})
 
 # Initialize Redis with your Upstash credentials
 redis = Redis(url=os.environ.get('KV_REST_API_URL'),
@@ -665,7 +668,7 @@ def all_pages():
         print(f"Request body: {json.dumps(json_body, indent=2)}")
         sys.stdout.flush()
 
-        response = requests.post(url, headers=headers, json=json_body, timeout=30)
+        response = requests.post(url, headers=headers, json=json_body, timeout=60)
         data = response.json()
 
         # Add size check for raw response
@@ -954,7 +957,7 @@ def all_pages():
         
         # Only cache non-HTMX, non-clear responses
         if not is_clear:
-            cache.set('all_pages_response', response, timeout=300)
+            cache.set('all_pages_response', response, timeout=7200)
         
         return response
 
