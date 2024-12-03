@@ -3,6 +3,9 @@ name: Update Total Nuevas
 on:
   schedule:
     - cron: '15 0 * * 0'  # Runs every Sunday at 00:15
+  push:
+    branches:
+      - mitades  # Replace 'main' with your branch name if different
 
 jobs:
   update-total-nuevas:
