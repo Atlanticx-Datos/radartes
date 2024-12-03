@@ -1,0 +1,13 @@
+name: Update Total Nuevas
+
+on:
+  schedule:
+    - cron: '15 0 * * 0'  # Runs every Sunday at 00:15
+
+jobs:
+  update-total-nuevas:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Update Total Nuevas
+        run: |
+          curl -X GET "https://oportunidades.lat/update_total_nuevas"

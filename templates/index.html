@@ -127,13 +127,15 @@
           <div class="flex items-center space-x-4">
             <!-- Counter with notification dot -->
             <div class="relative flex items-center">
-              <span class="text-base font-medium text-black border-b-2 border-black">+25</span>
-              <div class="absolute -right-2 top-0">
-                <span class="flex h-1.5 w-1.5">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
-                </span>
-              </div>
+              {% if total_nuevas > 1 %}
+                <span class="text-base font-medium text-black border-b-2 border-black">+{{ total_nuevas }}</span>
+                <div class="absolute -right-2 top-0">
+                  <span class="flex h-1.5 w-1.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
+                  </span>
+                </div>
+              {% endif %}
             </div>
             <!-- Text -->
             <div class="flex items-center justify-center">

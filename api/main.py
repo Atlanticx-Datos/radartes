@@ -525,6 +525,13 @@ def inject_og_data():
         }
     return dict(get_og_data=get_og_data)
 
+@app.context_processor
+def inject_total_nuevas():
+    try:
+        total_nuevas = int(redis.get('total_nuevas') or 0)
+    except:
+        total_nuevas = 0
+    return dict(total_nuevas=total_nuevas)
 
 @app.route("/")
 def index():
@@ -1074,6 +1081,42 @@ def save_page(page_id=None):
 
     # Redirect to the /database route to display all pages
     return redirect(url_for("all_pages"))
+
+@app.route("/update_total_nuevas", methods=["GET"])
+def update_total_nuevas():
+    try:
+        # Use the specific page ID for the "Total" page
+        page_id = "1519dd874b3a8033a633f021cec697ce"
+        url = f"https://api.notion.com/v1/pages/{page_id}"
+        headers = {
+            "Authorization": "Bearer " + NOTION_TOKEN,
+            "Content-Type": "application/json",
+            "Notion-Version": "2022-06-28",
+        }
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Raise an error for bad responses
+        data = response.json()
+
+        # Log the response for debugging
+        print("Notion API response:", json.dumps(data, indent=2))
+
+        # Extract the "Total de nuevas" value
+        total_nuevas = data["properties"]["Total de nuevas"]["rollup"]["number"]
+
+        # Store the value in Redis with a TTL of 6 days, 23 hours, and 55 minutes (604500 seconds)
+        redis.set('total_nuevas', total_nuevas, ex=604500)
+        print(f"Updated total_nuevas: {total_nuevas}")
+
+        return "Total nuevas updated successfully", 200
+    except requests.exceptions.HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+    except requests.exceptions.RequestException as req_err:
+        print(f"Request error occurred: {req_err}")
+    except KeyError as key_err:
+        print(f"Key error: {key_err} - Check if the JSON structure has changed.")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+    return "Failed to update total nuevas", 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5001))
