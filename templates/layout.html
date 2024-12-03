@@ -36,9 +36,6 @@
     <meta property="og:site_name" content="100 + Oportunidades">
     <meta property="og:locale" content="en_US">
 
-    <!-- Additional Meta Tags -->
-    <meta property="fb:app_id" content="your_facebook_app_id"> <!-- If you have a Facebook app -->
-
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-36M4V4L5RX"></script>
     <script>
@@ -165,11 +162,11 @@
     <link rel="shortcut icon" href="/static/public/favicon.ico" />
 </head>
 
-<body class="flex justify-center items-center bg-slate-100 min-h-screen">
+<body class="flex justify-center items-center bg-white min-h-screen">
     <div id="layout-spinner" class="spinner h-8 w-8" style="display: none;">
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
     </div>
-    <main class="w-full min-h-screen bg-slate-100 flex flex-col">
+    <main class="w-full min-h-screen bg-white flex flex-col">
         <!-- Navigation - only show on non-index pages -->
         {% if request.endpoint != 'index' %}
         <div class="w-full flex-shrink-0">
@@ -225,10 +222,10 @@
 
         <!-- Content wrapper -->
         <div class="flex-grow flex items-center justify-center 
-                    pt-8                     /* Default/mobile padding */
-                    h-[667px]:pt-6          /* Smaller phones */
-                    h-[896px]:pt-10         /* iPhone XR */
-                    h-[926px]:pt-12         /* iPhone 13 Pro Max */
+                    pt-16                     /* Default/mobile padding */
+                    h-[667px]:pt-16          /* Smaller phones */
+                    h-[896px]:pt-20         /* iPhone XR */
+                    h-[926px]:pt-24         /* iPhone 13 Pro Max */
                     md:pt-16">            
             {% block body %}{% endblock %}
         </div>

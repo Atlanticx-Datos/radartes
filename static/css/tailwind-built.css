@@ -1842,11 +1842,20 @@ details.collapse summary::-webkit-details-marker {
 .-right-2 {
   right: -0.5rem;
 }
+.-top-10 {
+  top: -2.5rem;
+}
+.bottom-2 {
+  bottom: 0.5rem;
+}
 .bottom-\[1px\] {
   bottom: 1px;
 }
 .left-1\/2 {
   left: 50%;
+}
+.left-20 {
+  left: 5rem;
 }
 .left-3 {
   left: 0.75rem;
@@ -1857,11 +1866,11 @@ details.collapse summary::-webkit-details-marker {
 .right-1 {
   right: 0.25rem;
 }
+.right-16 {
+  right: 4rem;
+}
 .right-2 {
   right: 0.5rem;
-}
-.right-\[-0\.5rem\] {
-  right: -0.5rem;
 }
 .top-0 {
   top: 0px;
@@ -1874,9 +1883,6 @@ details.collapse summary::-webkit-details-marker {
 }
 .top-8 {
   top: 2rem;
-}
-.top-\[-1\.2rem\] {
-  top: -1.2rem;
 }
 .top-\[1\.5px\] {
   top: 1.5px;
@@ -1942,6 +1948,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .ml-4 {
   margin-left: 1rem;
+}
+.ml-auto {
+  margin-left: auto;
 }
 .mr-2 {
   margin-right: 0.5rem;
@@ -2014,6 +2023,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .h-2 {
   height: 0.5rem;
+}
+.h-24 {
+  height: 6rem;
 }
 .h-3 {
   height: 0.75rem;
@@ -2452,11 +2464,14 @@ details.collapse summary::-webkit-details-marker {
 .pl-6 {
   padding-left: 1.5rem;
 }
+.pt-16 {
+  padding-top: 4rem;
+}
 .pt-4 {
   padding-top: 1rem;
 }
-.pt-8 {
-  padding-top: 2rem;
+.text-left {
+  text-align: left;
 }
 .text-center {
   text-align: center;
@@ -2632,11 +2647,14 @@ details.collapse summary::-webkit-details-marker {
   background-color: rgb(226 232 240 / var(--tw-bg-opacity));
 }
 @media (min-width: 768px) {
+  .md\:bottom-2 {
+    bottom: 0.5rem;
+  }
+  .md\:left-24 {
+    left: 6rem;
+  }
   .md\:right-2 {
     right: 0.5rem;
-  }
-  .md\:right-\[-1\.2rem\] {
-    right: -1.2rem;
   }
   .md\:top-3 {
     top: 0.75rem;

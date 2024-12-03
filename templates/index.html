@@ -15,10 +15,14 @@
               md:h-[600px]">               
     <!-- Navigation for Index Page -->
     <nav class="absolute 
-                top-[-1.2rem]
-                right-[-0.5rem] md:right-[-1.2rem] 
-                z-[100]">
-      <div class="dropdown dropdown-bottom dropdown-end">
+                -top-10
+                right-16
+                z-[100] flex items-center justify-between w-full px-4">
+      <!-- Logo for larger screens -->
+      <div class="hidden md:block">
+        <img src="/static/public/LogoCienOpps.png" alt="Logo" class="h-24">
+      </div>
+      <div class="ml-auto dropdown dropdown-bottom dropdown-end relative left-20 md:left-24 bottom-2 md:bottom-2">
         <div tabindex="0" role="button" class="relative">
           <div class="relative">
             <span class="flex items-center justify-center w-10 h-10 bg-slate-400 rounded-full">
@@ -71,14 +75,14 @@
     <!-- Hero Section - Responsive Two Column Layout -->
     <div class="flex flex-col md:flex-row h-full">
       <!-- Left Column - Hero Text -->
-      <div class="h-[50vh] md:h-full w-full md:w-1/2 flex flex-col items-start justify-center px-6 md:px-12 font-londrina">
+      <div class="h-[50vh] md:h-full w-full md:w-1/2 flex flex-col items-start justify-center px-6 md:px-12 font-londrina text-left">
         <!-- Service Name -->
         <h2 class="service-name mb-2 text-sm text-gray-400 uppercase font-black font-londrina tracking-widest" style="color: #E5E5E5;">
           100 <span class="relative bottom-[1px] text-indigo-500">+</span> Oportunidades
         </h2>
 
         <!-- Mobile Hero Text -->
-        <p class="block md:hidden hero-mobile uppercase text-center">
+        <p class="block md:hidden hero-mobile uppercase">
           Tu <span class="mr-3 text-indigo-500 impulso-text">impulso</span><br>en artes y cultura.
         </p>
 
