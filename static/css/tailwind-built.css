@@ -1842,6 +1842,9 @@ details.collapse summary::-webkit-details-marker {
 .-right-2 {
   right: -0.5rem;
 }
+.bottom-\[1px\] {
+  bottom: 1px;
+}
 .left-1\/2 {
   left: 50%;
 }
@@ -2187,6 +2190,9 @@ details.collapse summary::-webkit-details-marker {
 .flex-col {
   flex-direction: column;
 }
+.items-start {
+  align-items: flex-start;
+}
 .items-center {
   align-items: center;
 }
@@ -2504,9 +2510,16 @@ details.collapse summary::-webkit-details-marker {
 .tracking-tighter {
   letter-spacing: -0.05em;
 }
+.tracking-widest {
+  letter-spacing: 0.1em;
+}
 .text-black {
   --tw-text-opacity: 1;
   color: rgb(0 0 0 / var(--tw-text-opacity));
+}
+.text-gray-400 {
+  --tw-text-opacity: 1;
+  color: rgb(156 163 175 / var(--tw-text-opacity));
 }
 .text-indigo-500 {
   --tw-text-opacity: 1;
@@ -2699,9 +2712,6 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:flex-row {
     flex-direction: row;
-  }
-  .md\:justify-start {
-    justify-content: flex-start;
   }
   .md\:space-x-2 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-x-reverse: 0;

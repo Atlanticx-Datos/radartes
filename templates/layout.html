@@ -4,36 +4,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ og_data.title if og_data else "100 ︱ Oportunidades" }}</title>
-    <meta property="og:title" content="{{ og_data.title if og_data else '100 ︱ Oportunidades' }}">
+    <title>{{ og_data.title if og_data else "100 + Oportunidades" }}</title>
+    <meta property="og:title" content="{{ og_data.title if og_data else '100 + Oportunidades' }}">
     <meta property="og:description"
         content="{{ og_data.description if og_data else 'Convocatorias, Becas y Recursos Globales para Artistas.' }}">
-    <meta property="og:url" content="{{ og_data.url if og_data else 'http://oportunidades-vercel.vercel.app' }}">
+    <meta property="og:url" content="{{ og_data.url if og_data else 'http://oportunidades.lat' }}">
     <meta property="og:image"
-        content="{{ og_data.image if og_data else 'http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png' }}">
+        content="{{ og_data.image if og_data else 'http://oportunidades.lat/static/public/LogoCienOpps.png' }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
     <!-- Twitter Card Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@your_twitter_username">
-    <meta name="twitter:title" content="{{ og_data.title if og_data else '100 ︱ Oportunidades' }}">
+    <meta name="twitter:title" content="{{ og_data.title if og_data else '100 + Oportunidades' }}">
     <meta name="twitter:description"
         content="{{ og_data.description if og_data else 'Convocatorias, Becas y Recursos Globales para Artistas.' }}">
     <meta name="twitter:image"
-        content="{{ og_data.image if og_data else 'http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png' }}">
+        content="{{ og_data.image if og_data else 'http://oportunidades.lat/static/public/LogoCienOpps.png' }}">
 
     <!-- Open Graph Tags for Facebook -->
-    <meta property="og:title" content="{{ og_data.title if og_data else '100 ︱ Oportunidades' }}">
+    <meta property="og:title" content="{{ og_data.title if og_data else '100 + Oportunidades' }}">
     <meta property="og:description"
         content="{{ og_data.description if og_data else 'Convocatorias, Becas y Recursos Globales para Artistas.' }}">
-    <meta property="og:url" content="{{ og_data.url if og_data else 'http://oportunidades-vercel.vercel.app' }}">
+    <meta property="og:url" content="{{ og_data.url if og_data else 'http://oportunidades.lat' }}">
     <meta property="og:image"
-        content="{{ og_data.image if og_data else 'http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png' }}">
+        content="{{ og_data.image if og_data else 'http://oportunidades.lat/static/public/LogoCienOpps.png' }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="100 ︱ Oportunidades">
+    <meta property="og:site_name" content="100 + Oportunidades">
     <meta property="og:locale" content="en_US">
 
     <!-- Additional Meta Tags -->
@@ -55,6 +55,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Londrina+Solid&display=swap" rel="stylesheet">
     
     <script src="https://unpkg.com/htmx.org@1.7.0/dist/htmx.min.js"></script>
     <style>
@@ -157,6 +158,11 @@
     
     <!-- Defer non-critical CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind-built.css') }}" media="print" onload="this.media='all'">
+
+    <!-- Favicon Links -->
+    <link rel="icon" type="image/png" href="/static/public/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/static/public/favicon.svg" />
+    <link rel="shortcut icon" href="/static/public/favicon.ico" />
 </head>
 
 <body class="flex justify-center items-center bg-slate-100 min-h-screen">
