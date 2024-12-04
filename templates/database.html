@@ -3,7 +3,7 @@
 {% block body %}
 
 <body>
-    <div class="max-w-[1400px] mx-auto px-4 md:px-8">
+    <div class="max-w-[1400px] mx-auto px-4 md:px-8 -mt-10">
         <!-- Title section -->
         <div class="mb-8 md:mb-20">
             <h1 class="text-2xl md:text-4xl font-bold text-black leading-none md:leading-tight tracking-tight mt-12 md:mt-0 ml-4">
@@ -184,6 +184,7 @@
                 </div>
             </div>
         </main>
+        {% include 'footer.html' %}
     </div>
 
 
@@ -762,5 +763,7 @@
             });
         });
     </script>
+
+
 </body>
 {% endblock %}
