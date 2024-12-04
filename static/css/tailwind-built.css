@@ -1928,6 +1928,9 @@ details.collapse summary::-webkit-details-marker {
 .-mr-2 {
   margin-right: -0.5rem;
 }
+.-mt-10 {
+  margin-top: -2.5rem;
+}
 .mb-1 {
   margin-bottom: 0.25rem;
 }
@@ -2186,6 +2189,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .animate-ping {
   animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+.cursor-default {
+  cursor: default;
 }
 .cursor-pointer {
   cursor: pointer;
@@ -2601,10 +2607,6 @@ details.collapse summary::-webkit-details-marker {
   --tw-bg-opacity: 1;
   background-color: rgb(234 88 12 / var(--tw-bg-opacity));
 }
-.hover\:text-\[\#E1306C\]:hover {
-  --tw-text-opacity: 1;
-  color: rgb(225 48 108 / var(--tw-text-opacity));
-}
 .hover\:text-indigo-700:hover {
   --tw-text-opacity: 1;
   color: rgb(67 56 202 / var(--tw-text-opacity));
@@ -2732,6 +2734,9 @@ details.collapse summary::-webkit-details-marker {
     --tw-space-x-reverse: 0;
     margin-right: calc(0.5rem * var(--tw-space-x-reverse));
     margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
+  }
+  .md\:rounded-none {
+    border-radius: 0px;
   }
   .md\:rounded-l-none {
     border-top-left-radius: 0px;
