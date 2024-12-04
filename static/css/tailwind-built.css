@@ -1845,8 +1845,8 @@ details.collapse summary::-webkit-details-marker {
 .-top-7 {
   top: -1.75rem;
 }
-.bottom-2 {
-  bottom: 0.5rem;
+.bottom-6 {
+  bottom: 1.5rem;
 }
 .bottom-\[1px\] {
   bottom: 1px;
@@ -1854,8 +1854,8 @@ details.collapse summary::-webkit-details-marker {
 .left-1\/2 {
   left: 50%;
 }
-.left-20 {
-  left: 5rem;
+.left-12 {
+  left: 3rem;
 }
 .left-3 {
   left: 0.75rem;
@@ -2690,6 +2690,9 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:mt-16 {
     margin-top: 4rem;
+  }
+  .md\:mt-3 {
+    margin-top: 0.75rem;
   }
   .md\:block {
     display: block;
