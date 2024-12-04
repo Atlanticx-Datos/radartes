@@ -1,0 +1,27 @@
+name: Refresh Database Cache
+
+on:
+  schedule:
+    - cron: '15 0 * * SUN'  # Runs at 00:15 on Sunday
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  refresh-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for database update
+        run: sleep 300  # Wait additional 5 minutes (total 15 min after database update)
+        
+      - name: Refresh Database Cache
+        run: |
+          curl -X POST https://oportunidades.lat/refresh_database_cache
+        
+      - name: Verify Cache Update
+        run: |
+          # Wait 30 seconds for cache to be populated
+          sleep 30
+          response=$(curl -s https://oportunidades.lat/database)
+          if [[ $response == *"Error"* ]]; then
+            echo "Cache refresh may have failed"
+            exit 1
+          fi

@@ -92,6 +92,8 @@ app.config["SESSION_USE_SIGNER"] = (
 app.config["JWT_SECRET_KEY"] = "daleboquita"  # Change this to your actual secret key
 jwt = JWTManager(app)
 
+p = inflect.engine()
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -611,22 +613,110 @@ def share_opportunity(opportunity_id):
 @app.route("/database", methods=["GET"])
 @login_required
 def all_pages():
-    # Check for HTMX request first
+    print("\n=== Starting database route ===")
+    sys.stdout.flush()
+    
     is_htmx = request.headers.get('HX-Request', 'false').lower() == 'true'
     is_clear = request.args.get("clear", "false").lower() == "true"
     search_query = request.args.get("search", "").lower()
 
-    # Don't use cache for HTMX requests
-    if not is_htmx:
-        cached_response = cache.get('all_pages_response')
-        if cached_response and not is_clear:
-            print("Serving from function cache")
-            return cached_response
+    # Define text processing functions
+    def normalize_text(text):
+        return ''.join(
+            c for c in unicodedata.normalize('NFD', text)
+            if unicodedata.category(c) != 'Mn'
+        )
 
-    print("\n=== Starting all_pages() route ===")
-    sys.stdout.flush()
-    p = inflect.engine()
-    print("Created inflect engine")
+    def singularize_text(text):
+        words = text.split()
+        return ' '.join(p.singular_noun(word) or word for word in words)
+
+    def preprocess_text(text):
+        if not isinstance(text, str):
+            text = str(text)
+        text = text.lower()
+        normalized = normalize_text(text)
+        return singularize_text(normalized)
+
+    # Month mapping
+    month_mapping = {
+        "enero": 1, "febrero": 2, "marzo": 3, "abril": 4,
+        "mayo": 5, "junio": 6, "julio": 7, "agosto": 8,
+        "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
+    }
+
+    # Check for month or "sin cierre" before preprocessing the search query
+    month_number = month_mapping.get(search_query)
+    is_sin_cierre = search_query == "sin cierre"
+    placeholder_date = '1900-01-01'
+
+    # Get cached content
+    cached_content = get_cached_database_content()
+    
+    if cached_content:
+        print(f"\n=== Using cached content with {len(cached_content['pages'])} pages ===")
+        sys.stdout.flush()
+        
+        pages = cached_content['pages']
+
+        # Handle clear request
+        if is_clear:
+            if is_htmx:
+                return render_template("_search_results.html", pages=pages)
+            else:
+                return render_template(
+                    "database.html", 
+                    pages=pages,
+                    closing_soon_pages=cached_content['closing_soon_pages'][:7],
+                    destacar_pages=cached_content['destacar_pages'],
+                    og_data={
+                        "title": "100 ︱ Oportunidades",
+                        "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
+                        "url": request.url,
+                        "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
+                    }
+                )
+        
+        # Handle search
+        if search_query:
+            if month_number is not None or is_sin_cierre:
+                filtered_pages = [
+                    page for page in pages
+                    if (is_sin_cierre and page.get("fecha_de_cierre") == placeholder_date)
+                    or (month_number and datetime.strptime(page.get("fecha_de_cierre", placeholder_date), '%Y-%m-%d').month == month_number)
+                ]
+            else:
+                # Preprocess search query once
+                processed_query = preprocess_text(search_query)
+                filtered_pages = [
+                    page for page in pages
+                    if processed_query in preprocess_text(page.get("nombre", ""))
+                    or processed_query in preprocess_text(page.get("país", ""))
+                    or processed_query in preprocess_text(page.get("destinatarios", ""))
+                    or processed_query in preprocess_text(page.get("ai_keywords", ""))
+                    or processed_query in preprocess_text(page.get("nombre_original", ""))
+                    or processed_query in preprocess_text(page.get("entidad", ""))
+                ]
+            
+            if is_htmx:
+                return render_template("_search_results.html", pages=filtered_pages)
+        
+        # If not searching and not clearing, return full cached content
+        return render_template(
+            "database.html", 
+            pages=pages,
+            closing_soon_pages=cached_content['closing_soon_pages'][:7],
+            destacar_pages=cached_content['destacar_pages'],
+            og_data={
+                "title": "100 ︱ Oportunidades",
+                "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
+                "url": request.url,
+                "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
+            }
+        )
+
+    # If no cache or cache miss, proceed with original logic
+    print("\n=== No cache or cache miss, proceeding with original logic ===")
     sys.stdout.flush()
 
     def fetch_notion_pages():
@@ -1117,6 +1207,187 @@ def update_total_nuevas():
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
     return "Failed to update total nuevas", 500
+
+def get_cached_database_content():
+    try:
+        print("\n=== Checking Redis cache ===")
+        sys.stdout.flush()
+        
+        # Try to get cached content from Redis
+        cached_content = redis.get('database_content')
+        print(f"Raw cached data exists: {cached_content is not None}")
+        sys.stdout.flush()
+        
+        if cached_content:
+            print("\n=== CACHE HIT: Found data in Redis ===")
+            sys.stdout.flush()
+            return json.loads(cached_content)
+            
+        print("\n=== CACHE MISS: No cached content found ===")
+        sys.stdout.flush()
+        return None
+    except Exception as e:
+        print(f"\n=== CACHE ERROR: {str(e)} ===")
+        sys.stdout.flush()
+        return None
+
+@app.route("/refresh_database_cache", methods=["POST"])
+def refresh_database_cache():
+    try:
+        # Fetch all pages from Notion
+        def fetch_notion_pages():
+            url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
+            headers = {
+                "Authorization": "Bearer " + NOTION_TOKEN,
+                "Content-Type": "application/json",
+                "Notion-Version": "2022-06-28",
+            }
+            
+            json_body = {
+                "filter": {
+                    "and": [
+                        {"property": "Publicar", "checkbox": {"equals": True}},
+                        {
+                            "or": [
+                                {"property": "Fecha de cierre", "date": {"is_empty": True}},
+                                {"property": "Fecha de cierre", "date": {"after": datetime.now().strftime('%Y-%m-%d')}}
+                            ]
+                        }
+                    ]
+                },
+                "page_size": 100
+            }
+
+            all_pages = []
+            has_more = True
+            start_cursor = None
+            request_count = 0
+            max_requests = 3
+
+            while has_more and request_count < max_requests:
+                request_count += 1
+                try:
+                    if start_cursor:
+                        json_body["start_cursor"] = start_cursor
+
+                    res = requests.post(url, headers=headers, json=json_body, timeout=30)
+                    res.raise_for_status()
+                    data = res.json()
+                    all_pages.extend(data.get("results", []))
+                    has_more = data.get("has_more", False)
+                    start_cursor = data.get("next_cursor")
+
+                except Exception as e:
+                    print(f"Request failed: {str(e)}")
+                    break
+
+            return all_pages
+
+        all_pages = fetch_notion_pages()
+        
+        # Process pages using existing logic
+        now_date = datetime.now()
+        seven_days_from_now = now_date + timedelta(days=7)
+        placeholder_date = '1900-01-01'
+
+        closing_soon_pages = []
+        pages = []
+        destacar_pages = []
+
+        for page in all_pages:
+            if "Publicar" in page["properties"] and page["properties"]["Publicar"]["checkbox"]:
+                page_data = {"id": page["id"], "created_time": page["created_time"]}
+
+                if "Resumen generado por la IA" in page["properties"]:
+                    page_data["nombre"] = (
+                        page["properties"]["Resumen generado por la IA"]["rich_text"][0]["text"]["content"]
+                        if page["properties"]["Resumen generado por la IA"]["rich_text"]
+                        else ""
+                    )
+
+                if "País" in page["properties"]:
+                    page_data["país"] = (
+                        page["properties"]["País"]["rich_text"][0]["text"]["content"]
+                        if page["properties"]["País"]["rich_text"]
+                        else ""
+                    )
+
+                if "Destinatarios" in page["properties"]:
+                    page_data["destinatarios"] = (
+                        page["properties"]["Destinatarios"]["rich_text"][0]["text"]["content"]
+                        if page["properties"]["Destinatarios"]["rich_text"]
+                        else ""
+                    )
+
+                if "AI keywords" in page["properties"]:
+                    page_data["ai_keywords"] = (
+                        page["properties"]["AI keywords"]["multi_select"][0]["name"]
+                        if page["properties"]["AI keywords"]["multi_select"]
+                        else ""
+                    )
+
+                if "URL" in page["properties"]:
+                    page_data["url"] = (
+                        page["properties"]["URL"]["url"]
+                        if page["properties"]["URL"].get("url")
+                        else ""
+                    )
+
+                if "Nombre" in page["properties"]:
+                    page_data["nombre_original"] = (
+                        page["properties"]["Nombre"]["title"][0]["text"]["content"]
+                        if page["properties"]["Nombre"]["title"]
+                        else ""
+                    )
+
+                if "Entidad" in page["properties"]:
+                    page_data["entidad"] = (
+                        page["properties"]["Entidad"]["rich_text"][0]["text"]["content"]
+                        if page["properties"]["Entidad"]["rich_text"]
+                        else ""
+                    )
+
+                # Handle fecha_de_cierre
+                fecha_de_cierre_prop = page["properties"].get("Fecha de cierre", None)
+                fecha_de_cierre = None
+                if fecha_de_cierre_prop and "date" in fecha_de_cierre_prop and fecha_de_cierre_prop["date"]:
+                    fecha_de_cierre = fecha_de_cierre_prop["date"].get("start", None)
+                    page_data["fecha_de_cierre"] = fecha_de_cierre
+                    cierre_date = datetime.strptime(fecha_de_cierre, '%Y-%m-%d')
+
+                    if now_date <= cierre_date <= seven_days_from_now:
+                        closing_soon_pages.append(page_data)
+                else:
+                    page_data["fecha_de_cierre"] = placeholder_date
+
+                # Handle destacar pages
+                if page_data.get("destinatarios", "").lower() == "destacar":
+                    if not fecha_de_cierre or cierre_date >= now_date:
+                        destacar_pages.append(page_data)
+
+                pages.append(page_data)
+
+        # Sort pages
+        sorted_pages = sorted(pages, key=lambda page: (
+            not page["fecha_de_cierre"] == placeholder_date,
+            datetime.strptime(page["fecha_de_cierre"], '%Y-%m-%d') if page["fecha_de_cierre"] != placeholder_date else datetime.max
+        ), reverse=True)
+
+        # Store the processed data
+        cache_data = {
+            'pages': sorted_pages,
+            'closing_soon_pages': closing_soon_pages[:7],
+            'destacar_pages': destacar_pages,
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        # Store for 7 days (604800 seconds)
+        redis.set('database_content', json.dumps(cache_data), ex=604800)
+        
+        return jsonify({"status": "success", "message": "Cache refreshed"}), 200
+    except Exception as e:
+        print(f"Cache refresh error: {str(e)}")
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5001))
