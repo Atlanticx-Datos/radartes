@@ -2,7 +2,7 @@ name: Refresh Database Cache
 
 on:
   schedule:
-    - cron: '15 0 * * SUN'  # Runs at 00:15 on Sunday
+    - cron: '0 13 * * MON'  # Runs at 00:15 on Sunday
   workflow_dispatch:  # Allows manual trigger
 
 jobs:
