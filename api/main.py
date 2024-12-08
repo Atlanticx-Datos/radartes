@@ -50,6 +50,84 @@ from flask_caching import Cache
 
 import logging
 
+
+KEYWORD_BINDINGS = {
+    # Educational/Academic terms that should map to artistic disciplines
+    'academic': {
+        'triggers': [
+            # Academic institutions and levels
+            'universidad', 'university', 'uni ', 'univ',
+            'facultad', 'faculty',
+            'instituto', 'institute',
+            'escuela', 'school',
+            'conservatorio', 'conservatory',
+            
+            # Academic programs
+            'maestría', 'maestria', 'master',
+            'doctorado', 'doctorate', 'phd',
+            'posgrado', 'postgrad',
+            'licenciatura', 'bachelor',
+            
+            # Research and study
+            'investigación', 'investigacion', 'research',
+            'formación', 'formacion', 'formation',
+            'estudios', 'studies',
+            
+            # Funding and opportunities
+            'beca', 'scholarship',
+            'residencia académica', 'academic residency'
+        ],
+        'maps_to': ['música', 'musica', 'danza', 'teatro']
+    },
+
+    # Specific artistic terms should only match their own discipline
+    'música': {
+        'triggers': [
+            # Direct music terms
+            'música', 'musica', 'musical',
+            
+            # Performance
+            'composición', 'composition',
+            'concierto', 'concert',
+            'orquesta', 'orchestra',
+            'ópera', 'opera',
+            
+            # Instruments and voice
+            'instrumento', 'instrument',
+            'piano', 'violin',
+            'canción', 'cancion', 'song',
+            'canto', 'singing',
+            
+            # Programs and institutions
+            'ibermúsicas', 'ibermusicas',
+            'conservatorio', 'conservatory',
+            
+            # General music terms
+            'sonoro', 'sound',
+            'opera', 'ópera',
+            'interpretación', 'music performance',
+        ],
+        'maps_to': ['música', 'musica']
+    },
+    'teatro': {
+        'triggers': [
+            'dramaturgia', 'dramaturgy',
+            'iberescena', 'actuación', 'performance',
+            'artes escénicas', 'scenic arts', 'escenografía',
+            'scenic design', 'textos', 'libretto'
+        ],
+        'maps_to': ['teatro']
+    },
+    'danza': {
+        'triggers': [
+            'coreografía', 'choreography',
+            'ballet',
+            'videodanza', 'videodance'
+        ],
+        'maps_to': ['danza']
+    }
+}
+
 load_dotenv()
 print("Loaded AUTH0_DOMAIN:", os.environ.get("AUTH0_DOMAIN"))
 
@@ -93,6 +171,8 @@ app.config["JWT_SECRET_KEY"] = "daleboquita"  # Change this to your actual secre
 jwt = JWTManager(app)
 
 p = inflect.engine()
+
+
 
 def login_required(f):
     @wraps(f)
@@ -631,12 +711,35 @@ def all_pages():
         words = text.split()
         return ' '.join(p.singular_noun(word) or word for word in words)
 
-    def preprocess_text(text):
+    def preprocess_text(text, expand_terms=False):
+        """Preprocesses text for searching, including keyword expansion if requested"""
         if not isinstance(text, str):
             text = str(text)
+        
+        # Basic preprocessing
         text = text.lower()
         normalized = normalize_text(text)
-        return singularize_text(normalized)
+        singularized = singularize_text(normalized)
+        
+        # Only expand terms for música, teatro, danza searches
+        if expand_terms:
+            # Start with the original processed text
+            expanded_terms = {singularized}
+            
+            # Check each category's triggers
+            for category, bindings in KEYWORD_BINDINGS.items():
+                # If any trigger matches our search term
+                if any(trigger in singularized for trigger in bindings['triggers']):
+                    # Add all triggers from this category
+                    expanded_terms.update(bindings['triggers'])
+                    expanded_terms.update(bindings['maps_to'])
+            
+            result = ' '.join(expanded_terms)
+            print(f"Expanded '{text}' to: {result}")
+            sys.stdout.flush()
+            return result
+        
+        return singularized
 
     # Month mapping
     month_mapping = {
@@ -686,16 +789,58 @@ def all_pages():
                     or (month_number and datetime.strptime(page.get("fecha_de_cierre", placeholder_date), '%Y-%m-%d').month == month_number)
                 ]
             else:
-                # Preprocess search query once
-                processed_query = preprocess_text(search_query)
+                # Determine if we should expand terms (only for música, teatro, danza)
+                search_lower = normalize_text(search_query.lower())
+                should_expand = any(term in search_lower for term in ['musica', 'música', 'teatro', 'danza'])
+                
+                # Preprocess search query
+                processed_query = preprocess_text(search_query, expand_terms=should_expand)
+                
+                # If we expanded terms, split them into a list
+                search_terms = processed_query.split() if should_expand else [processed_query]
+                
+                def check_page_content(page):
+                    # Combine all searchable content from the page
+                    page_content = ' '.join([
+                        page.get("nombre", ""),
+                        page.get("país", ""),
+                        page.get("destinatarios", ""),
+                        page.get("ai_keywords", ""),
+                        page.get("nombre_original", ""),
+                        page.get("entidad", "")
+                    ])
+                    processed_content = preprocess_text(page_content, expand_terms=False).lower()
+                    
+                    # For artistic disciplines, check both content and educational terms
+                    if should_expand:
+                        # Check for direct artistic terms
+                        artistic_match = any(term in processed_content for term in search_terms)
+                        
+                        # Check for educational terms using KEYWORD_BINDINGS
+                        educational_terms = [term.lower() for term in KEYWORD_BINDINGS['academic']['triggers']]
+                        educational_match = any(term in processed_content for term in educational_terms)
+                        
+                        # Check if the educational terms map to the current artistic discipline
+                        maps_to_terms = [term.lower() for term in KEYWORD_BINDINGS['academic']['maps_to']]
+                        music_match = any(term in maps_to_terms for term in ['musica', 'música'])
+                        
+                        # Debug output
+                        if artistic_match or (educational_match and music_match):
+                            print(f"\nChecking page: {page.get('nombre', '')}")
+                            print(f"Content: {processed_content}")
+                            print(f"Artistic match: {artistic_match}")
+                            print(f"Educational match: {educational_match}")
+                            print(f"Music match: {music_match}")
+                            sys.stdout.flush()
+                        
+                        return artistic_match or (educational_match and music_match)
+                    
+                    # For non-artistic searches (like "investigacion")
+                    return processed_query in processed_content
+                
                 filtered_pages = [
                     page for page in pages
-                    if processed_query in preprocess_text(page.get("nombre", ""))
-                    or processed_query in preprocess_text(page.get("país", ""))
-                    or processed_query in preprocess_text(page.get("destinatarios", ""))
-                    or processed_query in preprocess_text(page.get("ai_keywords", ""))
-                    or processed_query in preprocess_text(page.get("nombre_original", ""))
-                    or processed_query in preprocess_text(page.get("entidad", ""))
+                    if check_page_content(page)
                 ]
             
             if is_htmx:
@@ -853,10 +998,35 @@ def all_pages():
     print("Defined singularize_text function")
     sys.stdout.flush()
 
-    def preprocess_text(text):
+    def preprocess_text(text, expand_terms=False):
+        """Preprocesses text for searching, including keyword expansion if requested"""
+        if not isinstance(text, str):
+            text = str(text)
+        
+        # Basic preprocessing
         text = text.lower()
         normalized = normalize_text(text)
-        return singularize_text(normalized)
+        singularized = singularize_text(normalized)
+        
+        # Only expand terms for música, teatro, danza searches
+        if expand_terms:
+            # Start with the original processed text
+            expanded_terms = {singularized}
+            
+            # Check each category's triggers
+            for category, bindings in KEYWORD_BINDINGS.items():
+                # If any trigger matches our search term
+                if any(trigger in singularized for trigger in bindings['triggers']):
+                    # Add all triggers from this category
+                    expanded_terms.update(bindings['triggers'])
+                    expanded_terms.update(bindings['maps_to'])
+            
+            result = ' '.join(expanded_terms)
+            print(f"Expanded '{text}' to: {result}")
+            sys.stdout.flush()
+            return result
+        
+        return singularized
     print("Defined preprocess_text function")
     sys.stdout.flush()
 
