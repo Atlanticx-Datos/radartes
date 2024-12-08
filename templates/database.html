@@ -88,7 +88,7 @@
                                                 {{ page.nombre | truncate(25, true, "...") }}
                                                 {% if page.entidad %}
                                                     / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
-                                                        {{ page.entidad | truncate(20, true, "...") }}
+                                                        {{ page.entidad | truncate(12, true, "...") }}
                                                     </span>
                                                 {% endif %}
                                             </span>
@@ -139,11 +139,11 @@
                 </div>
 
                 <!-- Second Column: Table -->
-                <div class="col-span-1 md:col-span-7 mt-2 lg:mt-0 border-neutral">
+                <div class="col-span-1 md:col-span-8 mt-2 lg:mt-0 border-neutral">
                     <form id="save-form" hx-post="/save_user_opportunity" hx-trigger="submit" hx-swap="innerHTML"
                         hx-target="#alert-container">
                         <div class="border-b border-neutral" id="results-container">
-                            <div class="max-h-[35rem] min-h-[20rem] overflow-auto pl-4 md:pl-0 custom-scrollbar md:border-t border-black" style="border-right: 1px solid black;">
+                            <div class="max-h-[35rem] min-h-[20rem] overflow-auto pl-4 md:pl-0 custom-scrollbar md:border-t border-black md:border-r md:border-r-black" >
                                 <table class="w-full h-full relative md:top-3">
                                     <thead>
                                         <tr class="my-4">
@@ -169,7 +169,7 @@
                 </div>
 
                 <!-- Third Column: Empty Container -->
-                <div class="hidden md:block col-span-1 mt-2 lg:mt-0 flex flex-col relative left-3" style="width: 40px;">
+                <!-- <div class="hidden md:block col-span-1 mt-2 lg:mt-0 flex flex-col relative left-3" style="width: 40px;">
                     <div class="bg-orange-500 rounded-t-md" style="height: 20px;"></div>
                     <div class="bg-black" style="height: 20px;"></div>
                     <div class="bg-[#0cc7c7]" style="height: 20px;"></div>
@@ -181,7 +181,7 @@
                             </path>
                         </svg>
                     </div>
-                </div>
+                </div> -->
             </div>
         </main>
         {% include 'footer.html' %}

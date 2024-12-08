@@ -1,7 +1,7 @@
 {% if pages %}
 {% for page in pages %}
 <tr class="border-b {% if loop.last %}mb-32 pb-32{% endif %}">
-    <th class="w-2/12">
+    <th class="w-1/12">
         <label>
             <input type="checkbox" class="checkbox rounded-none h-4 w-4" name="selected_pages" value="{{ page.id }}" />
         </label>
@@ -27,7 +27,7 @@
     <td class="w-2/12 text-xs p-2 md:p-0 relative md:right-2 fecha-de-cierre">
         {{ page.fecha_de_cierre | default("Sin cierre") | format_date }}
     </td>
-    <th class="w-2/12 p-2 md:pr-4 static">
+    <th class="w-1/12 p-2 static">
         <div class="flex items-center gap-1 bg-slate-100 p-2">
             <div role="button"
                tabindex="0"
