@@ -2075,6 +2075,9 @@ details.collapse summary::-webkit-details-marker {
 .w-1\.5 {
   width: 0.375rem;
 }
+.w-1\/12 {
+  width: 8.333333%;
+}
 .w-1\/4 {
   width: 25%;
 }
@@ -2664,9 +2667,6 @@ details.collapse summary::-webkit-details-marker {
   .md\:col-span-4 {
     grid-column: span 4 / span 4;
   }
-  .md\:col-span-7 {
-    grid-column: span 7 / span 7;
-  }
   .md\:col-span-8 {
     grid-column: span 8 / span 8;
   }
@@ -2760,6 +2760,10 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:border-t {
     border-top-width: 1px;
+  }
+  .md\:border-r-black {
+    --tw-border-opacity: 1;
+    border-right-color: rgb(0 0 0 / var(--tw-border-opacity));
   }
   .md\:p-0 {
     padding: 0px;

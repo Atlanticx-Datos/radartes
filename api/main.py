@@ -1345,6 +1345,9 @@ def save_page(page_id=None):
 @app.route("/update_total_nuevas", methods=["GET"])
 def update_total_nuevas():
     try:
+        # Add debug logging
+        print("Starting update_total_nuevas process")
+        
         # Use the specific page ID for the "Total" page
         page_id = "1519dd874b3a8033a633f021cec697ce"
         url = f"https://api.notion.com/v1/pages/{page_id}"
@@ -1353,30 +1356,34 @@ def update_total_nuevas():
             "Content-Type": "application/json",
             "Notion-Version": "2022-06-28",
         }
+        
+        print("Fetching data from Notion...")
         response = requests.get(url, headers=headers)
-        response.raise_for_status()  # Raise an error for bad responses
+        response.raise_for_status()
         data = response.json()
-
-        # Log the response for debugging
-        print("Notion API response:", json.dumps(data, indent=2))
 
         # Extract the "Total de nuevas" value
         total_nuevas = data["properties"]["Total de nuevas"]["rollup"]["number"]
+        print(f"Extracted total_nuevas value: {total_nuevas}")
 
-        # Store the value in Redis with a TTL of 6 days, 23 hours, and 55 minutes (604500 seconds)
+        # Store in Redis
         redis.set('total_nuevas', total_nuevas, ex=604500)
-        print(f"Updated total_nuevas: {total_nuevas}")
+        print(f"Stored in Redis: {total_nuevas}")
 
-        return "Total nuevas updated successfully", 200
-    except requests.exceptions.HTTPError as http_err:
-        print(f"HTTP error occurred: {http_err}")
-    except requests.exceptions.RequestException as req_err:
-        print(f"Request error occurred: {req_err}")
-    except KeyError as key_err:
-        print(f"Key error: {key_err} - Check if the JSON structure has changed.")
+        # Return the value in the response
+        return jsonify({
+            "status": "success",
+            "total_nuevas": total_nuevas,
+            "message": "Total nuevas updated successfully"
+        }), 200
+
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-    return "Failed to update total nuevas", 500
+        error_message = f"Error updating total_nuevas: {str(e)}"
+        print(error_message)
+        return jsonify({
+            "status": "error",
+            "error": error_message
+        }), 500
 
 def get_cached_database_content():
     try:

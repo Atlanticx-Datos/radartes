@@ -2,15 +2,23 @@ name: Update Total Nuevas
 
 on:
   schedule:
-    - cron: '15 13 * * 1'   # Runs every Monday at 10:15
+    - cron: '15 13 * * 1'  # Runs every Monday at 10:15 AM Buenos Aires time (UTC-3)
   push:
     branches:
-      - mitades  # Replace 'main' with your branch name if different
+      - mitades
 
 jobs:
-  update-total-nuevas:
+  update-total:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Update Total Nuevas
+      - name: Update Total Nuevas
         run: |
-          curl -X GET "https://oportunidades.lat/update_total_nuevas"
+          response=$(curl -s https://oportunidades.lat/update_total_nuevas)
+          echo "Full response: $response"
+          if [[ $response == *"success"* ]]; then
+            total=$(echo $response | jq -r '.total_nuevas')
+            echo "Successfully updated total_nuevas to: $total"
+          else
+            echo "Error in update: $response"
+            exit 1
+          fi
