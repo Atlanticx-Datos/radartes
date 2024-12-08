@@ -2,7 +2,7 @@ name: Update Total Nuevas
 
 on:
   schedule:
-    - cron: '15 0 * * 0'  # Runs every Sunday at 00:15
+    - cron: '15 13 * * 1'   # Runs every Monday at 10:15
   push:
     branches:
       - mitades  # Replace 'main' with your branch name if different
