@@ -1842,8 +1842,8 @@ details.collapse summary::-webkit-details-marker {
 .-right-2 {
   right: -0.5rem;
 }
-.-top-7 {
-  top: -1.75rem;
+.-top-6 {
+  top: -1.5rem;
 }
 .bottom-6 {
   bottom: 1.5rem;
@@ -1854,11 +1854,11 @@ details.collapse summary::-webkit-details-marker {
 .left-1\/2 {
   left: 50%;
 }
-.left-12 {
-  left: 3rem;
-}
 .left-3 {
   left: 0.75rem;
+}
+.left-8 {
+  left: 2rem;
 }
 .right-0 {
   right: 0px;
@@ -1866,11 +1866,11 @@ details.collapse summary::-webkit-details-marker {
 .right-1 {
   right: 0.25rem;
 }
-.right-10 {
-  right: 2.5rem;
-}
 .right-2 {
   right: 0.5rem;
+}
+.right-5 {
+  right: 1.25rem;
 }
 .top-0 {
   top: 0px;
@@ -2646,11 +2646,11 @@ details.collapse summary::-webkit-details-marker {
   background-color: rgb(226 232 240 / var(--tw-bg-opacity));
 }
 @media (min-width: 768px) {
-  .md\:bottom-10 {
-    bottom: 2.5rem;
+  .md\:bottom-14 {
+    bottom: 3.5rem;
   }
-  .md\:left-12 {
-    left: 3rem;
+  .md\:left-14 {
+    left: 3.5rem;
   }
   .md\:right-2 {
     right: 0.5rem;
@@ -2669,6 +2669,9 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:col-span-8 {
     grid-column: span 8 / span 8;
+  }
+  .md\:mb-0 {
+    margin-bottom: 0px;
   }
   .md\:mb-20 {
     margin-bottom: 5rem;
