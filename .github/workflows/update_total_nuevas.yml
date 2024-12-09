@@ -13,12 +13,14 @@ jobs:
     steps:
       - name: Update Total Nuevas
         run: |
-          response=$(curl -s https://oportunidades.lat/update_total_nuevas)
+          echo "Making request to /update_total_nuevas with redirect following"
+          response=$(curl -s -L https://oportunidades.lat/update_total_nuevas)
           echo "Full response: $response"
           if [[ $response == *"success"* ]]; then
-            total=$(echo $response | jq -r '.total_nuevas')
+            total=$(echo "$response" | jq -r '.total_nuevas')
             echo "Successfully updated total_nuevas to: $total"
           else
             echo "Error in update: $response"
             exit 1
           fi
+        shell: /usr/bin/bash -e {0}
