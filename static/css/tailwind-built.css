@@ -1845,8 +1845,8 @@ details.collapse summary::-webkit-details-marker {
 .-top-6 {
   top: -1.5rem;
 }
-.bottom-6 {
-  bottom: 1.5rem;
+.bottom-8 {
+  bottom: 2rem;
 }
 .bottom-\[1px\] {
   bottom: 1px;
