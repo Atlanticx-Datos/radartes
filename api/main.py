@@ -49,6 +49,10 @@ import inflect
 from flask_caching import Cache
 
 import logging
+import secrets
+
+from flask_session import Session
+import redis
 
 
 load_dotenv()
@@ -58,6 +62,27 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__, static_folder='../static', static_url_path='/static', template_folder='../templates')
 app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", "default_fallback_secret_key")
+
+# Session configuration - place this near the top of your file, after app creation
+app.config.update(
+    SECRET_KEY=os.getenv("FLASK_SECRET_KEY", "your-secret-key-here"),
+    SESSION_TYPE="filesystem",
+    SESSION_FILE_DIR=os.path.join(app.root_path, 'flask_session'),
+    SESSION_COOKIE_NAME="oportunidades_session",
+    SESSION_COOKIE_SECURE=False,  # False for local development
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_DOMAIN=None,  # Important for Safari
+    PERMANENT_SESSION_LIFETIME=timedelta(hours=24),
+    SESSION_REFRESH_EACH_REQUEST=True,
+    SESSION_COOKIE_PATH='/'  # Ensure cookie is available for all paths
+)
+
+# Initialize Session
+Session(app)
+
+# Make sure session directory exists
+os.makedirs(os.path.join(app.root_path, 'flask_session'), exist_ok=True)
 
 # Configure caching with longer timeout
 cache = Cache(app, config={
@@ -101,8 +126,12 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if "user" not in session:
-            session["next"] = request.url
-            return redirect(url_for("login"))
+            original_url = request.url
+            # Store URL in both session and query parameter
+            session["next"] = original_url
+            session.modified = True
+            logger.info(f"Login required: Storing original URL: {original_url}")
+            return redirect(url_for("login", next=original_url))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -146,43 +175,132 @@ oauth.register(
     client_secret=os.environ.get("AUTH0_CLIENT_SECRET"),
     client_kwargs={
         "scope": "openid profile email",
+        "response_type": "code"
     },
     server_metadata_url=f'https://{os.environ.get("AUTH0_DOMAIN")}/.well-known/openid-configuration',
 )
 
 @app.route("/login")
 def login():
-    # Store the original URL the user was trying to access before logging in
-    session["original_url"] = request.args.get("next") or url_for("index")
-    return oauth.auth0.authorize_redirect(
-        redirect_uri=url_for("callback", _external=True)
-    )
+    try:
+        # Get the next URL from query params first, then session, then default
+        next_url = request.args.get("next") or session.get("next") or url_for("index")
+        
+        # Clear session but preserve next_url
+        session.clear()
+        session["next"] = next_url
+        
+        logger.info(f"Login: Next URL stored: {next_url}")
+        
+        # Generate state and store it in session
+        state = secrets.token_urlsafe(32)
+        session['oauth_state'] = state
+        session.modified = True
+        
+        logger.info(f"Generated state: {state}")
+        logger.info(f"Session contents at login: {dict(session)}")
+        
+        # Ensure redirect_uri is absolute
+        callback_url = url_for("callback", _external=True, next=next_url)
+        
+        # Set session cookie explicitly for Safari
+        response = oauth.auth0.authorize_redirect(
+            redirect_uri=callback_url,
+            state=state
+        )
+        
+        # Set both session and redirect cookies
+        response.set_cookie(
+            'oportunidades_session',
+            session.sid,
+            httponly=True,
+            secure=False,  # Set to True in production
+            samesite='Lax',
+            max_age=86400,  # 24 hours
+            path='/'
+        )
+        
+        response.set_cookie(
+            'redirect_url',
+            next_url,
+            httponly=True,
+            secure=False,  # Set to True in production
+            samesite='Lax',
+            max_age=300,  # 5 minutes
+            path='/'
+        )
+        
+        return response
+    except Exception as e:
+        logger.error(f"Login error: {str(e)}")
+        return f"Login failed: {str(e)}", 400
 
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
     try:
-        # Obtain the access token from Auth0
-        token = oauth.auth0.authorize_access_token()
-
-        # Store the token in the session
-        session["jwt"] = token
-
-        # User info endpoint - manually specified
-        user_info_endpoint = "https://dev-3klm8ed6qtx4zj6v.us.auth0.com/userinfo"
-        user_info_response = oauth.auth0.get(user_info_endpoint)
-
-        # Extract user information from the response
-        user_info = user_info_response.json()
-        session["user"] = user_info
+        # Try to get the redirect URL from multiple sources
+        next_url = (
+            request.args.get("next") or  # URL parameter
+            request.cookies.get("redirect_url") or  # Cookie
+            session.get("next") or  # Session
+            url_for("index")  # Default
+        )
         
-        # Redirect to the originally requested URL, or default to the index page
-        next_url = session.get("next", url_for("index"))
-        session.pop("next", None)  # Clear the stored URL
-        return redirect(next_url)
+        logger.info(f"Callback: Found redirect URL: {next_url}")
+        
+        # Log state values for debugging
+        request_state = request.args.get('state')
+        session_state = session.get('oauth_state')
+        
+        logger.info(f"Callback: Session contents at start: {dict(session)}")
+        logger.info(f"Request state: {request_state}")
+        logger.info(f"Session state: {session_state}")
+        
+        # Verify state before token exchange
+        if not session_state:
+            logger.error("No state found in session")
+            raise ValueError("No state in session - session may have expired")
+            
+        if request_state != session_state:
+            logger.error(f"State mismatch: Request={request_state}, Session={session_state}")
+            raise ValueError("State mismatch - possible CSRF attack")
+        
+        # Exchange code for token
+        callback_url = url_for("callback", _external=True, next=next_url)
+        token = oauth.auth0.authorize_access_token(
+            redirect_uri=callback_url
+        )
+        
+        # Get userinfo
+        userinfo = oauth.auth0.userinfo()
+        
+        # Store in session
+        session["user"] = userinfo
+        session["jwt"] = token
+        session.modified = True
+        
+        # Create response with redirect
+        response = redirect(next_url)
+        
+        # Set session cookie again
+        response.set_cookie(
+            'oportunidades_session',
+            session.sid,
+            httponly=True,
+            secure=False,  # Set to True in production
+            samesite='Lax',
+            max_age=86400,
+            path='/'
+        )
+        
+        # Clear the redirect_url cookie
+        response.delete_cookie('redirect_url')
+        
+        return response
+        
     except Exception as e:
-        # Handle errors and provide feedback
-        print(f"Error during callback processing: {str(e)}")
-        return f"An error occurred: {str(e)}"
+        logger.error(f"Auth0 callback error: {str(e)}")
+        return "Authentication failed. Please try logging in again.", 400
 
 
 @app.route("/logout")
@@ -1083,5 +1201,8 @@ def refresh_database_cache():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == "__main__":
+    # Ensure session directory exists
+    os.makedirs(os.path.join(app.root_path, 'flask_session'), exist_ok=True)
+    
     port = int(os.environ.get("PORT", 5001))
     app.run(host="0.0.0.0", port=port, debug=True)
