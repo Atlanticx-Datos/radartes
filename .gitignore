@@ -18,6 +18,7 @@ venv.bak/
 # Flask specific
 instance/
 .webassets-cache
+flask_session/
 
 # Installer logs
 pip-log.txt
@@ -98,3 +99,6 @@ node_modules/
 # Build directories
 build/
 dist/
+
+# Session files
+flask_session/
