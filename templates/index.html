@@ -22,7 +22,7 @@
       <div class="hidden md:block">
         <img src="/static/public/Logo_Blanco.png" alt="Logo" class="h-12">
       </div>
-      <div class="ml-auto dropdown dropdown-bottom relative left-8 md:left-12 dropdown-end bottom-8 md:-top-8">
+      <div class="ml-auto dropdown dropdown-bottom relative left-8 md:left-10 dropdown-end bottom-8 md:-top-8">
         <div tabindex="0" role="button" class="relative">
           <div class="relative">
             <span class="flex items-center justify-center w-10 h-10 bg-slate-400 rounded-full">
@@ -138,20 +138,17 @@
             <!-- Counter with notification dot -->
             <div class="relative flex items-center">
               {% if total_nuevas > 1 %}
-                <span class="text-base font-medium text-black border-b-2 border-black">+{{ total_nuevas }}</span>
-                <div class="absolute -right-2 top-0">
-                  <span class="flex h-1.5 w-1.5">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
-                  </span>
-                </div>
+                <!-- Badge styling for total_nuevas -->
+                <span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold absolute -top-3 -right-3">
+                  +{{ total_nuevas }}
+                </span>
               {% endif %}
             </div>
             <!-- Text -->
             <div class="flex items-center justify-center">
               <span class="updates-text text-black">
                 <span class="mr-2"></span>
-                <span>Actualizamos y verificamos becas, premios, convocatorias y movilidad.</span>
+                <span>Nuevas becas, premios, convocatorias y residencias.</span>
               </span>
             </div>
           </div>
@@ -162,7 +159,7 @@
           <div class="flex space-x-6 md:space-x-2">
             <a href="mailto:your@email.com"
               class="text-black hover:text-indigo-700 transition-all duration-300 hover:-translate-y-1">
-              <svg class="w-6 h-6 social-icon-md" fill="currentColor" viewBox="0 0 24 24">
+              <svg class="w-6 h-6 md:w-4 md:h-4 lg:w-5 lg:h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
                 <path
                   d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" />
@@ -173,7 +170,7 @@
               class="text-black cursor-default opacity-75"
               aria-disabled="true"
               title="Instagram account coming soon!">
-              <svg class="w-5 h-5 social-icon-md scale-110 relative top-[1.5px]" fill="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 md:w-3 md:h-3 lg:w-4 lg:h-4 scale-110 relative top-[1.5px]" fill="currentColor" viewBox="0 0 24 24">
                 <path fill-rule="evenodd"
                   d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
                   clip-rule="evenodd" />
@@ -232,11 +229,12 @@
   }
 
   /* Medium screens */
-  @media (min-width: 768px) and (max-width: 1023px) {
+  @media (min-width: 768px) {
     .hero-text {
-      font-size: 4rem;
+      font-size: 2.7rem;
       line-height: 0.95;
-      font-weight: 300;
+      font-weight: 500;
+      letter-spacing: -0.05em;
     }
   }
 
@@ -248,7 +246,7 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;
-      font-size: 3.8rem;
+      font-size: 3rem;
       line-height: 1;
       font-weight: 600;
     }
@@ -280,7 +278,7 @@
 
   @media (min-width: 768px) {
     .hero-mobile {
-        font-size: 4rem;
+        font-size: 3.9rem;
         line-height: 0.88;
         font-weight: 500;
     }
@@ -295,8 +293,12 @@
   @media (min-width: 768px) and (max-width: 1023px) {
     .updates-text {
       white-space: nowrap;
-      font-size: 0.875rem;
+      font-size: 0.8rem;
       letter-spacing: -0.01em;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+     text-align: center !important; /* Ensure text is centered */
+     width: 100% !important; /* Ensure the div takes full width of its parent */
     }
 
     /* Hide elements between md and lg */
@@ -337,18 +339,15 @@
   .gallery-image {
     position: absolute;
     transition: transform 1.5s ease-in-out, opacity 0.3s ease-in-out;
+    filter: contrast(180%) saturate(180%) brightness(0.7) !important;
+    
+    /* Added properties to improve Safari rendering */
+    will-change: transform, opacity, filter;
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
   }
 
-  /* Original effect */
-  .effect-level-1 {
-    filter: contrast(200%) saturate(200%) brightness(0.9);
-  }
-
-  /* Brighter and more colorful - final effect */
-  .effect-level-2 {
-    filter: contrast(220%) saturate(250%) brightness(1);
-  }
-
+  /* Ensure 'translate-x-full' and 'translate-x-neg' are defined appropriately */
   .translate-x-full {
     transform: translateX(100%);
   }
@@ -361,6 +360,16 @@
     transform: translateX(-100%);
   }
 
+  /* Original effect */
+  .effect-level-1 {
+    filter: contrast(200%) saturate(200%) brightness(0.9);
+  }
+
+  /* Brighter and more colorful - final effect */
+  .effect-level-2 {
+    filter: contrast(220%) saturate(250%) brightness(1);
+  }
+
   /* Base wrapper positioning */
   @media (min-height: 896px) and (max-width: 428px) {
     .w-full.max-w-\[1180px\] {
@@ -370,28 +379,6 @@
 </style>
 
 <script>
-  // Lazy load videos
-  document.addEventListener('DOMContentLoaded', function() {
-      const lazyVideos = document.querySelectorAll('.lazy-video');
-      
-      const videoObserver = new IntersectionObserver((entries, observer) => {
-          entries.forEach(entry => {
-              if (entry.isIntersecting) {
-                  const video = entry.target;
-                  video.src = video.dataset.src;
-                  video.load();
-                  video.play();
-                  video.setAttribute('autoplay', '');
-                  video.setAttribute('loop', '');
-                  video.setAttribute('muted', '');
-                  observer.unobserve(video);
-              }
-          });
-      });
-
-      lazyVideos.forEach(video => videoObserver.observe(video));
-  });
-
   // Optimize spinner behavior
   function showSpinner(event) {
       const spinner = document.getElementById('spinner');
@@ -404,7 +391,7 @@
       }
   }
 
-  // Simple JavaScript to test image switching
+  // JavaScript to handle image carousel without removing 'effect-level-1' class
   document.addEventListener('DOMContentLoaded', function() {
     const images = document.querySelectorAll('.gallery-image');
     let currentIndex = 0;
@@ -422,7 +409,7 @@
       nextImage.classList.remove('translate-x-full');
       nextImage.classList.add('translate-x-zero');
 
-      // After animation, reset positions
+      // After animation, reset positions without altering 'effect-level-1'
       setTimeout(() => {
         currentImage.classList.remove('translate-x-neg');
         currentImage.classList.add('translate-x-full');
@@ -431,7 +418,7 @@
       currentIndex = nextIndex;
     }
 
-    // Initialize first image
+    // Initialize first image with 'translate-x-zero'
     images[0].classList.add('translate-x-zero');
 
     // Switch every 5 seconds

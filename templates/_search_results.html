@@ -1,7 +1,7 @@
 {% if pages %}
 {% for page in pages %}
 <tr class="border-b {% if loop.last %}mb-32 pb-32{% endif %}">
-    <th class="w-1/12">
+    <th class="w-1/12 md:px-4 lg:px-0">
         <label>
             <input type="checkbox" class="checkbox rounded-none h-4 w-4" name="selected_pages" value="{{ page.id }}" />
         </label>

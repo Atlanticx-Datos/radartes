@@ -199,19 +199,19 @@
                             </div>
                         </div>
                         <ul tabindex="0"
-                            class="dropdown-content z-[1] menu p-2 bg-base-100 rounded-md w-52 border border-black mt-3">
+                            class="dropdown-content z-[1] menu p-2 bg-base-100 rounded-md w-52 border border-black mt-3 text-gray-700 font-Poppins">
                             <li><a href="{{ url_for('all_pages') }}" onclick="layoutshowSpinner(event)"><span
-                                        class="border-l-4 border-accent pl-3">Oportunidades</span></a></li>
+                                        class="border-l-4 border-accent pl-3 uppercase font-semibold">Oportunidades</span></a></li>
                             <li><a href="{{ url_for('list_saved_opportunities') }}" onclick="layoutshowSpinner(event)"><span
-                                        class="border-l-4 border-secondary pl-3">Guardadas</span></a></li>
-                            <li><a href="{{ url_for('index') }}"><span class="border-l-4 border-black pl-3">Home</span></a>
+                                        class="border-l-4 border-secondary pl-3 uppercase font-semibold">Guardadas</span></a></li>
+                            <li><a href="{{ url_for('index') }}"><span class="border-l-4 border-black pl-3 uppercase font-semibold">Home</span></a>
                             </li>
                             {% if session.get('user') %}
                             <li><a href="https://github.com/Atlanticx-Datos/100_Oportunidades" target="_blank"
-                                    rel="noopener noreferrer"><span class="border-l-4 border-primary pl-3">GitHub</span></a>
+                                    rel="noopener noreferrer"><span class="border-l-4 border-primary pl-3 uppercase font-semibold">GitHub</span></a>
                             </li>
                             <li><a href="{{ url_for('logout') }}"><span
-                                        class="border-l-4 border-base-200 pl-3">Cerrar</span></a></li>
+                                        class="border-l-4 border-base-200 pl-3 uppercase font-semibold">Cerrar</span></a></li>
                             {% endif %}
                         </ul>
                     </div>
