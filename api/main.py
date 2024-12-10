@@ -51,83 +51,6 @@ from flask_caching import Cache
 import logging
 
 
-KEYWORD_BINDINGS = {
-    # Educational/Academic terms that should map to artistic disciplines
-    'academic': {
-        'triggers': [
-            # Academic institutions and levels
-            'universidad', 'university', 'uni ', 'univ',
-            'facultad', 'faculty',
-            'instituto', 'institute',
-            'escuela', 'school',
-            'conservatorio', 'conservatory',
-            
-            # Academic programs
-            'maestría', 'maestria', 'master',
-            'doctorado', 'doctorate', 'phd',
-            'posgrado', 'postgrad',
-            'licenciatura', 'bachelor',
-            
-            # Research and study
-            'investigación', 'investigacion', 'research',
-            'formación', 'formacion', 'formation',
-            'estudios', 'studies',
-            
-            # Funding and opportunities
-            'beca', 'scholarship',
-            'residencia académica', 'academic residency'
-        ],
-        'maps_to': ['música', 'musica', 'danza', 'teatro']
-    },
-
-    # Specific artistic terms should only match their own discipline
-    'música': {
-        'triggers': [
-            # Direct music terms
-            'música', 'musica', 'musical',
-            
-            # Performance
-            'composición', 'composition',
-            'concierto', 'concert',
-            'orquesta', 'orchestra',
-            'ópera', 'opera',
-            
-            # Instruments and voice
-            'instrumento', 'instrument',
-            'piano', 'violin',
-            'canción', 'cancion', 'song',
-            'canto', 'singing',
-            
-            # Programs and institutions
-            'ibermúsicas', 'ibermusicas',
-            'conservatorio', 'conservatory',
-            
-            # General music terms
-            'sonoro', 'sound',
-            'opera', 'ópera',
-            'interpretación', 'music performance',
-        ],
-        'maps_to': ['música', 'musica']
-    },
-    'teatro': {
-        'triggers': [
-            'dramaturgia', 'dramaturgy',
-            'iberescena', 'actuación', 'performance',
-            'artes escénicas', 'scenic arts', 'escenografía',
-            'scenic design', 'textos', 'libretto'
-        ],
-        'maps_to': ['teatro']
-    },
-    'danza': {
-        'triggers': [
-            'coreografía', 'choreography',
-            'ballet',
-            'videodanza', 'videodance'
-        ],
-        'maps_to': ['danza']
-    }
-}
-
 load_dotenv()
 print("Loaded AUTH0_DOMAIN:", os.environ.get("AUTH0_DOMAIN"))
 
@@ -699,59 +622,9 @@ def all_pages():
     is_htmx = request.headers.get('HX-Request', 'false').lower() == 'true'
     is_clear = request.args.get("clear", "false").lower() == "true"
     search_query = request.args.get("search", "").lower()
-
-    # Define text processing functions
-    def normalize_text(text):
-        return ''.join(
-            c for c in unicodedata.normalize('NFD', text)
-            if unicodedata.category(c) != 'Mn'
-        )
-
-    def singularize_text(text):
-        words = text.split()
-        return ' '.join(p.singular_noun(word) or word for word in words)
-
-    def preprocess_text(text, expand_terms=False):
-        """Preprocesses text for searching, including keyword expansion if requested"""
-        if not isinstance(text, str):
-            text = str(text)
-        
-        # Basic preprocessing
-        text = text.lower()
-        normalized = normalize_text(text)
-        singularized = singularize_text(normalized)
-        
-        # Only expand terms for música, teatro, danza searches
-        if expand_terms:
-            # Start with the original processed text
-            expanded_terms = {singularized}
-            
-            # Check each category's triggers
-            for category, bindings in KEYWORD_BINDINGS.items():
-                # If any trigger matches our search term
-                if any(trigger in singularized for trigger in bindings['triggers']):
-                    # Add all triggers from this category
-                    expanded_terms.update(bindings['triggers'])
-                    expanded_terms.update(bindings['maps_to'])
-            
-            result = ' '.join(expanded_terms)
-            print(f"Expanded '{text}' to: {result}")
-            sys.stdout.flush()
-            return result
-        
-        return singularized
-
-    # Month mapping
-    month_mapping = {
-        "enero": 1, "febrero": 2, "marzo": 3, "abril": 4,
-        "mayo": 5, "junio": 6, "julio": 7, "agosto": 8,
-        "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
-    }
-
-    # Check for month or "sin cierre" before preprocessing the search query
-    month_number = month_mapping.get(search_query)
-    is_sin_cierre = search_query == "sin cierre"
-    placeholder_date = '1900-01-01'
+    is_expanded = request.args.get("expanded", "false").lower() == "true"
+    month_number = request.args.get("month", type=int)
+    is_sin_cierre = request.args.get("sin_cierre", "false").lower() == "true"
 
     # Get cached content
     cached_content = get_cached_database_content()
@@ -761,97 +634,95 @@ def all_pages():
         sys.stdout.flush()
         
         pages = cached_content['pages']
+        closing_soon_pages = cached_content['closing_soon_pages']
+        destacar_pages = cached_content['destacar_pages']
 
         # Handle clear request
         if is_clear:
             if is_htmx:
                 return render_template("_search_results.html", pages=pages)
-            else:
-                return render_template(
-                    "database.html", 
-                    pages=pages,
-                    closing_soon_pages=cached_content['closing_soon_pages'][:7],
-                    destacar_pages=cached_content['destacar_pages'],
-                    og_data={
-                        "title": "100 ︱ Oportunidades",
-                        "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
-                        "url": request.url,
-                        "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
-                    }
-                )
+            return render_template(
+                "database.html",
+                pages=pages,
+                closing_soon_pages=closing_soon_pages[:7],
+                destacar_pages=destacar_pages,
+                og_data={
+                    "title": "100 ︱ Oportunidades",
+                    "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
+                    "url": request.url,
+                    "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
+                }
+            )
+
+        # Apply filters
+        filtered_pages = pages
         
-        # Handle search
-        if search_query:
-            if month_number is not None or is_sin_cierre:
-                filtered_pages = [
-                    page for page in pages
-                    if (is_sin_cierre and page.get("fecha_de_cierre") == placeholder_date)
-                    or (month_number and datetime.strptime(page.get("fecha_de_cierre", placeholder_date), '%Y-%m-%d').month == month_number)
-                ]
-            else:
-                # Determine if we should expand terms (only for música, teatro, danza)
-                search_lower = normalize_text(search_query.lower())
-                should_expand = any(term in search_lower for term in ['musica', 'música', 'teatro', 'danza'])
+        # Apply month-based filter first
+        if month_number is not None or is_sin_cierre:
+            filtered_pages = [
+                page for page in filtered_pages 
+                if (is_sin_cierre and page.get("fecha_de_cierre") == "1900-01-01")
+                or (month_number and datetime.strptime(page.get("fecha_de_cierre", "1900-01-01"), '%Y-%m-%d').month == month_number)
+            ]
+        
+        # Then apply search filter if needed
+        elif search_query:
+            def normalize_text(text):
+                if not isinstance(text, str):
+                    text = str(text)
+                return unicodedata.normalize('NFKD', text.lower()) \
+                    .encode('ASCII', 'ignore') \
+                    .decode('ASCII')
+
+            if is_expanded:
+                search_terms = search_query.split('|')
+                print(f"Expanded search terms: {search_terms}")  # Debug log
                 
-                # Preprocess search query
-                processed_query = preprocess_text(search_query, expand_terms=should_expand)
-                
-                # If we expanded terms, split them into a list
-                search_terms = processed_query.split() if should_expand else [processed_query]
-                
-                def check_page_content(page):
-                    # Combine all searchable content from the page
-                    page_content = ' '.join([
-                        page.get("nombre", ""),
-                        page.get("país", ""),
-                        page.get("destinatarios", ""),
-                        page.get("ai_keywords", ""),
-                        page.get("nombre_original", ""),
-                        page.get("entidad", "")
+                filtered_pages = []
+                for page in pages:
+                    # Focus primarily on ai_keywords
+                    keywords = normalize_text(str(page.get("ai_keywords", "")))
+                    
+                    # Check nombre only for exact discipline matches
+                    nombre = normalize_text(str(page.get("nombre", "")))
+                    
+                    # Check if it's a residency
+                    descripcion = normalize_text(str(page.get("descripción", "")))
+                    is_residency = any(term in descripcion for term in [
+                        "residencia", "residencia artistica", "residencia para artistas",
+                        "artist residency", "residencia de artistas"
                     ])
-                    processed_content = preprocess_text(page_content, expand_terms=False).lower()
                     
-                    # For artistic disciplines, check both content and educational terms
-                    if should_expand:
-                        # Check for direct artistic terms
-                        artistic_match = any(term in processed_content for term in search_terms)
-                        
-                        # Check for educational terms using KEYWORD_BINDINGS
-                        educational_terms = [term.lower() for term in KEYWORD_BINDINGS['academic']['triggers']]
-                        educational_match = any(term in processed_content for term in educational_terms)
-                        
-                        # Check if the educational terms map to the current artistic discipline
-                        maps_to_terms = [term.lower() for term in KEYWORD_BINDINGS['academic']['maps_to']]
-                        music_match = any(term in maps_to_terms for term in ['musica', 'música'])
-                        
-                        # Debug output
-                        if artistic_match or (educational_match and music_match):
-                            print(f"\nChecking page: {page.get('nombre', '')}")
-                            print(f"Content: {processed_content}")
-                            print(f"Artistic match: {artistic_match}")
-                            print(f"Educational match: {educational_match}")
-                            print(f"Music match: {music_match}")
-                            sys.stdout.flush()
-                        
-                        return artistic_match or (educational_match and music_match)
-                    
-                    # For non-artistic searches (like "investigacion")
-                    return processed_query in processed_content
-                
+                    # Include if:
+                    # 1. Matches discipline-specific terms in ai_keywords or nombre
+                    # 2. Is a residency (they usually accept all disciplines)
+                    # 3. Matches educational terms in ai_keywords
+                    if any(normalize_text(term) in keywords or 
+                          (normalize_text(term) in nombre and any(
+                              discipline in term for discipline in ["music", "musica", "danza", "teatro", "theater"]
+                          )) or
+                          (is_residency and "artista" in keywords)
+                          for term in search_terms):
+                        filtered_pages.append(page)
+                        print(f"Matched page: {page.get('nombre', '')}")  # Debug log
+            else:
+                normalized_query = normalize_text(search_query)
                 filtered_pages = [
                     page for page in pages
-                    if check_page_content(page)
+                    if normalized_query in normalize_text(str(page.get("ai_keywords", "")))
+                    or normalized_query in normalize_text(str(page.get("nombre", "")))
                 ]
+
+            print(f"Found {len(filtered_pages)} matching pages")  # Debug log
             
             if is_htmx:
                 return render_template("_search_results.html", pages=filtered_pages)
-        
-        # If not searching and not clearing, return full cached content
+
         return render_template(
-            "database.html", 
-            pages=pages,
-            closing_soon_pages=cached_content['closing_soon_pages'][:7],
-            destacar_pages=cached_content['destacar_pages'],
+            "database.html",
+            pages=filtered_pages,
+            closing_soon_pages=closing_soon_pages[:7],
+            destacar_pages=destacar_pages,
             og_data={
                 "title": "100 ︱ Oportunidades",
                 "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
@@ -860,374 +731,19 @@ def all_pages():
             }
         )
 
-    # If no cache or cache miss, proceed with original logic
-    print("\n=== No cache or cache miss, proceeding with original logic ===")
-    sys.stdout.flush()
-
-    def fetch_notion_pages():
-        cache_key = 'notion_pages'
-        
-        try:
-            # Try cache first
-            cached_data = redis.get(cache_key)
-            if cached_data:
-                print("\n=== CACHE HIT: Serving from Upstash KV ===")
-                return json.loads(cached_data)
-        except Exception as e:
-            print(f"\n=== CACHE ERROR: {str(e)} ===")
-        
-        print("\n=== CACHE MISS: Fetching from Notion API ===")
-        fetch_start_time = time.time()
-        
-        # Your existing code stays exactly the same, including all logging
-        url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
-        headers = {
-            "Authorization": "Bearer " + NOTION_TOKEN,
-            "Content-Type": "application/json",
-            "Notion-Version": "2022-06-28",
+    # If no cached content, return empty template
+    return render_template(
+        "database.html",
+        pages=[],
+        closing_soon_pages=[],
+        destacar_pages=[],
+        og_data={
+            "title": "100 ︱ Oportunidades",
+            "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
+            "url": request.url,
+            "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
         }
-        print(f"Headers: {headers}")
-        sys.stdout.flush()
-        
-        now_date_str = datetime.now().strftime('%Y-%m-%d')
-            # 1. Reduce the number of properties we request
-        json_body = {
-            "filter": {
-                "and": [
-                    {"property": "Publicar", "checkbox": {"equals": True}},
-                    {
-                        "or": [
-                            {"property": "Fecha de cierre", "date": {"is_empty": True}},
-                            {"property": "Fecha de cierre", "date": {"after": datetime.now().strftime('%Y-%m-%d')}}
-                        ]
-                    }
-                ]
-            },
-            # 2. Only request the properties we actually use
-            "page_size": 100  # 3. Increase page size to reduce number of requests
-        }
-
-        print(f"Request body: {json.dumps(json_body, indent=2)}")
-        sys.stdout.flush()
-
-        response = requests.post(url, headers=headers, json=json_body, timeout=60)
-        data = response.json()
-
-        # Add size check for raw response
-        raw_json = json.dumps(data)
-        response_size = sys.getsizeof(raw_json)
-        print(f"\nRaw response size: {response_size / 1024:.2f} KB")
-        
-        all_pages = []
-        has_more = True
-        start_cursor = None
-        request_count = 0
-        max_requests = 3  # Limit maximum number of requests
-
-        while has_more and request_count < max_requests:
-            request_count += 1
-            request_start = time.time()
-            try:
-                if start_cursor:
-                    json_body["start_cursor"] = start_cursor
-
-                print(f"Making request with start_cursor: {start_cursor}")
-                res = requests.post(url, headers=headers, json=json_body, timeout=30)
-                res.raise_for_status()
-                data = res.json()
-                print(f"Response status: {res.status_code}")
-                print(f"Response body: {res.text}")
-                print(f"Received {len(data.get('results', []))} results")
-                sys.stdout.flush()
-                res.raise_for_status()
-                all_pages.extend(data.get("results", []))
-                has_more = data.get("has_more", False)
-                start_cursor = data.get("next_cursor")
-                
-                print(f"has_more: {has_more}, next_cursor: {start_cursor}")
-
-                logger.info(f"Notion API request #{request_count} took {time.time() - request_start:.2f}s")  # Add this line
-
-            except requests.exceptions.Timeout:
-                print("Request timed out")
-                break
-
-            except requests.exceptions.RequestException as e:
-                print(f"Request failed: {str(e)}")
-                break
-
-            if not has_more:
-                break
-
-        print(f"Finished fetching, total pages: {len(all_pages)}")
-        print(f"Total fetch time: {time.time() - fetch_start_time:.2f} seconds")
-        raw_json = json.dumps(data)
-        response_size = sys.getsizeof(raw_json)
-        print(f"\nRaw response size: {response_size / 1024:.2f} KB")
-        processed_json = json.dumps(all_pages)
-        processed_size = sys.getsizeof(processed_json)
-        print(f"Processed data size: {processed_size / 1024:.2f} KB")
-        
-        try:
-            redis.set(cache_key, json.dumps(all_pages), ex=21600)  # Cache for 30 minutes
-            print("\n=== CACHE UPDATE: Stored new data in Upstash KV ===")
-        except Exception as e:
-            print(f"\n=== CACHE ERROR: {str(e)} ===")
-        
-        return all_pages
-    
-    if request.args.get("clear", "false").lower() == "true":
-        cache.delete('notion_pages')
-        print("Cache cleared due to clear search request")
-        sys.stdout.flush()
-
-    # Rest of the existing code remains exactly the same
-    search_query = request.args.get("search", "").lower()
-    
-    def normalize_text(text):
-        return ''.join(
-            c for c in unicodedata.normalize('NFD', text)
-            if unicodedata.category(c) != 'Mn'
-        )
-    print("Defined normalize_text function")
-    sys.stdout.flush()
-
-    def singularize_text(text):
-        words = text.split()
-        return ' '.join(p.singular_noun(word) or word for word in words)
-    print("Defined singularize_text function")
-    sys.stdout.flush()
-
-    def preprocess_text(text, expand_terms=False):
-        """Preprocesses text for searching, including keyword expansion if requested"""
-        if not isinstance(text, str):
-            text = str(text)
-        
-        # Basic preprocessing
-        text = text.lower()
-        normalized = normalize_text(text)
-        singularized = singularize_text(normalized)
-        
-        # Only expand terms for música, teatro, danza searches
-        if expand_terms:
-            # Start with the original processed text
-            expanded_terms = {singularized}
-            
-            # Check each category's triggers
-            for category, bindings in KEYWORD_BINDINGS.items():
-                # If any trigger matches our search term
-                if any(trigger in singularized for trigger in bindings['triggers']):
-                    # Add all triggers from this category
-                    expanded_terms.update(bindings['triggers'])
-                    expanded_terms.update(bindings['maps_to'])
-            
-            result = ' '.join(expanded_terms)
-            print(f"Expanded '{text}' to: {result}")
-            sys.stdout.flush()
-            return result
-        
-        return singularized
-    print("Defined preprocess_text function")
-    sys.stdout.flush()
-
-    search_query = preprocess_text(request.args.get("search", "").strip())
-    print(f"Processed search query: {search_query}")
-    sys.stdout.flush()
-
-    print("About to call fetch_notion_pages")
-    sys.stdout.flush()
-    all_pages = fetch_notion_pages()
-    print(f"Received {len(all_pages) if all_pages else 0} pages")
-    sys.stdout.flush()
-    
-    
-    now_date = datetime.now()
-    seven_days_from_now = now_date + timedelta(days=7)
-    fifteen_days_from_now = now_date + timedelta(days=15)
-    placeholder_date = '1900-01-01'  # Placeholder date for pages without fecha_de_cierre
-
-    # Month mapping
-    month_mapping = {
-        "enero": 1, "febrero": 2, "marzo": 3, "abril": 4,
-        "mayo": 5, "junio": 6, "julio": 7, "agosto": 8,
-        "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
-    }
-
-    # Check for month or "sin cierre" before preprocessing the search query
-    month_number = month_mapping.get(search_query)
-    is_sin_cierre = search_query == "sin cierre"
-
-       # Only preprocess search query if it's not a month or "sin cierre"
-    if not month_number and not is_sin_cierre:
-        search_query = preprocess_text(search_query)
-
-    closing_soon_pages = []
-    pages = []
-    destacar_pages = []
-
-    for page in all_pages:
-
-        print(f"\nProcessing page: {page['id']}")
-        sys.stdout.flush()
-
-        if "Publicar" in page["properties"] and page["properties"]["Publicar"]["checkbox"]:
-
-
-            print("Page is published")
-            sys.stdout.flush()
-
-            page_data = {"id": page["id"], "created_time": page["created_time"]}
-
-            if "Resumen generado por la IA" in page["properties"]:
-                page_data["nombre"] = (
-                    page["properties"]["Resumen generado por la IA"]["rich_text"][0]["text"]["content"]
-                    if page["properties"]["Resumen generado por la IA"]["rich_text"]
-                    else ""
-                )
-
-                print(f"Nombre: {page_data['nombre']}")
-                sys.stdout.flush()
-
-            if "País" in page["properties"]:
-                page_data["país"] = (
-                    page["properties"]["País"]["rich_text"][0]["text"]["content"]
-                    if page["properties"]["País"]["rich_text"]
-                    else ""
-                )
-
-            if "Destinatarios" in page["properties"]:
-                page_data["destinatarios"] = (
-                    page["properties"]["Destinatarios"]["rich_text"][0]["text"]["content"]
-                    if page["properties"]["Destinatarios"]["rich_text"]
-                    else ""
-                )
-
-            if "AI keywords" in page["properties"]:
-                page_data["ai_keywords"] = (
-                    page["properties"]["AI keywords"]["multi_select"][0]["name"]
-                    if page["properties"]["AI keywords"]["multi_select"]
-                    else ""
-                )
-
-            if "URL" in page["properties"]:
-                page_data["url"] = (
-                    page["properties"]["URL"]["url"]
-                    if page["properties"]["URL"].get("url")
-                    else ""
-                )
-
-            if "Nombre" in page["properties"]:
-                page_data["nombre_original"] = (
-                    page["properties"]["Nombre"]["title"][0]["text"]["content"]
-                    if page["properties"]["Nombre"]["title"]
-                    else ""
-                )
-
-            if "Entidad" in page["properties"]:
-                page_data["entidad"] = (
-                    page["properties"]["Entidad"]["rich_text"][0]["text"]["content"]
-                    if page["properties"]["Entidad"]["rich_text"]
-                    else ""
-        )
-
-            # Check if "Fecha de cierre" property exists and has a date
-            fecha_de_cierre_prop = page["properties"].get("Fecha de cierre", None)
-            fecha_de_cierre = None
-            if fecha_de_cierre_prop and "date" in fecha_de_cierre_prop and fecha_de_cierre_prop["date"]:
-                fecha_de_cierre = fecha_de_cierre_prop["date"].get("start", None)
-
-            print("Page ID:", page["id"], "Fecha de Cierre:", fecha_de_cierre if fecha_de_cierre else "None")
-
-            # Check if "Fecha de cierre" property exists and has a date
-            fecha_de_cierre_prop = page["properties"].get("Fecha de cierre", None)
-            fecha_de_cierre = None
-            if fecha_de_cierre_prop and "date" in fecha_de_cierre_prop and fecha_de_cierre_prop["date"]:
-                fecha_de_cierre = fecha_de_cierre_prop["date"].get("start", None)
-                page_data["fecha_de_cierre"] = fecha_de_cierre
-                cierre_date = datetime.strptime(fecha_de_cierre, '%Y-%m-%d')
-
-                if now_date <= cierre_date <= seven_days_from_now:
-                    closing_soon_pages.append(page_data)
-            else:
-                page_data["fecha_de_cierre"] = placeholder_date
-
-            # Add to destacar_pages if "destacar" is in "destinatarios" and fecha_de_cierre is empty or not past today
-            if page_data.get("destinatarios", "").lower() == "destacar":
-                if not fecha_de_cierre or cierre_date >= now_date:
-                    destacar_pages.append(page_data)
-
-            # Ensure each page is added to pages only once
-            pages.append(page_data)
-            print("Added to pages list")
-            sys.stdout.flush()
-
-    print(f"\nFinal counts:")
-    print(f"Total pages: {len(pages)}")
-    print(f"Closing soon: {len(closing_soon_pages)}")
-    print(f"Destacar: {len(destacar_pages)}")
-    sys.stdout.flush()
-
-    # If less than 5 pages, extend to 15 days
-    if len(closing_soon_pages) < 5:
-        for page in pages:
-            if "fecha_de_cierre" in page:
-                cierre_date = datetime.strptime(page["fecha_de_cierre"], '%Y-%m-%d')
-                if seven_days_from_now < cierre_date <= fifteen_days_from_now:
-                    closing_soon_pages.append(page)
-                    if len(closing_soon_pages) >= 7:
-                        break
-
-    # Apply month-based filter first
-    if month_number is not None or is_sin_cierre:
-        pages = [
-            page for page in pages 
-            if (is_sin_cierre and page.get("fecha_de_cierre") == placeholder_date)
-            or (month_number and datetime.strptime(page.get("fecha_de_cierre", placeholder_date), '%Y-%m-%d').month == month_number)
-        ]
-    # Then apply regular search filter if needed
-    elif search_query:
-        pages = [
-            page for page in pages 
-            if search_query in preprocess_text(page.get("nombre", ""))
-            or search_query in preprocess_text(page.get("país", ""))
-            or search_query in preprocess_text(page.get("destinatarios", ""))
-            or search_query in preprocess_text(page.get("ai_keywords", ""))
-            or search_query in preprocess_text(page.get("nombre_original", ""))
-            or search_query in preprocess_text(page.get("entidad", ""))
-        ]
-
-    closing_soon_pages = sorted(closing_soon_pages, key=lambda page: page["fecha_de_cierre"])
-    sorted_pages = sorted(pages, key=lambda page: (
-        not page["fecha_de_cierre"] == placeholder_date,  # Cambiado: negamos la condición para invertir el orden
-        datetime.strptime(page["fecha_de_cierre"], '%Y-%m-%d') if page["fecha_de_cierre"] != placeholder_date else datetime.max  # Segundo: orden por fecha
-    ), reverse=True)
-
-    og_data = {
-        "title": "100 ︱ Oportunidades",
-        "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
-        "url": request.url,
-        "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
-    }
-
-    if is_htmx:
-        print("HTMX request - bypassing cache")
-        return render_template("_search_results.html", pages=sorted_pages)
-    else:
-        print("Regular request")
-        response = render_template(
-            "database.html", 
-            pages=sorted_pages, 
-            closing_soon_pages=closing_soon_pages[:7],
-            destacar_pages=destacar_pages,
-            og_data=og_data
-        )
-        
-        # Only cache non-HTMX, non-clear responses
-        if not is_clear:
-            cache.set('all_pages_response', response, timeout=7200)
-        
-        return response
-
+    )
 
 # Custom Jinja2 filter for date
 @app.template_filter('format_date')

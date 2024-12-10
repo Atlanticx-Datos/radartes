@@ -218,11 +218,15 @@
 
         // Function to handle search input
         function handleSearchInput(event) {
+            if (searchInProgress) return;
+            
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 const searchTerm = event.target.value.trim();
                 if (searchTerm.length >= 3) {
+                    searchInProgress = true;
                     trackSearch(searchTerm);
+                    fetchSearchResults(searchTerm);
                 }
             }, 1000);
         }
@@ -294,14 +298,25 @@
 
         // Function to fetch search results
         function fetchSearchResults(searchValue) {
-            fetch(`/database?search=${encodeURIComponent(searchValue)}`, {
+            const spinner = document.getElementById('spinner');
+            spinner.style.display = 'block';
+
+            const searchResult = expandSearchTerms(searchValue);
+            console.log('Search payload:', searchResult);
+            
+            const queryParams = new URLSearchParams({
+                search: searchResult.terms,
+                expanded: searchResult.expanded
+            });
+
+            fetch(`/database?${queryParams.toString()}`, {
                 headers: { 'HX-Request': 'true' }
             })
             .then(response => response.text())
             .then(html => {
                 document.getElementById('search-results').innerHTML = html;
                 scrollToTop('results-container');
-                // Reattach handlers after search results are loaded
+                setupSearchHandlers(); // Reattach handlers after search
                 attachOpportunityHandlers();
             })
             .catch(error => {
@@ -309,34 +324,39 @@
                 trackSearchError(searchValue, 'fetch_error');
             })
             .finally(() => {
-                searchInProgress = false;
-                toggleSpinner(false);
+                spinner.style.display = 'none';
+                searchInProgress = false; // Reset search flag
             });
         }
 
         // Function to clear search
         function clearSearch() {
-            if (!searchInProgress) {
-                document.getElementById('search-input').value = '';
-                searchInProgress = true;
-                toggleSpinner(true);
-                fetch('/database?clear=true', {
-                    headers: { 'HX-Request': 'true' }
-                })
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById('search-results').innerHTML = html;
-                    scrollToTop('results-container');
-                    // Reattach handlers after clearing search
-                    attachOpportunityHandlers();
-                })
-                .catch(error => {
-                    console.error('Clear error:', error);
-                })
-                .finally(() => {
-                    searchInProgress = false;
-                    toggleSpinner(false);
-                });
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.value = '';
+                
+                if (!searchInProgress) {
+                    searchInProgress = true;
+                    toggleSpinner(true);
+                    
+                    fetch('/database?clear=true', {
+                        headers: { 'HX-Request': 'true' }
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('search-results').innerHTML = html;
+                        scrollToTop('results-container');
+                        setupSearchHandlers(); // Reattach handlers after clearing
+                        attachOpportunityHandlers();
+                    })
+                    .catch(error => {
+                        console.error('Clear error:', error);
+                    })
+                    .finally(() => {
+                        searchInProgress = false;
+                        toggleSpinner(false);
+                    });
+                }
             }
         }
 
@@ -761,6 +781,125 @@
                     return false;
                 });
             });
+        });
+
+        // Replace the existing SEARCH_CATEGORIES with this refined version
+        const SEARCH_CATEGORIES = {
+            music: {
+                triggers: ['música', 'musica', 'music', 'musical'],
+                related: [
+                    // Core Music Terms
+                    'composición', 'composicion', 'composition',
+                    'concierto', 'concert', 'orchestra', 'orquesta',
+                    'ópera', 'opera',
+                    'interpretación musical', 'interpretacion musical',
+                    'dirección musical', 'direccion musical', 'conducting',
+                    'sonido musical', 'producción musical',
+                    
+                    // Instruments and Voice
+                    'instrumento', 'instrument', 'piano', 'violin', 'guitarra',
+                    'canto', 'singing', 'canción', 'cancion',
+                    'banda', 'band', 'ensemble', 'coro', 'choir',
+                    
+                    // Music Education and Institutions
+                    'conservatorio', 'conservatory',
+                    'escuela de música', 'escuela de musica',
+                    'ibermúsicas', 'ibermusicas',
+                    
+                    // Music Roles
+                    'compositor', 'compositora', 'composer',
+                    'músico', 'musico', 'musician',
+                    'director musical', 'directora musical',
+                    
+                    // Educational Terms
+                    'beca', 'becas', 'scholarship',
+                    'maestría', 'maestria', 'master',
+                    'doctorado', 'doctorate', 'phd',
+                    'universidad', 'university', 'univ',
+                    'facultad', 'faculty',
+                    'posgrado', 'postgrado',
+                    'licenciatura', 'bachelor',
+                    'formación', 'formacion',
+                    
+                    // General Artist Terms (to catch residencies)
+                    'residencia artística', 'residencia artistica',
+                    'residencia para artistas', 'artist residency',
+                    'residencia de creación', 'residencia de creacion',
+                    'artista', 'artistas', 'artist', 'artists'
+                ]
+            }
+        };
+
+        // Normalize text helper function
+        function normalizeText(text) {
+            return text.toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
+        }
+
+        // Update expandSearchTerms to better handle residency terms
+        function expandSearchTerms(searchTerm) {
+            const normalizedSearch = normalizeText(searchTerm);
+            
+            for (const [category, data] of Object.entries(SEARCH_CATEGORIES)) {
+                if (data.triggers.some(trigger => {
+                    const normalizedTrigger = normalizeText(trigger);
+                    return normalizedTrigger === normalizedSearch || 
+                           normalizedSearch.includes(normalizedTrigger);
+                })) {
+                    // Get all terms including residency-related ones
+                    const allTerms = new Set([
+                        ...data.triggers,
+                        ...data.related,
+                        // Always include general residency terms
+                        'residencia artística', 'residencia artistica',
+                        'residencia para artistas', 'artist residency',
+                        'residencia de creación', 'residencia de creacion',
+                        'artista', 'artistas', 'artist', 'artists'
+                    ]);
+                    
+                    const normalizedTerms = [...allTerms].map(term => normalizeText(term));
+                    
+                    console.log(`Expanded search for ${searchTerm} to:`, normalizedTerms);
+                    return {
+                        terms: normalizedTerms.join('|'),
+                        expanded: true
+                    };
+                }
+            }
+            
+            return {
+                terms: searchTerm,
+                expanded: false
+            };
+        }
+
+        // Update the event handling setup
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initial setup of search input handler
+            setupSearchHandlers();
+        });
+
+        // Create a new function to setup all search-related handlers
+        function setupSearchHandlers() {
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                // Remove existing listeners first
+                const newSearchInput = searchInput.cloneNode(true);
+                searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+                
+                // Add input event listener
+                newSearchInput.addEventListener('input', handleSearchInput);
+                
+                // Add keypress event listener
+                newSearchInput.addEventListener('keypress', handleKeyPress);
+            }
+        }
+
+        // Add event listener for HTMX after-swap
+        document.body.addEventListener('htmx:afterSwap', function(event) {
+            setupSearchHandlers();
+            attachOpportunityHandlers();
         });
     </script>
 
