@@ -310,13 +310,29 @@
             });
 
             fetch(`/database?${queryParams.toString()}`, {
-                headers: { 'HX-Request': 'true' }
+                headers: { 
+                    'HX-Request': 'true',
+                    'HX-Trigger': 'search'
+                }
             })
             .then(response => response.text())
             .then(html => {
-                document.getElementById('search-results').innerHTML = html;
+                const searchResults = document.getElementById('search-results');
+                searchResults.innerHTML = html;
+                
+                // Re-apply grid classes to parent elements
+                const firstColumn = document.querySelector('.col-span-1.md\\:col-span-5.lg\\:col-span-4');
+                const secondColumn = document.querySelector('.col-span-1.md\\:col-span-7.lg\\:col-span-8');
+                
+                if (firstColumn) {
+                    firstColumn.className = 'col-span-1 md:col-span-5 lg:col-span-4 md:border-r border-neutral flex flex-col justify-between';
+                }
+                if (secondColumn) {
+                    secondColumn.className = 'col-span-1 md:col-span-7 lg:col-span-8 mt-2 lg:mt-0 border-neutral';
+                }
+                
                 scrollToTop('results-container');
-                setupSearchHandlers(); // Reattach handlers after search
+                setupSearchHandlers();
                 attachOpportunityHandlers();
             })
             .catch(error => {
@@ -325,7 +341,7 @@
             })
             .finally(() => {
                 spinner.style.display = 'none';
-                searchInProgress = false; // Reset search flag
+                searchInProgress = false;
             });
         }
 
