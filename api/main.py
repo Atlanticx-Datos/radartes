@@ -103,7 +103,7 @@ cache = Cache(app, config={
 
 # Initialize Redis with your Upstash credentials
 redis = Redis(url=os.environ.get('KV_REST_API_URL'),
-             token=os.environ.get('KV_REST_API_TOKEN'))
+              token=os.environ.get('KV_REST_API_TOKEN'))
 
 # Environment-specific configuration
 if os.getenv("FLASK_ENV") == "development":
@@ -117,13 +117,11 @@ else:
 # Session(app)  # Comment this out if using the default Flask session management
 
 app.config["SESSION_TYPE"] = "filesystem"
-app.config["SESSION_COOKIE_SECURE"] = True  # Ensure cookies are sent over HTTPS
-app.config["SESSION_COOKIE_HTTPONLY"] = True  # Prevent JavaScript from accessing the cookies
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax"  # Add CSRF protection by allowing cookies to be sent only on same-site requests
-app.config["SESSION_PERMANENT"] = True  # Ensure sessions don't expire immediately
-app.config["SESSION_USE_SIGNER"] = (
-    True  # Optionally, enhance security by signing the session cookie
-)
+app.config["SESSION_COOKIE_SECURE"] = False  # Set to True in production
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_PERMANENT"] = True
+app.config["SESSION_USE_SIGNER"] = True
 
 # Role-Base Access Mgmt
 app.config["JWT_SECRET_KEY"] = "daleboquita"  # Change this to your actual secret key
@@ -193,115 +191,26 @@ oauth.register(
 
 @app.route("/login")
 def login():
-    try:
-        # Get the next URL from query params first, then session, then default
-        next_url = request.args.get("next") or session.get("next") or url_for("index")
-        
-        # Store state in both session and a separate cookie
-        state = secrets.token_urlsafe(32)
-        
-        # Clear session but preserve next_url and state
-        session.clear()
-        session['oauth_state'] = state
-        session['next'] = next_url
-        session.modified = True
-        
-        logger.info(f"Login: Next URL stored: {next_url}")
-        logger.info(f"Generated state: {state}")
-        logger.info(f"Session contents at login: {dict(session)}")
-        
-        # Ensure redirect_uri is absolute
-        callback_url = url_for("callback", _external=True, next=next_url)
-        
-        # Create response with Auth0 redirect
-        response = oauth.auth0.authorize_redirect(
-            redirect_uri=callback_url,
-            state=state
-        )
-        
-        # Set additional cookies for redundancy
-        response.set_cookie(
-            'auth_state',
-            state,
-            httponly=True,
-            secure=False,  # Set to True in production
-            samesite='Lax',
-            max_age=300  # 5 minutes
-        )
-        
-        response.set_cookie(
-            'redirect_url',
-            next_url,
-            httponly=True,
-            secure=False,  # Set to True in production
-            samesite='Lax',
-            max_age=300
-        )
-        
-        return response
-        
-    except Exception as e:
-        logger.error(f"Login error: {str(e)}")
-        return f"Login failed: {str(e)}", 400
+    session["original_url"] = request.args.get("next") or url_for("index")
+    return oauth.auth0.authorize_redirect(
+        redirect_uri=url_for("callback", _external=True)
+    )
 
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
     try:
-        # Try to get the state from multiple sources
-        request_state = request.args.get('state')
-        session_state = session.get('oauth_state')
-        cookie_state = request.cookies.get('auth_state')
-        
-        # Use cookie state as fallback
-        if not session_state and cookie_state:
-            session_state = cookie_state
-            session['oauth_state'] = cookie_state
-            session.modified = True
-        
-        logger.info(f"Callback: Session contents at start: {dict(session)}")
-        logger.info(f"Request state: {request_state}")
-        logger.info(f"Session state: {session_state}")
-        
-        if not session_state:
-            logger.error("No state found in session or cookies")
-            raise ValueError("No state found - session may have expired")
-            
-        if request_state != session_state:
-            logger.error(f"State mismatch: Request={request_state}, Session={session_state}")
-            raise ValueError("State mismatch - possible CSRF attack")
-        
-        # Get the redirect URL from multiple sources
-        next_url = (
-            request.args.get("next") or
-            request.cookies.get("redirect_url") or
-            session.get("next") or
-            url_for("index")
-        )
-        
-        # Exchange code for token
-        callback_url = url_for("callback", _external=True, next=next_url)
-        token = oauth.auth0.authorize_access_token(
-            redirect_uri=callback_url
-        )
-        
-        # Get userinfo and store in session
-        userinfo = oauth.auth0.userinfo()
-        session["user"] = userinfo
+        token = oauth.auth0.authorize_access_token()
         session["jwt"] = token
-        session.modified = True
-        
-        # Create response with redirect
-        response = redirect(next_url)
-        
-        # Clear the temporary cookies
-        response.delete_cookie('auth_state')
-        response.delete_cookie('redirect_url')
-        
-        return response
-        
+        user_info_endpoint = "https://dev-3klm8ed6qtx4zj6v.us.auth0.com/userinfo"
+        user_info_response = oauth.auth0.get(user_info_endpoint)
+        user_info = user_info_response.json()
+        session["user"] = user_info
+        next_url = session.get("next", url_for("index"))
+        session.pop("next", None)
+        return redirect(next_url)
     except Exception as e:
-        logger.error(f"Auth0 callback error: {str(e)}")
-        return "Authentication failed. Please try logging in again.", 400
+        print(f"Error during callback processing: {str(e)}")
+        return f"An error occurred: {str(e)}"
 
 
 @app.route("/logout")
@@ -799,23 +708,14 @@ def all_pages():
                 
                 filtered_pages = []
                 for page in pages:
-                    # Focus primarily on ai_keywords
                     keywords = normalize_text(str(page.get("ai_keywords", "")))
-                    
-                    # Check nombre only for exact discipline matches
                     nombre = normalize_text(str(page.get("nombre", "")))
-                    
-                    # Check if it's a residency
                     descripcion = normalize_text(str(page.get("descripción", "")))
                     is_residency = any(term in descripcion for term in [
                         "residencia", "residencia artistica", "residencia para artistas",
                         "artist residency", "residencia de artistas"
                     ])
                     
-                    # Include if:
-                    # 1. Matches discipline-specific terms in ai_keywords or nombre
-                    # 2. Is a residency (they usually accept all disciplines)
-                    # 3. Matches educational terms in ai_keywords
                     if any(normalize_text(term) in keywords or 
                           (normalize_text(term) in nombre and any(
                               discipline in term for discipline in ["music", "musica", "danza", "teatro", "theater"]

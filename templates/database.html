@@ -3,6 +3,10 @@
 {% block body %}
 
 <body>
+    <div id="spinner" class="spinner h-8 w-8" style="display: none;">
+        <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
+    </div>
+
     <div class="max-w-[1400px] mx-auto px-2 md:px-8 -mt-10">
         <!-- Title section -->
         <div class="mb-8 md:mb-20">
@@ -123,7 +127,13 @@
                             placeholder="Buscar por nombre, tipo o mes"
                             class="input input-bordered rounded-none w-full pl-6 lg:ml-0 focus:ring-0 focus:ring-offset-0 focus:ring-inset md:border-r-0 bg-slate-100"
                             name="search" 
-                            onkeypress="handleKeyPress(event)"
+                            hx-get="/database"
+                            hx-trigger="keyup changed delay:500ms"
+                            hx-target="#search-results"
+                            hx-include="[name='expanded']"
+                            hx-indicator="#spinner"
+                            hx-swap="innerHTML"
+                            hx-preserve="true"
                         >
                         <div class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer"
                             onclick="clearSearch()">
@@ -136,24 +146,31 @@
                 </div>
 
                 <!-- Second Column: Table -->
-                <div class="col-span-1 md:col-span-7 lg:col-span-8 mt-2 lg:mt-0 min-w-0">
+                <div class="col-span-1 md:col-span-7 lg:col-span-8 mt-2 lg:mt-0 min-w-0" 
+                     id="table-container"
+                     hx-preserve="true">
                     <form id="save-form" hx-post="/save_user_opportunity" hx-trigger="submit" hx-swap="innerHTML"
                         hx-target="#alert-container">
                         <div class="border-b border-neutral" id="results-container">
-                            <div class="max-h-[35rem] min-h-[20rem] overflow-auto pl-4 md:pl-0 custom-scrollbar md:border-t border-black md:border-r md:border-r-black" >
-                                <table class="w-full h-full relative md:top-3">
-                                    <thead>
-                                        <tr class="my-4">
-                                            <th class="w-10">✓</th>
-                                            <th class="w-1/4 text-xs tracking-tighter text-neutral-700 text-center md:pr-28 uppercase">Oportunidad</th>
-                                            <th class="w-1/4 text-xs tracking-tighter text-neutral-700 uppercase text-start md:text-center pl-6 md:pl-0 md:pr-4">Descripción</th>
-                                            <th class="flex-1"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="search-results" class="relative top-2">
-                                        {% include "_search_results.html" %}
-                                    </tbody>
-                                </table>
+                            <div class="max-h-[35rem] min-h-[20rem] overflow-y-auto overflow-x-hidden pl-4 md:pl-0 md:scrollbar-none custom-scrollbar md:border-t border-black md:border-r md:border-r-black">
+                                <div class="w-[120%] md:w-full -ml-4 md:ml-0 overflow-x-auto md:overflow-x-hidden scrollbar-none">
+                                    <div class="min-w-full relative">
+                                        <table class="w-full h-full table-fixed">
+                                            <thead class="sticky top-0 bg-white">
+                                                <tr>
+                                                    <th class="w-[7%] pl-4 pt-4 pb-3">✓</th>
+                                                    <th class="w-[38%] text-xs tracking-tighter text-neutral-700 text-left pl-6 pt-4 pb-3">Oportunidad</th>
+                                                    <th class="w-[35%] text-xs tracking-tighter text-neutral-700 text-left pl-6 pt-4 pb-3">Descripción</th>
+                                                    <th class="w-[12%] text-xs tracking-tighter text-neutral-700 text-center pt-4 pb-3">Cierre</th>
+                                                    <th class="w-[8%] pt-4 pb-3"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="search-results" class="relative">
+                                                {% include "_search_results.html" %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="flex justify-center items-center space-x-2 mt-6 mb-4">
@@ -180,15 +197,37 @@
             z-index: 1000;
         }
 
-        /* Improve touch scrolling behavior */
-        #results-container > div {
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
+        /* Hide scrollbar for all devices */
+        .scrollbar-none::-webkit-scrollbar,
+        .custom-scrollbar::-webkit-scrollbar,
+        #results-container > div::-webkit-scrollbar,
+        #results-container::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+        
+        /* Firefox */
+        .scrollbar-none,
+        .custom-scrollbar,
+        #results-container > div,
+        #results-container {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        
+        /* Prevent horizontal overflow only on desktop */
+        @media (min-width: 768px) {
+            #results-container {
+                overflow-x: hidden !important;
+            }
         }
 
-        /* Ensure the container can be scrolled in both directions */
-        .overflow-auto {
-            overscroll-behavior: auto;
+        /* Ensure clickable areas are accessible */
+        .dropdown,
+        .opportunity-link {
+            position: relative !important;
+            z-index: 10 !important;
         }
     </style>
  
@@ -281,7 +320,9 @@
         // Function to fetch search results
         function fetchSearchResults(searchValue) {
             const spinner = document.getElementById('spinner');
-            spinner.style.display = 'block';
+            if (spinner) {
+                spinner.style.display = 'block';
+            }
 
             const searchResult = expandSearchTerms(searchValue);
             console.log('Search payload:', searchResult);
@@ -322,7 +363,9 @@
                 trackSearchError(searchValue, 'fetch_error');
             })
             .finally(() => {
-                spinner.style.display = 'none';
+                if (spinner) {
+                    spinner.style.display = 'none';
+                }
                 searchInProgress = false;
             });
         }
@@ -361,7 +404,9 @@
         // Function to toggle spinner visibility
         function toggleSpinner(show) {
             const spinner = document.getElementById('spinner');
-            spinner.style.display = show ? 'block' : 'none';
+            if (spinner) {
+                spinner.style.display = show ? 'block' : 'none';
+            }
         }
 
         // Function to scroll to top of an element
@@ -898,6 +943,19 @@
         document.body.addEventListener('htmx:afterSwap', function(event) {
             setupSearchHandlers();
             attachOpportunityHandlers();
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('HTMX loaded:', typeof htmx !== 'undefined');
+            const searchInput = document.getElementById('search-input');
+            console.log('Search input found:', searchInput !== null);
+            if (searchInput) {
+                console.log('HTMX attributes:', {
+                    get: searchInput.getAttribute('hx-get'),
+                    trigger: searchInput.getAttribute('hx-trigger'),
+                    target: searchInput.getAttribute('hx-target')
+                });
+            }
         });
     </script>
 

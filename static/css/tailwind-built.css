@@ -1757,6 +1757,36 @@ details.collapse summary::-webkit-details-marker {
   --togglehandleborder: 0 0 0 3px var(--fallback-bc,oklch(var(--bc)/1)) inset,
       var(--handleoffsetcalculator) 0 0 3px var(--fallback-bc,oklch(var(--bc)/1)) inset;
 }
+.artboard.phone-1.horizontal,
+      .artboard.phone-1.artboard-horizontal {
+  width: 568px;
+  height: 320px;
+}
+.artboard.phone-2.horizontal,
+      .artboard.phone-2.artboard-horizontal {
+  width: 667px;
+  height: 375px;
+}
+.artboard.phone-3.horizontal,
+      .artboard.phone-3.artboard-horizontal {
+  width: 736px;
+  height: 414px;
+}
+.artboard.phone-4.horizontal,
+      .artboard.phone-4.artboard-horizontal {
+  width: 812px;
+  height: 375px;
+}
+.artboard.phone-5.horizontal,
+      .artboard.phone-5.artboard-horizontal {
+  width: 896px;
+  height: 414px;
+}
+.artboard.phone-6.horizontal,
+      .artboard.phone-6.artboard-horizontal {
+  width: 1024px;
+  height: 320px;
+}
 .btn-xs {
   height: 1.5rem;
   min-height: 1.5rem;
@@ -1850,6 +1880,9 @@ details.collapse summary::-webkit-details-marker {
 .relative {
   position: relative;
 }
+.sticky {
+  position: sticky;
+}
 .-right-3 {
   right: -0.75rem;
 }
@@ -1888,9 +1921,6 @@ details.collapse summary::-webkit-details-marker {
 }
 .top-1\/2 {
   top: 50%;
-}
-.top-2 {
-  top: 0.5rem;
 }
 .top-\[1\.5px\] {
   top: 1.5px;
@@ -1932,9 +1962,8 @@ details.collapse summary::-webkit-details-marker {
   margin-left: auto;
   margin-right: auto;
 }
-.my-4 {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+.-ml-4 {
+  margin-left: -1rem;
 }
 .-mr-1 {
   margin-right: -0.25rem;
@@ -1963,6 +1992,9 @@ details.collapse summary::-webkit-details-marker {
 .ml-1 {
   margin-left: 0.25rem;
 }
+.ml-12 {
+  margin-left: 3rem;
+}
 .ml-4 {
   margin-left: 1rem;
 }
@@ -1974,6 +2006,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .mr-3 {
   margin-right: 0.75rem;
+}
+.mr-4 {
+  margin-right: 1rem;
 }
 .mt-1 {
   margin-top: 0.25rem;
@@ -2077,12 +2112,6 @@ details.collapse summary::-webkit-details-marker {
 .min-h-screen {
   min-height: 100vh;
 }
-.w-1\/12 {
-  width: 8.333333%;
-}
-.w-1\/4 {
-  width: 25%;
-}
 .w-10 {
   width: 2.5rem;
 }
@@ -2092,23 +2121,14 @@ details.collapse summary::-webkit-details-marker {
 .w-2 {
   width: 0.5rem;
 }
-.w-2\/12 {
-  width: 16.666667%;
-}
 .w-2\/3 {
   width: 66.666667%;
 }
 .w-3 {
   width: 0.75rem;
 }
-.w-3\/12 {
-  width: 25%;
-}
 .w-4 {
   width: 1rem;
-}
-.w-4\/12 {
-  width: 33.333333%;
 }
 .w-5 {
   width: 1.25rem;
@@ -2121,6 +2141,33 @@ details.collapse summary::-webkit-details-marker {
 }
 .w-8 {
   width: 2rem;
+}
+.w-\[10\%\] {
+  width: 10%;
+}
+.w-\[110\%\] {
+  width: 110%;
+}
+.w-\[12\%\] {
+  width: 12%;
+}
+.w-\[30\%\] {
+  width: 30%;
+}
+.w-\[35\%\] {
+  width: 35%;
+}
+.w-\[38\%\] {
+  width: 38%;
+}
+.w-\[45\%\] {
+  width: 45%;
+}
+.w-\[7\%\] {
+  width: 7%;
+}
+.w-\[8\%\] {
+  width: 8%;
 }
 .w-\[95\%\] {
   width: 95%;
@@ -2148,6 +2195,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .flex-grow {
   flex-grow: 1;
+}
+.table-fixed {
+  table-layout: fixed;
 }
 .-translate-x-1\/2 {
   --tw-translate-x: -50%;
@@ -2215,6 +2265,9 @@ details.collapse summary::-webkit-details-marker {
 .gap-1 {
   gap: 0.25rem;
 }
+.gap-1\.5 {
+  gap: 0.375rem;
+}
 .gap-2 {
   gap: 0.5rem;
 }
@@ -2254,6 +2307,15 @@ details.collapse summary::-webkit-details-marker {
 }
 .overflow-visible {
   overflow: visible;
+}
+.overflow-x-auto {
+  overflow-x: auto;
+}
+.overflow-y-auto {
+  overflow-y: auto;
+}
+.overflow-x-hidden {
+  overflow-x: hidden;
 }
 .truncate {
   overflow: hidden;
@@ -2396,9 +2458,6 @@ details.collapse summary::-webkit-details-marker {
   -o-object-fit: cover;
      object-fit: cover;
 }
-.p-1 {
-  padding: 0.25rem;
-}
 .p-2 {
   padding: 0.5rem;
 }
@@ -2437,6 +2496,9 @@ details.collapse summary::-webkit-details-marker {
   padding-top: 1rem;
   padding-bottom: 1rem;
 }
+.pb-3 {
+  padding-bottom: 0.75rem;
+}
 .pb-32 {
   padding-bottom: 8rem;
 }
@@ -2455,6 +2517,9 @@ details.collapse summary::-webkit-details-marker {
 .pt-16 {
   padding-top: 4rem;
 }
+.pt-4 {
+  padding-top: 1rem;
+}
 .pt-5 {
   padding-top: 1.25rem;
 }
@@ -2463,9 +2528,6 @@ details.collapse summary::-webkit-details-marker {
 }
 .text-center {
   text-align: center;
-}
-.text-start {
-  text-align: start;
 }
 .text-3xl {
   font-size: 1.875rem;
@@ -2502,6 +2564,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .leading-none {
   line-height: 1;
+}
+.leading-tight {
+  line-height: 1.25;
 }
 .tracking-tight {
   letter-spacing: -0.025em;
@@ -2637,12 +2702,6 @@ details.collapse summary::-webkit-details-marker {
   .md\:left-10 {
     left: 2.5rem;
   }
-  .md\:right-2 {
-    right: 0.5rem;
-  }
-  .md\:top-3 {
-    top: 0.75rem;
-  }
   .md\:col-span-1 {
     grid-column: span 1 / span 1;
   }
@@ -2666,6 +2725,9 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:ml-10 {
     margin-left: 2.5rem;
+  }
+  .md\:ml-4 {
+    margin-left: 1rem;
   }
   .md\:mt-0 {
     margin-top: 0px;
@@ -2724,6 +2786,21 @@ details.collapse summary::-webkit-details-marker {
   .md\:w-4 {
     width: 1rem;
   }
+  .md\:w-\[12\%\] {
+    width: 12%;
+  }
+  .md\:w-\[35\%\] {
+    width: 35%;
+  }
+  .md\:w-\[38\%\] {
+    width: 38%;
+  }
+  .md\:w-\[8\%\] {
+    width: 8%;
+  }
+  .md\:w-full {
+    width: 100%;
+  }
   .md\:flex-1 {
     flex: 1 1 0%;
   }
@@ -2732,6 +2809,9 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:flex-row {
     flex-direction: row;
+  }
+  .md\:gap-3 {
+    gap: 0.75rem;
   }
   .md\:space-x-2 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-x-reverse: 0;
@@ -2765,19 +2845,12 @@ details.collapse summary::-webkit-details-marker {
     --tw-border-opacity: 1;
     border-right-color: rgb(0 0 0 / var(--tw-border-opacity));
   }
-  .md\:p-0 {
-    padding: 0px;
-  }
   .md\:p-3 {
     padding: 0.75rem;
   }
   .md\:px-12 {
     padding-left: 3rem;
     padding-right: 3rem;
-  }
-  .md\:px-2 {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
   }
   .md\:px-4 {
     padding-left: 1rem;
@@ -2802,14 +2875,11 @@ details.collapse summary::-webkit-details-marker {
   .md\:pl-0 {
     padding-left: 0px;
   }
-  .md\:pl-2 {
-    padding-left: 0.5rem;
+  .md\:pl-4 {
+    padding-left: 1rem;
   }
   .md\:pl-8 {
     padding-left: 2rem;
-  }
-  .md\:pr-28 {
-    padding-right: 7rem;
   }
   .md\:pr-4 {
     padding-right: 1rem;
@@ -2817,14 +2887,8 @@ details.collapse summary::-webkit-details-marker {
   .md\:pt-16 {
     padding-top: 4rem;
   }
-  .md\:pt-2 {
-    padding-top: 0.5rem;
-  }
   .md\:pt-8 {
     padding-top: 2rem;
-  }
-  .md\:text-center {
-    text-align: center;
   }
   .md\:text-4xl {
     font-size: 2.25rem;
@@ -2879,9 +2943,5 @@ details.collapse summary::-webkit-details-marker {
   }
   .lg\:grid-cols-6 {
     grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
-  .lg\:px-0 {
-    padding-left: 0px;
-    padding-right: 0px;
   }
 }
