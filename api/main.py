@@ -61,33 +61,14 @@ print("Loaded AUTH0_DOMAIN:", os.environ.get("AUTH0_DOMAIN"))
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__, static_folder='../static', static_url_path='/static', template_folder='../templates')
-app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", "default_fallback_secret_key")
-
-# Session configuration
-if os.environ.get('VERCEL_ENV'):
-    # Production (Vercel) - use Redis
-    app.config.update(
-        SESSION_TYPE='redis',
-        SESSION_REDIS=redis.from_url(os.environ.get('REDIS_URL')),
-        SESSION_COOKIE_SECURE=True,
-        SESSION_COOKIE_HTTPONLY=True,
-        SESSION_COOKIE_SAMESITE='Lax',
-        PERMANENT_SESSION_LIFETIME=timedelta(hours=24),
-        SESSION_REFRESH_EACH_REQUEST=True
-    )
-else:
-    # Development - use filesystem
-    app.config.update(
-        SESSION_TYPE='filesystem',
-        SESSION_FILE_DIR=os.path.join(app.root_path, 'flask_session'),
-        SESSION_COOKIE_SECURE=False,
-        SESSION_COOKIE_HTTPONLY=True,
-        SESSION_COOKIE_SAMESITE='Lax',
-        SESSION_COOKIE_PATH='/',
-        SESSION_COOKIE_NAME='oportunidades_session',
-        PERMANENT_SESSION_LIFETIME=timedelta(hours=24),
-        SESSION_REFRESH_EACH_REQUEST=True
-    )
+app.config.update(
+    SECRET_KEY=os.getenv("FLASK_SECRET_KEY", "default_fallback_secret_key"),
+    SESSION_COOKIE_SECURE=os.environ.get('VERCEL_ENV', False),  # Secure in production
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+    PERMANENT_SESSION_LIFETIME=timedelta(hours=24),
+    SESSION_REFRESH_EACH_REQUEST=True
+)
 
 # Initialize Session
 Session(app)
