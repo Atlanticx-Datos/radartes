@@ -221,7 +221,6 @@
             z-index: 10 !important;
         }
 
-        /* Ensure overflow is allowed for small and medium screens */
         @media (max-width: 1024px) {
 
             #results-container,
@@ -240,28 +239,35 @@
                 width: 150% !important;
             }
 
-            /* Target the specific div with border */
-            .max-h-\[35rem\].md\:border-r {
-                border-right: 1px solid black !important;
-                position: relative !important;
-                z-index: 2 !important;
-            }
+            /* Adjust z-index for headers */
+            th:nth-child(2),
+            /* Oportunidad */
+            th:nth-child(3)
 
-            /* Target specifically the Descripción header */
-            /* Target specifically the Descripción header */
-            th:nth-child(3) {
-                width: 30% !important;
-                /* Further reduced from 32% */
-                max-width: 30% !important;
+            /* Descripción */
+                {
                 position: relative !important;
                 z-index: 1 !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-                white-space: nowrap !important;
-                padding-right: 8px !important;
-                /* Add some right padding */
+                /* Ensure headers are below the border */
+            }
+
+            /* Adjust sticky header behavior */
+            thead.sticky {
+                position: sticky !important;
+                top: 0 !important;
+                z-index: 1 !important;
+                /* Ensure header is above table content */
+                background: white !important;
+            }
+
+            /* Ensure border stays above sticky header */
+            .max-h-\[35rem\].md\:border-r {
+                position: relative !important;
+                z-index: 20 !important;
+                /* Higher z-index for the border */
             }
         }
+
 
         /* Keep overflow hidden for larger screens */
         @media (min-width: 1025px) {

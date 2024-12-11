@@ -112,13 +112,11 @@ def login_required(f):
     def decorated_function(*args, **kwargs):
         try:
             if "user" not in session:
-                original_url = request.url
-                # Store URL in query parameter only, not session
-                return redirect(url_for("login", next=original_url))
+                # Store the full URL of the current request
+                return redirect(url_for("login", next=request.url))
             return f(*args, **kwargs)
         except RuntimeError as e:
             print(f"Session error: {str(e)}")
-            # Fallback behavior - redirect to login without storing next URL
             return redirect(url_for("login"))
     return decorated_function
 
@@ -169,7 +167,8 @@ oauth.register(
 
 @app.route("/login")
 def login():
-    session["original_url"] = request.args.get("next") or url_for("index")
+    # Store the original URL in session
+    session["original_url"] = request.args.get("next") or request.referrer or url_for("index")
     return oauth.auth0.authorize_redirect(
         redirect_uri=url_for("callback", _external=True)
     )
@@ -183,9 +182,10 @@ def callback():
         user_info_response = oauth.auth0.get(user_info_endpoint)
         user_info = user_info_response.json()
         session["user"] = user_info
-        next_url = session.get("next", url_for("index"))
-        session.pop("next", None)
-        return redirect(next_url)
+        
+        # Redirect to the original URL
+        original_url = session.pop("original_url", url_for("index"))
+        return redirect(original_url)
     except Exception as e:
         print(f"Error during callback processing: {str(e)}")
         return f"An error occurred: {str(e)}"
