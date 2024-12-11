@@ -63,20 +63,31 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__, static_folder='../static', static_url_path='/static', template_folder='../templates')
 app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", "default_fallback_secret_key")
 
-# Session configuration - place this near the top of your file, after app creation
-app.config.update(
-    SECRET_KEY=os.getenv("FLASK_SECRET_KEY", "your-secret-key-here"),
-    SESSION_TYPE="filesystem",
-    SESSION_FILE_DIR=os.path.join(app.root_path, 'flask_session'),
-    SESSION_COOKIE_NAME="oportunidades_session",
-    SESSION_COOKIE_SECURE=False,  # False for local development
-    SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE="Lax",
-    SESSION_COOKIE_DOMAIN=None,  # Important for Safari
-    PERMANENT_SESSION_LIFETIME=timedelta(hours=24),
-    SESSION_REFRESH_EACH_REQUEST=True,
-    SESSION_COOKIE_PATH='/'  # Ensure cookie is available for all paths
-)
+# Session configuration
+if os.environ.get('VERCEL_ENV'):
+    # Production (Vercel) - use Redis
+    app.config.update(
+        SESSION_TYPE='redis',
+        SESSION_REDIS=redis.from_url(os.environ.get('REDIS_URL')),
+        SESSION_COOKIE_SECURE=True,
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SAMESITE='Lax',
+        PERMANENT_SESSION_LIFETIME=timedelta(hours=24),
+        SESSION_REFRESH_EACH_REQUEST=True
+    )
+else:
+    # Development - use filesystem
+    app.config.update(
+        SESSION_TYPE='filesystem',
+        SESSION_FILE_DIR=os.path.join(app.root_path, 'flask_session'),
+        SESSION_COOKIE_SECURE=False,
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SAMESITE='Lax',
+        SESSION_COOKIE_PATH='/',
+        SESSION_COOKIE_NAME='oportunidades_session',
+        PERMANENT_SESSION_LIFETIME=timedelta(hours=24),
+        SESSION_REFRESH_EACH_REQUEST=True
+    )
 
 # Initialize Session
 Session(app)
@@ -186,38 +197,36 @@ def login():
         # Get the next URL from query params first, then session, then default
         next_url = request.args.get("next") or session.get("next") or url_for("index")
         
-        # Clear session but preserve next_url
-        session.clear()
-        session["next"] = next_url
-        
-        logger.info(f"Login: Next URL stored: {next_url}")
-        
-        # Generate state and store it in session
+        # Store state in both session and a separate cookie
         state = secrets.token_urlsafe(32)
+        
+        # Clear session but preserve next_url and state
+        session.clear()
         session['oauth_state'] = state
+        session['next'] = next_url
         session.modified = True
         
+        logger.info(f"Login: Next URL stored: {next_url}")
         logger.info(f"Generated state: {state}")
         logger.info(f"Session contents at login: {dict(session)}")
         
         # Ensure redirect_uri is absolute
         callback_url = url_for("callback", _external=True, next=next_url)
         
-        # Set session cookie explicitly for Safari
+        # Create response with Auth0 redirect
         response = oauth.auth0.authorize_redirect(
             redirect_uri=callback_url,
             state=state
         )
         
-        # Set both session and redirect cookies
+        # Set additional cookies for redundancy
         response.set_cookie(
-            'oportunidades_session',
-            session.sid,
+            'auth_state',
+            state,
             httponly=True,
             secure=False,  # Set to True in production
             samesite='Lax',
-            max_age=86400,  # 24 hours
-            path='/'
+            max_age=300  # 5 minutes
         )
         
         response.set_cookie(
@@ -226,11 +235,11 @@ def login():
             httponly=True,
             secure=False,  # Set to True in production
             samesite='Lax',
-            max_age=300,  # 5 minutes
-            path='/'
+            max_age=300
         )
         
         return response
+        
     except Exception as e:
         logger.error(f"Login error: {str(e)}")
         return f"Login failed: {str(e)}", 400
@@ -238,32 +247,36 @@ def login():
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
     try:
-        # Try to get the redirect URL from multiple sources
-        next_url = (
-            request.args.get("next") or  # URL parameter
-            request.cookies.get("redirect_url") or  # Cookie
-            session.get("next") or  # Session
-            url_for("index")  # Default
-        )
-        
-        logger.info(f"Callback: Found redirect URL: {next_url}")
-        
-        # Log state values for debugging
+        # Try to get the state from multiple sources
         request_state = request.args.get('state')
         session_state = session.get('oauth_state')
+        cookie_state = request.cookies.get('auth_state')
+        
+        # Use cookie state as fallback
+        if not session_state and cookie_state:
+            session_state = cookie_state
+            session['oauth_state'] = cookie_state
+            session.modified = True
         
         logger.info(f"Callback: Session contents at start: {dict(session)}")
         logger.info(f"Request state: {request_state}")
         logger.info(f"Session state: {session_state}")
         
-        # Verify state before token exchange
         if not session_state:
-            logger.error("No state found in session")
-            raise ValueError("No state in session - session may have expired")
+            logger.error("No state found in session or cookies")
+            raise ValueError("No state found - session may have expired")
             
         if request_state != session_state:
             logger.error(f"State mismatch: Request={request_state}, Session={session_state}")
             raise ValueError("State mismatch - possible CSRF attack")
+        
+        # Get the redirect URL from multiple sources
+        next_url = (
+            request.args.get("next") or
+            request.cookies.get("redirect_url") or
+            session.get("next") or
+            url_for("index")
+        )
         
         # Exchange code for token
         callback_url = url_for("callback", _external=True, next=next_url)
@@ -271,10 +284,8 @@ def callback():
             redirect_uri=callback_url
         )
         
-        # Get userinfo
+        # Get userinfo and store in session
         userinfo = oauth.auth0.userinfo()
-        
-        # Store in session
         session["user"] = userinfo
         session["jwt"] = token
         session.modified = True
@@ -282,18 +293,8 @@ def callback():
         # Create response with redirect
         response = redirect(next_url)
         
-        # Set session cookie again
-        response.set_cookie(
-            'oportunidades_session',
-            session.sid,
-            httponly=True,
-            secure=False,  # Set to True in production
-            samesite='Lax',
-            max_age=86400,
-            path='/'
-        )
-        
-        # Clear the redirect_url cookie
+        # Clear the temporary cookies
+        response.delete_cookie('auth_state')
         response.delete_cookie('redirect_url')
         
         return response
