@@ -60,10 +60,17 @@ print("Loaded AUTH0_DOMAIN:", os.environ.get("AUTH0_DOMAIN"))
 
 logger = logging.getLogger(__name__)
 
+# Create Flask app
 app = Flask(__name__, static_folder='../static', static_url_path='/static', template_folder='../templates')
+
+# Set the secret key FIRST, before any other configuration
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
+if not app.secret_key:
+    raise RuntimeError("FLASK_SECRET_KEY must be set!")
+
+# Then do the rest of your configuration
 app.config.update(
-    SECRET_KEY=os.getenv("FLASK_SECRET_KEY", "default_fallback_secret_key"),
-    SESSION_COOKIE_SECURE=os.environ.get('VERCEL_ENV', False),  # Secure in production
+    SESSION_COOKIE_SECURE=os.environ.get('VERCEL_ENV', False),
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='Lax',
     PERMANENT_SESSION_LIFETIME=timedelta(hours=24),
