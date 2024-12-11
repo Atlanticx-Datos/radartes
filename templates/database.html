@@ -10,8 +10,9 @@
     <div class="max-w-[1400px] mx-auto px-2 md:px-8 -mt-10">
         <!-- Title section -->
         <div class="mb-8 md:mb-20">
-            <h1 class="text-3xl md:text-4xl font-bold text-black leading-none md:leading-tight tracking-tight mt-4 md:mt-12 md:mt-0 ml-4">
-                Informate, compartí y guardá oportunidades, gratis. 
+            <h1
+                class="text-3xl md:text-4xl font-bold text-black leading-none md:leading-tight tracking-tight mt-4 md:mt-12 md:mt-0 ml-4">
+                Informate, compartí y guardá oportunidades, gratis.
             </h1>
         </div>
 
@@ -19,7 +20,8 @@
         <main class="w-full relative">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-0">
                 <!-- First Column: Accordions -->
-                <div class="col-span-1 md:col-span-5 lg:col-span-4 flex flex-col justify-between min-w-0 md:border-r border-neutral">
+                <div
+                    class="col-span-1 md:col-span-5 lg:col-span-4 flex flex-col justify-between min-w-0 md:border-r border-neutral">
                     <div class="flex-1 flex flex-col gap-2">
                         <!-- Accordion 1 -->
                         <div class="join join-vertical w-full">
@@ -34,10 +36,8 @@
                                     {% if closing_soon_pages %}
                                     {% for page in closing_soon_pages %}
                                     <p class="relative">
-                                        <a href="{{ page.url }}" target="_blank"
-                                            data-name="{{ page.nombre }}"
-                                            data-country="{{ page.País }}"
-                                            data-url="{{ page.url }}"
+                                        <a href="{{ page.url }}" target="_blank" data-name="{{ page.nombre }}"
+                                            data-country="{{ page.País }}" data-url="{{ page.url }}"
                                             class="cierran-pronto-link">
                                             {{ page.nombre | truncate(50) }}
                                             <span
@@ -65,7 +65,8 @@
                         <div class="join join-vertical w-full">
                             <div class="collapse join-item border-neutral rounded-none w-full">
                                 <input type="radio" name="my-accordion-2" checked="" />
-                                <div class="collapse-title text-sm tracking-tighter text-neutral-700 inline-block md:mt">
+                                <div
+                                    class="collapse-title text-sm tracking-tighter text-neutral-700 inline-block md:mt">
                                     <span class="md:border border-neutral-300 md:px-4 md:py-2">
                                         DESTACADAS
                                     </span>
@@ -74,26 +75,25 @@
                                     {% if destacar_pages %}
                                     {% for page in destacar_pages %}
                                     <p class="relative">
-                                        <a href="{{ page.url }}" target="_blank"
-                                            data-name="{{ page.nombre }}"
-                                            data-country="{{ page.País }}"
-                                            data-url="{{ page.url }}"
-                                            class="accordion-link"
-                                            onclick="handleDestacadaClick(this)">
+                                        <a href="{{ page.url }}" target="_blank" data-name="{{ page.nombre }}"
+                                            data-country="{{ page.País }}" data-url="{{ page.url }}"
+                                            class="accordion-link" onclick="handleDestacadaClick(this)">
                                             <span class="md:hidden whitespace-nowrap">
                                                 {{ page.nombre | truncate(18, true, "...") }}
                                                 {% if page.entidad %}
-                                                    / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
-                                                        {{ page.entidad | truncate(12, true, "...") }}
-                                                    </span>
+                                                / <span
+                                                    class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
+                                                    {{ page.entidad | truncate(12, true, "...") }}
+                                                </span>
                                                 {% endif %}
                                             </span>
                                             <span class="hidden md:inline whitespace-nowrap">
                                                 {{ page.nombre | truncate(25, true, "...") }}
                                                 {% if page.entidad %}
-                                                    / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
-                                                        {{ page.entidad | truncate(12, true, "...") }}
-                                                    </span>
+                                                / <span
+                                                    class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
+                                                    {{ page.entidad | truncate(12, true, "...") }}
+                                                </span>
                                                 {% endif %}
                                             </span>
                                             <span
@@ -118,27 +118,18 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Search Input -->
                     <div class="flex-shrink-0 flex items-center relative w-full">
-                        <input 
-                            type="text" 
-                            id="search-input" 
-                            placeholder="Buscar por nombre, tipo o mes"
+                        <input type="text" id="search-input" placeholder="Buscar por nombre, tipo o mes"
                             class="input input-bordered rounded-none w-full pl-6 lg:ml-0 focus:ring-0 focus:ring-offset-0 focus:ring-inset md:border-r-0 bg-slate-100"
-                            name="search" 
-                            hx-get="/database"
-                            hx-trigger="keyup changed delay:500ms"
-                            hx-target="#search-results"
-                            hx-include="[name='expanded']"
-                            hx-indicator="#spinner"
-                            hx-swap="innerHTML"
-                            hx-preserve="true"
-                        >
+                            name="search" hx-get="/database" hx-trigger="keyup changed delay:500ms"
+                            hx-target="#search-results" hx-include="[name='expanded']" hx-indicator="#spinner"
+                            hx-swap="innerHTML" hx-preserve="true">
                         <div class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer"
                             onclick="clearSearch()">
-                            <svg class="w-4 h-4" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <svg class="w-4 h-4" fill="none" stroke-width="1.5" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
                             </svg>
                         </div>
@@ -146,22 +137,29 @@
                 </div>
 
                 <!-- Second Column: Table -->
-                <div class="col-span-1 md:col-span-7 lg:col-span-8 mt-2 lg:mt-0 min-w-0" 
-                     id="table-container"
-                     hx-preserve="true">
+                <div class="col-span-1 md:col-span-7 lg:col-span-8 mt-2 lg:mt-0 min-w-0" id="table-container"
+                    hx-preserve="true">
                     <form id="save-form" hx-post="/save_user_opportunity" hx-trigger="submit" hx-swap="innerHTML"
                         hx-target="#alert-container">
                         <div class="border-b border-neutral" id="results-container">
-                            <div class="max-h-[35rem] min-h-[20rem] overflow-y-auto overflow-x-hidden pl-4 md:pl-0 md:scrollbar-none custom-scrollbar md:border-t border-black md:border-r md:border-r-black">
-                                <div class="w-[120%] md:w-full -ml-4 md:ml-0 overflow-x-auto md:overflow-x-hidden scrollbar-none">
+                            <div
+                                class="max-h-[35rem] min-h-[20rem] overflow-y-auto overflow-x-hidden pl-4 md:pl-0 md:scrollbar-none custom-scrollbar md:border-t border-black md:border-r md:border-r-black">
+                                <div
+                                    class="w-[120%] md:w-full -ml-4 md:ml-0 overflow-x-auto md:overflow-x-hidden scrollbar-none">
                                     <div class="min-w-full relative">
                                         <table class="w-full h-full table-fixed">
                                             <thead class="sticky top-0 bg-white">
                                                 <tr>
                                                     <th class="w-[7%] pl-4 pt-4 pb-3">✓</th>
-                                                    <th class="w-[38%] text-xs tracking-tighter text-neutral-700 text-left pl-6 pt-4 pb-3">Oportunidad</th>
-                                                    <th class="w-[35%] text-xs tracking-tighter text-neutral-700 text-left pl-6 pt-4 pb-3">Descripción</th>
-                                                    <th class="w-[12%] text-xs tracking-tighter text-neutral-700 text-center pt-4 pb-3">Cierre</th>
+                                                    <th
+                                                        class="w-[38%] text-xs tracking-tighter text-neutral-700 text-left pl-6 pt-4 pb-3">
+                                                        Oportunidad</th>
+                                                    <th
+                                                        class="w-[35%] text-xs tracking-tighter text-neutral-700 text-left pl-6 pt-4 pb-3">
+                                                        Descripción</th>
+                                                    <th
+                                                        class="w-[12%] text-xs tracking-tighter text-neutral-700 text-center pt-4 pb-3">
+                                                        Cierre</th>
                                                     <th class="w-[8%] pt-4 pb-3"></th>
                                                 </tr>
                                             </thead>
@@ -200,27 +198,20 @@
         /* Hide scrollbar for all devices */
         .scrollbar-none::-webkit-scrollbar,
         .custom-scrollbar::-webkit-scrollbar,
-        #results-container > div::-webkit-scrollbar,
+        #results-container>div::-webkit-scrollbar,
         #results-container::-webkit-scrollbar {
             display: none !important;
             width: 0 !important;
             height: 0 !important;
         }
-        
+
         /* Firefox */
         .scrollbar-none,
         .custom-scrollbar,
-        #results-container > div,
+        #results-container>div,
         #results-container {
             scrollbar-width: none !important;
             -ms-overflow-style: none !important;
-        }
-        
-        /* Prevent horizontal overflow only on desktop */
-        @media (min-width: 768px) {
-            #results-container {
-                overflow-x: hidden !important;
-            }
         }
 
         /* Ensure clickable areas are accessible */
@@ -229,8 +220,69 @@
             position: relative !important;
             z-index: 10 !important;
         }
+
+        /* Ensure overflow is allowed for small and medium screens */
+        @media (max-width: 1024px) {
+
+            #results-container,
+            #results-container>div,
+            .max-h-\[35rem\] {
+                overflow-x: auto !important;
+            }
+
+            /* Override any md: prefixed overflow classes */
+            .md\:overflow-x-hidden {
+                overflow-x: auto !important;
+            }
+
+            table {
+                table-layout: fixed !important;
+                width: 150% !important;
+            }
+
+            /* Target the specific div with border */
+            .max-h-\[35rem\].md\:border-r {
+                border-right: 1px solid black !important;
+                position: relative !important;
+                z-index: 2 !important;
+            }
+
+            /* Target specifically the Descripción header */
+            /* Target specifically the Descripción header */
+            th:nth-child(3) {
+                width: 30% !important;
+                /* Further reduced from 32% */
+                max-width: 30% !important;
+                position: relative !important;
+                z-index: 1 !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                white-space: nowrap !important;
+                padding-right: 8px !important;
+                /* Add some right padding */
+            }
+        }
+
+        /* Keep overflow hidden for larger screens */
+        @media (min-width: 1025px) {
+
+            #results-container,
+            #results-container>div,
+            .max-h-\[35rem\] {
+                overflow-x: hidden !important;
+            }
+        }
+
+        /* Hide scrollbars but keep functionality */
+        .scrollbar-none::-webkit-scrollbar,
+        .custom-scrollbar::-webkit-scrollbar,
+        #results-container>div::-webkit-scrollbar,
+        #results-container::-webkit-scrollbar {
+            width: 0 !important;
+            height: 0 !important;
+        }
     </style>
- 
+
 
     <!-- Script for handling HTMX search -->
     <script>
@@ -240,7 +292,7 @@
         // Function to handle search input
         function handleSearchInput(event) {
             if (searchInProgress) return;
-            
+
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 const searchTerm = event.target.value.trim();
@@ -273,7 +325,7 @@
                 const newLink = link.cloneNode(true);
                 link.parentNode.replaceChild(newLink, link);
 
-                newLink.addEventListener('click', function(e) {
+                newLink.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -299,16 +351,16 @@
                     a.rel = 'noopener noreferrer';
                     a.target = '_blank';
                     document.body.appendChild(a);
-                    
+
                     // Trigger click
                     a.click();
-                    
+
                     // Remove the element and force focus back to current window
                     requestAnimationFrame(() => {
                         document.body.removeChild(a);
                         window.focus();
                     });
-                    
+
                     return false;
                 });
             });
@@ -326,48 +378,48 @@
 
             const searchResult = expandSearchTerms(searchValue);
             console.log('Search payload:', searchResult);
-            
+
             const queryParams = new URLSearchParams({
                 search: searchResult.terms,
                 expanded: searchResult.expanded
             });
 
             fetch(`/database?${queryParams.toString()}`, {
-                headers: { 
+                headers: {
                     'HX-Request': 'true',
                     'HX-Trigger': 'search'
                 }
             })
-            .then(response => response.text())
-            .then(html => {
-                const searchResults = document.getElementById('search-results');
-                searchResults.innerHTML = html;
-                
-                // Re-apply grid classes to parent elements
-                const firstColumn = document.querySelector('.col-span-1.md\\:col-span-5.lg\\:col-span-4');
-                const secondColumn = document.querySelector('.col-span-1.md\\:col-span-7.lg\\:col-span-8');
-                
-                if (firstColumn) {
-                    firstColumn.className = 'col-span-1 md:col-span-5 lg:col-span-4 md:border-r border-neutral flex flex-col justify-between';
-                }
-                if (secondColumn) {
-                    secondColumn.className = 'col-span-1 md:col-span-7 lg:col-span-8 mt-2 lg:mt-0 border-neutral';
-                }
-                
-                scrollToTop('results-container');
-                setupSearchHandlers();
-                attachOpportunityHandlers();
-            })
-            .catch(error => {
-                console.error('Search error:', error);
-                trackSearchError(searchValue, 'fetch_error');
-            })
-            .finally(() => {
-                if (spinner) {
-                    spinner.style.display = 'none';
-                }
-                searchInProgress = false;
-            });
+                .then(response => response.text())
+                .then(html => {
+                    const searchResults = document.getElementById('search-results');
+                    searchResults.innerHTML = html;
+
+                    // Re-apply grid classes to parent elements
+                    const firstColumn = document.querySelector('.col-span-1.md\\:col-span-5.lg\\:col-span-4');
+                    const secondColumn = document.querySelector('.col-span-1.md\\:col-span-7.lg\\:col-span-8');
+
+                    if (firstColumn) {
+                        firstColumn.className = 'col-span-1 md:col-span-5 lg:col-span-4 md:border-r border-neutral flex flex-col justify-between';
+                    }
+                    if (secondColumn) {
+                        secondColumn.className = 'col-span-1 md:col-span-7 lg:col-span-8 mt-2 lg:mt-0 border-neutral';
+                    }
+
+                    scrollToTop('results-container');
+                    setupSearchHandlers();
+                    attachOpportunityHandlers();
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    trackSearchError(searchValue, 'fetch_error');
+                })
+                .finally(() => {
+                    if (spinner) {
+                        spinner.style.display = 'none';
+                    }
+                    searchInProgress = false;
+                });
         }
 
         // Function to clear search
@@ -375,28 +427,28 @@
             const searchInput = document.getElementById('search-input');
             if (searchInput) {
                 searchInput.value = '';
-                
+
                 if (!searchInProgress) {
                     searchInProgress = true;
                     toggleSpinner(true);
-                    
+
                     fetch('/database?clear=true', {
                         headers: { 'HX-Request': 'true' }
                     })
-                    .then(response => response.text())
-                    .then(html => {
-                        document.getElementById('search-results').innerHTML = html;
-                        scrollToTop('results-container');
-                        setupSearchHandlers(); // Reattach handlers after clearing
-                        attachOpportunityHandlers();
-                    })
-                    .catch(error => {
-                        console.error('Clear error:', error);
-                    })
-                    .finally(() => {
-                        searchInProgress = false;
-                        toggleSpinner(false);
-                    });
+                        .then(response => response.text())
+                        .then(html => {
+                            document.getElementById('search-results').innerHTML = html;
+                            scrollToTop('results-container');
+                            setupSearchHandlers(); // Reattach handlers after clearing
+                            attachOpportunityHandlers();
+                        })
+                        .catch(error => {
+                            console.error('Clear error:', error);
+                        })
+                        .finally(() => {
+                            searchInProgress = false;
+                            toggleSpinner(false);
+                        });
                 }
             }
         }
@@ -437,7 +489,7 @@
         // Function to sanitize keywords
         function sanitizeKeywords(keywords) {
             if (!keywords) return '';
-            
+
             // Si keywords es un string JSON, parsearlo primero
             try {
                 if (typeof keywords === 'string') {
@@ -497,12 +549,12 @@
                     'beca', 'becas', 'scholarship', 'fellowship', 'grant',
                     'financiacion', 'financiamiento', 'apoyo economico', 'stipend'
                 ],
-                
+
                 residencia: [
-                    'residencia', 'residency', 'artist in residence', 
+                    'residencia', 'residency', 'artist in residence',
                     'estancia artistica', 'art residency', 'creative residency'
                 ],
-                
+
                 premio: [
                     'premio', 'award', 'concurso', 'certamen', 'competition',
                     'reconocimiento', 'prize', 'contest'
@@ -514,17 +566,17 @@
                     'visual art', 'fine arts', 'arte contemporaneo',
                     'contemporary art', 'mixed media'
                 ],
-                
+
                 fotografia: [
                     'fotografia', 'photography', 'photo', 'fotografica',
                     'photoespana', 'fotorreportaje', 'fotoperiodismo'
                 ],
-                
+
                 audiovisual: [
                     'cine', 'film', 'video', 'documental', 'cortometraje',
                     'cinematografia', 'audiovisual', 'animacion'
                 ],
-                
+
                 performing_arts: [
                     'teatro', 'danza', 'performance', 'escenicas',
                     'performing arts', 'theatre', 'dance', 'circo'
@@ -535,7 +587,7 @@
                     'formacion', 'curso', 'taller', 'workshop', 'masterclass',
                     'training', 'education', 'professional development'
                 ],
-                
+
                 investigacion: [
                     'investigacion', 'research', 'academic', 'estudio',
                     'desarrollo', 'phd', 'doctorado', 'thesis'
@@ -546,12 +598,12 @@
                     'digital', 'virtual', 'online', 'tecnologia',
                     'new media', 'net art', 'digital art'
                 ],
-                
+
                 exposicion: [
                     'exposicion', 'exhibition', 'muestra', 'gallery',
                     'exhibicion', 'galeria'
                 ],
-                
+
                 festival: [
                     'festival', 'bienal', 'feria', 'biennial',
                     'fair', 'encuentro', 'trienal'
@@ -586,28 +638,28 @@
         }
 
         // Add debug logging
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             console.log('Attaching click handlers...');
-            
+
             // Remove any existing handlers first
             document.querySelectorAll('.opportunity-link').forEach(link => {
                 const clone = link.cloneNode(true);
                 link.parentNode.replaceChild(clone, link);
             });
-            
+
             // Attach new handlers
             document.querySelectorAll('.opportunity-link').forEach(link => {
                 console.log('Attaching handler to:', link.dataset.name);
-                
-                link.addEventListener('click', function(e) {
+
+                link.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    
+
                     console.log('Click handler fired for:', this.dataset.name);
-                    
+
                     const keywords = this.dataset.keywords || '';
                     const categoryAnalysis = analyzeKeywords(keywords);
-                    
+
                     const eventData = {
                         'opportunity_name': this.dataset.name,
                         'country': this.dataset.country || 'sin país',
@@ -617,10 +669,10 @@
                         'event_category': 'Oportunidad',
                         'section': 'main'
                     };
-                    
+
                     console.log('Sending event data:', eventData);
                     gtag('event', 'opportunity_click', eventData);
-                    
+
                     setTimeout(() => {
                         window.open(this.dataset.url, '_blank', 'noopener,noreferrer');
                     }, 100);
@@ -638,7 +690,7 @@
             if (!opportunity.matchedCategories || opportunity.matchedCategories.length === 0) {
                 console.warn(`Warning: No categories matched for opportunity: ${opportunity.title}`);
             }
-            
+
             // Check for potentially missing categories
             const keywords = opportunity.keywords.toLowerCase();
             const uncategorizedKeywords = findUncategorizedKeywords(keywords);
@@ -687,9 +739,9 @@
                 'section': 'destacadas',
                 'event_category': 'Accordion'
             };
-            
+
             gtag('event', 'destacadas_click', eventData);  // This specific event name
-            
+
             window.open(element.dataset.url, '_blank', 'noopener,noreferrer');
         }
 
@@ -700,24 +752,24 @@
                 'section': 'cierran_pronto',
                 'event_category': 'Accordion'
             };
-            
+
             gtag('event', 'cierranPronto_click', eventData);  // This specific event name
-            
+
             window.open(element.dataset.url, '_blank', 'noopener,noreferrer');
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // For Cierran Pronto links
             document.querySelectorAll('.cierran-pronto-link').forEach(link => {
                 // Remove any existing click handlers
                 const newLink = link.cloneNode(true);
                 link.parentNode.replaceChild(newLink, link);
-                
-                newLink.addEventListener('click', function(e) {
+
+                newLink.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     e.stopImmediatePropagation();  // Stop other handlers
-                    
+
                     const eventData = {
                         'opportunity_name': this.dataset.name,
                         'country': this.dataset.country || 'sin país',
@@ -725,15 +777,15 @@
                         'event_category': 'Accordion',
                         'opportunity_keywords': this.dataset.keywords || ''
                     };
-                    
+
                     // Send our custom event
                     gtag('event', 'cierranPronto_click', eventData);
-                    
+
                     // Navigate after tracking
                     setTimeout(() => {
                         window.open(this.dataset.url, '_blank', 'noopener,noreferrer');
                     }, 100);
-                    
+
                     return false;  // Prevent bubbling
                 }, true);  // Use capture phase
             });
@@ -743,12 +795,12 @@
                 // Remove any existing click handlers
                 const newLink = link.cloneNode(true);
                 link.parentNode.replaceChild(newLink, link);
-                
-                newLink.addEventListener('click', function(e) {
+
+                newLink.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     e.stopImmediatePropagation();  // Stop other handlers
-                    
+
                     const eventData = {
                         'opportunity_name': this.dataset.name,
                         'country': this.dataset.country || 'sin país',
@@ -756,15 +808,15 @@
                         'event_category': 'Accordion',
                         'opportunity_keywords': this.dataset.keywords || ''
                     };
-                    
+
                     // Send our custom event
                     gtag('event', 'destacadas_click', eventData);
-                    
+
                     // Navigate after tracking
                     setTimeout(() => {
                         window.open(this.dataset.url, '_blank', 'noopener,noreferrer');
                     }, 100);
-                    
+
                     return false;  // Prevent bubbling
                 }, true);  // Use capture phase
             });
@@ -777,16 +829,16 @@
             enhanced_link_attribution: false
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Get total opportunities count
             const totalOpportunities = document.querySelectorAll('.opportunity-link').length;
             console.log('Total opportunities:', totalOpportunities); // Debug log
-            
+
             document.querySelectorAll('.opportunity-link').forEach(link => {
                 const newLink = link.cloneNode(true);
                 link.parentNode.replaceChild(newLink, link);
 
-                newLink.addEventListener('click', function(e) {
+                newLink.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -813,14 +865,14 @@
                     a.rel = 'noopener noreferrer';
                     a.target = '_blank';
                     document.body.appendChild(a);
-                    
+
                     a.click();
-                    
+
                     requestAnimationFrame(() => {
                         document.body.removeChild(a);
                         window.focus();
                     });
-                    
+
                     return false;
                 });
             });
@@ -838,22 +890,22 @@
                     'interpretación musical', 'interpretacion musical',
                     'dirección musical', 'direccion musical', 'conducting',
                     'sonido musical', 'producción musical',
-                    
+
                     // Instruments and Voice
                     'instrumento', 'instrument', 'piano', 'violin', 'guitarra',
                     'canto', 'singing', 'canción', 'cancion',
                     'banda', 'band', 'ensemble', 'coro', 'choir',
-                    
+
                     // Music Education and Institutions
                     'conservatorio', 'conservatory',
                     'escuela de música', 'escuela de musica',
                     'ibermúsicas', 'ibermusicas',
-                    
+
                     // Music Roles
                     'compositor', 'compositora', 'composer',
                     'músico', 'musico', 'musician',
                     'director musical', 'directora musical',
-                    
+
                     // Educational Terms
                     'beca', 'becas', 'scholarship',
                     'maestría', 'maestria', 'master',
@@ -863,7 +915,7 @@
                     'posgrado', 'postgrado',
                     'licenciatura', 'bachelor',
                     'formación', 'formacion',
-                    
+
                     // General Artist Terms (to catch residencies)
                     'residencia artística', 'residencia artistica',
                     'residencia para artistas', 'artist residency',
@@ -883,12 +935,12 @@
         // Update expandSearchTerms to better handle residency terms
         function expandSearchTerms(searchTerm) {
             const normalizedSearch = normalizeText(searchTerm);
-            
+
             for (const [category, data] of Object.entries(SEARCH_CATEGORIES)) {
                 if (data.triggers.some(trigger => {
                     const normalizedTrigger = normalizeText(trigger);
-                    return normalizedTrigger === normalizedSearch || 
-                           normalizedSearch.includes(normalizedTrigger);
+                    return normalizedTrigger === normalizedSearch ||
+                        normalizedSearch.includes(normalizedTrigger);
                 })) {
                     // Get all terms including residency-related ones
                     const allTerms = new Set([
@@ -900,9 +952,9 @@
                         'residencia de creación', 'residencia de creacion',
                         'artista', 'artistas', 'artist', 'artists'
                     ]);
-                    
+
                     const normalizedTerms = [...allTerms].map(term => normalizeText(term));
-                    
+
                     console.log(`Expanded search for ${searchTerm} to:`, normalizedTerms);
                     return {
                         terms: normalizedTerms.join('|'),
@@ -910,7 +962,7 @@
                     };
                 }
             }
-            
+
             return {
                 terms: searchTerm,
                 expanded: false
@@ -918,7 +970,7 @@
         }
 
         // Update the event handling setup
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Initial setup of search input handler
             setupSearchHandlers();
         });
@@ -930,22 +982,22 @@
                 // Remove existing listeners first
                 const newSearchInput = searchInput.cloneNode(true);
                 searchInput.parentNode.replaceChild(newSearchInput, searchInput);
-                
+
                 // Add input event listener
                 newSearchInput.addEventListener('input', handleSearchInput);
-                
+
                 // Add keypress event listener
                 newSearchInput.addEventListener('keypress', handleKeyPress);
             }
         }
 
         // Add event listener for HTMX after-swap
-        document.body.addEventListener('htmx:afterSwap', function(event) {
+        document.body.addEventListener('htmx:afterSwap', function (event) {
             setupSearchHandlers();
             attachOpportunityHandlers();
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             console.log('HTMX loaded:', typeof htmx !== 'undefined');
             const searchInput = document.getElementById('search-input');
             console.log('Search input found:', searchInput !== null);
