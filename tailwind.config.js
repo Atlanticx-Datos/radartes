@@ -1,5 +1,5 @@
 module.exports = {
-  content: ['./templates/**/*.html', './static/js/**/*.js'],
+  purge: ['./templates/**/*.html'],
   theme: {
     screens: {
       'sm': '640px',
@@ -49,6 +49,15 @@ module.exports = {
           '7xl': ['4.375rem', { lineHeight: '1' }],
           'hero': ['8.125rem', { lineHeight: '1' }],
         }
+      },
+      colors: {
+        'categoria-premios': 'rgba(255, 243, 242, 0.6)',
+        'categoria-residencias': 'rgba(242, 255, 243, 0.6)',
+        'categoria-convocatorias': 'rgba(242, 246, 255, 0.6)',
+        'categoria-fondos': 'rgba(255, 253, 242, 0.6)',
+        'categoria-oportunidades': 'rgba(247, 242, 255, 0.6)',
+        'categoria-apoyos': 'rgba(255, 245, 242, 0.6)',
+        'categoria-becas': 'rgba(242, 255, 251, 0.6)',
       },
     },
   },

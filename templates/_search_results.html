@@ -1,9 +1,20 @@
 {% if pages %}
 {% for page in pages %}
-<tr class="border-b {% if loop.last %}mb-32 pb-32{% endif %}">
-    <th class="w-[7%] pl-4 md:pl-4">
-        <label>
-            <input type="checkbox" class="checkbox rounded-none h-4 w-4" name="selected_pages" value="{{ page.id }}" />
+<tr style="
+    background-color: 
+    {% if page.categoria|lower == 'premios' %} rgba(255, 243, 242, 0.6) 
+    {% elif page.categoria|lower == 'residencias' %} rgba(242, 255, 243, 0.6) 
+    {% elif page.categoria|lower == 'becas' %} rgba(242, 255, 251, 0.6) 
+    {% elif page.categoria|lower == 'convocatorias' %} rgba(242, 246, 255, 0.6) 
+    {% elif page.categoria|lower == 'fondos' %} rgba(255, 253, 242, 0.6) 
+    {% elif page.categoria|lower == 'oportunidades' %} rgba(247, 242, 255, 0.6) 
+    {% elif page.categoria|lower == 'apoyos' %} rgba(255, 245, 242, 0.6) 
+    {% else %} transparent 
+    {% endif %}
+;">
+    <th class="w-[7%]">
+        <label class="flex justify-center items-center w-full h-full">
+            <input type="checkbox" class="checkbox rounded-none h-4 w-4">
         </label>
     </th>
     <td class="w-[45%] md:w-[38%] pl-6">
@@ -45,9 +56,9 @@
     <td class="w-[10%] md:w-[12%] text-xs text-center fecha-de-cierre">
         {{ page.fecha_de_cierre | default("Sin cierre") | format_date }}
     </td>
-    <th class="w-[8%] md:w-[8%]">
+    <th class="w-[8%] md:w-[8%] min-w-[70px]">
         <div class="flex items-center justify-center">
-            <div class="inline-flex items-center gap-1.5 md:gap-3 bg-slate-100 py-2 px-3 md:px-4 ml-12 md:ml-4 mr-4">
+            <div class="inline-flex items-center gap-1.5 md:gap-3 bg-slate-100 py-2 px-3 md:px-4 ml-9 md:ml-1 mr-4">
                 <button
                    role="button"
                    tabindex="0"
