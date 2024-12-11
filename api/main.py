@@ -57,15 +57,14 @@ from flask_session import Session
 load_dotenv()
 
 # Initialize Redis with Upstash credentials
-redis = Redis(url=os.environ.get('KV_REST_API_URL'),
-             token=os.environ.get('KV_REST_API_TOKEN'))
-
-# Debug print to verify Redis connection
 try:
-    redis.set('test', 'test')
+    redis = Redis(url=os.environ.get('KV_REST_API_URL'),
+                  token=os.environ.get('KV_REST_API_TOKEN'))
+    redis.set('test', 'test')  # Test connection
     print("Redis connection successful")
 except Exception as e:
     print(f"Redis connection error: {str(e)}")
+    redis = None  # Set to None so we can check if Redis is available
 
 # Debug print to verify environment variable
 secret_key = os.getenv("FLASK_SECRET_KEY")
@@ -624,8 +623,42 @@ def share_opportunity(opportunity_id):
 @login_required
 def all_pages():
     print("\n=== Starting database route ===")
-    sys.stdout.flush()
     
+    force_refresh = request.args.get("refresh", "false").lower() == "true"
+    
+    if force_refresh:
+        print("\n=== Force refresh requested ===")
+        refresh_response = refresh_database_cache()
+        if refresh_response[1] == 200:
+            cached_content = get_cached_database_content()
+        else:
+            print("\n=== Force refresh failed ===")
+            cached_content = None
+    else:
+        cached_content = get_cached_database_content()
+        
+        if not cached_content:
+            print("\n=== Cache miss, attempting refresh ===")
+            refresh_response = refresh_database_cache()
+            if refresh_response[1] == 200:
+                cached_content = get_cached_database_content()
+            else:
+                print("\n=== Cache refresh failed ===")
+
+    if not cached_content:
+        return render_template(
+            "database.html",
+            pages=[],
+            closing_soon_pages=[],
+            destacar_pages=[],
+            og_data={
+                "title": "100 ︱ Oportunidades",
+                "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
+                "url": request.url,
+                "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
+            }
+        )
+
     is_htmx = request.headers.get('HX-Request', 'false').lower() == 'true'
     is_clear = request.args.get("clear", "false").lower() == "true"
     search_query = request.args.get("search", "").lower()
@@ -633,92 +666,17 @@ def all_pages():
     month_number = request.args.get("month", type=int)
     is_sin_cierre = request.args.get("sin_cierre", "false").lower() == "true"
 
-    # Get cached content
-    cached_content = get_cached_database_content()
-    
-    if cached_content:
-        print(f"\n=== Using cached content with {len(cached_content['pages'])} pages ===")
-        sys.stdout.flush()
-        
-        pages = cached_content['pages']
-        closing_soon_pages = cached_content['closing_soon_pages']
-        destacar_pages = cached_content['destacar_pages']
+    pages = cached_content['pages']
+    closing_soon_pages = cached_content['closing_soon_pages']
+    destacar_pages = cached_content['destacar_pages']
 
-        # Handle clear request
-        if is_clear:
-            if is_htmx:
-                return render_template("_search_results.html", pages=pages)
-            return render_template(
-                "database.html",
-                pages=pages,
-                closing_soon_pages=closing_soon_pages[:7],
-                destacar_pages=destacar_pages,
-                og_data={
-                    "title": "100 ︱ Oportunidades",
-                    "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
-                    "url": request.url,
-                    "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
-                }
-            )
-
-        # Apply filters
-        filtered_pages = pages
-        
-        # Apply month-based filter first
-        if month_number is not None or is_sin_cierre:
-            filtered_pages = [
-                page for page in filtered_pages 
-                if (is_sin_cierre and page.get("fecha_de_cierre") == "1900-01-01")
-                or (month_number and datetime.strptime(page.get("fecha_de_cierre", "1900-01-01"), '%Y-%m-%d').month == month_number)
-            ]
-        
-        # Then apply search filter if needed
-        elif search_query:
-            def normalize_text(text):
-                if not isinstance(text, str):
-                    text = str(text)
-                return unicodedata.normalize('NFKD', text.lower()) \
-                    .encode('ASCII', 'ignore') \
-                    .decode('ASCII')
-
-            if is_expanded:
-                search_terms = search_query.split('|')
-                print(f"Expanded search terms: {search_terms}")  # Debug log
-                
-                filtered_pages = []
-                for page in pages:
-                    keywords = normalize_text(str(page.get("ai_keywords", "")))
-                    nombre = normalize_text(str(page.get("nombre", "")))
-                    descripcion = normalize_text(str(page.get("descripción", "")))
-                    is_residency = any(term in descripcion for term in [
-                        "residencia", "residencia artistica", "residencia para artistas",
-                        "artist residency", "residencia de artistas"
-                    ])
-                    
-                    if any(normalize_text(term) in keywords or 
-                          (normalize_text(term) in nombre and any(
-                              discipline in term for discipline in ["music", "musica", "danza", "teatro", "theater"]
-                          )) or
-                          (is_residency and "artista" in keywords)
-                          for term in search_terms):
-                        filtered_pages.append(page)
-                        print(f"Matched page: {page.get('nombre', '')}")  # Debug log
-            else:
-                normalized_query = normalize_text(search_query)
-                filtered_pages = [
-                    page for page in pages
-                    if normalized_query in normalize_text(str(page.get("ai_keywords", "")))
-                    or normalized_query in normalize_text(str(page.get("nombre", "")))
-                ]
-
-            print(f"Found {len(filtered_pages)} matching pages")  # Debug log
-            
-            if is_htmx:
-                return render_template("_search_results.html", pages=filtered_pages)
-
+    # Handle clear request
+    if is_clear:
+        if is_htmx:
+            return render_template("_search_results.html", pages=pages)
         return render_template(
             "database.html",
-            pages=filtered_pages,
+            pages=pages,
             closing_soon_pages=closing_soon_pages[:7],
             destacar_pages=destacar_pages,
             og_data={
@@ -729,12 +687,66 @@ def all_pages():
             }
         )
 
-    # If no cached content, return empty template
+    # Apply filters
+    filtered_pages = pages
+    
+    # Apply month-based filter first
+    if month_number is not None or is_sin_cierre:
+        filtered_pages = [
+            page for page in filtered_pages 
+            if (is_sin_cierre and page.get("fecha_de_cierre") == "1900-01-01")
+            or (month_number and datetime.strptime(page.get("fecha_de_cierre", "1900-01-01"), '%Y-%m-%d').month == month_number)
+        ]
+    
+    # Then apply search filter if needed
+    elif search_query:
+        def normalize_text(text):
+            if not isinstance(text, str):
+                text = str(text)
+            return unicodedata.normalize('NFKD', text.lower()) \
+                .encode('ASCII', 'ignore') \
+                .decode('ASCII')
+
+        if is_expanded:
+            search_terms = search_query.split('|')
+            print(f"Expanded search terms: {search_terms}")  # Debug log
+            
+            filtered_pages = []
+            for page in pages:
+                keywords = normalize_text(str(page.get("ai_keywords", "")))
+                nombre = normalize_text(str(page.get("nombre", "")))
+                descripcion = normalize_text(str(page.get("descripción", "")))
+                is_residency = any(term in descripcion for term in [
+                    "residencia", "residencia artistica", "residencia para artistas",
+                    "artist residency", "residencia de artistas"
+                ])
+                
+                if any(normalize_text(term) in keywords or 
+                      (normalize_text(term) in nombre and any(
+                          discipline in term for discipline in ["music", "musica", "danza", "teatro", "theater"]
+                      )) or
+                      (is_residency and "artista" in keywords)
+                      for term in search_terms):
+                    filtered_pages.append(page)
+                    print(f"Matched page: {page.get('nombre', '')}")  # Debug log
+        else:
+            normalized_query = normalize_text(search_query)
+            filtered_pages = [
+                page for page in pages
+                if normalized_query in normalize_text(str(page.get("ai_keywords", "")))
+                or normalized_query in normalize_text(str(page.get("nombre", "")))
+            ]
+
+        print(f"Found {len(filtered_pages)} matching pages")  # Debug log
+        
+        if is_htmx:
+            return render_template("_search_results.html", pages=filtered_pages)
+
     return render_template(
         "database.html",
-        pages=[],
-        closing_soon_pages=[],
-        destacar_pages=[],
+        pages=filtered_pages,
+        closing_soon_pages=closing_soon_pages[:7],
+        destacar_pages=destacar_pages,
         og_data={
             "title": "100 ︱ Oportunidades",
             "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
@@ -901,26 +913,37 @@ def update_total_nuevas():
 
 def get_cached_database_content():
     try:
+        if not redis:
+            print("\n=== Redis not available ===")
+            return None
+
         print("\n=== Checking Redis cache ===")
         sys.stdout.flush()
         
-        # Use the Upstash Redis client methods
         cached_content = redis.get('database_content')
-        if cached_content:
-            print("\n=== CACHE HIT: Found data in Redis ===")
-            sys.stdout.flush()
-            return json.loads(cached_content)
+        if not cached_content:
+            print("\n=== CACHE MISS: No cached content found ===")
+            return None
+
+        # Decode and parse JSON
+        try:
+            decoded_content = cached_content.decode('utf-8') if isinstance(cached_content, bytes) else cached_content
+            parsed_content = json.loads(decoded_content)
+            print(f"\n=== CACHE HIT: Found {len(parsed_content.get('pages', []))} pages ===")
+            return parsed_content
+        except json.JSONDecodeError as e:
+            print(f"\n=== JSON Parse Error: {str(e)} ===")
+            return None
             
-        print("\n=== CACHE MISS: No cached content found ===")
-        sys.stdout.flush()
-        return None
     except Exception as e:
         print(f"\n=== CACHE ERROR: {str(e)} ===")
-        sys.stdout.flush()
         return None
 
 @app.route("/refresh_database_cache", methods=["POST"])
 def refresh_database_cache():
+    if not redis:
+        return jsonify({"status": "error", "message": "Redis not available"}), 500
+
     try:
         # Fetch all pages from Notion
         def fetch_notion_pages():
@@ -1061,7 +1084,7 @@ def refresh_database_cache():
             datetime.strptime(page["fecha_de_cierre"], '%Y-%m-%d') if page["fecha_de_cierre"] != placeholder_date else datetime.max
         ), reverse=True)
 
-        # Store the processed data
+        # Store the processed data with explicit encoding
         cache_data = {
             'pages': sorted_pages,
             'closing_soon_pages': closing_soon_pages[:7],
@@ -1069,10 +1092,18 @@ def refresh_database_cache():
             'timestamp': datetime.now().isoformat()
         }
         
-        # Store for 7 days (604800 seconds)
-        redis.set('database_content', json.dumps(cache_data), ex=604800)
+        # Convert to JSON string with explicit encoding
+        cache_json = json.dumps(cache_data, ensure_ascii=False)
         
-        return jsonify({"status": "success", "message": "Cache refreshed"}), 200
+        # Store in Redis with explicit expiration
+        redis.set('database_content', cache_json, ex=604800)  # 7 days
+        
+        print(f"\n=== Cache refreshed with {len(sorted_pages)} pages ===")
+        return jsonify({
+            "status": "success", 
+            "message": f"Cache refreshed with {len(sorted_pages)} pages"
+        }), 200
+
     except Exception as e:
         print(f"Cache refresh error: {str(e)}")
         return jsonify({"status": "error", "message": str(e)}), 500
