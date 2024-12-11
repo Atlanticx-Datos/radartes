@@ -894,11 +894,8 @@ def get_cached_database_content():
         print("\n=== Checking Redis cache ===")
         sys.stdout.flush()
         
-        # Try to get cached content from Redis
+        # Use the Upstash Redis client methods
         cached_content = redis.get('database_content')
-        print(f"Raw cached data exists: {cached_content is not None}")
-        sys.stdout.flush()
-        
         if cached_content:
             print("\n=== CACHE HIT: Found data in Redis ===")
             sys.stdout.flush()
