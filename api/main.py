@@ -1057,6 +1057,13 @@ def refresh_database_cache():
                         if page["properties"]["Entidad"]["rich_text"]
                         else ""
                     )
+                
+                if "Categoría" in page["properties"]:
+                    page_data["categoria"] = (
+                        page["properties"]["Categoría"]["rich_text"][0]["text"]["content"]
+                        if page["properties"]["Categoría"]["rich_text"]
+                        else ""
+                    )
 
                 # Handle fecha_de_cierre
                 fecha_de_cierre_prop = page["properties"].get("Fecha de cierre", None)

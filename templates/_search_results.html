@@ -25,10 +25,10 @@
     <td class="w-[30%] md:w-[35%]">
         <div class="border-left-custom text-sm py-2 capitalize-first h-12 flex items-center pl-6" style="line-height: 0.8rem;">
             <span class="md:hidden whitespace-nowrap">
-                {{ (page.ai_keywords | truncate(20)).capitalize() }}
+                {{ (page.ai_keywords | truncate(12)).capitalize() }}
                 {% if page.entidad %}
                 / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
-                    {{ page.entidad | truncate(12, true, "...") }}
+                    {{ page.entidad | truncate(8, true, "...") }}
                 </span>
                 {% endif %}
             </span>
