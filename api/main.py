@@ -63,48 +63,35 @@ print(f"Secret key exists: {bool(secret_key)}")
 
 app = Flask(__name__, static_folder='../static', static_url_path='/static', template_folder='../templates')
 
-# Set secret key directly
-app.secret_key = secret_key
-
-# Double-check secret key is set
-print(f"App secret key is set: {bool(app.secret_key)}")
-
-# Rest of your configuration
-app.config.update(
-    SESSION_COOKIE_SECURE=os.environ.get('VERCEL_ENV', False),
-    SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE='Lax',
-    PERMANENT_SESSION_LIFETIME=timedelta(hours=24),
-    SESSION_REFRESH_EACH_REQUEST=True
-)
-
-# Initialize Session
-Session(app)
-
-# Only create session directory in development
-if not os.environ.get('VERCEL_ENV'):
-    os.makedirs(os.path.join(app.root_path, 'flask_session'), exist_ok=True)
-
-# Configure caching with longer timeout
-cache = Cache(app, config={
-    'CACHE_TYPE': 'simple',
-    'CACHE_DEFAULT_TIMEOUT': 7200  # Increase to 2 hours
-})
-
-# Initialize Redis with your Upstash credentials
-redis = Redis(url=os.environ.get('KV_REST_API_URL'),
-              token=os.environ.get('KV_REST_API_TOKEN'))
+# Set secret key first
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "default_fallback_secret_key")
 
 # Environment-specific configuration
 if os.getenv("FLASK_ENV") == "development":
-    app.config["ENV"] = "development"
-    app.config["DEBUG"] = True
+    app.config.update(
+        ENV="development",
+        DEBUG=True,
+        SESSION_COOKIE_SECURE=False
+    )
 else:
-    app.config["ENV"] = "production"
-    app.config["DEBUG"] = False
+    app.config.update(
+        ENV="production",
+        DEBUG=False,
+        SESSION_COOKIE_SECURE=True  # Ensure cookies are sent over HTTPS in production
+    )
+
+# Session configuration
+app.config.update(
+    SESSION_TYPE="filesystem",
+    SESSION_COOKIE_HTTPONLY=True,  # Prevent JavaScript from accessing the cookies
+    SESSION_COOKIE_SAMESITE="Lax",  # CSRF protection
+    SESSION_PERMANENT=True,  # Sessions don't expire immediately
+    SESSION_USE_SIGNER=True,  # Sign the session cookie
+    PERMANENT_SESSION_LIFETIME=timedelta(hours=24)
+)
 
 # Role-Base Access Mgmt
-app.config["JWT_SECRET_KEY"] = "daleboquita"  # Change this to your actual secret key
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "daleboquita")
 jwt = JWTManager(app)
 
 p = inflect.engine()
