@@ -56,19 +56,20 @@ import redis
 
 
 load_dotenv()
-print("Loaded AUTH0_DOMAIN:", os.environ.get("AUTH0_DOMAIN"))
 
-logger = logging.getLogger(__name__)
+# Debug print to verify environment variable
+secret_key = os.getenv("FLASK_SECRET_KEY")
+print(f"Secret key exists: {bool(secret_key)}")
 
-# Create Flask app
 app = Flask(__name__, static_folder='../static', static_url_path='/static', template_folder='../templates')
 
-# Set the secret key FIRST, before any other configuration
-app.secret_key = os.getenv("FLASK_SECRET_KEY")
-if not app.secret_key:
-    raise RuntimeError("FLASK_SECRET_KEY must be set!")
+# Set secret key directly
+app.secret_key = secret_key
 
-# Then do the rest of your configuration
+# Double-check secret key is set
+print(f"App secret key is set: {bool(app.secret_key)}")
+
+# Rest of your configuration
 app.config.update(
     SESSION_COOKIE_SECURE=os.environ.get('VERCEL_ENV', False),
     SESSION_COOKIE_HTTPONLY=True,
@@ -113,14 +114,16 @@ p = inflect.engine()
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if "user" not in session:
-            original_url = request.url
-            # Store URL in both session and query parameter
-            session["next"] = original_url
-            session.modified = True
-            logger.info(f"Login required: Storing original URL: {original_url}")
-            return redirect(url_for("login", next=original_url))
-        return f(*args, **kwargs)
+        try:
+            if "user" not in session:
+                original_url = request.url
+                # Store URL in query parameter only, not session
+                return redirect(url_for("login", next=original_url))
+            return f(*args, **kwargs)
+        except RuntimeError as e:
+            print(f"Session error: {str(e)}")
+            # Fallback behavior - redirect to login without storing next URL
+            return redirect(url_for("login"))
     return decorated_function
 
 
