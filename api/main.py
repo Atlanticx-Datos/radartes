@@ -52,10 +52,20 @@ import logging
 import secrets
 
 from flask_session import Session
-import redis
 
 
 load_dotenv()
+
+# Initialize Redis with Upstash credentials
+redis = Redis(url=os.environ.get('KV_REST_API_URL'),
+             token=os.environ.get('KV_REST_API_TOKEN'))
+
+# Debug print to verify Redis connection
+try:
+    redis.set('test', 'test')
+    print("Redis connection successful")
+except Exception as e:
+    print(f"Redis connection error: {str(e)}")
 
 # Debug print to verify environment variable
 secret_key = os.getenv("FLASK_SECRET_KEY")
