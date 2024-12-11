@@ -2145,11 +2145,11 @@ details.collapse summary::-webkit-details-marker {
 .w-\[10\%\] {
   width: 10%;
 }
-.w-\[110\%\] {
-  width: 110%;
-}
 .w-\[12\%\] {
   width: 12%;
+}
+.w-\[120\%\] {
+  width: 120%;
 }
 .w-\[30\%\] {
   width: 30%;
@@ -2177,6 +2177,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .min-w-0 {
   min-width: 0px;
+}
+.min-w-full {
+  min-width: 100%;
 }
 .max-w-\[1180px\] {
   max-width: 1180px;
@@ -2817,6 +2820,9 @@ details.collapse summary::-webkit-details-marker {
     --tw-space-x-reverse: 0;
     margin-right: calc(0.5rem * var(--tw-space-x-reverse));
     margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
+  }
+  .md\:overflow-x-hidden {
+    overflow-x: hidden;
   }
   .md\:rounded-none {
     border-radius: 0px;

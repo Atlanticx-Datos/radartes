@@ -92,8 +92,9 @@ else:
 # Initialize Session
 Session(app)
 
-# Make sure session directory exists
-os.makedirs(os.path.join(app.root_path, 'flask_session'), exist_ok=True)
+# Only create session directory in development
+if not os.environ.get('VERCEL_ENV'):
+    os.makedirs(os.path.join(app.root_path, 'flask_session'), exist_ok=True)
 
 # Configure caching with longer timeout
 cache = Cache(app, config={
@@ -112,16 +113,6 @@ if os.getenv("FLASK_ENV") == "development":
 else:
     app.config["ENV"] = "production"
     app.config["DEBUG"] = False
-
-# Remove dependency on flask_session
-# Session(app)  # Comment this out if using the default Flask session management
-
-app.config["SESSION_TYPE"] = "filesystem"
-app.config["SESSION_COOKIE_SECURE"] = False  # Set to True in production
-app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-app.config["SESSION_PERMANENT"] = True
-app.config["SESSION_USE_SIGNER"] = True
 
 # Role-Base Access Mgmt
 app.config["JWT_SECRET_KEY"] = "daleboquita"  # Change this to your actual secret key
