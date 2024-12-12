@@ -39,7 +39,7 @@ from dateutil.relativedelta import relativedelta
 from flask_socketio import SocketIO
 import socket as py_socket
 
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from flask_caching import Cache
 
@@ -216,57 +216,67 @@ def save_to_notion(user_id, page_id):
         "Content-Type": "application/json",
         "Notion-Version": "2022-06-28",
     }
-    json_body = {
+    
+    data = {
         "parent": {"database_id": OPORTUNIDADES_ID},
         "properties": {
-            "User ID": {"title": [{"text": {"content": user_id}}]},
-            "Opportunity ID": {"rich_text": [{"text": {"content": page_id}}]},
-        },
+            "User ID": {
+                "title": [{"text": {"content": user_id}}]
+            },
+            "Opportunity ID": {
+                "rich_text": [{"text": {"content": page_id}}]
+            }
+        }
     }
-
-    response = requests.post(url, headers=headers, json=json_body)
-    response.raise_for_status()  # Raise an exception for HTTP errors
+    
+    app.logger.info(f"Saving opportunity {page_id} for user {user_id}")
+    
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+        app.logger.info(f"Successfully saved opportunity {page_id}")
+        return response.json()
+    except Exception as e:
+        app.logger.error(f"Error saving opportunity: {str(e)}")
+        raise
 
 @app.route("/save_user_opportunity", methods=["POST"])
 @login_required
 def save_user_opportunity():
     user_id = session["user"]["sub"]
-    
-    # Add debugging
-    print("Request form data:", request.form)
-    print("Request headers:", request.headers)
+    app.logger.info(f"Saving opportunities for user {user_id}")
 
     try:
         selected_pages = request.form.getlist("selected_pages")
-        print("Selected pages:", selected_pages)  # Debug line
+        app.logger.info(f"Selected pages to save: {selected_pages}")
 
         if not selected_pages:
-            print("No pages selected")  # Debug line
+            app.logger.warning("No pages selected")
             return jsonify({"error": "No pages selected"}), 400
 
+        saved_count = 0
         for page_id in selected_pages:
-            print(f"Processing page ID: {page_id}")  # Debug line
-            # Check if the opportunity is already saved
-            if is_opportunity_already_saved(user_id, page_id):
-                print(f"Page {page_id} already saved")  # Debug line
-                continue
+            try:
+                if not is_opportunity_already_saved(user_id, page_id):
+                    save_to_notion(user_id, page_id)
+                    saved_count += 1
+                    app.logger.info(f"Saved opportunity {page_id}")
+                else:
+                    app.logger.info(f"Opportunity {page_id} already saved")
+            except Exception as e:
+                app.logger.error(f"Error saving opportunity {page_id}: {str(e)}")
 
-            # Save the opportunity to the user's saved opportunities in Notion
-            save_to_notion(user_id, page_id)
-            print(f"Page {page_id} saved successfully")  # Debug line
-
-        success_message = """
-        <div role="alert" class="flex items-center alert alert-success p-3">
+        success_message = f"""
+        <div role="alert" class="flex items-center justify-center alert alert-success p-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>Oportunidades guardadas exitosamente!</span>
         </div>
         """
-
         return success_message, 200
+
     except Exception as e:
-        print("Error in save_user_opportunity:", str(e))  # Debug line
+        app.logger.error(f"Error in save_user_opportunity: {str(e)}")
         return jsonify({"error": str(e)}), 400
 
 def fetch_opportunity_details(opportunity_id):
@@ -276,40 +286,62 @@ def fetch_opportunity_details(opportunity_id):
 @login_required
 def list_saved_opportunities():
     user_id = session["user"]["sub"]
+    app.logger.info(f"=== Fetching saved opportunities for user {user_id} ===")
 
-    # Fetch saved opportunity IDs from Notion
-    opportunity_ids = get_saved_opportunity_ids(user_id)
-    print(f"Retrieved opportunity IDs: {opportunity_ids}")
+    try:
+        opportunity_ids = get_saved_opportunity_ids(user_id)
+        app.logger.info(f"Retrieved {len(opportunity_ids)} opportunity IDs: {opportunity_ids}")
 
-    # Fetch detailed information for each opportunity concurrently
-    with ThreadPoolExecutor() as executor:
-        opportunities = list(executor.map(fetch_opportunity_details, opportunity_ids))
-    
-    # Filter out None values
-    opportunities = [opp for opp in opportunities if opp is not None]
-    print(f"Filtered opportunities: {len(opportunities)}")
+        if not opportunity_ids:
+            app.logger.info("No saved opportunities found")
+            return render_template("user_opportunities.html", 
+                                opportunities=[], 
+                                og_data=get_default_og_data())
 
-    # Generate og_data based on the first saved opportunity or use default values
-    default_og_data = {
+        with ThreadPoolExecutor() as executor:
+            future_to_id = {executor.submit(get_opportunity_by_id, opp_id): opp_id 
+                          for opp_id in opportunity_ids}
+            
+            opportunities = []
+            for future in as_completed(future_to_id):
+                opp_id = future_to_id[future]
+                try:
+                    opportunity = future.result()
+                    if opportunity:
+                        opportunities.append(opportunity)
+                        app.logger.info(f"Successfully fetched opportunity: {opportunity.get('nombre', 'Unknown')} (ID: {opp_id})")
+                    else:
+                        app.logger.error(f"Failed to fetch opportunity {opp_id}")
+                except Exception as e:
+                    app.logger.error(f"Error fetching opportunity {opp_id}: {str(e)}")
+
+        app.logger.info(f"Successfully fetched {len(opportunities)} out of {len(opportunity_ids)} opportunities")
+
+        if opportunities:
+            og_data = {
+                "title": opportunities[0]["nombre"],
+                "description": opportunities[0].get("resumen_IA", "Convocatorias, Becas y Recursos Globales para Artistas."),
+                "url": request.url,
+                "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
+            }
+        else:
+            og_data = get_default_og_data()
+
+        return render_template("user_opportunities.html", opportunities=opportunities, og_data=og_data)
+
+    except Exception as e:
+        app.logger.error(f"Error in list_saved_opportunities: {str(e)}")
+        return render_template("user_opportunities.html", 
+                             opportunities=[], 
+                             og_data=get_default_og_data())
+
+def get_default_og_data():
+    return {
         "title": "100 ︱ Oportunidades",
         "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
         "url": request.url,
         "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
     }
-
-    if opportunities and len(opportunities) > 0 and opportunities[0]:
-        first_opportunity = opportunities[0]
-        og_data = {
-            "title": first_opportunity.get("nombre", default_og_data["title"]),
-            "description": first_opportunity.get("resumen_IA", default_og_data["description"]),
-            "url": request.url,
-            "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
-        }
-    else:
-        og_data = default_og_data
-
-    return render_template("user_opportunities.html", opportunities=opportunities, og_data=og_data)
-
 
 def is_opportunity_already_saved(user_id, page_id):
     url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
@@ -334,38 +366,45 @@ def is_opportunity_already_saved(user_id, page_id):
     return bool(data["results"])
 
 def get_saved_opportunity_ids(user_id):
+    app.logger.info(f"Fetching saved opportunities for user {user_id}")
+    
     url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
     headers = {
         "Authorization": "Bearer " + NOTION_TOKEN,
         "Content-Type": "application/json",
         "Notion-Version": "2022-06-28",
     }
-    json_body = {"filter": {"property": "User ID", "title": {"equals": user_id}}}
+    json_body = {
+        "filter": {
+            "and": [
+                {"property": "User ID", "title": {"equals": user_id}},
+                {"property": "Opportunity ID", "rich_text": {"contains": ""}}
+            ]
+        }
+    }
 
-    print(f"Fetching saved opportunities for user: {user_id}")
-    print(f"Request URL: {url}")
-    print(f"Request body: {json_body}")
-    
-    response = requests.post(url, headers=headers, json=json_body)
-    response.raise_for_status()
-    data = response.json()
+    try:
+        response = requests.post(url, headers=headers, json=json_body)
+        response.raise_for_status()
+        data = response.json()
+        
+        opportunity_ids = []
+        for result in data.get("results", []):
+            try:
+                opp_id = result["properties"]["Opportunity ID"]["rich_text"][0]["text"]["content"]
+                if len(opp_id) == 36:  # Only add valid UUIDs
+                    app.logger.info(f"Found valid opportunity ID: {opp_id}")
+                    opportunity_ids.append(opp_id)
+                else:
+                    app.logger.warning(f"Skipping invalid opportunity ID: {opp_id}")
+            except (KeyError, IndexError) as e:
+                app.logger.error(f"Error extracting opportunity ID from result: {e}")
+                continue
 
-    print(f"Raw response data: {data}")  # Let's see what we're getting back
-
-    opportunity_ids = []
-    for result in data.get("results", []):
-        try:
-            opp_id = result["properties"]["Opportunity ID"]["rich_text"][0]["text"]["content"]
-            print(f"Found opportunity ID: {opp_id}")
-            if opp_id and opp_id.strip():  # Only add non-empty IDs
-                opportunity_ids.append(opp_id)
-        except (KeyError, IndexError) as e:
-            print(f"Error extracting opportunity ID from result: {e}")
-            print(f"Result data: {result}")
-            continue
-
-    print(f"Final opportunity IDs: {opportunity_ids}")
-    return opportunity_ids
+        return opportunity_ids
+    except Exception as e:
+        app.logger.error(f"Error fetching saved opportunities: {str(e)}")
+        return []
 
 def get_opportunity_by_id(opportunity_id):
     if not opportunity_id or not isinstance(opportunity_id, str) or len(opportunity_id) < 2:
