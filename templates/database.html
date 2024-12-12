@@ -135,15 +135,15 @@
                         </div>
                     </div>
 
-                    <div class="hidden md:block mt-4">
-                        <h3 class="text-lg font-semibold mb-2">Tipo de Oportunidad</h3>
-                        <div class="grid grid-cols-3 gap-2">
+                    <div class="hidden md:block mt-4 bg-slate-100 rounded-sm p-6 px-6 mr-2">
+                        <h3 class="text-lg font-semibold mb-4">Tipo de Oportunidad</h3>
+                        <div class="grid grid-cols-3 gap-3">
                             <div class="flex items-center">
-                                <div class="w-4 h-4 bg-red-200 mr-2"></div>
+                                <div class="w-4 h-4 bg-red-300 mr-2"></div>
                                 <span class="text-sm">Premios</span>
                             </div>
                             <div class="flex items-center">
-                                <div class="w-4 h-4 bg-green-200 mr-2"></div>
+                                <div class="w-4 h-4 bg-green-300 mr-2"></div>
                                 <span class="text-sm">Residencias</span>
                             </div>
                             <div class="flex items-center">
@@ -151,20 +151,24 @@
                                 <span class="text-sm">Becas</span>
                             </div>
                             <div class="flex items-center">
-                                <div class="w-4 h-4 bg-blue-200 mr-2"></div>
-                                <span class="text-sm">Convocatorias</span>
+                                <div class="w-4 h-4 bg-blue-300 mr-2"></div>
+                                <span class="text-sm">Convocat.</span>
                             </div>
                             <div class="flex items-center">
-                                <div class="w-4 h-4 bg-yellow-200 mr-2"></div>
+                                <div class="w-4 h-4 bg-yellow-300 mr-2"></div>
                                 <span class="text-sm">Fondos</span>
                             </div>
                             <div class="flex items-center">
-                                <div class="w-4 h-4 bg-purple-200 mr-2"></div>
-                                <span class="text-sm">Oportunidades</span>
+                                <div class="w-4 h-4 bg-purple-300 mr-2"></div>
+                                <span class="text-sm">Oportun.</span>
                             </div>
                             <div class="flex items-center">
                                 <div class="w-4 h-4 bg-orange-300 mr-2"></div>
                                 <span class="text-sm">Apoyos</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-yellow-400 mr-2"></div>
+                                <span class="text-sm">Destacadas</span>
                             </div>
                         </div>
                     </div>
@@ -180,9 +184,9 @@
                                 class="max-h-[35rem] min-h-[20rem] overflow-y-auto overflow-x-hidden pl-4 md:pl-0 md:scrollbar-none custom-scrollbar md:border-t border-black md:border-r md:border-r-black">
                                 <div
                                     class="w-[120%] md:w-full -ml-4 md:ml-0 overflow-x-auto md:overflow-x-hidden scrollbar-none">
-                                    <div class="min-w-full relative">
-                                        <table class="w-full h-full table-fixed">
-                                            <thead class="sticky top-0 bg-white">
+                                    <div class="min-w-full">
+                                        <table class="w-full h-full table-fixed relative isolate">
+                                            <thead class="sticky top-0 bg-white z-20">
                                                 <tr>
                                                     <th class="w-[7%] pl-4 pt-4 pb-3">✓</th>
                                                     <th
@@ -197,7 +201,7 @@
                                                     <th class="w-[8%] pt-4 pb-3"></th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="search-results" class="relative">
+                                            <tbody id="search-results" class="relative z-30">
                                                 {% include "_search_results.html" %}
                                             </tbody>
                                         </table>
@@ -205,15 +209,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="flex justify-center items-center space-x-2 mt-6 mb-4">
-                            <div id="alert-container" class="flex items-center"></div>
-                            <button type="submit"
-                                class="uppercase text-sm font-black tracking-tighter text-neutral-700">Guardar
-                                Seleccionados</button>
-                        </div>
                     </form>
                 </div>
-            </div>
         </main>
         {% include 'footer.html' %}
     </div>

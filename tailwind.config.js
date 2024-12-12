@@ -92,6 +92,18 @@ module.exports = {
             fontWeight: '500 !important',
             letterSpacing: '0 !important',
           }
+        },
+        '.dropdown-overlay': {
+          'position': 'relative',
+          'isolation': 'isolate',
+          '& .dropdown-content': {
+            'background-color': 'white',
+            'z-index': '9999',
+            'position': 'absolute',
+            'isolation': 'isolate',
+            '--tw-shadow': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+            'box-shadow': 'var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)'
+          }
         }
       }
       addUtilities(newUtilities)

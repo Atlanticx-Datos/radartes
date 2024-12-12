@@ -57,7 +57,7 @@
     <td class="w-[10%] md:w-[12%] text-xs text-center fecha-de-cierre">
         {{ page.fecha_de_cierre | default("Sin cierre") | format_date }}
     </td>
-    <th class="w-[8%] md:w-[8%] min-w-[70px]">
+    <th class="w-[8%] md:w-[8%] min-w-[70px] relative">
         <div class="flex items-center justify-center">
             <div class="inline-flex items-center gap-1.5 md:gap-3 bg-slate-100 py-2 px-3 md:px-4 ml-9 md:ml-1 mr-4">
                 <button
@@ -72,24 +72,19 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5L19.5 4.5M19.5 4.5H8.25M19.5 4.5V15.75"></path>
                     </svg>
                 </button>
-                <div class="dropdown dropdown-end">
-                    <label tabindex="0" class="flex items-center justify-center w-4 h-4">
-                        <svg class="w-3 md:w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z">
-                            </path>
+                <div class="static">
+                    <button tabindex="0" 
+                            role="button" 
+                            class="flex items-center justify-center w-4 h-4"
+                            onclick="toggleDropdown(this)">
+                        <svg class="w-3 md:w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"></path>
                         </svg>
-                    </label>
-                    <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-                        <li><a href="#"
-                                onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'whatsapp')">WhatsApp</a>
-                        </li>
-                        <li><a href="#"
-                                onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'linkedin')">LinkedIn</a>
-                        </li>
-                        <li><a href="#" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'gmail')">Email</a>
-                        </li>
+                    </button>
+                    <ul class="dropdown-content menu p-2 shadow-xl bg-white rounded-md w-52 border border-black mt-3 absolute right-0 hidden">
+                        <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'whatsapp')">WhatsApp</a></li>
+                        <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'linkedin')">LinkedIn</a></li>
+                        <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'gmail')">Email</a></li>
                     </ul>
                 </div>
             </div>
@@ -138,6 +133,23 @@
     .fecha-de-cierre.confirmar {
         padding-left: 6px; /* Adjusts the text slightly to the right */
     }
+
+    /* Force solid background and proper stacking for dropdowns */
+    .dropdown-content {
+        background-color: white !important;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1), 0 4px 6px -1px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* Ensure menu items have solid background */
+    .dropdown-content .menu-item {
+        background-color: white !important;
+    }
+    
+    /* Create stacking context */
+    .dropdown {
+        position: relative;
+        isolation: isolate;
+    }
 </style>
 
 <script>
@@ -166,5 +178,81 @@
             // Ensure all fecha-de-cierre elements are centered
             element.classList.add('text-center');
         });
+    });
+
+    function handleDropdown(event) {
+        // Prevent the click from bubbling up
+        event.stopPropagation();
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const dropdowns = document.querySelectorAll('details.dropdown');
+        dropdowns.forEach(dropdown => {
+            if (!dropdown.contains(event.target)) {
+                dropdown.removeAttribute('open');
+            }
+        });
+    });
+
+    function manageDropdownStack(dropdownEl) {
+        // Get all SVG icons in the table
+        const icons = document.querySelectorAll('th svg');
+        const dropdown = dropdownEl.querySelector('.dropdown-content');
+        
+        // Store original z-index values
+        icons.forEach(icon => {
+            if (!icon.dataset.originalZ) {
+                icon.dataset.originalZ = getComputedStyle(icon).zIndex;
+            }
+            icon.style.zIndex = '1';
+        });
+
+        // Set dropdown to highest z-index
+        dropdown.style.zIndex = '9999';
+        dropdown.style.backgroundColor = 'white';
+        
+        // Add click outside listener
+        const closeDropdown = (e) => {
+            if (!dropdownEl.contains(e.target)) {
+                // Restore original z-index values
+                icons.forEach(icon => {
+                    icon.style.zIndex = icon.dataset.originalZ || 'auto';
+                });
+                document.removeEventListener('click', closeDropdown);
+            }
+        };
+        
+        document.addEventListener('click', closeDropdown);
+    }
+
+    function toggleDropdown(button) {
+        // Close all other table dropdowns first
+        document.querySelectorAll('th .dropdown-content').forEach(d => {
+            if (d !== button.nextElementSibling) {
+                d.classList.add('hidden');
+            }
+        });
+        
+        // Toggle current dropdown
+        const dropdown = button.nextElementSibling;
+        dropdown.classList.toggle('hidden');
+        
+        // Position the dropdown relative to the button
+        if (!dropdown.classList.contains('hidden')) {
+            const buttonHeight = button.offsetHeight;
+            dropdown.style.top = `${buttonHeight + 4}px`;
+            dropdown.style.right = '0';
+            dropdown.style.zIndex = '9999';
+        }
+    }
+
+    // Close dropdown when clicking outside, but only for table dropdowns
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('th .dropdown-content') && !event.target.closest('th button')) {
+            document.querySelectorAll('th .dropdown-content').forEach(d => {
+                d.classList.add('hidden');
+            });
+        }
     });
 </script>

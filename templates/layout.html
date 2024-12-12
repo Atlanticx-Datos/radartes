@@ -69,10 +69,19 @@
             z-index: 1000;
         }
 
-        .dropdown-content {
+        /* Navigation dropdown specific styles */
+        nav .dropdown-content {
             position: fixed;
             z-index: 999999 !important;
-            background-color: azure;
+            background-color: white;
+        }
+
+        /* Table share dropdown specific styles */
+        .table-fixed .dropdown-content {
+            position: absolute;
+            z-index: 50;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1), 0 4px 6px -1px rgba(0,0,0,0.1);
         }
 
         @media (min-width: 768px) {
