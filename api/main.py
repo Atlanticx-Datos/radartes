@@ -667,6 +667,13 @@ def share_opportunity(opportunity_id):
 def all_pages():
     print("\n=== Starting database route ===")
     
+    # Add month mapping
+    month_mapping = {
+        "enero": 1, "febrero": 2, "marzo": 3, "abril": 4,
+        "mayo": 5, "junio": 6, "julio": 7, "agosto": 8,
+        "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
+    }
+    
     force_refresh = request.args.get("refresh", "false").lower() == "true"
     
     if force_refresh:
@@ -706,8 +713,19 @@ def all_pages():
     is_clear = request.args.get("clear", "false").lower() == "true"
     search_query = request.args.get("search", "").lower()
     is_expanded = request.args.get("expanded", "false").lower() == "true"
-    month_number = request.args.get("month", type=int)
-    is_sin_cierre = request.args.get("sin_cierre", "false").lower() == "true"
+    
+    # Check for month in search query before other processing
+    month_number = month_mapping.get(search_query)
+    if not month_number:
+        # Check if it's a direct month number
+        try:
+            month_num = int(search_query)
+            if 1 <= month_num <= 12:
+                month_number = month_num
+        except ValueError:
+            pass
+    
+    is_sin_cierre = search_query == "sin cierre"
 
     pages = cached_content['pages']
     closing_soon_pages = cached_content['closing_soon_pages']
@@ -733,15 +751,18 @@ def all_pages():
     # Apply filters
     filtered_pages = pages
     
-    # Apply month-based filter first
-    if month_number is not None or is_sin_cierre:
+    # Apply month-based or sin_cierre filter
+    if month_number or is_sin_cierre:
         filtered_pages = [
             page for page in filtered_pages 
-            if (is_sin_cierre and page.get("fecha_de_cierre") == "1900-01-01")
-            or (month_number and datetime.strptime(page.get("fecha_de_cierre", "1900-01-01"), '%Y-%m-%d').month == month_number)
+            if (is_sin_cierre and page.get("fecha_de_cierre") == "1900-01-01") or
+               (month_number and datetime.strptime(page.get("fecha_de_cierre", "1900-01-01"), '%Y-%m-%d').month == month_number)
         ]
+        
+        if is_htmx:
+            return render_template("_search_results.html", pages=filtered_pages)
     
-    # Then apply search filter if needed
+    # Apply regular search if no month/sin_cierre filter
     elif search_query:
         def normalize_text(text):
             if not isinstance(text, str):
@@ -785,6 +806,7 @@ def all_pages():
         if is_htmx:
             return render_template("_search_results.html", pages=filtered_pages)
 
+    # Default return for non-HTMX requests
     return render_template(
         "database.html",
         pages=filtered_pages,
