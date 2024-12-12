@@ -2,14 +2,7 @@
 {% for page in pages %}
 <tr style="
     background-color: 
-    {% if page.destinatarios == 'Destacar' %} rgba(255, 223, 186, 0.8); 
-    {% elif page.categoria|lower == 'premios' %} rgba(255, 243, 242, 0.6); 
-    {% elif page.categoria|lower == 'residencias' %} rgba(242, 255, 243, 0.6); 
-    {% elif page.categoria|lower == 'becas' %} rgba(242, 255, 251, 0.6); 
-    {% elif page.categoria|lower == 'convocatorias' %} rgba(242, 246, 255, 0.6); 
-    {% elif page.categoria|lower == 'fondos' %} rgba(255, 253, 242, 0.6); 
-    {% elif page.categoria|lower == 'oportunidades' %} rgba(247, 242, 255, 0.6); 
-    {% elif page.categoria|lower == 'apoyos' %} rgba(255, 245, 242, 0.6); 
+    {% if page.destinatarios == 'Destacar' %} rgba(251, 146, 60, 0.15); 
     {% else %} transparent; 
     {% endif %}
 ;">

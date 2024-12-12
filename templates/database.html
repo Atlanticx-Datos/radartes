@@ -134,51 +134,12 @@
                             </svg>
                         </div>
                     </div>
-
-                    <div class="hidden md:block mt-4 bg-slate-100 rounded-sm p-6 px-6 mr-2">
-                        <h3 class="text-lg font-semibold mb-4">Tipo de Oportunidad</h3>
-                        <div class="grid grid-cols-3 gap-3">
-                            <div class="flex items-center">
-                                <div class="w-4 h-4 bg-red-300 mr-2"></div>
-                                <span class="text-sm">Premios</span>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-4 h-4 bg-green-300 mr-2"></div>
-                                <span class="text-sm">Residencias</span>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-4 h-4 bg-teal-300 mr-2"></div>
-                                <span class="text-sm">Becas</span>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-4 h-4 bg-blue-300 mr-2"></div>
-                                <span class="text-sm">Convocat.</span>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-4 h-4 bg-yellow-300 mr-2"></div>
-                                <span class="text-sm">Fondos</span>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-4 h-4 bg-purple-300 mr-2"></div>
-                                <span class="text-sm">Oportun.</span>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-4 h-4 bg-orange-300 mr-2"></div>
-                                <span class="text-sm">Apoyos</span>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-4 h-4 bg-yellow-400 mr-2"></div>
-                                <span class="text-sm">Destacadas</span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Second Column: Table -->
                 <div class="col-span-1 md:col-span-7 lg:col-span-8 mt-2 lg:mt-0 min-w-0" id="table-container"
                     hx-preserve="true">
-                    <form id="save-form" hx-post="/save_user_opportunity" hx-trigger="submit" hx-swap="innerHTML"
-                        hx-target="#alert-container">
+                    <form id="save-form" method="POST">
                         <div class="border-b border-neutral" id="results-container">
                             <div
                                 class="max-h-[35rem] min-h-[20rem] overflow-y-auto overflow-x-hidden pl-4 md:pl-0 md:scrollbar-none custom-scrollbar md:border-t border-black md:border-r md:border-r-black">
@@ -208,6 +169,13 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="flex justify-center items-center space-x-2 mt-6 mb-4">
+                            <div id="alert-container" class="flex items-center"></div>
+                            <button type="submit"
+                                class="uppercase text-sm font-black tracking-tighter text-neutral-700">
+                                Guardar Seleccionados
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -1046,6 +1014,100 @@
                 });
             }
         });
+
+        // Replace the form submission handling code with this corrected version
+        document.addEventListener('DOMContentLoaded', function () {
+            const saveForm = document.getElementById('save-form');
+            let isSubmitting = false;
+
+            if (saveForm) {
+                saveForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    if (isSubmitting) {
+                        return;
+                    }
+
+                    const checkedOpportunities = document.querySelectorAll('input[type="checkbox"]:checked');
+
+                    if (checkedOpportunities.length === 0) {
+                        const alertContainer = document.getElementById('alert-container');
+                        alertContainer.innerHTML = `
+                        <div role="alert" class="flex items-center justify-center alert alert-warning p-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                    `;
+                        setTimeout(() => {
+                            alertContainer.innerHTML = '';
+                        }, 3000);
+                        return;
+                    }
+
+                    isSubmitting = true;
+                    const formData = new FormData();
+
+                    checkedOpportunities.forEach(checkbox => {
+                        formData.append('selected_pages', checkbox.value);
+                    });
+
+                    fetch('/save_user_opportunity', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        credentials: 'same-origin'
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.text().then(text => {
+                                    throw new Error(text || 'Network response was not ok');
+                                });
+                            }
+                            return response.text();
+                        })
+                        .then(html => {
+                            const alertContainer = document.getElementById('alert-container');
+                            alertContainer.innerHTML = `
+                        <div role="alert" class="flex items-center justify-center alert alert-success p-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    `;
+
+                            checkedOpportunities.forEach(checkbox => {
+                                checkbox.checked = false;
+                            });
+
+                            setTimeout(() => {
+                                alertContainer.innerHTML = '';
+                            }, 3000);
+                        })
+                        .catch(error => {
+                            const alertContainer = document.getElementById('alert-container');
+                            alertContainer.innerHTML = `
+                        <div role="alert" class="flex items-center justify-center alert alert-error p-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    `;
+
+                            setTimeout(() => {
+                                alertContainer.innerHTML = '';
+                            }, 3000);
+                        })
+                        .finally(() => {
+                            isSubmitting = false;
+                        });
+                });
+            }
+        });
+
+        // Remove the previous HTMX event listeners since we're handling it with fetch now
     </script>
 
 
