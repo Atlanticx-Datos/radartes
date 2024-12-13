@@ -5,14 +5,11 @@
 {% endblock %}
 
 {% block body %}
-<div class="w-full max-w-[1180px] mx-auto px-3 mt-4 md:mt-0 md:px-8 relative">
-  <!-- Main Content Section -->
-  <div class="relative bg-black text-white flex flex-col rounded-xl md:rounded-none md:mt-3
-              h-[800px]                    /* Default height */
-              h-[667px]:h-[700px]          /* Shorter for small phones */
-              h-[800px]:h-[800px]          /* Standard for mid phones */
-              h-[900px]:h-[960px]          /* Taller for large phones */
-              md:h-[600px]">
+<div class="w-full max-w-[1350px] mx-auto px-3 md:px-8">
+  <!-- Main Content Section - Simplified height management -->
+  <div class="relative bg-black text-white flex flex-col rounded-xl md:rounded-none
+              min-h-screen md:h-[600px]"> <!-- Simplified height control -->
+
     <!-- Navigation for Index Page -->
     <nav class="absolute 
                 -top-6
@@ -76,69 +73,88 @@
       </div>
     </nav>
 
-    <!-- Hero Section with Mobile-First Approach -->
+    <!-- Hero Section - Simplified structure -->
     <div class="flex flex-col md:flex-row h-full bg-zinc-900 text-white">
-      <!-- Mobile Layout (flex-col) -->
+      <!-- Mobile Layout - Now uses full height -->
       <div class="flex flex-col h-full md:hidden">
-        <!-- First Column Content - Mobile -->
-        <div class="flex-1 flex flex-col justify-center px-6">
+        <div class="flex-1 flex flex-col justify-center px-6 pt-16"> <!-- Added pt-16 for nav spacing -->
           <h1 class="hero-mobile mb-4">Your Hero Message</h1>
           <p class="text-xl">Brief description or tagline.</p>
         </div>
-        
-        <!-- Gallery - Mobile -->
+
         <div class="flex-1 relative overflow-hidden">
-          <div class="gallery-container w-full h-full">
+          <div class="gallery-container relative w-full h-full overflow-hidden">
             <img src="/static/public/Pao.png" alt="Hero Image 1"
-              class="gallery-image w-full h-full object-cover effect-level-1">
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-0 transition-all duration-1500 ease-in-out">
             <img src="/static/public/Manu.png" alt="Hero Image 2"
-              class="gallery-image w-full h-full object-cover effect-level-1 translate-x-full">
-            <img src="/static/public/Boquita_Still.png" alt="Hero Image 2"
-              class="gallery-image w-full h-full object-cover effect-level-1 translate-x-full">
-            <img src="/static/public/Gaia.png" alt="Hero Image 2"
-              class="gallery-image w-full h-full object-cover effect-level-1 translate-x-full">
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+            <img src="/static/public/Boquita_Still.png" alt="Hero Image 3"
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+            <img src="/static/public/Gaia.png" alt="Hero Image 4"
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
           </div>
         </div>
       </div>
 
-      <!-- Desktop Layout (hidden on mobile, flex-row) -->
-      <div class="hidden md:flex md:flex-row h-full">
-        <!-- First Column - Hero Text (wider) -->
-        <div class="w-[28%] flex flex-col justify-center px-8">
-          <h1 class="hero-text mb-4 text-[3.7rem] font-bold leading-[0.95]">Más recursos <span class="text-indigo-500">globales</span></h1>
-          <p class="text-xl text-gray-300">Para artistas, gestores e investigadores latinxs.</p>
+      <!-- Desktop Layout - Simplified -->
+      <div class="hidden md:flex md:flex-row h-full w-full">
+        <!-- First Column - Hero Text -->
+        <div class="w-[35%] flex flex-col justify-center px-8">
+          <h1 class="text-[4.2rem] font-bold leading-[0.9] mb-4">Más recursos <span
+              class="text-indigo-500">globales</span></h1>
+          <p class="text-xl text-gray-300 mr-12">Para artistas, gestores e investigadores latinxs.</p>
         </div>
 
-        <!-- Second Column - What We Offer (wider) -->
-        <div class="w-[28%] flex flex-col justify-center px-8">
-          <h2 class="text-[2.5rem] font-semibold mb-4 leading-[1]">Encontrá, guardá y compartí el impulso que necesitás</h2>
-          <p class="text-lg text-gray-300 mb-6">Enlazamos a más de 100 becas, residencias, premios y convocatorias vigentes. Actualizamos constantemente.</p>
-        </div>
-
-        <!-- Third Column - Image Gallery -->
-        <div class="w-[28%] overflow-hidden relative">
-          <div class="gallery-container w-full h-full">
+        <!-- Second Column - Image Gallery (moved from third to second position) -->
+        <div class="w-[40%] overflow-hidden relative">
+          <div class="gallery-container relative w-full h-full overflow-hidden">
             <img src="/static/public/Pao.png" alt="Hero Image 1"
-              class="gallery-image w-full h-full object-cover effect-level-1">
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-0 transition-all duration-1500 ease-in-out">
             <img src="/static/public/Manu.png" alt="Hero Image 2"
-              class="gallery-image w-full h-full object-cover effect-level-1 translate-x-full">
-            <img src="/static/public/Boquita_Still.png" alt="Hero Image 2"
-              class="gallery-image w-full h-full object-cover effect-level-1 translate-x-full">
-            <img src="/static/public/Gaia.png" alt="Hero Image 2"
-              class="gallery-image w-full h-full object-cover effect-level-1 translate-x-full">
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+            <img src="/static/public/Boquita_Still.png" alt="Hero Image 3"
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+            <img src="/static/public/Gaia.png" alt="Hero Image 4"
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
           </div>
         </div>
 
-        <!-- Fourth Column - Our Objective (thinner) -->
-        <div class="w-[16%] flex flex-col justify-center px-6">
-          <h2 class="text-[2.5rem] font-semibold mb-4">Our Objective</h2>
-          <p class="text-lg text-gray-300">Explanation of project goals.</p>
+        <!-- Third Column - What We Offer (with hierarchical structure) -->
+        <div class="w-[25%] flex flex-col justify-center px-8">
+          <!-- Level 1: Primary Heading -->
+          <h2 class="text-[2rem] font-bold leading-[0.95] mb-4 -mr-12">Informate gratis sobre becas, premios, residencias y encargos.
+          </h2>
+
+          <!-- Level 2: Secondary Text -->
+          <p class="text-xl text-gray-300 mb-6 pr-12 leading-[1.1] mt-2 -mr-12">Busca, guarda y comparte recursos para
+            transformar tu carrera internacional</p>
+
+          <!-- Level 3: Descriptive Text -->
+          <p class="text-sm text-gray-400 leading-snug pr-12 mb-8">
+            + Oportunidades es un proyecto de la ONG Atlanticx en el marco de la "Digital Public Goods Alliance",
+            una propuesta de sostenibilidad de la ONU que busca hacer accesibles datos de impacto público.
+          </p>
+
+          <!-- Fixed Button with smaller size -->
+          <a href="{{ url_for('all_pages') }}" 
+             class="inline-flex items-center justify-center px-5 py-2.5 
+                    bg-indigo-500 hover:bg-indigo-600 
+                    text-white font-semibold text-base
+                    rounded-lg transition-all duration-300 ease-in-out
+                    transform hover:scale-[1.02] hover:-translate-y-0.5
+                    shadow-lg hover:shadow-indigo-500/50
+                    -mr-12 w-fit">
+            Entrar
+            <svg class="w-4 h-4 ml-2 -mr-1 transform rotate-[-45deg]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
         </div>
       </div>
     </div>
 
-    <!-- Services Section - Reverted positioning -->
-    <div class="absolute top-[calc(100%-1.8rem)] left-1/2 transform -translate-x-1/2 w-[95%] z-10">
+    <!-- Services Section - Adjusted positioning -->
+    <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[95%] z-10">
       <div class="grid grid-cols-2 md:grid-cols-12 min-h-[3.5rem] gap-0 overflow-visible 
                   ring-8 ring-zinc-800 rounded-lg">
         <!-- Add Opportunity Column -->
@@ -199,252 +215,207 @@
         </div>
       </div>
     </div>
+
+    <!-- Footer Section - Positioned relative to main content -->
+    <div class="w-full z-20 relative">
+      {% include 'footer.html' %}
+    </div>
   </div>
 
-  <!-- Footer Section - Positioned relative to main content -->
-  <div class="w-full mt-8 z-20 relative">
-    {% include 'footer.html' %}
+  <!-- Spinner -->
+  <div id="spinner" class="spinner h-8 w-8">
+    <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
   </div>
-</div>
-</div>
 
-<!-- Spinner -->
-<div id="spinner" class="spinner h-8 w-8">
-  <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
-</div>
+  <style>
+    .spinner {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+    }
 
-<style>
-  .spinner {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1000;
-  }
-
-  .gratis-text {
-    font-family: 'Inter', sans-serif;
-    font-size: 3.5rem;
-    line-height: 0.88;
-    color: #6366F1;
-    font-weight: 900;
-  }
-
-  @media (max-width: 768px) {
     .gratis-text {
-      font-size: 3.6rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 3.5rem;
       line-height: 0.88;
+      color: #6366F1;
       font-weight: 900;
     }
-  }
 
-  /* Base styles for hero-text */
-  .hero-text {
-    font-family: 'Poppins', sans-serif;
-    font-size: 3.1rem;
-    line-height: 0.88;
-    font-weight: 700;
-  }
+    @media (max-width: 768px) {
+      .gratis-text {
+        font-size: 3.6rem;
+        line-height: 0.88;
+        font-weight: 900;
+      }
+    }
 
-  /* Medium screens */
-  @media (min-width: 768px) {
+    /* Base styles for hero-text */
     .hero-text {
-      font-size: 2.7rem;
-      line-height: 0.95;
-      font-weight: 500;
-      letter-spacing: -0.05em;
-    }
-  }
-
-  /* Large screens */
-  @media (min-width: 1024px) and (max-width: 1279px) {
-    .hero-text {
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-size: 3rem;
-      line-height: 1;
-      font-weight: 600;
-    }
-  }
-
-  /* Extra large screens */
-  @media (min-width: 1280px) {
-    .hero-text {
-      font-size: 3.7rem;
-      line-height: 0.98;
-      font-weight: 600;
-    }
-  }
-
-  .hero-mobile {
-    font-family: 'Poppins', sans-serif;
-    font-size: 3.1rem;
-    line-height: 1;
-    font-weight: 700;
-  }
-
-  /* Small phones (iPhone SE, 6, 7, 8) */
-  @media (max-height: 667px) {
-    .hero-mobile {
-      font-size: 2.5rem;
-      line-height: 1;
-    }
-  }
-
-  @media (min-width: 768px) {
-    .hero-mobile {
-      font-size: 3.9rem;
+      font-family: 'Poppins', sans-serif;
+      font-size: 3.1rem;
       line-height: 0.88;
+      font-weight: 700;
+    }
+
+    /* Medium screens */
+    @media (min-width: 768px) {
+      .hero-text {
+        font-size: 2.7rem;
+        line-height: 0.95;
+        font-weight: 500;
+        letter-spacing: -0.05em;
+      }
+    }
+
+    /* Large screens */
+    @media (min-width: 1024px) and (max-width: 1279px) {
+      .hero-text {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 3rem;
+        line-height: 1;
+        font-weight: 600;
+      }
+    }
+
+    /* Extra large screens */
+    @media (min-width: 1280px) {
+      .hero-text {
+        font-size: 3.7rem;
+        line-height: 0.98;
+        font-weight: 600;
+      }
+    }
+
+    .hero-mobile {
+      font-family: 'Poppins', sans-serif;
+      font-size: 3.1rem;
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    /* Small phones (iPhone SE, 6, 7, 8) */
+    @media (max-height: 667px) {
+      .hero-mobile {
+        font-size: 2.5rem;
+        line-height: 1;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .hero-mobile {
+        font-size: 3.9rem;
+        line-height: 0.88;
+        font-weight: 500;
+      }
+    }
+
+    .updates-text {
+      font-size: 1rem;
+      line-height: 1.5;
       font-weight: 500;
     }
-  }
 
-  .updates-text {
-    font-size: 1rem;
-    line-height: 1.5;
-    font-weight: 500;
-  }
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .updates-text {
+        white-space: nowrap;
+        font-size: 0.8rem;
+        letter-spacing: -0.01em;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        text-align: center !important;
+        /* Ensure text is centered */
+        width: 100% !important;
+        /* Ensure the div takes full width of its parent */
+      }
 
-  @media (min-width: 768px) and (max-width: 1023px) {
-    .updates-text {
-      white-space: nowrap;
-      font-size: 0.8rem;
-      letter-spacing: -0.01em;
-      text-overflow: ellipsis !important;
-      white-space: nowrap !important;
-      text-align: center !important;
-      /* Ensure text is centered */
-      width: 100% !important;
-      /* Ensure the div takes full width of its parent */
+      /* Hide elements between md and lg */
+      .counter-md,
+      .arrow-md,
+      .notification-dot-md,
+      .separator-md,
+      .updates-text-full {
+        display: none;
+      }
+
+      /* Show truncated version */
+      .updates-text-truncated {
+        display: block;
+      }
     }
 
-    /* Hide elements between md and lg */
-    .counter-md,
-    .arrow-md,
-    .notification-dot-md,
-    .separator-md,
-    .updates-text-full {
-      display: none;
+    /* Remove the larger breakpoint styles since we want default behavior after lg */
+
+    @media screen {
+      .debug-footer {
+        outline: 2px solid red;
+        /* This will help us see if styles are loading */
+      }
     }
 
-    /* Show truncated version */
-    .updates-text-truncated {
-      display: block;
-    }
-  }
-
-  /* Remove the larger breakpoint styles since we want default behavior after lg */
-
-  @media screen {
-    .debug-footer {
-      outline: 2px solid red;
-      /* This will help us see if styles are loading */
-    }
-  }
-
-  /* Force footer visibility */
-  @media (min-width: 768px) {
-    .md\:h-16 {
-      height: 4rem !important;
-    }
-  }
-
-  .gallery-container {
-    position: relative;
-  }
-
-  .gallery-image {
-    position: absolute;
-    transition: transform 1.5s ease-in-out, opacity 0.3s ease-in-out;
-    filter: contrast(180%) saturate(180%) brightness(0.7) !important;
-
-    /* Added properties to improve Safari rendering */
-    will-change: transform, opacity, filter;
-    backface-visibility: hidden;
-    transform: translate3d(0, 0, 0);
-  }
-
-  /* Ensure 'translate-x-full' and 'translate-x-neg' are defined appropriately */
-  .translate-x-full {
-    transform: translateX(100%);
-  }
-
-  .translate-x-zero {
-    transform: translateX(0);
-  }
-
-  .translate-x-neg {
-    transform: translateX(-100%);
-  }
-
-  /* Original effect */
-  .effect-level-1 {
-    filter: contrast(200%) saturate(200%) brightness(0.9);
-  }
-
-  /* Brighter and more colorful - final effect */
-  .effect-level-2 {
-    filter: contrast(220%) saturate(250%) brightness(1);
-  }
-
-  /* Base wrapper positioning */
-  @media (min-height: 896px) and (max-width: 428px) {
-    .w-full.max-w-\[1180px\] {
-      margin-top: 4rem !important;
-      /* Ensure this overrides other margins for tall phones */
-    }
-  }
-</style>
-
-<script>
-  // Optimize spinner behavior
-  function showSpinner(event) {
-    const spinner = document.getElementById('spinner');
-    if (spinner) {
-      spinner.style.display = 'block';
-      // Add timeout to prevent infinite loading state
-      setTimeout(() => {
-        spinner.style.display = 'none';
-      }, 10000);
-    }
-  }
-
-  // JavaScript to handle image carousel without removing 'effect-level-1' class
-  document.addEventListener('DOMContentLoaded', function () {
-    const images = document.querySelectorAll('.gallery-image');
-    let currentIndex = 0;
-
-    function switchImage() {
-      const currentImage = images[currentIndex];
-      const nextIndex = (currentIndex + 1) % images.length;
-      const nextImage = images[nextIndex];
-
-      // Move current image to the left
-      currentImage.classList.remove('translate-x-zero');
-      currentImage.classList.add('translate-x-neg');
-
-      // Move next image from right to center
-      nextImage.classList.remove('translate-x-full');
-      nextImage.classList.add('translate-x-zero');
-
-      // After animation, reset positions without altering 'effect-level-1'
-      setTimeout(() => {
-        currentImage.classList.remove('translate-x-neg');
-        currentImage.classList.add('translate-x-full');
-      }, 1500);
-
-      currentIndex = nextIndex;
+    /* Force footer visibility */
+    @media (min-width: 768px) {
+      .md\:h-16 {
+        height: 4rem !important;
+      }
     }
 
-    // Initialize first image with 'translate-x-zero'
-    images[0].classList.add('translate-x-zero');
+    .gallery-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
 
-    // Switch every 5 seconds
-    setInterval(switchImage, 5000);
-  });
-</script>
-{% endblock %}
+    .gallery-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      transform: translateX(100%);
+      transition: transform 1.5s ease-in-out;
+      filter: contrast(180%) saturate(180%) brightness(0.7) !important;
+      will-change: transform;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    /* Make this rule more specific */
+    .gallery-container .gallery-image:first-child {
+      transform: translateX(0) !important;
+    }
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const images = Array.from(document.querySelectorAll('.gallery-image'));
+      let currentIndex = 0;
+
+      function switchImage() {
+        const currentImage = images[currentIndex];
+        const nextIndex = (currentIndex + 1) % images.length;
+        const nextImage = images[nextIndex];
+
+        // Instead of using classList, let's try direct style manipulation
+        currentImage.style.transform = 'translateX(-100%)';
+        nextImage.style.transform = 'translateX(0)';
+
+        setTimeout(() => {
+          currentImage.style.transform = 'translateX(100%)';
+          currentIndex = nextIndex;
+        }, 1500);
+      }
+
+      // Start the carousel
+      setInterval(switchImage, 5000);
+    });
+  </script>
+  {% endblock %}
