@@ -157,7 +157,7 @@
 <script>
     function shareOpportunity(url, title, platform) {
         const encodedUrl = encodeURIComponent(url);
-        const encodedTitle = encodeURIComponent('\n- 100 ︱ Oportunidades');
+        const encodedTitle = encodeURIComponent('\n- + Oportunidades');
 
         let shareUrl = '';
 
@@ -229,6 +229,16 @@
     }
 
     function toggleDropdown(button) {
+        // Prevent any event bubbling and default behavior
+        event.preventDefault();
+        event.stopPropagation();
+        
+        // Clear any existing alerts
+        const alertContainer = document.getElementById('alert-container');
+        if (alertContainer) {
+            alertContainer.innerHTML = '';
+        }
+        
         // Close all other table dropdowns first
         document.querySelectorAll('th .dropdown-content').forEach(d => {
             if (d !== button.nextElementSibling) {
@@ -255,6 +265,11 @@
             document.querySelectorAll('th .dropdown-content').forEach(d => {
                 d.classList.add('hidden');
             });
+        }
+        
+        // Prevent form submission checks when clicking dropdowns
+        if (event.target.closest('.dropdown-content') || event.target.closest('button[onclick*="toggleDropdown"]')) {
+            event.stopPropagation();
         }
     });
 </script>
