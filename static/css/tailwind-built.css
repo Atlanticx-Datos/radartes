@@ -2024,6 +2024,9 @@ details.collapse summary::-webkit-details-marker {
 .-mr-2 {
   margin-right: -0.5rem;
 }
+.-mr-8 {
+  margin-right: -2rem;
+}
 .-mt-10 {
   margin-top: -2.5rem;
 }
@@ -2045,14 +2048,14 @@ details.collapse summary::-webkit-details-marker {
 .ml-1 {
   margin-left: 0.25rem;
 }
-.ml-2 {
-  margin-left: 0.5rem;
-}
 .ml-4 {
   margin-left: 1rem;
 }
 .ml-9 {
   margin-left: 2.25rem;
+}
+.mr-1 {
+  margin-right: 0.25rem;
 }
 .mr-12 {
   margin-right: 3rem;
@@ -2221,10 +2224,6 @@ details.collapse summary::-webkit-details-marker {
 }
 .w-\[95\%\] {
   width: 95%;
-}
-.w-fit {
-  width: -moz-fit-content;
-  width: fit-content;
 }
 .w-full {
   width: 100%;
@@ -2615,10 +2614,6 @@ details.collapse summary::-webkit-details-marker {
 .text-\[4\.2rem\] {
   font-size: 4.2rem;
 }
-.text-base {
-  font-size: 1rem;
-  line-height: 1.5rem;
-}
 .text-sm {
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -2691,6 +2686,10 @@ details.collapse summary::-webkit-details-marker {
 .text-gray-400 {
   --tw-text-opacity: 1;
   color: rgb(156 163 175 / var(--tw-text-opacity));
+}
+.text-gray-500 {
+  --tw-text-opacity: 1;
+  color: rgb(107 114 128 / var(--tw-text-opacity));
 }
 .text-gray-700 {
   --tw-text-opacity: 1;
@@ -3019,8 +3018,8 @@ details.collapse summary::-webkit-details-marker {
   .md\:pr-4 {
     padding-right: 1rem;
   }
-  .md\:pt-16 {
-    padding-top: 4rem;
+  .md\:pt-12 {
+    padding-top: 3rem;
   }
   .md\:pt-8 {
     padding-top: 2rem;

@@ -702,7 +702,6 @@ def share_opportunity(opportunity_id):
 
 
 @app.route("/database", methods=["GET"])
-@login_required
 def all_pages():
     print("\n=== Starting database route ===")
     

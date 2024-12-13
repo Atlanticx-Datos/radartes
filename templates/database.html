@@ -172,10 +172,16 @@
                         </div>
                         <div class="flex justify-center items-center space-x-2 mt-6 mb-4">
                             <div id="alert-container" class="flex items-center"></div>
-                            <button type="submit"
-                                class="uppercase text-sm font-black tracking-tighter text-neutral-700">
-                                Guardar Seleccionados
-                            </button>
+                            {% if session.get('user') %}
+                                <button type="submit" class="uppercase text-sm font-black tracking-tighter text-neutral-700">
+                                    Guardar Seleccionados
+                                </button>
+                            {% else %}
+                                <button type="button" onclick="redirectToLogin()" 
+                                        class="uppercase text-sm font-black tracking-tighter text-neutral-700">
+                                    Iniciar sesión para guardar
+                                </button>
+                            {% endif %}
                         </div>
                     </form>
                 </div>
@@ -1108,6 +1114,10 @@
         });
 
         // Remove the previous HTMX event listeners since we're handling it with fetch now
+
+        function redirectToLogin() {
+            window.location.href = "{{ url_for('login', next=request.path) }}";
+        }
     </script>
 
 
