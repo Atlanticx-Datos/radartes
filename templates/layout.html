@@ -172,11 +172,15 @@
     <link rel="shortcut icon" href="/static/public/favicon.ico" />
 </head>
 
-<body class="flex justify-center items-center bg-white min-h-screen">
+<body class="flex justify-center max-sm:items-start items-center bg-white min-h-screen">
     <div id="layout-spinner" class="spinner h-8 w-8" style="display: none;">
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
     </div>
-    <main class="w-full min-h-screen bg-white flex flex-col">
+    <main class="w-full min-h-screen bg-white flex flex-col
+                 px-4
+                 sm:px-6
+                 md:px-8
+                 max-sm:rounded-lg">
         <!-- Navigation - only show on non-index pages -->
         {% if request.endpoint != 'index' %}
         <div class="w-full flex-shrink-0">
@@ -231,12 +235,12 @@
         {% endif %}
 
         <!-- Content wrapper -->
-        <div class="flex-grow flex items-center justify-center 
-                    pt-16                     /* Default/mobile padding */
-                    h-[667px]:pt-16          /* Smaller phones */
-                    h-[896px]:pt-20         /* iPhone XR */
-                    h-[926px]:pt-24         /* iPhone 13 Pro Max */
-                    md:pt-12">            
+        <div class="flex-grow flex 
+                    max-sm:items-start 
+                    sm:items-center 
+                    justify-center 
+                    pt-16 
+                    md:pt-12">
             {% block body %}{% endblock %}
         </div>
     </main>
