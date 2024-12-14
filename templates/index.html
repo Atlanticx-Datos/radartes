@@ -5,107 +5,113 @@
 {% endblock %}
 
 {% block body %}
-<div class="relative bg-black text-white flex flex-col rounded-xl md:rounded-none
-            max-sm:h-[100dvh] 
-            sm:h-screen 
-            md:h-[700px]">
+<!-- For mobile: only hero + gallery take viewport height. For desktop: maintains original layout -->
+<div class="flex flex-col bg-black text-white">
+  <!-- Hero + Gallery Container -->
+  <div class="relative flex flex-col rounded-xl md:rounded-none
+              max-sm:h-[100dvh] 
+              sm:h-screen 
+              md:h-[700px]">
 
-  <!-- Hero Section - Simplified structure -->
-  <div class="flex flex-col md:flex-row h-full bg-zinc-900 text-white
-              max-sm:items-start
-              max-sm:rounded-2xl
-              overflow-hidden">
-    <!-- Mobile Layout -->
-    <div class="flex flex-col h-full md:hidden">
-      <div class="flex-1 flex flex-col justify-start px-6 pt-12">
-        <h1 class="hero-mobile mb-4">Listamos recursos artísticos <span class="text-indigo-500">globales_</span></h1>
-        <p class="text-xl text-gray-300 mb-6">Para artistas, gestores e investigadores latinxs.</p>
-        
-        <!-- Button aligned left -->
-        <a href="{{ url_for('all_pages') }}" 
-           class="inline-flex items-center justify-center px-5 py-2.5 
-                  bg-indigo-500 hover:bg-indigo-600 
-                  text-white font-semibold text-sm
-                  rounded-lg transition-all duration-300 ease-in-out
-                  transform hover:scale-[1.02] hover:-translate-y-0.5
-                  shadow-lg hover:shadow-indigo-500/50
-                  w-4/5 mb-8">
-          <span class="flex-1 text-center">Entrar</span>
-        </a>
-      </div>
-
-      <div class="flex-1 relative overflow-hidden">
-        <div class="gallery-container relative w-full h-full overflow-hidden">
-          <img src="/static/public/Pao.png" alt="Hero Image 1"
-            class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-0 transition-all duration-1500 ease-in-out">
-          <img src="/static/public/Manu.png" alt="Hero Image 2"
-            class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
-          <img src="/static/public/Boquita_Still.png" alt="Hero Image 3"
-            class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
-          <img src="/static/public/Gaia.png" alt="Hero Image 4"
-            class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+    <!-- Hero Section - Simplified structure -->
+    <div class="flex flex-col md:flex-row h-full bg-zinc-900 text-white
+                max-sm:items-start
+                max-sm:rounded-2xl
+                overflow-hidden">
+      <!-- Mobile Layout -->
+      <div class="flex flex-col md:hidden">
+        <!-- Hero section -->
+        <div class="h-[400px] flex flex-col justify-start px-6 pt-8">
+          <h1 class="hero-mobile mb-4">Listamos recursos artísticos <span class="text-indigo-500">globales_</span></h1>
+          <p class="text-xl text-gray-300 mb-6 mr-24 tracking-tight">Para artistas, gestores e investigadores de latinoamérica.</p>
+          
+          <!-- Button aligned left -->
+          <a href="{{ url_for('all_pages') }}" 
+             class="inline-flex items-center justify-center px-5 py-2.5 
+                    bg-indigo-500 hover:bg-indigo-600 
+                    text-white font-semibold text-sm
+                    rounded-lg transition-all duration-300 ease-in-out
+                    transform hover:scale-[1.02] hover:-translate-y-0.5
+                    shadow-lg hover:shadow-indigo-500/50
+                    w-3/5 mb-8">
+            <span class="flex-1 text-center">Entrar</span>
+          </a>
         </div>
-      </div>
-    </div>
 
-    <!-- Desktop Layout - Simplified -->
-    <div class="hidden md:flex md:flex-row h-full w-full">
-      <!-- First Column - Hero Text -->
-      <div class="w-[35%] flex flex-col justify-center px-8">
-        <h1 class="text-[4.2rem] font-bold leading-[0.9] mb-4">Listamos recursos artísticos <span
-            class="text-indigo-500">globales_</span></h1>
-        <p class="text-xl text-gray-300 mr-16">Para artistas, gestores e investigadores latinxs.</p>
-      </div>
-
-      <!-- Second Column - Image Gallery (moved from third to second position) -->
-      <div class="w-[40%] overflow-hidden relative">
-        <div class="gallery-container relative w-full h-full overflow-hidden">
-          <img src="/static/public/Pao.png" alt="Hero Image 1"
-            class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-0 transition-all duration-1500 ease-in-out">
-          <img src="/static/public/Manu.png" alt="Hero Image 2"
-            class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
-          <img src="/static/public/Boquita_Still.png" alt="Hero Image 3"
-            class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
-          <img src="/static/public/Gaia.png" alt="Hero Image 4"
-            class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+        <!-- Gallery section -->
+        <div class="h-[400px] relative overflow-hidden">
+          <div class="gallery-container relative w-full h-full overflow-hidden">
+            <img src="/static/public/Pao.png" alt="Hero Image 1"
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-0 transition-all duration-1500 ease-in-out">
+            <img src="/static/public/Manu.png" alt="Hero Image 2"
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+            <img src="/static/public/Boquita_Still.png" alt="Hero Image 3"
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+            <img src="/static/public/Gaia.png" alt="Hero Image 4"
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+          </div>
         </div>
       </div>
 
-      <!-- Third Column - What We Offer (with hierarchical structure) -->
-      <div class="w-[25%] flex flex-col justify-center px-8">
-        <!-- Level 1: Primary Heading -->
-        <h2 class="text-[1.8rem] font-bold leading-[0.95] mb-4">Informate gratis sobre becas, premios, residencias y encargos.
-        </h2>
+      <!-- Desktop Layout - Simplified -->
+      <div class="hidden md:flex md:flex-row h-full w-full">
+        <!-- First Column - Hero Text -->
+        <div class="w-[35%] flex flex-col justify-center px-8">
+          <h1 class="text-[4.2rem] font-bold leading-[0.9] mb-4">Listamos recursos artísticos <span
+              class="text-indigo-500">globales_</span></h1>
+          <p class="text-xl text-gray-300 mr-16">Para artistas, gestores e investigadores latinxs.</p>
+        </div>
 
-        <!-- Level 2: Secondary Text -->
-        <p class="text-xl text-gray-300 mb-6 pr-12 leading-[1.1] mt-2 -mr-6"><span class="text-indigo-500 font-black mr-1">_</span>busca, guarda y comparte recursos</span> para
-          transformar tu carrera internacional <span class="text-indigo-500 font-black">_</span></p>
+        <!-- Second Column - Image Gallery (moved from third to second position) -->
+        <div class="w-[40%] overflow-hidden relative">
+          <div class="gallery-container relative w-full h-full overflow-hidden">
+            <img src="/static/public/Pao.png" alt="Hero Image 1"
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-0 transition-all duration-1500 ease-in-out">
+            <img src="/static/public/Manu.png" alt="Hero Image 2"
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+            <img src="/static/public/Boquita_Still.png" alt="Hero Image 3"
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+            <img src="/static/public/Gaia.png" alt="Hero Image 4"
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+          </div>
+        </div>
 
-        <!-- Level 3: Descriptive Text -->
-        <p class="text-sm text-gray-400 leading-snug pr-12 mb-8">
-          + Oportunidades es un proyecto de la ONG Atlanticx en el marco de la "Digital Public Goods Alliance",
-          una propuesta de sostenibilidad de la ONU que busca hacer accesibles datos de impacto público.
-        </p>
+        <!-- Third Column - What We Offer (with hierarchical structure) -->
+        <div class="w-[25%] flex flex-col justify-center px-8">
+          <!-- Level 1: Primary Heading -->
+          <h2 class="text-[1.8rem] font-bold leading-[0.95] mb-4">Informate gratis sobre becas, premios, residencias y encargos.
+          </h2>
 
-        <!-- Fixed Button with smaller size -->
-        <a href="{{ url_for('all_pages') }}" 
-           class="inline-flex items-center justify-center px-5 py-2.5 
-                  bg-indigo-500 hover:bg-indigo-600 
-                  text-white font-semibold text-sm
-                  rounded-lg transition-all duration-300 ease-in-out
-                  transform hover:scale-[1.02] hover:-translate-y-0.5
-                  shadow-lg hover:shadow-indigo-500/50
-                  -mr-12 w-full">
-          <span class="flex-1 text-center">Entrar</span>
-        </a>
+          <!-- Level 2: Secondary Text -->
+          <p class="text-xl text-gray-300 mb-6 pr-12 leading-[1.1] mt-2 -mr-6"><span class="text-indigo-500 font-black mr-1">_</span>busca, guarda y comparte recursos</span> para
+            transformar tu carrera internacional <span class="text-indigo-500 font-black">_</span></p>
+
+          <!-- Level 3: Descriptive Text -->
+          <p class="text-sm text-gray-400 leading-snug pr-12 mb-8">
+            + Oportunidades es un proyecto de la ONG Atlanticx en el marco de la "Digital Public Goods Alliance",
+            una propuesta de sostenibilidad de la ONU que busca hacer accesibles datos de impacto público.
+          </p>
+
+          <!-- Fixed Button with smaller size -->
+          <a href="{{ url_for('all_pages') }}" 
+             class="inline-flex items-center justify-center px-5 py-2.5 
+                    bg-indigo-500 hover:bg-indigo-600 
+                    text-white font-semibold text-sm
+                    rounded-lg transition-all duration-300 ease-in-out
+                    transform hover:scale-[1.02] hover:-translate-y-0.5
+                    shadow-lg hover:shadow-indigo-500/50
+                    -mr-12 w-full">
+            <span class="flex-1 text-center">Entrar</span>
+          </a>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Footer Section - Positioned at bottom for mobile -->
-  <div class="w-full z-20 max-sm:mt-auto relative">
+  <!-- Footer Section - Outside of viewport container -->
+  <footer class="w-full z-20 relative max-sm:mt-4">
     {% include 'footer.html' %}
-  </div>
+  </footer>
 </div>
 
 <!-- Spinner -->
@@ -183,7 +189,7 @@
   .hero-mobile {
     font-family: 'Poppins', sans-serif;
     font-size: 3.1rem;
-    line-height: 1;
+    line-height: 0.95;
     font-weight: 700;
   }
 
