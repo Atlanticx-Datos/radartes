@@ -6,12 +6,12 @@
 
 {% block body %}
 <!-- For mobile: only hero + gallery take viewport height. For desktop: maintains original layout -->
-<div class="flex flex-col bg-black text-white">
+<div class="flex flex-col text-white">
   <!-- Hero + Gallery Container -->
   <div class="relative flex flex-col rounded-xl md:rounded-none
               max-sm:h-[100dvh] 
               sm:h-screen 
-              md:h-[700px]">
+              md:h-[700px] bg-black">
 
     <!-- Hero Section - Simplified structure -->
     <div class="flex flex-col md:flex-row h-full bg-zinc-900 text-white
@@ -188,7 +188,7 @@
 
   .hero-mobile {
     font-family: 'Poppins', sans-serif;
-    font-size: 3.1rem;
+    font-size: 2.5rem;
     line-height: 0.95;
     font-weight: 700;
   }
