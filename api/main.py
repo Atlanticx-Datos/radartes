@@ -1218,6 +1218,10 @@ def refresh_database_cache():
         print(f"Cache refresh error: {str(e)}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
+@app.route("/politica-privacidad")
+def privacy_policy():
+    return render_template("privacy_policy.html")
+
 if __name__ == "__main__":
     # Ensure session directory exists
     os.makedirs(os.path.join(app.root_path, 'flask_session'), exist_ok=True)
