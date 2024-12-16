@@ -36,7 +36,7 @@
                                     {% if closing_soon_pages %}
                                     {% for page in closing_soon_pages %}
                                     <p class="relative">
-                                        <a href="{{ page.url }}" target="_blank" data-name="{{ page.nombre }}"
+                                        <a href="{{ page.base_url if page.base_url else page.url }}" target="_blank" data-name="{{ page.nombre }}"
                                             data-country="{{ page.País }}" data-url="{{ page.url }}"
                                             class="cierran-pronto-link">
                                             {{ page.nombre | truncate(50) }}
@@ -75,7 +75,7 @@
                                     {% if destacar_pages %}
                                     {% for page in destacar_pages %}
                                     <p class="relative">
-                                        <a href="{{ page.url }}" target="_blank" data-name="{{ page.nombre }}"
+                                        <a href="{{ page.base_url if page.base_url else page.url }}" target="_blank" data-name="{{ page.nombre }}"
                                             data-country="{{ page.País }}" data-url="{{ page.url }}"
                                             class="accordion-link" onclick="handleDestacadaClick(this)">
                                             <span class="md:hidden whitespace-nowrap">

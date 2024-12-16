@@ -51,6 +51,8 @@ from flask_caching import Cache
 import logging
 import secrets
 
+from urllib.parse import urlparse
+
 from flask_session import Session
 
 
@@ -104,8 +106,6 @@ app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "daleboquita")
 jwt = JWTManager(app)
 
 p = inflect.engine()
-
-
 
 def login_required(f):
     @wraps(f)
@@ -450,6 +450,11 @@ def get_opportunity_by_id(opportunity_id):
             "url": (
                 data["properties"]["URL"].get("url", "")
                 if data["properties"]["URL"]
+                else ""
+            ),
+            "base_url": (
+                data["properties"]["Base URL"]["rich_text"][0]["text"]["content"]
+                if data["properties"]["Base URL"]["rich_text"]
                 else ""
             ),
             "ai_keywords": (
@@ -837,6 +842,7 @@ def all_pages():
                 page for page in pages
                 if normalized_query in normalize_text(str(page.get("ai_keywords", "")))
                 or normalized_query in normalize_text(str(page.get("nombre", "")))
+                or normalized_query in normalize_text(str(page.get("país", ""))) 
             ]
 
         print(f"Found {len(filtered_pages)} matching pages")  # Debug log
@@ -1109,84 +1115,126 @@ def refresh_database_cache():
         destacar_pages = []
 
         for page in all_pages:
-            if "Publicar" in page["properties"] and page["properties"]["Publicar"]["checkbox"]:
-                page_data = {"id": page["id"], "created_time": page["created_time"]}
+            try:
+                if "Publicar" in page["properties"] and page["properties"]["Publicar"]["checkbox"]:
+                    page_data = {"id": page["id"], "created_time": page["created_time"]}
 
-                if "Resumen generado por la IA" in page["properties"]:
-                    page_data["nombre"] = (
-                        page["properties"]["Resumen generado por la IA"]["rich_text"][0]["text"]["content"]
-                        if page["properties"]["Resumen generado por la IA"]["rich_text"]
-                        else ""
-                    )
+                    if "Resumen generado por la IA" in page["properties"]:
+                        page_data["nombre"] = (
+                            page["properties"]["Resumen generado por la IA"]["rich_text"][0]["text"]["content"]
+                            if page["properties"]["Resumen generado por la IA"]["rich_text"]
+                            else ""
+                        )
 
-                if "País" in page["properties"]:
-                    page_data["país"] = (
-                        page["properties"]["País"]["rich_text"][0]["text"]["content"]
-                        if page["properties"]["País"]["rich_text"]
-                        else ""
-                    )
+                    if "País" in page["properties"]:
+                        page_data["país"] = (
+                            page["properties"]["País"]["rich_text"][0]["text"]["content"]
+                            if page["properties"]["País"]["rich_text"]
+                            else ""
+                        )
 
-                if "Destinatarios" in page["properties"]:
-                    page_data["destinatarios"] = (
-                        page["properties"]["Destinatarios"]["rich_text"][0]["text"]["content"]
-                        if page["properties"]["Destinatarios"]["rich_text"]
-                        else ""
-                    )
+                    if "Destinatarios" in page["properties"]:
+                        page_data["destinatarios"] = (
+                            page["properties"]["Destinatarios"]["rich_text"][0]["text"]["content"]
+                            if page["properties"]["Destinatarios"]["rich_text"]
+                            else ""
+                        )
 
-                if "AI keywords" in page["properties"]:
-                    page_data["ai_keywords"] = (
-                        page["properties"]["AI keywords"]["multi_select"][0]["name"]
-                        if page["properties"]["AI keywords"]["multi_select"]
-                        else ""
-                    )
+                    if "AI keywords" in page["properties"]:
+                        first_keyword_name = (
+                            page["properties"]["AI keywords"]["multi_select"][0]["name"]
+                            if page["properties"]["AI keywords"]["multi_select"]
+                            else ""
+                        )
+                        # Split the keyword name and take the first word
+                        page_data["ai_keywords"] = first_keyword_name.split()[0] if first_keyword_name else ""
 
-                if "URL" in page["properties"]:
-                    page_data["url"] = (
-                        page["properties"]["URL"]["url"]
-                        if page["properties"]["URL"].get("url")
-                        else ""
-                    )
+                    if "URL" in page["properties"]:
+                        page_data["url"] = (
+                            page["properties"]["URL"]["url"]
+                            if page["properties"]["URL"].get("url")
+                            else ""
+                        )
 
-                if "Nombre" in page["properties"]:
-                    page_data["nombre_original"] = (
-                        page["properties"]["Nombre"]["title"][0]["text"]["content"]
-                        if page["properties"]["Nombre"]["title"]
-                        else ""
-                    )
+                    if "Base URL" in page["properties"]:
+                        page_data["base_url"] = (
+                            page["properties"]["Base URL"]["rich_text"][0]["text"]["content"]
+                            if page["properties"]["Base URL"]["rich_text"]
+                            else ""
+                        )
 
-                if "Entidad" in page["properties"]:
-                    page_data["entidad"] = (
-                        page["properties"]["Entidad"]["rich_text"][0]["text"]["content"]
-                        if page["properties"]["Entidad"]["rich_text"]
-                        else ""
-                    )
-                
-                if "Categoría" in page["properties"]:
-                    page_data["categoria"] = (
-                        page["properties"]["Categoría"]["rich_text"][0]["text"]["content"]
-                        if page["properties"]["Categoría"]["rich_text"]
-                        else ""
-                    )
+                    if "Nombre" in page["properties"]:
+                        page_data["nombre_original"] = (
+                            page["properties"]["Nombre"]["title"][0]["text"]["content"]
+                            if page["properties"]["Nombre"]["title"]
+                            else ""
+                        )
 
-                # Handle fecha_de_cierre
-                fecha_de_cierre_prop = page["properties"].get("Fecha de cierre", None)
-                fecha_de_cierre = None
-                if fecha_de_cierre_prop and "date" in fecha_de_cierre_prop and fecha_de_cierre_prop["date"]:
-                    fecha_de_cierre = fecha_de_cierre_prop["date"].get("start", None)
-                    page_data["fecha_de_cierre"] = fecha_de_cierre
-                    cierre_date = datetime.strptime(fecha_de_cierre, '%Y-%m-%d')
+                    if "Entidad" in page["properties"]:
+                        page_data["entidad"] = (
+                            page["properties"]["Entidad"]["rich_text"][0]["text"]["content"]
+                            if page["properties"]["Entidad"]["rich_text"]
+                            else ""
+                        )
+                    
+                    if "Categoría" in page["properties"]:
+                        page_data["categoria"] = (
+                            page["properties"]["Categoría"]["rich_text"][0]["text"]["content"]
+                            if page["properties"]["Categoría"]["rich_text"]
+                            else ""
+                        )
 
-                    if now_date <= cierre_date <= seven_days_from_now:
-                        closing_soon_pages.append(page_data)
-                else:
-                    page_data["fecha_de_cierre"] = placeholder_date
+                    # Handle fecha_de_cierre
+                    fecha_de_cierre_prop = page["properties"].get("Fecha de cierre", None)
+                    fecha_de_cierre = None
+                    if fecha_de_cierre_prop and "date" in fecha_de_cierre_prop and fecha_de_cierre_prop["date"]:
+                        fecha_de_cierre = fecha_de_cierre_prop["date"].get("start", None)
+                        page_data["fecha_de_cierre"] = fecha_de_cierre
+                        cierre_date = datetime.strptime(fecha_de_cierre, '%Y-%m-%d')
 
-                # Handle destacar pages
-                if page_data.get("destinatarios", "").lower() == "destacar":
-                    if not fecha_de_cierre or cierre_date >= now_date:
-                        destacar_pages.append(page_data)
+                        if now_date <= cierre_date <= seven_days_from_now:
+                            closing_soon_pages.append(page_data)
+                    else:
+                        page_data["fecha_de_cierre"] = placeholder_date
 
-                pages.append(page_data)
+                    # Handle destacar pages
+                    if page_data.get("destinatarios", "").lower() == "destacar":
+                        if not fecha_de_cierre or cierre_date >= now_date:
+                            destacar_pages.append(page_data)
+
+                    # Extract base URL and URL from the already processed page_data
+                    base_url = page_data.get("base_url", "")
+                    url = page_data.get("url", "")
+
+                    # Parse and extract the full domain (not just the subdomain)
+                    def extract_domain(url_string):
+                        if not url_string:
+                            return ""
+                        try:
+                            parsed = urlparse(url_string)
+                            # If the URL doesn't start with http/https, add it
+                            if not parsed.netloc:
+                                parsed = urlparse(f"https://{url_string}")
+                            # Get the full domain (e.g., "arteinformado.com" or "argentina.gob.ar")
+                            return parsed.netloc.replace('www.', '')
+                        except Exception as e:
+                            logging.error(f"Error parsing URL {url_string}: {e}")
+                            return ""
+
+                    base_url_domain = extract_domain(base_url)
+                    url_domain = extract_domain(url)
+
+                    # Use base_url_domain if available, otherwise fallback to url_domain
+                    page_data["url_base"] = base_url_domain if base_url_domain else url_domain
+
+                    # Log the extracted domains for debugging
+                    logging.debug(f"Page: {page_data.get('nombre', 'Unknown')}, Base URL Domain: {base_url_domain}, URL Domain: {url_domain}")
+
+                    pages.append(page_data)
+            except KeyError as e:
+                logging.error(f"Missing key in page data: {e}")
+            except Exception as e:
+                logging.error(f"Error processing page: {e}")
 
         # Sort pages
         sorted_pages = sorted(pages, key=lambda page: (
@@ -1194,7 +1242,7 @@ def refresh_database_cache():
             datetime.strptime(page["fecha_de_cierre"], '%Y-%m-%d') if page["fecha_de_cierre"] != placeholder_date else datetime.max
         ), reverse=True)
 
-        # Store the processed data with explicit encoding
+        # Store the processed data in Redis
         cache_data = {
             'pages': sorted_pages,
             'closing_soon_pages': closing_soon_pages[:7],
@@ -1202,20 +1250,27 @@ def refresh_database_cache():
             'timestamp': datetime.now().isoformat()
         }
         
-        # Convert to JSON string with explicit encoding
+        # Convert to JSON string
         cache_json = json.dumps(cache_data, ensure_ascii=False)
         
-        # Store in Redis with explicit expiration
+        # Store in Redis
         redis.set('database_content', cache_json, ex=604800)  # 7 days
-        
-        print(f"\n=== Cache refreshed with {len(sorted_pages)} pages ===")
+
+        # Debug: Log the cached content
+        cached_content = redis.get('database_content')
+        if cached_content:
+            if isinstance(cached_content, bytes):
+                cached_content = cached_content.decode('utf-8')
+            app.logger.debug("Cached Content: %s", cached_content)
+
+        app.logger.info(f"Cache refreshed with {len(sorted_pages)} pages")
         return jsonify({
             "status": "success", 
             "message": f"Cache refreshed with {len(sorted_pages)} pages"
         }), 200
 
     except Exception as e:
-        print(f"Cache refresh error: {str(e)}")
+        app.logger.error(f"Cache refresh error: {str(e)}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/politica-privacidad")
