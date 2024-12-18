@@ -150,10 +150,8 @@ AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN", "login.oportunidades
 
 if os.environ.get("VERCEL") or os.environ.get("FLASK_ENV") == "production":
     AUTH0_CALLBACK_URL = "https://oportunidades.lat/callback"
-    AUTH0_BASE_URL = f"https://{AUTH0_CUSTOM_DOMAIN}"
 else:
     AUTH0_CALLBACK_URL = "http://localhost:5001/callback"
-    AUTH0_BASE_URL = f"https://{AUTH0_CUSTOM_DOMAIN}"
 
 oauth = OAuth(app)
 
@@ -161,13 +159,15 @@ oauth.register(
     "auth0",
     client_id=AUTH0_CLIENT_ID,
     client_secret=AUTH0_CLIENT_SECRET,
-    api_base_url=AUTH0_BASE_URL,
-    access_token_url=f"{AUTH0_BASE_URL}/oauth/token",
-    authorize_url=f"{AUTH0_BASE_URL}/authorize",
+    api_base_url=f"https://{AUTH0_CUSTOM_DOMAIN}",
+    access_token_url=f"https://{AUTH0_CUSTOM_DOMAIN}/oauth/token",
+    authorize_url=f"https://{AUTH0_CUSTOM_DOMAIN}/authorize",
+    jwks_uri=f"https://{AUTH0_CUSTOM_DOMAIN}/.well-known/jwks.json",
     client_kwargs={
         "scope": "openid profile email",
-    },
-    server_metadata_url=f'https://{AUTH0_CUSTOM_DOMAIN}/.well-known/openid-configuration'
+        "response_type": "code",
+        "audience": f"https://{AUTH0_CUSTOM_DOMAIN}/userinfo"
+    }
 )
 
 @app.route("/login")
@@ -182,9 +182,10 @@ def login():
             
         session["original_url"] = request.args.get("next") or request.referrer or url_for("index")
         
-        # Explicitly set the redirect_uri in the authorization request
         return oauth.auth0.authorize_redirect(
-            redirect_uri=AUTH0_CALLBACK_URL
+            redirect_uri=AUTH0_CALLBACK_URL,
+            audience=f"https://{AUTH0_CUSTOM_DOMAIN}/userinfo",
+            prompt="login"  # Force re-authentication
         )
     except Exception as e:
         app.logger.error(f"Login error: {str(e)}")
@@ -199,22 +200,22 @@ def callback():
         app.logger.info(f"Request args: {request.args}")
         
         token = oauth.auth0.authorize_access_token()
+        app.logger.info(f"Access token obtained: {bool(token)}")
+        
         session["jwt"] = token
         
-        user_info_response = oauth.auth0.get(
-            f"https://{AUTH0_CUSTOM_DOMAIN}/userinfo"
-        )
-        user_info = user_info_response.json()
-        session["user"] = user_info
+        userinfo_response = oauth.auth0.get("userinfo")
+        userinfo = userinfo_response.json()
+        app.logger.info(f"User info obtained: {bool(userinfo)}")
         
-        # Redirect to the original URL
+        session["user"] = userinfo
+        
         original_url = session.pop("original_url", url_for("index"))
         app.logger.info(f"Redirecting to: {original_url}")
         return redirect(original_url)
         
     except Exception as e:
         app.logger.error(f"Error during callback processing: {str(e)}")
-        # Clear the session in case of error
         session.clear()
         return redirect(url_for("login"))
 
