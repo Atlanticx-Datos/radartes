@@ -55,13 +55,47 @@ from urllib.parse import urlparse
 
 from flask_session import Session
 
+import base64
+import json
+
 
 load_dotenv()
 
+class RedisWrapper:
+    def __init__(self, redis_client):
+        self.redis_client = redis_client
+
+    def setex(self, name, time, value):
+        # Convert bytes to base64 string for JSON serialization
+        if isinstance(value, bytes):
+            value = {
+                "_type": "bytes",
+                "data": base64.b64encode(value).decode('utf-8')
+            }
+        return self.redis_client.set(name, json.dumps(value), ex=time)
+
+    def get(self, name):
+        # Retrieve and convert back from base64 if necessary
+        value = self.redis_client.get(name)
+        if value:
+            try:
+                parsed = json.loads(value)
+                if isinstance(parsed, dict) and parsed.get("_type") == "bytes":
+                    return base64.b64decode(parsed["data"].encode('utf-8'))
+                return value
+            except json.JSONDecodeError:
+                return value
+        return value
+
+    def __getattr__(self, name):
+        # Delegate other methods to the original Redis client
+        return getattr(self.redis_client, name)
+
 # Initialize Redis with Upstash credentials
 try:
-    redis = Redis(url=os.environ.get('KV_REST_API_URL'),
-                  token=os.environ.get('KV_REST_API_TOKEN'))
+    original_redis = Redis(url=os.environ.get('KV_REST_API_URL'),
+                           token=os.environ.get('KV_REST_API_TOKEN'))
+    redis = RedisWrapper(original_redis)
     redis.set('test', 'test')  # Test connection
     print("Redis connection successful")
 except Exception as e:
@@ -93,13 +127,21 @@ else:
 
 # Session configuration
 app.config.update(
-    SESSION_TYPE="filesystem",
+    SESSION_TYPE="redis",
+    SESSION_REDIS=redis,
     SESSION_COOKIE_SECURE=True if os.environ.get("FLASK_ENV") != "development" else False,
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_USE_SIGNER=True,
     PERMANENT_SESSION_LIFETIME=timedelta(hours=24)
 )
 
+# Mark all sessions as permanent by default
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+
+# Initialize the Session extension
 Session(app)
 
 # Role-Base Access Mgmt
@@ -146,9 +188,10 @@ headers = {
 # Auth0 Integration
 AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
 AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
-AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN", "login.oportunidades.lat")
+AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN")  # login.oportunidades.lat
+AUTH0_TENANT_DOMAIN = os.environ.get("AUTH0_TENANT_DOMAIN")  # your-tenant-name.us.auth0.com
 
-if os.environ.get("VERCEL") or os.environ.get("FLASK_ENV") == "production":
+if os.environ.get("FLASK_ENV") == "production":
     AUTH0_CALLBACK_URL = "https://oportunidades.lat/callback"
 else:
     AUTH0_CALLBACK_URL = "http://localhost:5001/callback"
@@ -159,57 +202,73 @@ oauth.register(
     "auth0",
     client_id=AUTH0_CLIENT_ID,
     client_secret=AUTH0_CLIENT_SECRET,
-    api_base_url=f"https://{AUTH0_CUSTOM_DOMAIN}",
-    access_token_url=f"https://{AUTH0_CUSTOM_DOMAIN}/oauth/token",
-    authorize_url=f"https://{AUTH0_CUSTOM_DOMAIN}/authorize",
-    jwks_uri=f"https://{AUTH0_CUSTOM_DOMAIN}/.well-known/jwks.json",
     client_kwargs={
         "scope": "openid profile email",
-        "response_type": "code",
-        "audience": f"https://{AUTH0_CUSTOM_DOMAIN}/userinfo"
-    }
+        "response_type": "code"
+    },
+    api_base_url=f"https://{AUTH0_TENANT_DOMAIN}",
+    access_token_url=f"https://{AUTH0_TENANT_DOMAIN}/oauth/token",
+    authorize_url=f"https://{AUTH0_CUSTOM_DOMAIN}/authorize",
+    server_metadata_url=f'https://{AUTH0_CUSTOM_DOMAIN}/.well-known/openid-configuration'
 )
 
 @app.route("/login")
 def login():
-    try:
-        app.logger.info(f"Auth0 Configuration:")
-        app.logger.info(f"Custom Domain: {AUTH0_CUSTOM_DOMAIN}")
-        app.logger.info(f"Callback URL configured: {AUTH0_CALLBACK_URL}")
-        
-        if not AUTH0_CUSTOM_DOMAIN:
-            raise ValueError("AUTH0_CUSTOM_DOMAIN is not configured")
-            
-        session["original_url"] = request.args.get("next") or request.referrer or url_for("index")
-        
-        return oauth.auth0.authorize_redirect(
-            redirect_uri=AUTH0_CALLBACK_URL,
-            audience=f"https://{AUTH0_CUSTOM_DOMAIN}/userinfo",
-            prompt="login"  # Force re-authentication
-        )
-    except Exception as e:
-        app.logger.error(f"Login error: {str(e)}")
-        flash("Authentication service temporarily unavailable. Please try again later.", "error")
-        return redirect(url_for("index"))
+    app.logger.info(f"Auth0 Configuration:")
+    app.logger.info(f"Custom Domain: {AUTH0_CUSTOM_DOMAIN}")
+    app.logger.info(f"Callback URL configured: {AUTH0_CALLBACK_URL}")
+    
+    # Generate and store state in session
+    state = secrets.token_urlsafe(32)
+    session['state'] = state
+    session.modified = True  # Explicitly mark the session as modified
+    
+    app.logger.info(f"Generated state: {state}")
+    app.logger.info(f"Session contents after setting state: {session}")
+    
+    session["original_url"] = request.args.get("next") or request.referrer or url_for("index")
+    return oauth.auth0.authorize_redirect(
+        redirect_uri=AUTH0_CALLBACK_URL,
+        state=state
+    )
 
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
     try:
         app.logger.info("Starting callback processing")
-        app.logger.info(f"Session state: {session.get('state', 'No state in session')}")
+        app.logger.info(f"Session contents at callback start: {session}")
         app.logger.info(f"Request args: {request.args}")
         
-        token = oauth.auth0.authorize_access_token()
-        app.logger.info(f"Access token obtained: {bool(token)}")
+        # Check for error in callback
+        if 'error' in request.args:
+            error_desc = request.args.get('error_description', 'Unknown error')
+            app.logger.error(f"Auth0 callback error: {error_desc}")
+            session.clear()
+            return redirect(url_for("login"))
         
+        # Verify state before proceeding
+        request_state = request.args.get('state')
+        session_state = session.get('state')
+        
+        if not session_state:
+            app.logger.error("No state in session")
+            return redirect(url_for("login"))
+            
+        if request_state != session_state:
+            app.logger.error(f"State mismatch: {request_state} != {session_state}")
+            return redirect(url_for("login"))
+        
+        token = oauth.auth0.authorize_access_token()
         session["jwt"] = token
         
-        userinfo_response = oauth.auth0.get("userinfo")
-        userinfo = userinfo_response.json()
-        app.logger.info(f"User info obtained: {bool(userinfo)}")
+        user_info_response = oauth.auth0.get("userinfo")
+        user_info = user_info_response.json()
+        session["user"] = user_info
         
-        session["user"] = userinfo
+        # Clear the state after successful verification
+        session.pop('state', None)
         
+        # Redirect to the original URL
         original_url = session.pop("original_url", url_for("index"))
         app.logger.info(f"Redirecting to: {original_url}")
         return redirect(original_url)
