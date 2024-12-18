@@ -146,7 +146,7 @@ headers = {
 # Auth0 Integration
 AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
 AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
-AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN")  # "login.oportunidadesl.lat"
+AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN", "login.oportunidadesl.lat")
 
 if os.environ.get("FLASK_ENV") == "production":
     AUTH0_CALLBACK_URL = "https://oportunidades.lat/callback"
@@ -169,14 +169,22 @@ oauth.register(
 
 @app.route("/login")
 def login():
-    app.logger.info(f"Auth0 Configuration:")
-    app.logger.info(f"Custom Domain: {AUTH0_CUSTOM_DOMAIN}")
-    app.logger.info(f"Callback URL configured: {AUTH0_CALLBACK_URL}")
-    
-    session["original_url"] = request.args.get("next") or request.referrer or url_for("index")
-    return oauth.auth0.authorize_redirect(
-        redirect_uri=AUTH0_CALLBACK_URL,
-    )
+    try:
+        app.logger.info(f"Auth0 Configuration:")
+        app.logger.info(f"Custom Domain: {AUTH0_CUSTOM_DOMAIN}")
+        app.logger.info(f"Callback URL configured: {AUTH0_CALLBACK_URL}")
+        
+        if not AUTH0_CUSTOM_DOMAIN:
+            raise ValueError("AUTH0_CUSTOM_DOMAIN is not configured")
+            
+        session["original_url"] = request.args.get("next") or request.referrer or url_for("index")
+        return oauth.auth0.authorize_redirect(
+            redirect_uri=AUTH0_CALLBACK_URL,
+        )
+    except Exception as e:
+        app.logger.error(f"Login error: {str(e)}")
+        flash("Authentication service temporarily unavailable. Please try again later.", "error")
+        return redirect(url_for("index"))
 
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
