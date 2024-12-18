@@ -94,12 +94,13 @@ else:
 # Session configuration
 app.config.update(
     SESSION_TYPE="filesystem",
-    SESSION_COOKIE_HTTPONLY=True,  # Prevent JavaScript from accessing the cookies
-    SESSION_COOKIE_SAMESITE="Lax",  # CSRF protection
-    SESSION_PERMANENT=True,  # Sessions don't expire immediately
-    SESSION_USE_SIGNER=True,  # Sign the session cookie
+    SESSION_COOKIE_SECURE=True if os.environ.get("FLASK_ENV") != "development" else False,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
     PERMANENT_SESSION_LIFETIME=timedelta(hours=24)
 )
+
+Session(app)
 
 # Role-Base Access Mgmt
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "daleboquita")
@@ -143,52 +144,66 @@ headers = {
 }
 
 # Auth0 Integration
-AUTH0_CLIENT_ID = os.getenv("AUTH0_CLIENT_ID")
-AUTH0_CLIENT_SECRET = os.getenv("AUTH0_CLIENT_SECRET")
-AUTH0_DOMAIN = os.getenv("AUTH0_DOMAIN")
+AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
+AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
+AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN")  # "login.oportunidadesl.lat"
 
-if os.getenv("FLASK_ENV") == "production":
-    AUTH0_CALLBACK_URL = "https://oportunidades.onrender.com/callback"
+if os.environ.get("FLASK_ENV") == "production":
+    AUTH0_CALLBACK_URL = "https://oportunidades.lat/callback"
 else:
-    AUTH0_CALLBACK_URL = "http://localhost:5000/callback"
+    AUTH0_CALLBACK_URL = "http://localhost:5001/callback"
 
 oauth = OAuth(app)
 
 oauth.register(
     "auth0",
-    client_id=os.environ.get("AUTH0_CLIENT_ID"),
-    client_secret=os.environ.get("AUTH0_CLIENT_SECRET"),
+    client_id=AUTH0_CLIENT_ID,
+    client_secret=AUTH0_CLIENT_SECRET,
     client_kwargs={
         "scope": "openid profile email",
-        "response_type": "code"
+        "response_type": "code",
+        "redirect_uri": AUTH0_CALLBACK_URL  # Add explicit redirect_uri here
     },
-    server_metadata_url=f'https://{os.environ.get("AUTH0_DOMAIN")}/.well-known/openid-configuration',
+    server_metadata_url=f'https://{AUTH0_CUSTOM_DOMAIN}/.well-known/openid-configuration'
 )
 
 @app.route("/login")
 def login():
-    # Store the original URL in session
+    app.logger.info(f"Auth0 Configuration:")
+    app.logger.info(f"Custom Domain: {AUTH0_CUSTOM_DOMAIN}")
+    app.logger.info(f"Callback URL configured: {AUTH0_CALLBACK_URL}")
+    
     session["original_url"] = request.args.get("next") or request.referrer or url_for("index")
     return oauth.auth0.authorize_redirect(
-        redirect_uri=url_for("callback", _external=True)
+        redirect_uri=AUTH0_CALLBACK_URL,
     )
 
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
     try:
+        app.logger.info("Starting callback processing")
+        app.logger.info(f"Session state: {session.get('state', 'No state in session')}")
+        app.logger.info(f"Request args: {request.args}")
+        
         token = oauth.auth0.authorize_access_token()
         session["jwt"] = token
-        user_info_endpoint = "https://dev-3klm8ed6qtx4zj6v.us.auth0.com/userinfo"
-        user_info_response = oauth.auth0.get(user_info_endpoint)
+        
+        user_info_response = oauth.auth0.get(
+            f"https://{AUTH0_CUSTOM_DOMAIN}/userinfo"
+        )
         user_info = user_info_response.json()
         session["user"] = user_info
         
         # Redirect to the original URL
         original_url = session.pop("original_url", url_for("index"))
+        app.logger.info(f"Redirecting to: {original_url}")
         return redirect(original_url)
+        
     except Exception as e:
-        print(f"Error during callback processing: {str(e)}")
-        return f"An error occurred: {str(e)}"
+        app.logger.error(f"Error during callback processing: {str(e)}")
+        # Clear the session in case of error
+        session.clear()
+        return redirect(url_for("login"))
 
 
 @app.route("/logout")
@@ -196,12 +211,12 @@ def logout():
     session.clear()
     return redirect(
         "https://"
-        + env.get("AUTH0_DOMAIN")
+        + AUTH0_CUSTOM_DOMAIN
         + "/v2/logout?"
         + urlencode(
             {
                 "returnTo": url_for("index", _external=True),
-                "client_id": env.get("AUTH0_CLIENT_ID"),
+                "client_id": AUTH0_CLIENT_ID,
             },
             quote_via=quote_plus,
         )
