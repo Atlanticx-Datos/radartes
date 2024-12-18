@@ -188,15 +188,23 @@ headers = {
 # Auth0 Integration
 AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
 AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
-AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN")  # login.oportunidades.lat
-AUTH0_TENANT_DOMAIN = os.environ.get("AUTH0_TENANT_DOMAIN")  # your-tenant-name.us.auth0.com
+AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN")
+AUTH0_TENANT_DOMAIN = os.environ.get("AUTH0_TENANT_DOMAIN")
 
-if os.environ.get("FLASK_ENV") == "production":
+# Use VERCEL environment variable to detect production
+is_production = os.environ.get("VERCEL") == "1"
+app.logger.info(f"Is Production (Vercel): {is_production}")
+
+if is_production:
     AUTH0_CALLBACK_URL = "https://oportunidades.lat/callback"
     BASE_URL = "https://oportunidades.lat"
+    app.logger.info("Using production URLs")
 else:
     AUTH0_CALLBACK_URL = "http://localhost:5001/callback"
     BASE_URL = "http://localhost:5001"
+    app.logger.info("Using development URLs")
+
+app.logger.info(f"Configured callback URL: {AUTH0_CALLBACK_URL}")
 
 oauth = OAuth(app)
 
