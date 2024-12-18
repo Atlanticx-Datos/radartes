@@ -193,8 +193,10 @@ AUTH0_TENANT_DOMAIN = os.environ.get("AUTH0_TENANT_DOMAIN")  # your-tenant-name.
 
 if os.environ.get("FLASK_ENV") == "production":
     AUTH0_CALLBACK_URL = "https://oportunidades.lat/callback"
+    BASE_URL = "https://oportunidades.lat"
 else:
     AUTH0_CALLBACK_URL = "http://localhost:5001/callback"
+    BASE_URL = "http://localhost:5001"
 
 oauth = OAuth(app)
 
