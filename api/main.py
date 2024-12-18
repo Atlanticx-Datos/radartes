@@ -146,15 +146,14 @@ headers = {
 # Auth0 Integration
 AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
 AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
-AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN", "login.oportunidadesl.lat")
+AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN", "login.oportunidades.lat")
 
-# Update callback URL configuration
-if os.environ.get("VERCEL"):
+if os.environ.get("VERCEL") or os.environ.get("FLASK_ENV") == "production":
     AUTH0_CALLBACK_URL = "https://oportunidades.lat/callback"
-elif os.environ.get("FLASK_ENV") == "production":
-    AUTH0_CALLBACK_URL = "https://oportunidades.lat/callback"
+    AUTH0_BASE_URL = f"https://{AUTH0_CUSTOM_DOMAIN}"
 else:
     AUTH0_CALLBACK_URL = "http://localhost:5001/callback"
+    AUTH0_BASE_URL = f"https://{AUTH0_CUSTOM_DOMAIN}"
 
 oauth = OAuth(app)
 
@@ -162,9 +161,11 @@ oauth.register(
     "auth0",
     client_id=AUTH0_CLIENT_ID,
     client_secret=AUTH0_CLIENT_SECRET,
+    api_base_url=AUTH0_BASE_URL,
+    access_token_url=f"{AUTH0_BASE_URL}/oauth/token",
+    authorize_url=f"{AUTH0_BASE_URL}/authorize",
     client_kwargs={
         "scope": "openid profile email",
-        "response_type": "code",
     },
     server_metadata_url=f'https://{AUTH0_CUSTOM_DOMAIN}/.well-known/openid-configuration'
 )
