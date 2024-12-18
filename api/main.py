@@ -148,7 +148,10 @@ AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
 AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
 AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN", "login.oportunidadesl.lat")
 
-if os.environ.get("FLASK_ENV") == "production":
+# Update callback URL configuration
+if os.environ.get("VERCEL"):
+    AUTH0_CALLBACK_URL = "https://oportunidades.lat/callback"
+elif os.environ.get("FLASK_ENV") == "production":
     AUTH0_CALLBACK_URL = "https://oportunidades.lat/callback"
 else:
     AUTH0_CALLBACK_URL = "http://localhost:5001/callback"
@@ -162,7 +165,6 @@ oauth.register(
     client_kwargs={
         "scope": "openid profile email",
         "response_type": "code",
-        "redirect_uri": AUTH0_CALLBACK_URL  # Add explicit redirect_uri here
     },
     server_metadata_url=f'https://{AUTH0_CUSTOM_DOMAIN}/.well-known/openid-configuration'
 )
@@ -178,8 +180,10 @@ def login():
             raise ValueError("AUTH0_CUSTOM_DOMAIN is not configured")
             
         session["original_url"] = request.args.get("next") or request.referrer or url_for("index")
+        
+        # Explicitly set the redirect_uri in the authorization request
         return oauth.auth0.authorize_redirect(
-            redirect_uri=AUTH0_CALLBACK_URL,
+            redirect_uri=AUTH0_CALLBACK_URL
         )
     except Exception as e:
         app.logger.error(f"Login error: {str(e)}")
