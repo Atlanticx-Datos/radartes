@@ -129,16 +129,32 @@ else:
 is_production = os.environ.get("VERCEL") == "1"
 app.logger.info(f"Is Production (Vercel): {is_production}")
 
+# Get the current domain from the request
+def get_current_domain():
+    if not is_production:
+        return "localhost:5001"
+    
+    # Handle Vercel preview deployments
+    vercel_url = os.environ.get("VERCEL_URL")
+    if vercel_url:
+        return vercel_url
+    
+    return "oportunidades.lat"
+
+# Update URLs based on environment
 if is_production:
-    AUTH0_CALLBACK_URL = "https://oportunidades.lat/callback"
-    BASE_URL = "https://oportunidades.lat"
-    SESSION_COOKIE_DOMAIN = "oportunidades.lat"
-    app.logger.info("Using production URLs")
+    current_domain = get_current_domain()
+    AUTH0_CALLBACK_URL = f"https://{current_domain}/callback"
+    BASE_URL = f"https://{current_domain}"
+    SESSION_COOKIE_DOMAIN = current_domain
+    app.logger.info(f"Using production URLs with domain: {current_domain}")
 else:
     AUTH0_CALLBACK_URL = "http://localhost:5001/callback"
     BASE_URL = "http://localhost:5001"
     SESSION_COOKIE_DOMAIN = None
     app.logger.info("Using development URLs")
+
+app.logger.info(f"Configured callback URL: {AUTH0_CALLBACK_URL}")
 
 # Session configuration
 app.config.update(
@@ -156,10 +172,11 @@ app.config.update(
 @app.before_request
 def before_request():
     session.permanent = True
+    # Update session cookie domain based on current request
     if is_production:
-        # Ensure www and non-www domains share the session
-        if request.headers.get('host', '').startswith('www.'):
-            session.cookie_domain = 'oportunidades.lat'
+        current_domain = get_current_domain()
+        session.cookie_domain = current_domain
+        app.logger.info(f"Setting cookie domain to: {current_domain}")
 
 # Initialize the Session extension
 Session(app)
@@ -210,8 +227,6 @@ AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
 AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
 AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN")
 AUTH0_TENANT_DOMAIN = os.environ.get("AUTH0_TENANT_DOMAIN")
-
-app.logger.info(f"Configured callback URL: {AUTH0_CALLBACK_URL}")
 
 oauth = OAuth(app)
 
