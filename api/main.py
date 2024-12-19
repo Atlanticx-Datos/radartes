@@ -275,12 +275,16 @@ def callback():
             app.logger.error(f"State mismatch: {request_state} != {session_state}")
             return redirect(url_for("login"))
         
+        app.logger.info("Getting access token...")
         token = oauth.auth0.authorize_access_token()
         session["jwt"] = token
+        app.logger.info("Token obtained successfully")
         
+        app.logger.info("Getting user info...")
         user_info_response = oauth.auth0.get("userinfo")
         user_info = user_info_response.json()
         session["user"] = user_info
+        app.logger.info(f"User info stored in session: {user_info}")
         
         # Clear the state after successful verification
         session.pop('state', None)
@@ -288,6 +292,7 @@ def callback():
         # Redirect to the original URL
         original_url = session.pop("original_url", url_for("index"))
         app.logger.info(f"Redirecting to: {original_url}")
+        app.logger.info(f"Final session contents: {session}")
         
         # Force session save before redirect
         session.modified = True
@@ -296,6 +301,7 @@ def callback():
         
     except Exception as e:
         app.logger.error(f"Error during callback processing: {str(e)}")
+        app.logger.exception("Full traceback:")  # This will log the full stack trace
         session.clear()
         return redirect(url_for("login"))
 
