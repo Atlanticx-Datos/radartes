@@ -163,18 +163,20 @@
     <div id="layout-spinner" class="spinner h-8 w-8" style="display: none;">
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
     </div>
-    <main class="w-full min-h-screen bg-white flex flex-col px-3 md:px-8 max-sm:rounded-lg">
+    <main class="w-full min-h-screen bg-white flex flex-col
+                 px-4
+                 sm:px-6
+                 md:px-8
+                 max-sm:rounded-lg">
         <!-- Navigation - only show on non-index pages -->
         {% if request.endpoint != 'index' %}
         <div class="w-full flex-shrink-0">
-            <div class="mx-auto md:px-6">
-                <nav class="flex justify-between items-center h-[34px] md:h-16 pt-10 md:pt-8 z-50 pr-2 md:pr-4">
-                    <div class="flex-grow hidden md:block"></div>
-                    
-                    <div class="dropdown dropdown-bottom z-50 relative ml-auto">
+            <div class="mx-auto">
+                <nav class="flex justify-end items-center h-[34px] md:h-16 pt-6 md:pt-8 z-50 md:pr-4">
+                    <div class="dropdown dropdown-bottom dropdown-end z-50 relative">
                         <div tabindex="0" role="button" class="relative">
                             <div class="relative">
-                                <span class="flex items-center justify-center md:w-10 md:h-10 w-9 h-9 bg-gray-200 rounded-full">
+                                <span class="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 bg-gray-200 rounded-full">
                                     <svg class="w-5 h-5" data-slot="icon" fill="currentColor" viewBox="0 0 20 20"
                                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                         <path
@@ -211,7 +213,12 @@
         {% endif %}
 
         <!-- Content wrapper -->
-        <div class="flex-grow flex pt-2 md:pt-8">
+        <div class="flex-grow flex 
+                    max-sm:items-start 
+                    sm:items-center 
+                    justify-center 
+                    pt-4
+                    md:pt-12">
             {% block body %}{% endblock %}
         </div>
     </main>

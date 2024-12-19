@@ -2029,6 +2029,9 @@ details.collapse summary::-webkit-details-marker {
 .mb-4 {
   margin-bottom: 1rem;
 }
+.mb-5 {
+  margin-bottom: 1.25rem;
+}
 .mb-6 {
   margin-bottom: 1.5rem;
 }
@@ -2043,6 +2046,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .ml-9 {
   margin-left: 2.25rem;
+}
+.ml-auto {
+  margin-left: auto;
 }
 .mr-1 {
   margin-right: 0.25rem;
@@ -2122,11 +2128,11 @@ details.collapse summary::-webkit-details-marker {
 .h-5 {
   height: 1.25rem;
 }
-.h-6 {
-  height: 1.5rem;
-}
 .h-8 {
   height: 2rem;
+}
+.h-9 {
+  height: 2.25rem;
 }
 .h-\[34px\] {
   height: 34px;
@@ -2178,6 +2184,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .w-8 {
   width: 2rem;
+}
+.w-9 {
+  width: 2.25rem;
 }
 .w-\[10\%\] {
   width: 10%;
@@ -2521,11 +2530,17 @@ details.collapse summary::-webkit-details-marker {
 .pr-12 {
   padding-right: 3rem;
 }
+.pr-2 {
+  padding-right: 0.5rem;
+}
+.pt-10 {
+  padding-top: 2.5rem;
+}
+.pt-2 {
+  padding-top: 0.5rem;
+}
 .pt-4 {
   padding-top: 1rem;
-}
-.pt-5 {
-  padding-top: 1.25rem;
 }
 .pt-8 {
   padding-top: 2rem;
@@ -2789,6 +2804,9 @@ details.collapse summary::-webkit-details-marker {
   .md\:hidden {
     display: none;
   }
+  .md\:h-10 {
+    height: 2.5rem;
+  }
   .md\:h-16 {
     height: 4rem;
   }
@@ -2797,6 +2815,9 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:h-auto {
     height: auto;
+  }
+  .md\:w-10 {
+    width: 2.5rem;
   }
   .md\:w-4 {
     width: 1rem;
