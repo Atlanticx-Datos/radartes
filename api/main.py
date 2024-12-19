@@ -134,11 +134,7 @@ def get_current_domain():
     if not is_production:
         return "localhost:5001"
     
-    # Handle Vercel preview deployments
-    vercel_url = os.environ.get("VERCEL_URL")
-    if vercel_url:
-        return vercel_url
-    
+    # For production, always use the main domain
     return "oportunidades.lat"
 
 # Update URLs based on environment
@@ -172,11 +168,10 @@ app.config.update(
 @app.before_request
 def before_request():
     session.permanent = True
-    # Update session cookie domain based on current request
+    # In production, always use the main domain for cookies
     if is_production:
-        current_domain = get_current_domain()
-        session.cookie_domain = current_domain
-        app.logger.info(f"Setting cookie domain to: {current_domain}")
+        session.cookie_domain = "oportunidades.lat"
+        app.logger.info(f"Setting cookie domain to: {session.cookie_domain}")
 
 # Initialize the Session extension
 Session(app)
