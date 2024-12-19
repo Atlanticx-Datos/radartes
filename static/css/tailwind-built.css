@@ -2227,9 +2227,6 @@ details.collapse summary::-webkit-details-marker {
 .max-w-\[1250px\] {
   max-width: 1250px;
 }
-.max-w-\[1400px\] {
-  max-width: 1400px;
-}
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -2470,6 +2467,10 @@ details.collapse summary::-webkit-details-marker {
 .p-2 {
   padding: 0.5rem;
 }
+.px-0 {
+  padding-left: 0px;
+  padding-right: 0px;
+}
 .px-1 {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
@@ -2481,10 +2482,6 @@ details.collapse summary::-webkit-details-marker {
 .px-3 {
   padding-left: 0.75rem;
   padding-right: 0.75rem;
-}
-.px-4 {
-  padding-left: 1rem;
-  padding-right: 1rem;
 }
 .px-5 {
   padding-left: 1.25rem;
@@ -2745,13 +2742,6 @@ details.collapse summary::-webkit-details-marker {
   .sm\:h-screen {
     height: 100vh;
   }
-  .sm\:items-center {
-    align-items: center;
-  }
-  .sm\:px-6 {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
 }
 @media (min-width: 768px) {
   .md\:col-span-5 {
@@ -2872,6 +2862,10 @@ details.collapse summary::-webkit-details-marker {
     padding-left: 1rem;
     padding-right: 1rem;
   }
+  .md\:px-6 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
   .md\:px-8 {
     padding-left: 2rem;
     padding-right: 2rem;
@@ -2892,9 +2886,6 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:pr-4 {
     padding-right: 1rem;
-  }
-  .md\:pt-12 {
-    padding-top: 3rem;
   }
   .md\:pt-8 {
     padding-top: 2rem;
