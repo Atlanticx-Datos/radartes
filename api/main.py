@@ -125,21 +125,41 @@ else:
         SESSION_COOKIE_SECURE=True  # Ensure cookies are sent over HTTPS in production
     )
 
+# Use VERCEL environment variable to detect production
+is_production = os.environ.get("VERCEL") == "1"
+app.logger.info(f"Is Production (Vercel): {is_production}")
+
+if is_production:
+    AUTH0_CALLBACK_URL = "https://oportunidades.lat/callback"
+    BASE_URL = "https://oportunidades.lat"
+    SESSION_COOKIE_DOMAIN = "oportunidades.lat"
+    app.logger.info("Using production URLs")
+else:
+    AUTH0_CALLBACK_URL = "http://localhost:5001/callback"
+    BASE_URL = "http://localhost:5001"
+    SESSION_COOKIE_DOMAIN = None
+    app.logger.info("Using development URLs")
+
 # Session configuration
 app.config.update(
     SESSION_TYPE="redis",
     SESSION_REDIS=redis,
-    SESSION_COOKIE_SECURE=True if os.environ.get("FLASK_ENV") != "development" else False,
+    SESSION_COOKIE_SECURE=True if is_production else False,
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_DOMAIN=SESSION_COOKIE_DOMAIN,
     SESSION_USE_SIGNER=True,
     PERMANENT_SESSION_LIFETIME=timedelta(hours=24)
 )
 
-# Mark all sessions as permanent by default
+# Mark all sessions as permanent and set cookie policy
 @app.before_request
-def make_session_permanent():
+def before_request():
     session.permanent = True
+    if is_production:
+        # Ensure www and non-www domains share the session
+        if request.headers.get('host', '').startswith('www.'):
+            session.cookie_domain = 'oportunidades.lat'
 
 # Initialize the Session extension
 Session(app)
@@ -190,19 +210,6 @@ AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
 AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
 AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN")
 AUTH0_TENANT_DOMAIN = os.environ.get("AUTH0_TENANT_DOMAIN")
-
-# Use VERCEL environment variable to detect production
-is_production = os.environ.get("VERCEL") == "1"
-app.logger.info(f"Is Production (Vercel): {is_production}")
-
-if is_production:
-    AUTH0_CALLBACK_URL = "https://oportunidades.lat/callback"
-    BASE_URL = "https://oportunidades.lat"
-    app.logger.info("Using production URLs")
-else:
-    AUTH0_CALLBACK_URL = "http://localhost:5001/callback"
-    BASE_URL = "http://localhost:5001"
-    app.logger.info("Using development URLs")
 
 app.logger.info(f"Configured callback URL: {AUTH0_CALLBACK_URL}")
 
@@ -281,6 +288,10 @@ def callback():
         # Redirect to the original URL
         original_url = session.pop("original_url", url_for("index"))
         app.logger.info(f"Redirecting to: {original_url}")
+        
+        # Force session save before redirect
+        session.modified = True
+        
         return redirect(original_url)
         
     except Exception as e:
