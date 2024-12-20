@@ -945,19 +945,36 @@ def all_pages():
             
             filtered_pages = []
             for page in pages:
+                # Normalize the relevant fields
                 keywords = normalize_text(str(page.get("ai_keywords", "")))
                 nombre = normalize_text(str(page.get("nombre", "")))
                 descripcion = normalize_text(str(page.get("descripción", "")))
+                
+                # Access and normalize "Nombre" and "Resumen Generado por la IA"
+                nombre_prop = normalize_text(
+                    page.get("properties", {}).get("Nombre", {}).get("title", [{}])[0].get("text", {}).get("content", "")
+                )
+                resumen_ia = normalize_text(
+                    page.get("properties", {}).get("Resumen generado por la IA", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "")
+                )
+                
                 is_residency = any(term in descripcion for term in [
                     "residencia", "residencia artistica", "residencia para artistas",
                     "artist residency", "residencia de artistas"
                 ])
                 
+                # Consider adding more related terms manually
+                related_terms = ["composicion", "cancion", "opera"]
+                
                 if any(normalize_text(term) in keywords or 
+                      normalize_text(term) in nombre or
+                      normalize_text(term) in nombre_prop or
+                      normalize_text(term) in resumen_ia or
                       (normalize_text(term) in nombre and any(
                           discipline in term for discipline in ["music", "musica", "danza", "teatro", "theater"]
                       )) or
-                      (is_residency and "artista" in keywords)
+                      (is_residency and "artista" in keywords) or
+                      any(rt in keywords for rt in related_terms)
                       for term in search_terms):
                     filtered_pages.append(page)
                     print(f"Matched page: {page.get('nombre', '')}")  # Debug log
@@ -967,7 +984,13 @@ def all_pages():
                 page for page in pages
                 if normalized_query in normalize_text(str(page.get("ai_keywords", "")))
                 or normalized_query in normalize_text(str(page.get("nombre", "")))
-                or normalized_query in normalize_text(str(page.get("país", ""))) 
+                or normalized_query in normalize_text(str(page.get("país", "")))
+                or normalized_query in normalize_text(
+                    page.get("properties", {}).get("Nombre", {}).get("title", [{}])[0].get("text", {}).get("content", "")
+                )
+                or normalized_query in normalize_text(
+                    page.get("properties", {}).get("Resumen generado por la IA", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "")
+                )
             ]
 
         print(f"Found {len(filtered_pages)} matching pages")  # Debug log
