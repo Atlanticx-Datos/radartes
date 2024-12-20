@@ -192,8 +192,12 @@
                         </div>
                         <ul tabindex="0"
                             class="dropdown-content z-[1] menu p-2 bg-base-100 rounded-md w-52 border border-black mt-3 text-gray-700 font-Poppins">
-                            <li><a href="{{ url_for('all_pages') }}" onclick="layoutshowSpinner(event)"><span
-                                        class="border-l-4 border-accent pl-3 uppercase font-semibold">Oportunidades</span></a></li>
+                            <li>
+                                <a href="{{ url_for('all_pages') }}" onclick="layoutshowSpinner(event)" class="flex items-center">
+                                    <span class="border-l-4 border-accent pl-3 uppercase font-semibold">Nuevas</span>
+                                    <span class="badge bg-red-500 text-white rounded-full px-2 py-1 ml-1 relative bottom-[1px]">{{ total_nuevas }}</span>
+                                </a>
+                            </li>
                             <li><a href="{{ url_for('list_saved_opportunities') }}" onclick="layoutshowSpinner(event)"><span
                                         class="border-l-4 border-secondary pl-3 uppercase font-semibold">Guardadas</span></a></li>
                             <li>
