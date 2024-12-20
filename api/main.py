@@ -1105,10 +1105,9 @@ def save_page(page_id=None):
 @app.route("/update_total_nuevas", methods=["GET"])
 def update_total_nuevas():
     try:
-        # Add debug logging
-        print("Starting update_total_nuevas process")
+        app.logger.info("Starting update_total_nuevas process")
         
-        # Use the specific page ID for the "Total" page
+        # Use the original page ID for the "Total" page
         page_id = "1519dd874b3a8033a633f021cec697ce"
         url = f"https://api.notion.com/v1/pages/{page_id}"
         headers = {
@@ -1117,29 +1116,38 @@ def update_total_nuevas():
             "Notion-Version": "2022-06-28",
         }
         
-        print("Fetching data from Notion...")
+        app.logger.info("Fetching data from Notion...")
         response = requests.get(url, headers=headers)
         response.raise_for_status()
         data = response.json()
 
-        # Extract the "Total de nuevas" value
-        total_nuevas = data["properties"]["Total de nuevas"]["rollup"]["number"]
-        print(f"Extracted total_nuevas value: {total_nuevas}")
+        # Log the full properties for debugging
+        app.logger.debug(f"Notion API properties: {data['properties']}")
+
+        # Extract the "Nueva Manual" value
+        nueva_manual_value = data["properties"]["Nueva Manual"]["number"]
+        if nueva_manual_value is None:
+            app.logger.error("Nueva Manual returned None")
+            return jsonify({
+                "status": "error",
+                "message": "Nueva Manual returned None"
+            }), 400
+
+        app.logger.info(f"Extracted nueva_manual_value: {nueva_manual_value}")
 
         # Store in Redis
-        redis.set('total_nuevas', total_nuevas, ex=604500)
-        print(f"Stored in Redis: {total_nuevas}")
+        redis.set('total_nuevas', nueva_manual_value, ex=604500)
+        app.logger.info(f"Stored in Redis: {nueva_manual_value}")
 
-        # Return the value in the response
         return jsonify({
             "status": "success",
-            "total_nuevas": total_nuevas,
+            "total_nuevas": nueva_manual_value,
             "message": "Total nuevas updated successfully"
         }), 200
 
     except Exception as e:
         error_message = f"Error updating total_nuevas: {str(e)}"
-        print(error_message)
+        app.logger.error(error_message)
         return jsonify({
             "status": "error",
             "error": error_message
