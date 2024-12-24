@@ -33,13 +33,17 @@
     <td class="w-[30%] md:w-[35%]">
         <div class="border-left-custom text-sm py-2 capitalize-first h-12 flex items-center pl-6" style="line-height: 0.8rem;">
             <span class="md:hidden whitespace-nowrap">
-                {{ page.ai_keywords | capitalize }}
+                {% for keyword in page.ai_keywords.split(',') %}
+                    <a href="#" hx-get="/find_similar_opportunities" hx-target="#search-results" hx-swap="innerHTML" hx-vals='{"keyword": "{{ keyword.strip() }}"}' hx-push-url="true">{{ keyword | capitalize }}</a>
+                {% endfor %}
                 / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
                     {{ page.url_base }}
                 </span>
             </span>
             <span class="hidden md:inline whitespace-nowrap">
-                {{ page.ai_keywords | capitalize }}
+                {% for keyword in page.ai_keywords.split(',') %}
+                    <a href="#" hx-get="/find_similar_opportunities" hx-target="#search-results" hx-swap="innerHTML" hx-vals='{"keyword": "{{ keyword.strip() }}"}' hx-push-url="true">{{ keyword | capitalize }}</a>
+                {% endfor %}
                 / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
                     {{ page.url_base }}
                 </span>

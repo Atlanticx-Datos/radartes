@@ -708,31 +708,26 @@ def get_similar_opportunities(keywords, exclude_ids):
     return opportunities
 
 @app.route("/find_similar_opportunities", methods=["GET"])
-@login_required
 def find_similar_opportunities():
-    user_id = session["user"]["sub"]
+    search_term = request.args.get("keyword", "").lower()
+    
+    # Obtener las oportunidades desde el caché
+    cached_content = get_cached_database_content()
+    if not cached_content:
+        return render_template("_search_results.html", pages=[])
 
-    # Fetch saved opportunity IDs from Notion
-    opportunity_ids = get_saved_opportunity_ids(user_id)
+    all_opportunities = cached_content['pages']
 
-    # Fetch AI keywords from user's saved opportunities
-    keywords = set()
-    for opportunity_id in opportunity_ids:
-        opportunity = get_opportunity_by_id(opportunity_id)
-        keywords.update(
-            [
-                tag["name"]
-                for tag in opportunity.get("properties", {})
-                .get("AI keywords", {})
-                .get("multi_select", [])
-            ]
-        )
-
-    # Fetch similar opportunities based on AI keywords
-    similar_opportunities = get_similar_opportunities(keywords, opportunity_ids)
+    similar_opportunities = [
+        opp for opp in all_opportunities
+        if search_term in opp.get("ai_keywords", "").lower() or
+           search_term in opp.get("categoria", "").lower() or
+           search_term in opp.get("nombre_original", "").lower() or
+           search_term in opp.get("nombre", "").lower()
+    ]
 
     return render_template(
-        "_similar_opportunities.html", similar_opportunities=similar_opportunities
+        "_search_results.html", pages=similar_opportunities
     )
 
 # Context

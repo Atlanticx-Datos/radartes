@@ -452,6 +452,9 @@
                             scrollToTop('results-container');
                             setupSearchHandlers(); // Reattach handlers after clearing
                             attachOpportunityHandlers();
+
+                            // Actualizar la URL en el historial del navegador
+                            history.pushState(null, '', '/database');
                         })
                         .catch(error => {
                             console.error('Clear error:', error);
@@ -1115,6 +1118,11 @@
         function redirectToLogin() {
             window.location.href = "{{ url_for('login', next=request.path) }}";
         }
+
+        window.addEventListener('popstate', function(event) {
+            // Recargar la página o restablecer el estado
+            location.reload();
+        });
     </script>
 
 
