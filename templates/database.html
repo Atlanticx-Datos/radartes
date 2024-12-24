@@ -300,7 +300,7 @@
         let searchInProgress = false;
         let searchTimeout;
 
-        // Function to handle search input
+        // Función para manejar la entrada de búsqueda
         function handleSearchInput(event) {
             if (searchInProgress) return;
 
@@ -310,130 +310,47 @@
                 if (searchTerm.length >= 3) {
                     searchInProgress = true;
                     trackSearch(searchTerm);
-                    fetchSearchResults(searchTerm);
+                    htmx.ajax('GET', `/database?search=${encodeURIComponent(searchTerm)}`, {
+                        target: '#search-results',
+                        swap: 'innerHTML',
+                        headers: { 'HX-Request': 'true' },
+                    }).then(() => {
+                        searchInProgress = false;
+                    }).catch(error => {
+                        console.error('Search error:', error);
+                        searchInProgress = false;
+                    });
                 }
-            }, 1000);
+            }, 500); // 500ms de debounce
         }
 
-        // Function to handle search submission
+        // Función para manejar la pulsación de teclas (Enter)
         function handleKeyPress(event) {
             if (event.key === 'Enter' && !searchInProgress) {
                 event.preventDefault();
                 const searchValue = document.getElementById('search-input').value.trim();
                 if (searchValue.length >= 3) {
                     searchInProgress = true;
-                    toggleSpinner(true);
                     trackSearch(searchValue);
-                    fetchSearchResults(searchValue);
-                }
-            }
-        }
-
-        // Define the handler function outside so we can reuse it
-        function attachOpportunityHandlers() {
-            document.querySelectorAll('.opportunity-link').forEach(link => {
-                // Remove any existing click handlers
-                const newLink = link.cloneNode(true);
-                link.parentNode.replaceChild(newLink, link);
-
-                newLink.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    const keywords = this.dataset.keywords || '';
-                    const categoryAnalysis = analyzeKeywords(keywords);
-
-                    const eventData = {
-                        'opportunity_name': this.dataset.name,
-                        'country': this.dataset.country || 'sin país',
-                        'opportunity_keywords': keywords,
-                        'opportunity_type': categoryAnalysis.primaryCategory,
-                        'opportunity_secondary_type': categoryAnalysis.secondaryCategory,
-                        'event_category': 'Oportunidad',
-                        'section': 'main'
-                    };
-
-                    console.log('Sending event data:', eventData);
-                    gtag('event', 'opportunity_click', eventData);
-
-                    // Create and trigger a hidden link
-                    const a = document.createElement('a');
-                    a.href = this.dataset.url;
-                    a.rel = 'noopener noreferrer';
-                    a.target = '_blank';
-                    document.body.appendChild(a);
-
-                    // Trigger click
-                    a.click();
-
-                    // Remove the element and force focus back to current window
-                    requestAnimationFrame(() => {
-                        document.body.removeChild(a);
-                        window.focus();
+                    htmx.ajax('GET', `/database?search=${encodeURIComponent(searchValue)}`, {
+                        target: '#search-results',
+                        swap: 'innerHTML',
+                        headers: { 'HX-Request': 'true' },
+                        onAfterSwap: () => {
+                            scrollToTop('search-results');
+                            searchInProgress = false;
+                        },
+                        onError: (error) => {
+                            console.error('Search error:', error);
+                            trackSearchError(searchValue, 'fetch_error');
+                            searchInProgress = false;
+                        }
                     });
-
-                    return false;
-                });
-            });
-        }
-
-        // Initial attachment of handlers
-        document.addEventListener('DOMContentLoaded', attachOpportunityHandlers);
-
-        // Function to fetch search results
-        function fetchSearchResults(searchValue) {
-            const spinner = document.getElementById('spinner');
-            if (spinner) {
-                spinner.style.display = 'block';
-            }
-
-            const searchResult = expandSearchTerms(searchValue);
-            console.log('Search payload:', searchResult);
-
-            const queryParams = new URLSearchParams({
-                search: searchResult.terms,
-                expanded: searchResult.expanded
-            });
-
-            fetch(`/database?${queryParams.toString()}`, {
-                headers: {
-                    'HX-Request': 'true',
-                    'HX-Trigger': 'search'
                 }
-            })
-                .then(response => response.text())
-                .then(html => {
-                    const searchResults = document.getElementById('search-results');
-                    searchResults.innerHTML = html;
-
-                    // Re-apply grid classes to parent elements
-                    const firstColumn = document.querySelector('.col-span-1.md\\:col-span-5.lg\\:col-span-4');
-                    const secondColumn = document.querySelector('.col-span-1.md\\:col-span-7.lg\\:col-span-8');
-
-                    if (firstColumn) {
-                        firstColumn.className = 'col-span-1 md:col-span-5 lg:col-span-4 md:border-r border-neutral flex flex-col justify-between';
-                    }
-                    if (secondColumn) {
-                        secondColumn.className = 'col-span-1 md:col-span-7 lg:col-span-8 mt-2 lg:mt-0 border-neutral';
-                    }
-
-                    scrollToTop('results-container');
-                    setupSearchHandlers();
-                    attachOpportunityHandlers();
-                })
-                .catch(error => {
-                    console.error('Search error:', error);
-                    trackSearchError(searchValue, 'fetch_error');
-                })
-                .finally(() => {
-                    if (spinner) {
-                        spinner.style.display = 'none';
-                    }
-                    searchInProgress = false;
-                });
+            }
         }
 
-        // Function to clear search
+        // Función para limpiar la búsqueda utilizando HTMX
         function clearSearch() {
             const searchInput = document.getElementById('search-input');
             if (searchInput) {
@@ -441,33 +358,24 @@
 
                 if (!searchInProgress) {
                     searchInProgress = true;
-                    toggleSpinner(true);
-
-                    fetch('/database?clear=true', {
-                        headers: { 'HX-Request': 'true' }
-                    })
-                        .then(response => response.text())
-                        .then(html => {
-                            document.getElementById('search-results').innerHTML = html;
-                            scrollToTop('results-container');
-                            setupSearchHandlers(); // Reattach handlers after clearing
-                            attachOpportunityHandlers();
-
-                            // Actualizar la URL en el historial del navegador
-                            history.pushState(null, '', '/database');
-                        })
-                        .catch(error => {
-                            console.error('Clear error:', error);
-                        })
-                        .finally(() => {
+                    htmx.ajax('GET', '/database?clear=true', {
+                        target: '#search-results',
+                        swap: 'innerHTML',
+                        headers: { 'HX-Request': 'true' },
+                        onAfterSwap: () => {
+                            scrollToTop('search-results');
                             searchInProgress = false;
-                            toggleSpinner(false);
-                        });
+                        },
+                        onError: (error) => {
+                            console.error('Clear error:', error);
+                            searchInProgress = false;
+                        }
+                    });
                 }
             }
         }
 
-        // Function to toggle spinner visibility
+        // Función para alternar la visibilidad del spinner
         function toggleSpinner(show) {
             const spinner = document.getElementById('spinner');
             if (spinner) {
@@ -475,7 +383,7 @@
             }
         }
 
-        // Function to scroll to top of an element
+        // Función para desplazarse al inicio de un elemento
         function scrollToTop(id) {
             const element = document.getElementById(id);
             if (element) {
@@ -483,7 +391,7 @@
             }
         }
 
-        // Function to track search events
+        // Función para rastrear eventos de búsqueda
         function trackSearch(searchTerm) {
             gtag('event', 'opportunity_search', {
                 send_to: 'G-36M4V4L5RX',
@@ -492,7 +400,7 @@
             });
         }
 
-        // Function to track search errors
+        // Función para rastrear errores de búsqueda
         function trackSearchError(searchTerm, errorType) {
             gtag('event', 'search_error', {
                 search_term: searchTerm,
@@ -500,628 +408,61 @@
             });
         }
 
-        // Function to sanitize keywords
-        function sanitizeKeywords(keywords) {
-            if (!keywords) return '';
-
-            // Si keywords es un string JSON, parsearlo primero
-            try {
-                if (typeof keywords === 'string') {
-                    keywords = JSON.parse(keywords);
-                }
-            } catch (e) {
-                console.warn('Error parsing keywords:', e);
-            }
-
-            // Mapa de reemplazo de caracteres especiales
-            const replacements = {
-                '\u00ed': 'í',
-                '\u00e1': 'á',
-                '\u00e9': 'é',
-                '\u00f3': 'ó',
-                '\u00fa': 'ú',
-                '\u00f1': 'ñ'
-            };
-
-            // Si keywords es un string, aplicar reemplazos
-            if (typeof keywords === 'string') {
-                Object.entries(replacements).forEach(([code, char]) => {
-                    keywords = keywords.replace(new RegExp(code, 'g'), char);
-                });
-                return keywords;
-            }
-
-            // Si keywords es un array, aplicar a cada elemento
-            if (Array.isArray(keywords)) {
-                return keywords.map(k => {
-                    if (typeof k === 'string') {
-                        Object.entries(replacements).forEach(([code, char]) => {
-                            k = k.replace(new RegExp(code, 'g'), char);
-                        });
-                    }
-                    return k;
-                });
-            }
-
-            return keywords;
-        }
-
-        // Simplified GA4 configuration for production domain only
-        gtag('config', 'G-36M4V4L5RX', {
-            send_page_view: true,
-            link_attribution: false,
-            enhanced_link_attribution: false,
-            enhanced_measurement: false,
-            cookie_domain: 'oportunidades.lat'
-        });
-
-        // Enhanced categories based on actual data patterns
-        function analyzeKeywords(keywords) {
-            const categories = {
-                // Funding Types (Tipos de Financiación)
-                beca: [
-                    'beca', 'becas', 'scholarship', 'fellowship', 'grant',
-                    'financiacion', 'financiamiento', 'apoyo economico', 'stipend'
-                ],
-
-                residencia: [
-                    'residencia', 'residency', 'artist in residence',
-                    'estancia artistica', 'art residency', 'creative residency'
-                ],
-
-                premio: [
-                    'premio', 'award', 'concurso', 'certamen', 'competition',
-                    'reconocimiento', 'prize', 'contest'
-                ],
-
-                // Artistic Fields (Campos Artísticos)
-                artes_visuales: [
-                    'arte visual', 'pintura', 'escultura', 'artes plasticas',
-                    'visual art', 'fine arts', 'arte contemporaneo',
-                    'contemporary art', 'mixed media'
-                ],
-
-                fotografia: [
-                    'fotografia', 'photography', 'photo', 'fotografica',
-                    'photoespana', 'fotorreportaje', 'fotoperiodismo'
-                ],
-
-                audiovisual: [
-                    'cine', 'film', 'video', 'documental', 'cortometraje',
-                    'cinematografia', 'audiovisual', 'animacion'
-                ],
-
-                performing_arts: [
-                    'teatro', 'danza', 'performance', 'escenicas',
-                    'performing arts', 'theatre', 'dance', 'circo'
-                ],
-
-                // Academic/Professional Development
-                formacion: [
-                    'formacion', 'curso', 'taller', 'workshop', 'masterclass',
-                    'training', 'education', 'professional development'
-                ],
-
-                investigacion: [
-                    'investigacion', 'research', 'academic', 'estudio',
-                    'desarrollo', 'phd', 'doctorado', 'thesis'
-                ],
-
-                // Format/Platform
-                digital: [
-                    'digital', 'virtual', 'online', 'tecnologia',
-                    'new media', 'net art', 'digital art'
-                ],
-
-                exposicion: [
-                    'exposicion', 'exhibition', 'muestra', 'gallery',
-                    'exhibicion', 'galeria'
-                ],
-
-                festival: [
-                    'festival', 'bienal', 'feria', 'biennial',
-                    'fair', 'encuentro', 'trienal'
-                ]
-            };
-
-            const normalizedKeywords = keywords.toLowerCase()
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, ""); // Remove diacritics
-
-            const matchedCategories = [];
-            for (const [category, keywordList] of Object.entries(categories)) {
-                if (keywordList.some(keyword => normalizedKeywords.includes(keyword))) {
-                    matchedCategories.push(category);
-                }
-            }
-
-            return {
-                primaryCategory: matchedCategories[0] || 'sin_categorizar',
-                secondaryCategory: matchedCategories[1] || '',
-                allCategories: matchedCategories // Useful for deeper analysis
-            };
-        }
-
-        // GA4 country tracking
-        function trackOpportunityView(opportunity) {
-            gtag('event', 'view_opportunity', {
-                'page_title': opportunity.nombre,
-                'country': opportunity.País,
-                'opportunity_type': opportunity.matchedCategories.join(',')
-            });
-        }
-
-        // Add debug logging
+        // Inicialización de eventos al cargar el DOM
         document.addEventListener('DOMContentLoaded', function () {
-            console.log('Attaching click handlers...');
-
-            // Remove any existing handlers first
-            document.querySelectorAll('.opportunity-link').forEach(link => {
-                const clone = link.cloneNode(true);
-                link.parentNode.replaceChild(clone, link);
-            });
-
-            // Attach new handlers
-            document.querySelectorAll('.opportunity-link').forEach(link => {
-                console.log('Attaching handler to:', link.dataset.name);
-
-                link.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    console.log('Click handler fired for:', this.dataset.name);
-
-                    const keywords = this.dataset.keywords || '';
-                    const categoryAnalysis = analyzeKeywords(keywords);
-
-                    const eventData = {
-                        'opportunity_name': this.dataset.name,
-                        'country': this.dataset.country || 'sin país',
-                        'opportunity_keywords': keywords,
-                        'opportunity_type': categoryAnalysis.primaryCategory,
-                        'opportunity_secondary_type': categoryAnalysis.secondaryCategory,
-                        'event_category': 'Oportunidad',
-                        'section': 'main'
-                    };
-
-                    console.log('Sending event data:', eventData);
-                    gtag('event', 'opportunity_click', eventData);
-
-                    setTimeout(() => {
-                        window.open(this.dataset.url, '_blank', 'noopener,noreferrer');
-                    }, 100);
-                });
-            });
-        });
-
-        // Remove any other click handlers
-        if (typeof handleOpportunityClick === 'function') {
-            delete window.handleOpportunityClick;
-        }
-
-        // Add validation function
-        function validateCategories(opportunity) {
-            if (!opportunity.matchedCategories || opportunity.matchedCategories.length === 0) {
-                console.warn(`Warning: No categories matched for opportunity: ${opportunity.title}`);
-            }
-
-            // Check for potentially missing categories
-            const keywords = opportunity.keywords.toLowerCase();
-            const uncategorizedKeywords = findUncategorizedKeywords(keywords);
-            if (uncategorizedKeywords.length > 0) {
-                console.warn(`Potential new keywords found: ${uncategorizedKeywords.join(', ')}`);
-            }
-        }
-
-        function handleOpportunityClick(element) {
-            // Get data from element
-            const keywords = element.dataset.keywords || '';
-            const name = element.dataset.name || '';
-            const country = element.dataset.country || 'sin país';
-            const url = element.dataset.url;
-
-            // Analyze categories from keywords
-            const categoryAnalysis = analyzeKeywords(keywords);
-
-            // Prepare event data for GA4
-            const eventData = {
-                'opportunity_name': name,
-                'country': country,
-                'opportunity_keywords': keywords,
-                'opportunity_type': categoryAnalysis.primaryCategory,      // Primary category
-                'opportunity_secondary_type': categoryAnalysis.secondaryCategory,  // Secondary category
-                'event_category': 'Oportunidad',
-                'section': 'main'
-            };
-
-            // Log for debugging
-            console.log('Sending to GA4:', eventData);
-
-            // Send to GA4
-            gtag('event', 'opportunity_click', eventData);
-
-            // Navigate after tracking
-            setTimeout(() => {
-                window.open(url, '_blank', 'noopener,noreferrer');
-            }, 100);
-        }
-
-        function handleDestacadaClick(element) {
-            const eventData = {
-                'opportunity_name': element.dataset.name,
-                'country': element.dataset.country || 'sin país',
-                'section': 'destacadas',
-                'event_category': 'Accordion'
-            };
-
-            gtag('event', 'destacadas_click', eventData);  // This specific event name
-
-            window.open(element.dataset.url, '_blank', 'noopener,noreferrer');
-        }
-
-        function handleCierranProntoClick(element) {
-            const eventData = {
-                'opportunity_name': element.dataset.name,
-                'country': element.dataset.country || 'sin país',
-                'section': 'cierran_pronto',
-                'event_category': 'Accordion'
-            };
-
-            gtag('event', 'cierranPronto_click', eventData);  // This specific event name
-
-            window.open(element.dataset.url, '_blank', 'noopener,noreferrer');
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            // For Cierran Pronto links
-            document.querySelectorAll('.cierran-pronto-link').forEach(link => {
-                // Remove any existing click handlers
-                const newLink = link.cloneNode(true);
-                link.parentNode.replaceChild(newLink, link);
-
-                newLink.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();  // Stop other handlers
-
-                    const eventData = {
-                        'opportunity_name': this.dataset.name,
-                        'country': this.dataset.country || 'sin país',
-                        'section': 'cierran_pronto',
-                        'event_category': 'Accordion',
-                        'opportunity_keywords': this.dataset.keywords || ''
-                    };
-
-                    // Send our custom event
-                    gtag('event', 'cierranPronto_click', eventData);
-
-                    // Navigate after tracking
-                    setTimeout(() => {
-                        window.open(this.dataset.url, '_blank', 'noopener,noreferrer');
-                    }, 100);
-
-                    return false;  // Prevent bubbling
-                }, true);  // Use capture phase
-            });
-
-            // For Destacadas links
-            document.querySelectorAll('.accordion-link').forEach(link => {
-                // Remove any existing click handlers
-                const newLink = link.cloneNode(true);
-                link.parentNode.replaceChild(newLink, link);
-
-                newLink.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();  // Stop other handlers
-
-                    const eventData = {
-                        'opportunity_name': this.dataset.name,
-                        'country': this.dataset.country || 'sin país',
-                        'section': 'destacadas',
-                        'event_category': 'Accordion',
-                        'opportunity_keywords': this.dataset.keywords || ''
-                    };
-
-                    // Send our custom event
-                    gtag('event', 'destacadas_click', eventData);
-
-                    // Navigate after tracking
-                    setTimeout(() => {
-                        window.open(this.dataset.url, '_blank', 'noopener,noreferrer');
-                    }, 100);
-
-                    return false;  // Prevent bubbling
-                }, true);  // Use capture phase
-            });
-        });
-
-        // Disable GA4's automatic link tracking
-        gtag('config', 'G-36M4V4L5RX', {
-            send_page_view: true,
-            link_attribution: false,
-            enhanced_link_attribution: false
-        });
-
-        document.addEventListener('DOMContentLoaded', function () {
-            // Get total opportunities count
-            const totalOpportunities = document.querySelectorAll('.opportunity-link').length;
-            console.log('Total opportunities:', totalOpportunities); // Debug log
-
-            document.querySelectorAll('.opportunity-link').forEach(link => {
-                const newLink = link.cloneNode(true);
-                link.parentNode.replaceChild(newLink, link);
-
-                newLink.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    const keywords = this.dataset.keywords || '';
-                    const categoryAnalysis = analyzeKeywords(keywords);
-
-                    const eventData = {
-                        'opportunity_name': this.dataset.name,
-                        'country': this.dataset.country || 'sin país',
-                        'opportunity_keywords': keywords,
-                        'opportunity_type': categoryAnalysis.primaryCategory,
-                        'opportunity_secondary_type': categoryAnalysis.secondaryCategory,
-                        'event_category': 'Oportunidad',
-                        'section': 'main',
-                        'total_opportunities': totalOpportunities
-                    };
-
-                    console.log('Sending event data with total:', eventData);
-                    gtag('event', 'opportunity_click', eventData);
-
-                    // Create and trigger a hidden link
-                    const a = document.createElement('a');
-                    a.href = this.dataset.url;
-                    a.rel = 'noopener noreferrer';
-                    a.target = '_blank';
-                    document.body.appendChild(a);
-
-                    a.click();
-
-                    requestAnimationFrame(() => {
-                        document.body.removeChild(a);
-                        window.focus();
-                    });
-
-                    return false;
-                });
-            });
-        });
-
-        // Replace the existing SEARCH_CATEGORIES with this refined version
-        const SEARCH_CATEGORIES = {
-            music: {
-                triggers: ['música', 'musica', 'music', 'musical'],
-                related: [
-                    // Core Music Terms
-                    'composición', 'composicion', 'composition',
-                    'concierto', 'concert', 'orchestra', 'orquesta',
-                    'ópera', 'opera',
-                    'interpretación musical', 'interpretacion musical',
-                    'dirección musical', 'direccion musical', 'conducting',
-                    'sonido musical', 'producción musical',
-
-                    // Instruments and Voice
-                    'instrumento', 'instrument', 'piano', 'violin', 'guitarra',
-                    'canto', 'singing', 'canción', 'cancion',
-                    'banda', 'band', 'ensemble', 'coro', 'choir',
-
-                    // Music Education and Institutions
-                    'conservatorio', 'conservatory',
-                    'escuela de música', 'escuela de musica',
-                    'ibermúsicas', 'ibermusicas',
-
-                    // Music Roles
-                    'compositor', 'compositora', 'composer',
-                    'músico', 'musico', 'musician',
-                    'director musical', 'directora musical',
-
-                    // Educational Terms
-                    'beca', 'becas', 'scholarship',
-                    'maestría', 'maestria', 'master',
-                    'doctorado', 'doctorate', 'phd',
-                    'universidad', 'university', 'univ',
-                    'facultad', 'faculty',
-                    'posgrado', 'postgrado',
-                    'licenciatura', 'bachelor',
-                    'formación', 'formacion',
-
-                    // General Artist Terms (to catch residencies)
-                    'residencia artística', 'residencia artistica',
-                    'residencia para artistas', 'artist residency',
-                    'residencia de creación', 'residencia de creacion',
-                    'artista', 'artistas', 'artist', 'artists'
-                ]
-            }
-        };
-
-        // Normalize text helper function
-        function normalizeText(text) {
-            return text.toLowerCase()
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "");
-        }
-
-        // Update expandSearchTerms to better handle residency terms
-        function expandSearchTerms(searchTerm) {
-            const normalizedSearch = normalizeText(searchTerm);
-
-            for (const [category, data] of Object.entries(SEARCH_CATEGORIES)) {
-                if (data.triggers.some(trigger => {
-                    const normalizedTrigger = normalizeText(trigger);
-                    return normalizedTrigger === normalizedSearch ||
-                        normalizedSearch.includes(normalizedTrigger);
-                })) {
-                    // Get all terms including residency-related ones
-                    const allTerms = new Set([
-                        ...data.triggers,
-                        ...data.related,
-                        // Always include general residency terms
-                        'residencia artística', 'residencia artistica',
-                        'residencia para artistas', 'artist residency',
-                        'residencia de creación', 'residencia de creacion',
-                        'artista', 'artistas', 'artist', 'artists'
-                    ]);
-
-                    const normalizedTerms = [...allTerms].map(term => normalizeText(term));
-
-                    console.log(`Expanded search for ${searchTerm} to:`, normalizedTerms);
-                    return {
-                        terms: normalizedTerms.join('|'),
-                        expanded: true
-                    };
-                }
-            }
-
-            return {
-                terms: searchTerm,
-                expanded: false
-            };
-        }
-
-        // Update the event handling setup
-        document.addEventListener('DOMContentLoaded', function () {
-            // Initial setup of search input handler
-            setupSearchHandlers();
-        });
-
-        // Create a new function to setup all search-related handlers
-        function setupSearchHandlers() {
             const searchInput = document.getElementById('search-input');
             if (searchInput) {
-                // Remove existing listeners first
-                const newSearchInput = searchInput.cloneNode(true);
-                searchInput.parentNode.replaceChild(newSearchInput, searchInput);
-
-                // Add input event listener
-                newSearchInput.addEventListener('input', handleSearchInput);
-
-                // Add keypress event listener
-                newSearchInput.addEventListener('keypress', handleKeyPress);
+                searchInput.addEventListener('input', handleSearchInput);
+                searchInput.addEventListener('keypress', handleKeyPress);
             }
-        }
 
-        // Add event listener for HTMX after-swap
-        document.body.addEventListener('htmx:afterSwap', function (event) {
-            setupSearchHandlers();
-            attachOpportunityHandlers();
-        });
-
-        document.addEventListener('DOMContentLoaded', function () {
-            console.log('HTMX loaded:', typeof htmx !== 'undefined');
-            const searchInput = document.getElementById('search-input');
-            console.log('Search input found:', searchInput !== null);
-            if (searchInput) {
-                console.log('HTMX attributes:', {
-                    get: searchInput.getAttribute('hx-get'),
-                    trigger: searchInput.getAttribute('hx-trigger'),
-                    target: searchInput.getAttribute('hx-target')
-                });
-            }
-        });
-
-        // Replace the form submission handling code with this corrected version
-        document.addEventListener('DOMContentLoaded', function () {
-            const saveForm = document.getElementById('save-form');
-            const saveButton = document.getElementById('save-button');
-            let isSubmitting = false;
-
-            if (saveForm && saveButton) {
-                saveButton.addEventListener('click', function (e) {
-                    e.preventDefault();
+            // Usar delegación de eventos para clear_search
+            document.body.addEventListener('click', function (event) {
+                const clearButton = event.target.closest('[onclick="clearSearch()"]');
+                if (clearButton) {
+                    event.preventDefault();
+                    event.stopPropagation();
                     
-                    if (isSubmitting) return;
+                    // Realizar una solicitud GET directa a /database
+                    window.location.href = '/database';
+                    return false;
+                }
+            });
 
-                    const checkedOpportunities = document.querySelectorAll('input[type="checkbox"]:checked');
-                    const alertContainer = document.getElementById('alert-container');
+            // Manejar el botón de retroceso y el historial
+            window.addEventListener('popstate', function(event) {
+                // Forzar una recarga completa al usar el botón de retroceso
+                window.location.reload();
+            });
 
-                    if (checkedOpportunities.length === 0) {
-                        alertContainer.innerHTML = `
-                            <div role="alert" class="flex items-center justify-center alert alert-warning p-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                </svg>
-                            </div>
-                        `;
-                        setTimeout(() => {
-                            alertContainer.innerHTML = '';
-                        }, 3000);
-                        return;
-                    }
+            // Eventos HTMX para el spinner
+            document.body.addEventListener('htmx:beforeRequest', function(event) {
+                toggleSpinner(true);
+            });
 
-                    isSubmitting = true;
-                    const formData = new FormData();
+            document.body.addEventListener('htmx:afterRequest', function(event) {
+                toggleSpinner(false);
+            });
 
-                    checkedOpportunities.forEach(checkbox => {
-                        formData.append('selected_pages', checkbox.value);
-                    });
+            document.body.addEventListener('htmx:responseError', function(event) {
+                console.error('HTMX Response Error:', event.detail.xhr);
+                toggleSpinner(false);
+            });
 
-                    fetch('/save_user_opportunity', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        credentials: 'same-origin'
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            return response.text().then(text => {
-                                throw new Error(text || 'Network response was not ok');
-                            });
-                        }
-                        return response.text();
-                    })
-                    .then(html => {
-                        alertContainer.innerHTML = `
-                            <div role="alert" class="flex items-center justify-center alert alert-success p-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                        `;
-
-                        checkedOpportunities.forEach(checkbox => {
-                            checkbox.checked = false;
-                        });
-
-                        setTimeout(() => {
-                            alertContainer.innerHTML = '';
-                        }, 3000);
-                    })
-                    .catch(error => {
-                        alertContainer.innerHTML = `
-                            <div role="alert" class="flex items-center justify-center alert alert-error p-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                        `;
-
-                        setTimeout(() => {
-                            alertContainer.innerHTML = '';
-                        }, 3000);
-                    })
-                    .finally(() => {
-                        isSubmitting = false;
-                    });
-                });
-            }
+            // Registrar el total de oportunidades para depuración
+            const totalOpportunities = document.querySelectorAll('.opportunity-link').length;
+            console.log('Total opportunities:', totalOpportunities);
         });
 
-        // Remove the previous HTMX event listeners since we're handling it with fetch now
+        // Opcional: Rastrear solicitudes HTMX para depuración
+        document.addEventListener('htmx:configRequest', function(evt) {
+            console.log('HTMX request triggered:', evt.detail);
+        });
 
-        function redirectToLogin() {
-            window.location.href = "{{ url_for('login', next=request.path) }}";
-        }
-
-        window.addEventListener('popstate', function(event) {
-            // Recargar la página o restablecer el estado
-            location.reload();
+        // Ocultar el spinner en caso de errores de respuesta
+        document.body.addEventListener('htmx:responseError', function(event) {
+            console.error('HTMX Response Error:', event.detail.xhr);
+            toggleSpinner(false);
         });
     </script>
 
