@@ -47,13 +47,30 @@
         <div class="h-[400px] relative overflow-hidden">
           <div class="gallery-container relative w-full h-full overflow-hidden">
             <img src="/static/public/Pao.png" alt="Hero Image 1"
-              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-0 transition-all duration-1500 ease-in-out">
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-0 transition-all duration-1500 ease-in-out"
+              width="800"
+              height="600"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async">
             <img src="/static/public/Manu.png" alt="Hero Image 2"
-              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
+              width="800"
+              height="600"
+              loading="lazy"
+              decoding="async">
             <img src="/static/public/Boquita_Still.png" alt="Hero Image 3"
-              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
+              width="800"
+              height="600"
+              loading="lazy"
+              decoding="async">
             <img src="/static/public/Gaia.png" alt="Hero Image 4"
-              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
+              width="800"
+              height="600"
+              loading="lazy"
+              decoding="async">
           </div>
         </div>
       </div>
@@ -71,13 +88,30 @@
         <div class="w-[40%] overflow-hidden relative">
           <div class="gallery-container relative w-full h-full overflow-hidden">
             <img src="/static/public/Pao.png" alt="Hero Image 1"
-              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-0 transition-all duration-1500 ease-in-out">
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-0 transition-all duration-1500 ease-in-out"
+              width="800"
+              height="600"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async">
             <img src="/static/public/Manu.png" alt="Hero Image 2"
-              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
+              width="800"
+              height="600"
+              loading="lazy"
+              decoding="async">
             <img src="/static/public/Boquita_Still.png" alt="Hero Image 3"
-              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
+              width="800"
+              height="600"
+              loading="lazy"
+              decoding="async">
             <img src="/static/public/Gaia.png" alt="Hero Image 4"
-              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out">
+              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
+              width="800"
+              height="600"
+              loading="lazy"
+              decoding="async">
           </div>
         </div>
 
@@ -314,5 +348,26 @@
     // Start the carousel
     setInterval(switchImage, 5000);
   });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Precarga las siguientes imágenes después de que la primera esté lista
+  const preloadNextImages = () => {
+    const imageUrls = [
+      '/static/public/Manu.png',
+      '/static/public/Boquita_Still.png',
+      '/static/public/Gaia.png'
+    ];
+    
+    imageUrls.forEach(url => {
+      const img = new Image();
+      img.src = url;
+    });
+  };
+  
+  // Ejecutar después de que la primera imagen esté cargada
+  window.addEventListener('load', preloadNextImages);
+});
 </script>
 {% endblock %}
