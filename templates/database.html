@@ -416,14 +416,38 @@
                 searchInput.addEventListener('keypress', handleKeyPress);
             }
 
-            // Usar delegación de eventos para clear_search
+            // Usar delegación de eventos para los enlaces de oportunidades y clear_search
             document.body.addEventListener('click', function (event) {
+                // Manejar enlaces de oportunidades
+                const opportunityLink = event.target.closest('.opportunity-link');
+                if (opportunityLink) {
+                    event.preventDefault();
+                    
+                    // Obtener datos para analytics
+                    const eventData = {
+                        'opportunity_name': opportunityLink.dataset.name || '',
+                        'country': opportunityLink.dataset.country || 'sin país',
+                        'opportunity_keywords': opportunityLink.dataset.keywords || '',
+                        'event_category': 'Oportunidad',
+                        'section': 'main'
+                    };
+
+                    // Enviar evento a Google Analytics
+                    console.log('Sending event data:', eventData);
+                    gtag('event', 'opportunity_click', eventData);
+
+                    // Abrir enlace en nueva pestaña
+                    const url = opportunityLink.getAttribute('data-url');
+                    if (url) {
+                        window.open(url, '_blank', 'noopener,noreferrer');
+                    }
+                    return false;
+                }
+
+                // Manejar clear_search
                 const clearButton = event.target.closest('[onclick="clearSearch()"]');
                 if (clearButton) {
                     event.preventDefault();
-                    event.stopPropagation();
-                    
-                    // Realizar una solicitud GET directa a /database
                     window.location.href = '/database';
                     return false;
                 }
@@ -431,7 +455,6 @@
 
             // Manejar el botón de retroceso y el historial
             window.addEventListener('popstate', function(event) {
-                // Forzar una recarga completa al usar el botón de retroceso
                 window.location.reload();
             });
 
