@@ -411,8 +411,46 @@
         // Inicialización de eventos al cargar el DOM
         document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.getElementById('search-input');
+            let initialContent = null;
+
+            // Guardar el contenido inicial
+            const searchResults = document.getElementById('search-results');
+            if (searchResults) {
+                initialContent = searchResults.innerHTML;
+            }
+
             if (searchInput) {
-                searchInput.addEventListener('input', handleSearchInput);
+                searchInput.addEventListener('input', function(event) {
+                    if (searchInProgress) return;
+
+                    clearTimeout(searchTimeout);
+                    const searchTerm = event.target.value.trim();
+
+                    // Si el input está vacío, simular el comportamiento de clear_search
+                    if (searchTerm === '') {
+                        window.location.href = '/database';
+                        return;
+                    }
+
+                    // Proceder con la búsqueda normal si hay 3 o más caracteres
+                    if (searchTerm.length >= 3) {
+                        searchTimeout = setTimeout(() => {
+                            searchInProgress = true;
+                            trackSearch(searchTerm);
+                            htmx.ajax('GET', `/database?search=${encodeURIComponent(searchTerm)}`, {
+                                target: '#search-results',
+                                swap: 'innerHTML',
+                                headers: { 'HX-Request': 'true' }
+                            }).then(() => {
+                                searchInProgress = false;
+                            }).catch(error => {
+                                console.error('Search error:', error);
+                                searchInProgress = false;
+                            });
+                        }, 500);
+                    }
+                });
+
                 searchInput.addEventListener('keypress', handleKeyPress);
             }
 
@@ -465,11 +503,20 @@
 
             document.body.addEventListener('htmx:afterRequest', function(event) {
                 toggleSpinner(false);
+                searchInProgress = false;
             });
 
             document.body.addEventListener('htmx:responseError', function(event) {
                 console.error('HTMX Response Error:', event.detail.xhr);
                 toggleSpinner(false);
+                searchInProgress = false;
+            });
+
+            // Asegurar que el spinner se oculte si hay algún error no manejado
+            window.addEventListener('error', function(event) {
+                console.error('Global error:', event.error);
+                toggleSpinner(false);
+                searchInProgress = false;
             });
 
             // Registrar el total de oportunidades para depuración

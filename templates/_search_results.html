@@ -1,9 +1,12 @@
 {% if pages %}
 {% for page in pages %}
 <tr style="
-    background-color: 
-    {% if page.destinatarios == 'Destacar' %} rgba(251, 146, 60, 0.15); 
-    {% else %} transparent; 
+    {% if page.destinatarios == 'Destacar' %}
+    background-color: rgb(241, 243, 245);
+    border-left: 4px solid #6366f1;  /* Color accent de Tailwind (indigo-500) */
+    padding-left: 0.5rem;
+    {% else %}
+    background-color: transparent;
     {% endif %}
 ;">
     <th class="w-[7%]">
