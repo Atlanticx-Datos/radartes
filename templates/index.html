@@ -3,10 +3,10 @@
 {% block head %}
 
 <!-- Preload gallery images -->
-<link rel="preload" href="/static/public/Pao.png" as="image">
-<link rel="preload" href="/static/public/Manu.png" as="image">
-<link rel="preload" href="/static/public/Boquita_Still.png" as="image">
-<link rel="preload" href="/static/public/Gaia.png" as="image">
+<link rel="preload" href="/static/public/Pao.webp" as="image" type="image/webp">
+<link rel="preload" href="/static/public/Manu.webp" as="image" type="image/webp">
+<link rel="preload" href="/static/public/Boquita_Still.webp" as="image" type="image/webp">
+<link rel="preload" href="/static/public/Gaia.webp" as="image" type="image/webp">
 {% endblock %}
 
 {% block body %}
@@ -46,31 +46,50 @@
         <!-- Gallery section -->
         <div class="h-[400px] relative overflow-hidden">
           <div class="gallery-container relative w-full h-full overflow-hidden">
-            <img src="/static/public/Pao.png" alt="Hero Image 1"
-              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-0 transition-all duration-1500 ease-in-out"
-              width="800"
-              height="600"
-              loading="eager"
-              fetchpriority="high"
-              decoding="async">
-            <img src="/static/public/Manu.png" alt="Hero Image 2"
-              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
-              width="800"
-              height="600"
-              loading="lazy"
-              decoding="async">
-            <img src="/static/public/Boquita_Still.png" alt="Hero Image 3"
-              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
-              width="800"
-              height="600"
-              loading="lazy"
-              decoding="async">
-            <img src="/static/public/Gaia.png" alt="Hero Image 4"
-              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
-              width="800"
-              height="600"
-              loading="lazy"
-              decoding="async">
+            <picture>
+              <source srcset="/static/public/Pao.webp" type="image/webp">
+              <img src="/static/public/Pao.png" 
+                   alt="Hero Image 1"
+                   class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-0 transition-all duration-1500 ease-in-out"
+                   width="800"
+                   height="600"
+                   loading="eager"
+                   fetchpriority="high"
+                   decoding="async">
+            </picture>
+
+            <picture>
+              <source srcset="/static/public/Manu.webp" type="image/webp">
+              <img src="/static/public/Manu.png" 
+                   alt="Hero Image 2"
+                   class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
+                   width="800"
+                   height="600"
+                   loading="lazy"
+                   decoding="async">
+            </picture>
+
+            <picture>
+              <source srcset="/static/public/Boquita_Still.webp" type="image/webp">
+              <img src="/static/public/Boquita_Still.png" 
+                   alt="Hero Image 3"
+                   class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
+                   width="800"
+                   height="600"
+                   loading="lazy"
+                   decoding="async">
+            </picture>
+
+            <picture>
+              <source srcset="/static/public/Gaia.webp" type="image/webp">
+              <img src="/static/public/Gaia.png" 
+                   alt="Hero Image 4"
+                   class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
+                   width="800"
+                   height="600"
+                   loading="lazy"
+                   decoding="async">
+            </picture>
           </div>
         </div>
       </div>
@@ -87,31 +106,50 @@
         <!-- Second Column - Image Gallery (moved from third to second position) -->
         <div class="w-[40%] overflow-hidden relative">
           <div class="gallery-container relative w-full h-full overflow-hidden">
-            <img src="/static/public/Pao.png" alt="Hero Image 1"
-              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-0 transition-all duration-1500 ease-in-out"
-              width="800"
-              height="600"
-              loading="eager"
-              fetchpriority="high"
-              decoding="async">
-            <img src="/static/public/Manu.png" alt="Hero Image 2"
-              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
-              width="800"
-              height="600"
-              loading="lazy"
-              decoding="async">
-            <img src="/static/public/Boquita_Still.png" alt="Hero Image 3"
-              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
-              width="800"
-              height="600"
-              loading="lazy"
-              decoding="async">
-            <img src="/static/public/Gaia.png" alt="Hero Image 4"
-              class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
-              width="800"
-              height="600"
-              loading="lazy"
-              decoding="async">
+            <picture>
+              <source srcset="/static/public/Pao.webp" type="image/webp">
+              <img src="/static/public/Pao.png" 
+                   alt="Hero Image 1"
+                   class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-0 transition-all duration-1500 ease-in-out"
+                   width="800"
+                   height="600"
+                   loading="eager"
+                   fetchpriority="high"
+                   decoding="async">
+            </picture>
+
+            <picture>
+              <source srcset="/static/public/Manu.webp" type="image/webp">
+              <img src="/static/public/Manu.png" 
+                   alt="Hero Image 2"
+                   class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
+                   width="800"
+                   height="600"
+                   loading="lazy"
+                   decoding="async">
+            </picture>
+
+            <picture>
+              <source srcset="/static/public/Boquita_Still.webp" type="image/webp">
+              <img src="/static/public/Boquita_Still.png" 
+                   alt="Hero Image 3"
+                   class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
+                   width="800"
+                   height="600"
+                   loading="lazy"
+                   decoding="async">
+            </picture>
+
+            <picture>
+              <source srcset="/static/public/Gaia.webp" type="image/webp">
+              <img src="/static/public/Gaia.png" 
+                   alt="Hero Image 4"
+                   class="gallery-image absolute top-0 left-0 w-full h-full object-cover transform translate-x-full transition-all duration-1500 ease-in-out"
+                   width="800"
+                   height="600"
+                   loading="lazy"
+                   decoding="async">
+            </picture>
           </div>
         </div>
 
@@ -320,22 +358,26 @@
   }
 
   /* Make this rule more specific */
-  .gallery-container .gallery-image:first-child {
+  .gallery-container picture:first-child img {
     transform: translateX(0) !important;
   }
 </style>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const images = Array.from(document.querySelectorAll('.gallery-image'));
+    const pictures = Array.from(document.querySelectorAll('.gallery-container picture'));
     let currentIndex = 0;
 
     function switchImage() {
-      const currentImage = images[currentIndex];
-      const nextIndex = (currentIndex + 1) % images.length;
-      const nextImage = images[nextIndex];
+      const currentPicture = pictures[currentIndex];
+      const nextIndex = (currentIndex + 1) % pictures.length;
+      const nextPicture = pictures[nextIndex];
 
-      // Instead of using classList, let's try direct style manipulation
+      // Get the img elements inside the pictures
+      const currentImage = currentPicture.querySelector('img');
+      const nextImage = nextPicture.querySelector('img');
+
+      // Apply transforms to the img elements
       currentImage.style.transform = 'translateX(-100%)';
       nextImage.style.transform = 'translateX(0)';
 
@@ -355,9 +397,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // Precarga las siguientes imágenes después de que la primera esté lista
   const preloadNextImages = () => {
     const imageUrls = [
-      '/static/public/Manu.png',
-      '/static/public/Boquita_Still.png',
-      '/static/public/Gaia.png'
+      '/static/public/Manu.webp',
+      '/static/public/Boquita_Still.webp',
+      '/static/public/Gaia.webp'
     ];
     
     imageUrls.forEach(url => {
