@@ -657,14 +657,19 @@ def get_similar_opportunities(keywords, exclude_ids):
         "Notion-Version": "2022-06-28",
     }
 
-    # Create a filter for each keyword
+    # Create filters for keywords and disciplines
     keyword_filters = [
         {"property": "AI keywords", "multi_select": {"contains": keyword}}
         for keyword in keywords
     ]
+    
+    discipline_filters = [
+        {"property": "Disciplina", "rich_text": {"contains": keyword}}
+        for keyword in keywords
+    ]
 
     json_body = {
-        "filter": {"or": keyword_filters},
+        "filter": {"or": keyword_filters + discipline_filters},
         "page_size": 10,  # Limit the number of results
     }
 
@@ -691,15 +696,18 @@ def get_similar_opportunities(keywords, exclude_ids):
                     else ""
                 ),
                 "destinatarios": (
-                    result["properties"]["Destinatarios"]["rich_text"][0]["text"][
-                        "content"
-                    ]
+                    result["properties"]["Destinatarios"]["rich_text"][0]["text"]["content"]
                     if result["properties"]["Destinatarios"]["rich_text"]
                     else ""
                 ),
                 "url": (
                     result["properties"]["URL"]["url"]
                     if result["properties"]["URL"].get("url")
+                    else ""
+                ),
+                "disciplina": (
+                    result["properties"]["Disciplina"]["rich_text"][0]["text"]["content"]
+                    if result["properties"]["Disciplina"]["rich_text"]
                     else ""
                 ),
             }
@@ -723,7 +731,8 @@ def find_similar_opportunities():
         if search_term in opp.get("ai_keywords", "").lower() or
            search_term in opp.get("categoria", "").lower() or
            search_term in opp.get("nombre_original", "").lower() or
-           search_term in opp.get("nombre", "").lower()
+           search_term in opp.get("nombre", "").lower() or
+           search_term in opp.get("disciplina", "").lower()
     ]
 
     return render_template(
@@ -1334,6 +1343,14 @@ def refresh_database_cache():
                             if page["properties"]["Categoría"]["rich_text"]
                             else ""
                         )
+
+                    if "Disciplina" in page["properties"]:
+                        page_data["disciplina"] = (
+                            page["properties"]["Disciplina"]["rich_text"][0]["text"]["content"]
+                            if page["properties"]["Disciplina"]["rich_text"]
+                            else ""
+                        )
+                        app.logger.info(f"Disciplina encontrada para {page_data.get('nombre', 'Unknown')}: {page_data['disciplina']}")
 
                     # Handle fecha_de_cierre
                     fecha_de_cierre_prop = page["properties"].get("Fecha de cierre", None)

@@ -24,7 +24,25 @@
                     <span class="md:hidden">{{ page.nombre | truncate(25) }}</span>
                     <span class="hidden md:inline">{{ page.nombre }}</span>
                 </div>
-                <div class="text-xs opacity-50 leading-none">{{ page.país }}</div>
+                <div class="text-xs opacity-50 leading-none flex items-center gap-2">
+                    {{ page.país }}
+                    {% if page.disciplina %}
+                        <span class="opacity-50">/</span>
+                        <div class="flex gap-1 flex-wrap">
+                            {% for disciplina in page.disciplina.split(',')[:3] %}
+                                <a href="#" 
+                                   class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-normal bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                                   hx-get="/find_similar_opportunities" 
+                                   hx-target="#search-results" 
+                                   hx-swap="innerHTML" 
+                                   hx-push-url="true" 
+                                   hx-vals='{"keyword": "{{ disciplina.strip() }}"}'>
+                                    {{ disciplina.strip() }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
         <input type="hidden" name="name_{{ page.id }}" value="{{ page.nombre }}">
