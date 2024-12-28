@@ -37,7 +37,7 @@
                                    hx-swap="innerHTML" 
                                    hx-push-url="true" 
                                    hx-vals='{"keyword": "{{ disciplina.strip() }}"}'>
-                                    {{ disciplina.strip() }}
+                                    {{ disciplina.strip() | capitalize }}
                                 </a>
                             {% endfor %}
                         </div>
