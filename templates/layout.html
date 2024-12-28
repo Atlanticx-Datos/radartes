@@ -73,7 +73,7 @@
         nav .dropdown-content {
             position: fixed;
             z-index: 999999 !important;
-            background-color: white;
+            background-color: rgb(244, 244, 245) !important;
         }
 
         /* Table share dropdown specific styles */
@@ -159,14 +159,14 @@
     <link rel="shortcut icon" href="/static/public/favicon.ico" />
 </head>
 
-<body class="flex justify-center max-sm:items-start items-center bg-white min-h-screen">
+<body class="flex justify-center max-sm:items-start items-center bg-zinc-100 min-h-screen">
     <div id="layout-spinner" class="spinner h-8 w-8" style="display: none;">
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
     </div>
-    <main class="w-full min-h-screen bg-white flex flex-col
-                 px-4
-                 sm:px-6
-                 md:px-8
+    <main class="w-full bg-zinc-100 flex flex-col
+                 px-0
+                 sm:px-4
+                 md:px-12
                  max-sm:rounded-lg">
         <!-- Navigation - only show on non-index pages -->
         {% if request.endpoint != 'index' %}

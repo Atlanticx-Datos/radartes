@@ -2,9 +2,10 @@
 {% for page in pages %}
 <tr style="
     {% if page.destinatarios == 'Destacar' %}
-    background-color: rgb(241, 243, 245);
-    border-left: 4px solid #6366f1;  /* Color accent de Tailwind (indigo-500) */
+    background-color: rgb(243, 244, 246) !important;  /* bg-gray-200 */
+    border-left: 4px solid #6366f1;  /* indigo-500 del brand */
     padding-left: 0.5rem;
+    box-shadow: inset 0 0 0 1px rgb(229, 231, 235);  /* sutil borde interno */
     {% else %}
     background-color: transparent;
     {% endif %}
@@ -31,7 +32,9 @@
                         <div class="flex gap-1 flex-wrap">
                             {% for disciplina in page.disciplina.split(',')[:3] %}
                                 <a href="#" 
-                                   class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-normal bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                                   class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-normal 
+                                          bg-gray-300 text-gray-700 
+                                          hover:bg-gray-400 hover:text-gray-900 transition-colors"
                                    hx-get="/find_similar_opportunities" 
                                    hx-target="#search-results" 
                                    hx-swap="innerHTML" 
@@ -92,7 +95,7 @@
     </td>
     <th class="w-[8%] md:w-[8%] min-w-[70px] relative">
         <div class="flex items-center justify-center">
-            <div class="inline-flex items-center gap-1.5 md:gap-3 bg-slate-100 py-2 px-3 md:px-4 ml-9 md:ml-1 mr-4">
+            <div class="inline-flex items-center gap-1.5 md:gap-3 bg-gray-200 py-2 px-3 md:px-4 ml-9 md:ml-1 mr-4">
                 <button
                    role="button"
                    tabindex="0"
@@ -114,7 +117,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"></path>
                         </svg>
                     </button>
-                    <ul class="dropdown-content menu p-2 shadow-xl bg-white rounded-md w-52 border border-black mt-3 absolute right-0 hidden">
+                    <ul class="dropdown-content menu p-2 shadow-xl bg-zinc-100 rounded-none w-52 border border-black mt-3 absolute right-0 hidden">
                         <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'whatsapp')">WhatsApp</a></li>
                         <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'linkedin')">LinkedIn</a></li>
                         <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'gmail')">Email</a></li>
@@ -169,13 +172,13 @@
 
     /* Force solid background and proper stacking for dropdowns */
     .dropdown-content {
-        background-color: white !important;
+        background-color: rgb(244, 244, 245) !important;
         box-shadow: 0 0 10px rgba(0,0,0,0.1), 0 4px 6px -1px rgba(0,0,0,0.1) !important;
     }
     
     /* Ensure menu items have solid background */
     .dropdown-content .menu-item {
-        background-color: white !important;
+        background-color: rgb(244, 244, 245) !important;
     }
     
     /* Create stacking context */
