@@ -36,9 +36,6 @@ from authlib.integrations.flask_client import OAuth
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
-from flask_socketio import SocketIO
-import socket as py_socket
-
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from flask_caching import Cache

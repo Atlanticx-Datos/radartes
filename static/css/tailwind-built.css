@@ -2991,7 +2991,7 @@ details.collapse summary::-webkit-details-marker {
   }
 }
 @media (min-width: 1336px) {
-  .\32xl\:ml-12 {
-    margin-left: 3rem;
+  .\32xl\:left-12 {
+    left: 3rem;
   }
 }

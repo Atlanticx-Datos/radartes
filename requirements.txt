@@ -14,18 +14,12 @@ Flask==2.2.5
 Flask-Caching==2.3.0
 Flask-JWT-Extended==4.6.0
 Flask-Session==0.4.0
-Flask-SocketIO==5.3.6
 frozenlist==1.5.0
-gevent==24.2.1
-gevent-websocket==0.10.1
-greenlet==3.0.3
 h11==0.14.0
-heroicons==2.6.0
 idna==3.7
 inflect==6.0.2
 itsdangerous==2.2.0
 Jinja2==3.1.4
-livereload==2.6.3
 MarkupSafe==2.1.5
 multidict==6.1.0
 propcache==0.2.0
@@ -34,11 +28,8 @@ pydantic==1.10.2
 PyJWT==2.8.0
 python-dateutil==2.9.0.post0
 python-dotenv==0.21.1
-python-engineio==4.9.1
-python-socketio==5.11.2
 redis==5.2.1
 requests==2.31.0
-simple-websocket==1.0.0
 six==1.16.0
 tornado==6.4
 typeguard==4.3.0
@@ -46,6 +37,4 @@ typing_extensions==4.12.2
 upstash-redis==1.2.0
 urllib3==2.2.1
 Werkzeug==2.2.3
-wsproto==1.2.0
-yarl==1.17.1
 zope.event==5.0

@@ -5,7 +5,7 @@ on:
     - cron: '15 13 * * 1'  # Runs every Monday at 10:15 AM Buenos Aires time (UTC-3)
   push:
     branches:
-      - mitades
+      - grok
 
 jobs:
   update-total:
