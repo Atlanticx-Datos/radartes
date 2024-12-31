@@ -2222,6 +2222,9 @@ details.collapse summary::-webkit-details-marker {
 .max-w-\[1250px\] {
   max-width: 1250px;
 }
+.max-w-xs {
+  max-width: 20rem;
+}
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -2269,9 +2272,6 @@ details.collapse summary::-webkit-details-marker {
 }
 .flex-col {
   flex-direction: column;
-}
-.flex-wrap {
-  flex-wrap: wrap;
 }
 .items-center {
   align-items: center;

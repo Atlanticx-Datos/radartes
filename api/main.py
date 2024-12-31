@@ -950,6 +950,7 @@ def all_pages():
                 keywords = normalize_text(str(page.get("ai_keywords", "")))
                 nombre = normalize_text(str(page.get("nombre", "")))
                 descripcion = normalize_text(str(page.get("descripción", "")))
+                disciplina = normalize_text(str(page.get("disciplina", "")))
                 
                 # Access and normalize "Nombre" and "Resumen Generado por la IA"
                 nombre_prop = normalize_text(
@@ -971,6 +972,7 @@ def all_pages():
                       normalize_text(term) in nombre or
                       normalize_text(term) in nombre_prop or
                       normalize_text(term) in resumen_ia or
+                      normalize_text(term) in disciplina or
                       (normalize_text(term) in nombre and any(
                           discipline in term for discipline in ["music", "musica", "danza", "teatro", "theater"]
                       )) or
@@ -983,13 +985,14 @@ def all_pages():
             normalized_query = normalize_text(search_query)
             filtered_pages = [
                 page for page in pages
-                if normalized_query in normalize_text(str(page.get("ai_keywords", "")))
-                or normalized_query in normalize_text(str(page.get("nombre", "")))
-                or normalized_query in normalize_text(str(page.get("país", "")))
-                or normalized_query in normalize_text(
+                if normalized_query in normalize_text(str(page.get("disciplina", ""))) or
+                normalized_query in normalize_text(str(page.get("ai_keywords", ""))) or
+                normalized_query in normalize_text(str(page.get("nombre", ""))) or
+                normalized_query in normalize_text(str(page.get("país", ""))) or
+                normalized_query in normalize_text(
                     page.get("properties", {}).get("Nombre", {}).get("title", [{}])[0].get("text", {}).get("content", "")
-                )
-                or normalized_query in normalize_text(
+                ) or
+                normalized_query in normalize_text(
                     page.get("properties", {}).get("Resumen generado por la IA", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "")
                 )
             ]

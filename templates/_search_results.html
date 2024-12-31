@@ -29,19 +29,33 @@
                     {{ page.país }}
                     {% if page.disciplina %}
                         <span class="opacity-50">/</span>
-                        <div class="flex gap-1 flex-wrap">
-                            {% for disciplina in page.disciplina.split(',')[:3] %}
-                                <a href="#" 
-                                   class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-normal 
-                                          bg-gray-300 text-gray-700 
-                                          hover:bg-gray-400 hover:text-gray-900 transition-colors"
-                                   hx-get="/find_similar_opportunities" 
-                                   hx-target="#search-results" 
-                                   hx-swap="innerHTML" 
-                                   hx-push-url="true" 
-                                   hx-vals='{"keyword": "{{ disciplina.strip() }}"}'>
-                                    {{ disciplina.strip() | capitalize }}
-                                </a>
+                        <div class="flex gap-1 nowrap">
+                            {% set total_length = 0 %}
+                            {% set max_length = 60 %}  {# Adjust max_length as needed #}
+                            {% set disciplinas = page.disciplina.split(',') %}
+                            {% for disciplina in disciplinas %}
+                                {% set disciplina_trimmed = disciplina.strip() %}
+                                {% set disciplina_length = disciplina_trimmed | length %}
+                                {% if total_length + disciplina_length + 2 > max_length %}
+                                    <span class="truncate" title="{{ disciplina_trimmed }}">
+                                        {{ disciplina_trimmed | truncate((max_length - total_length - 3), True, "...") }}
+                                    </span>
+                                    {% set total_length = max_length %} {# Set total_length to max_length to prevent further additions #}
+                                {% else %}
+                                    <a href="#" 
+                                       class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-normal 
+                                              bg-gray-300 text-gray-700 
+                                              hover:bg-gray-400 hover:text-gray-900 transition-colors truncate max-w-xs"
+                                       hx-get="/find_similar_opportunities" 
+                                       hx-target="#search-results" 
+                                       hx-swap="innerHTML" 
+                                       hx-push-url="true" 
+                                       hx-vals='{"keyword": "{{ disciplina_trimmed }}"}'
+                                       title="{{ disciplina_trimmed }}">
+                                        {{ disciplina_trimmed | capitalize }}
+                                    </a>
+                                    {% set total_length = total_length + disciplina_length + 2 %}
+                                {% endif %}
                             {% endfor %}
                         </div>
                     {% endif %}
@@ -59,12 +73,13 @@
             <span class="md:hidden whitespace-nowrap">
                 {% for keyword in page.ai_keywords.split(',') %}
                     <a href="#" 
-                       class="opportunity-link" 
+                       class="opportunity-link truncate" 
                        hx-get="/find_similar_opportunities" 
                        hx-target="#search-results" 
                        hx-swap="innerHTML" 
                        hx-push-url="true" 
-                       hx-vals='{"keyword": "{{ keyword.strip() }}"}'>
+                       hx-vals='{"keyword": "{{ keyword.strip() }}"}'
+                       title="{{ keyword.strip() | capitalize }}">
                        {{ keyword | capitalize }}
                     </a>
                 {% endfor %}
@@ -75,12 +90,13 @@
             <span class="hidden md:inline whitespace-nowrap">
                 {% for keyword in page.ai_keywords.split(',') %}
                     <a href="#" 
-                       class="opportunity-link" 
+                       class="opportunity-link truncate" 
                        hx-get="/find_similar_opportunities" 
                        hx-target="#search-results" 
                        hx-swap="innerHTML" 
                        hx-push-url="true" 
-                       hx-vals='{"keyword": "{{ keyword.strip() }}"}'>
+                       hx-vals='{"keyword": "{{ keyword.strip() }}"}'
+                       title="{{ keyword.strip() | capitalize }}">
                        {{ keyword | capitalize }}
                     </a>
                 {% endfor %}
@@ -103,9 +119,13 @@
                    data-keywords="{{ page.ai_keywords }}"
                    data-name="{{ page.nombre }}"
                    data-country="{{ page.país }}"
-                   class="opportunity-link flex items-center justify-center w-4 h-4">
-                    <svg class="w-3 md:w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5L19.5 4.5M19.5 4.5H8.25M19.5 4.5V15.75"></path>
+                   class="opportunity-link flex items-center justify-center w-4 h-4 truncate"
+                   title="{{ page.nombre }}">
+                    <svg class="w-3 md:w-4" data-slot="icon" fill="none"
+                        stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M4.5 19.5L19.5 4.5M19.5 4.5H8.25M19.5 4.5V15.75"></path>
                     </svg>
                 </button>
                 <div class="static">
@@ -113,8 +133,11 @@
                             role="button" 
                             class="flex items-center justify-center w-4 h-4"
                             onclick="toggleDropdown(this)">
-                        <svg class="w-3 md:w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"></path>
+                        <svg class="w-3 md:w-4" data-slot="icon" fill="none"
+                            stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"></path>
                         </svg>
                     </button>
                     <ul class="dropdown-content menu p-2 shadow-xl bg-zinc-100 rounded-none w-52 border border-black mt-3 absolute right-0 hidden">
@@ -136,23 +159,23 @@
 
 <style>
     .border-left-custom {
-            position: relative;
-        }
+        position: relative;
+    }
 
-        .border-left-custom::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 70%;
-            background-color: #e5e7eb;
-        }
+    .border-left-custom::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 70%;
+        background-color: #e5e7eb;
+    }
 
-        .capitalize-first::first-letter {
-            text-transform: uppercase !important;
-        }
+    .capitalize-first::first-letter {
+        text-transform: uppercase !important;
+    }
 
     tr:last-child {
         margin-bottom: 8rem !important;
@@ -186,6 +209,23 @@
         position: relative;
         isolation: isolate;
     }
+
+    /* Prevent wrapping and apply ellipsis */
+    .nowrap {
+        white-space: nowrap;
+    }
+
+    .truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Adjust max-width for badges */
+    .max-w-xs {
+        max-width: 10rem; /* Adjust as needed */
+    }
+    
 </style>
 
 <script>
