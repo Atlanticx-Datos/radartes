@@ -1445,6 +1445,12 @@ def refresh_database_cache():
 def privacy_policy():
     return render_template("privacy_policy.html")
 
+@app.context_processor
+def utility_processor():
+    def versioned_static(filename):
+        return url_for('static', filename=filename, v=1.0)  # Incrementa este número cuando hagas cambios
+    return dict(versioned_static=versioned_static)
+
 if __name__ == "__main__":
     # Ensure session directory exists
     os.makedirs(os.path.join(app.root_path, 'flask_session'), exist_ok=True)
