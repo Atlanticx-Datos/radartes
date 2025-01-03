@@ -2389,6 +2389,9 @@ details.collapse summary::-webkit-details-marker {
 .border-l-4 {
   border-left-width: 4px;
 }
+.border-l-\[6px\] {
+  border-left-width: 6px;
+}
 .border-r {
   border-right-width: 1px;
 }
@@ -2659,6 +2662,9 @@ details.collapse summary::-webkit-details-marker {
 .tracking-tighter {
   letter-spacing: -0.05em;
 }
+.tracking-wider {
+  letter-spacing: 0.05em;
+}
 .text-gray-300 {
   --tw-text-opacity: 1;
   color: rgb(209 213 219 / var(--tw-text-opacity));
@@ -2830,8 +2836,8 @@ details.collapse summary::-webkit-details-marker {
   .md\:col-span-7 {
     grid-column: span 7 / span 7;
   }
-  .md\:-mt-10 {
-    margin-top: -2.5rem;
+  .md\:-mt-8 {
+    margin-top: -2rem;
   }
   .md\:mb-16 {
     margin-bottom: 4rem;
