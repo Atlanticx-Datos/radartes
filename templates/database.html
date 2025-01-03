@@ -8,13 +8,23 @@
     </div>
 
     <div class="px-0 md:px-8 mt-4 md:-mt-10" style="margin-left: -1rem !important; margin-right: -0.5rem !important;">
-        <!-- Title section -->
-        <div class="mb-5 md:mb-20">
-            <h1
-                class="text-3xl md:text-4xl font-bold text-black leading-none md:leading-tight tracking-tight mt-6 md:mt-12 md:mt-0 ml-4">
-                Informate, compartí y guardá oportunidades, gratis.
-            </h1>
-        </div>
+
+        <header class="mb-8 md:mb-16 ml-4">
+            <div class="flex flex-col md:flex-row items-start gap-6 md:gap-12">
+                <!-- Logo and Brand -->
+                <div class="relative border-l-4 border-gray-300 pl-8 h-10" style="border-top: 6px solid transparent;">
+                    <div class="flex items-center gap-3 -mt-3">
+                        <img src="{{ url_for('static', filename='public/Frame_3.png') }}" alt="+ Oportunidades Logo"
+                            class="w-10 h-10 md:w-12 md:h-12">
+                        <div class="flex flex-col">
+                            <h2 class="text-3xl font-bold tracking-tight text-slate-700">+ Oportunidades</h2>
+                            <p class="text-sm text-neutral-500 ml-[2em] tracking-snug -mt-1">Base de datos de convocatorias</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
 
         <!-- Main content -->
         <main class="w-full relative">
@@ -36,9 +46,9 @@
                                     {% if closing_soon_pages %}
                                     {% for page in closing_soon_pages %}
                                     <p class="relative">
-                                        <a href="{{ page.base_url if page.base_url else page.url }}" target="_blank" data-name="{{ page.nombre }}"
-                                            data-country="{{ page.País }}" data-url="{{ page.url }}"
-                                            class="cierran-pronto-link">
+                                        <a href="{{ page.base_url if page.base_url else page.url }}" target="_blank"
+                                            data-name="{{ page.nombre }}" data-country="{{ page.País }}"
+                                            data-url="{{ page.url }}" class="cierran-pronto-link">
                                             {{ page.nombre | truncate(50) }}
                                             <span
                                                 class="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center -mr-1">
@@ -75,9 +85,10 @@
                                     {% if destacar_pages %}
                                     {% for page in destacar_pages %}
                                     <p class="relative">
-                                        <a href="{{ page.base_url if page.base_url else page.url }}" target="_blank" data-name="{{ page.nombre }}"
-                                            data-country="{{ page.País }}" data-url="{{ page.url }}"
-                                            class="accordion-link" onclick="handleDestacadaClick(this)">
+                                        <a href="{{ page.base_url if page.base_url else page.url }}" target="_blank"
+                                            data-name="{{ page.nombre }}" data-country="{{ page.País }}"
+                                            data-url="{{ page.url }}" class="accordion-link"
+                                            onclick="handleDestacadaClick(this)">
                                             <span class="md:hidden whitespace-nowrap">
                                                 {{ page.nombre | truncate(18, true, "...") }}
                                                 {% if page.entidad %}
@@ -173,14 +184,15 @@
                         <div class="flex justify-center items-center space-x-2 mt-6 mb-4">
                             <div id="alert-container" class="flex items-center"></div>
                             {% if session.get('user') %}
-                                <button type="submit" id="save-button" class="uppercase text-sm font-black tracking-tighter text-neutral-700">
-                                    Guardar Seleccionados
-                                </button>
+                            <button type="submit" id="save-button"
+                                class="uppercase text-sm font-black tracking-tighter text-neutral-700">
+                                Guardar Seleccionados
+                            </button>
                             {% else %}
-                                <button type="button" onclick="redirectToLogin()" 
-                                        class="uppercase text-sm font-black tracking-tighter text-neutral-700">
-                                    Iniciar sesión para guardar
-                                </button>
+                            <button type="button" onclick="redirectToLogin()"
+                                class="uppercase text-sm font-black tracking-tighter text-neutral-700">
+                                Iniciar sesión para guardar
+                            </button>
                             {% endif %}
                         </div>
                     </form>
@@ -420,7 +432,7 @@
             }
 
             if (searchInput) {
-                searchInput.addEventListener('input', function(event) {
+                searchInput.addEventListener('input', function (event) {
                     if (searchInProgress) return;
 
                     clearTimeout(searchTimeout);
@@ -460,7 +472,7 @@
                 const opportunityLink = event.target.closest('.opportunity-link');
                 if (opportunityLink) {
                     event.preventDefault();
-                    
+
                     // Obtener datos para analytics
                     const eventData = {
                         'opportunity_name': opportunityLink.dataset.name || '',
@@ -492,28 +504,28 @@
             });
 
             // Manejar el botón de retroceso y el historial
-            window.addEventListener('popstate', function(event) {
+            window.addEventListener('popstate', function (event) {
                 window.location.reload();
             });
 
             // Eventos HTMX para el spinner
-            document.body.addEventListener('htmx:beforeRequest', function(event) {
+            document.body.addEventListener('htmx:beforeRequest', function (event) {
                 toggleSpinner(true);
             });
 
-            document.body.addEventListener('htmx:afterRequest', function(event) {
+            document.body.addEventListener('htmx:afterRequest', function (event) {
                 toggleSpinner(false);
                 searchInProgress = false;
             });
 
-            document.body.addEventListener('htmx:responseError', function(event) {
+            document.body.addEventListener('htmx:responseError', function (event) {
                 console.error('HTMX Response Error:', event.detail.xhr);
                 toggleSpinner(false);
                 searchInProgress = false;
             });
 
             // Asegurar que el spinner se oculte si hay algún error no manejado
-            window.addEventListener('error', function(event) {
+            window.addEventListener('error', function (event) {
                 console.error('Global error:', event.error);
                 toggleSpinner(false);
                 searchInProgress = false;
@@ -525,12 +537,12 @@
         });
 
         // Opcional: Rastrear solicitudes HTMX para depuración
-        document.addEventListener('htmx:configRequest', function(evt) {
+        document.addEventListener('htmx:configRequest', function (evt) {
             console.log('HTMX request triggered:', evt.detail);
         });
 
         // Ocultar el spinner en caso de errores de respuesta
-        document.body.addEventListener('htmx:responseError', function(event) {
+        document.body.addEventListener('htmx:responseError', function (event) {
             console.error('HTMX Response Error:', event.detail.xhr);
             toggleSpinner(false);
         });
