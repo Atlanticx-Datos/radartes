@@ -29,7 +29,7 @@
                     {{ page.país }}
                     {% if page.disciplina %}
                         <span class="opacity-50">/</span>
-                        <div class="flex gap-1 nowrap">
+                        <div class="flex gap-1 md:flex-nowrap flex-wrap">
                             {% set total_length = 0 %}
                             {% set max_length = 60 %}  {# Adjust max_length as needed #}
                             {% set disciplinas = page.disciplina.split(',') %}
@@ -45,14 +45,16 @@
                                     <a href="#" 
                                        class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-normal 
                                               bg-gray-300 text-gray-700 
-                                              hover:bg-gray-400 hover:text-gray-900 transition-colors truncate max-w-xs"
+                                              hover:bg-gray-400 hover:text-gray-900 transition-colors
+                                              md:max-w-none max-w-[100px] truncate"
                                        hx-get="/find_similar_opportunities" 
                                        hx-target="#search-results" 
                                        hx-swap="innerHTML" 
                                        hx-push-url="true" 
                                        hx-vals='{"keyword": "{{ disciplina_trimmed }}"}'
                                        title="{{ disciplina_trimmed }}">
-                                        {{ disciplina_trimmed | capitalize }}
+                                        <span class="md:hidden">{{ disciplina_trimmed[:7] + '...' if disciplina_trimmed|length > 7 else disciplina_trimmed | capitalize }}</span>
+                                        <span class="hidden md:inline">{{ disciplina_trimmed | capitalize }}</span>
                                     </a>
                                     {% set total_length = total_length + disciplina_length + 2 %}
                                 {% endif %}
