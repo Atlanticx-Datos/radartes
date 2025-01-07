@@ -1471,5 +1471,8 @@ if __name__ == "__main__":
     # Ensure session directory exists
     os.makedirs(os.path.join(app.root_path, 'flask_session'), exist_ok=True)
     
-    port = int(os.environ.get("PORT", 5001))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    # Check if running in development or production
+    if os.environ.get("RENDER") != "1":
+        # Development server
+        port = int(os.environ.get("PORT", 5001))
+        app.run(host="0.0.0.0", port=port, debug=True)

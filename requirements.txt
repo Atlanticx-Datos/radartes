@@ -38,3 +38,4 @@ upstash-redis==1.2.0
 urllib3==2.2.1
 Werkzeug==2.2.3
 zope.event==5.0
+gunicorn==21.2.0
