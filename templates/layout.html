@@ -159,7 +159,8 @@
     <link rel="shortcut icon" href="/static/public/favicon.ico" />
 </head>
 
-<body class="flex justify-center max-sm:items-start items-center bg-zinc-100 min-h-screen">
+<body class="flex justify-center max-sm:items-start items-center bg-zinc-100 min-h-screen
+             {% if request.endpoint == 'list_saved_opportunities' %}!items-start{% endif %}">
     <div id="layout-spinner" class="spinner h-8 w-8" style="display: none;">
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
     </div>
@@ -167,7 +168,8 @@
                  px-4
                  sm:px-4
                  md:px-12
-                 max-sm:rounded-lg">
+                 max-sm:rounded-lg
+                 {% if request.endpoint == 'list_saved_opportunities' %}!justify-start{% endif %}">
         <!-- Navigation - only show on non-index pages -->
         {% if request.endpoint != 'index' %}
         <div class="w-full flex-shrink-0">

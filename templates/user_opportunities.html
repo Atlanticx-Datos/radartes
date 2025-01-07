@@ -1,15 +1,13 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-
-<body>
-    <main class="w-full max-w-[1250px] mx-auto mt-2">
+<div class="w-full px-4 sm:px-4 md:px-12">
+    <main class="w-full max-w-[1250px] mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-6 gap-0">
             <!-- First Column: Header for Saved Opportunities -->
-            <div
-                class="col-span-1 lg:col-span-2 mt-2 lg:mt-0 border-r-0 border-neutral flex flex-col justify-between h-auto">
+            <div class="col-span-1 lg:col-span-2 mt-2 lg:mt-0 border-r-0 border-neutral flex flex-col justify-between h-auto">
                 <div class="mt-4">
-                    <div class="md:py-6 pl-2 md:pl-8 w-2/3 mt-8 bg-black text-white font-black md:ml-10 ">
+                    <div class="md:py-6 pl-2 md:pl-8 w-2/3 bg-black text-white font-black md:ml-10">
                         GUARDADAS
                     </div>
                 </div>
@@ -31,13 +29,11 @@
                         /* Hide scrollbar for Firefox */
                         table {
                             scrollbar-width: none;
-                            /* Firefox */
                         }
                     </style>
                     <div id="alert-container" class="mb-4"></div>
                     <!-- Table as FORM -->
-                    <form id="delete-form" hx-post="/delete_opportunity" hx-trigger="submit" hx-swap="innerHTML"
-                        hx-target="#alert-container">
+                    <form id="delete-form" hx-post="/delete_opportunity" hx-trigger="submit" hx-swap="innerHTML" hx-target="#alert-container">
                         <table id="my_results" class="table w-full">
                             <thead>
                                 <tr>
@@ -55,50 +51,47 @@
                 </div>
             </div>
 
-           
-            <!-- Third Column: Empty Container for Visual Consistency -->
-            <div class="col-span-1 lg:col-span-1 mt-2 lg:mt-0 flex flex-col border-neutral bg-accent relative md:md-height-custom"
-                style="height: 32rem;">
+            <!-- Third Column: Empty Container -->
+            <div class="col-span-1 lg:col-span-1 mt-2 lg:mt-0 flex flex-col border-neutral bg-accent relative md:md-height-custom" style="height: 32rem;">
                 <div class="md:flex-1 border-b border-r border-t border-l border-neutral bg-secondary h-32 md:h-auto">
                 </div>
                 <div class="md:flex-1 border-l border-r border-b border-black h-32 md:h-auto"></div>
                 <div class="w-full h-10 border-l border-neutral bg-white h-10 md:h-auto"></div>
             </div>
-
         </div>
     </main>
+</div>
 
-    <!-- Script for handling delete functionality -->
-    <script>
-        function deleteOpportunity(pageId) {
-            // Show the spinner
-            document.getElementById('spinner').style.display = 'block';
+<!-- Script for handling delete functionality -->
+<script>
+    function deleteOpportunity(pageId) {
+        // Show the spinner
+        document.getElementById('spinner').style.display = 'block';
 
-            console.log('Deleting opportunity with ID:', pageId);
-            fetch('/delete_opportunity/' + pageId, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+        console.log('Deleting opportunity with ID:', pageId);
+        fetch('/delete_opportunity/' + pageId, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/saved_opportunities';
+                } else {
+                    return response.json().then(data => {
+                        alert('Error: ' + data.error);
+                        // Hide the spinner if there's an error
+                        document.getElementById('spinner').style.display = 'none';
+                    });
                 }
             })
-                .then(response => {
-                    if (response.ok) {
-                        window.location.href = '/saved_opportunities';
-                    } else {
-                        return response.json().then(data => {
-                            alert('Error: ' + data.error);
-                            // Hide the spinner if there's an error
-                            document.getElementById('spinner').style.display = 'none';
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    // Hide the spinner if there's an error
-                    document.getElementById('spinner').style.display = 'none';
-                });
-        }
-    </script>
-</body>
+            .catch(error => {
+                console.error('Error:', error);
+                // Hide the spinner if there's an error
+                document.getElementById('spinner').style.display = 'none';
+            });
+    }
+</script>
 {% endblock %}
