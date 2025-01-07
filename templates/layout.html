@@ -190,16 +190,16 @@
                                 </span>
                             </div>
                         </div>
-                        <ul tabindex="0"
-                            class="dropdown-content z-[1] menu py-2 px-2 bg-base-100 rounded-sm w-56 border border-black mt-3 text-gray-700 font-Poppins">
+                        <ul tabindex="0" class="dropdown-content z-[1] menu py-2 px-2 bg-base-100 rounded-sm w-56 border border-black mt-3 text-gray-700 font-Poppins">
                             <li>
                                 <a href="{{ url_for('all_pages') }}" onclick="layoutshowSpinner(event)" class="flex items-center">
                                     <span class="border-l-4 border-accent pl-2 uppercase font-semibold">Oportunidades</span>
                                     <span class="badge bg-red-500 text-white rounded-full px-2 py-1 ml-0 relative bottom-[1px]">{{ total_nuevas }}</span>
                                 </a>
                             </li>
-                            <li><a href="{{ url_for('list_saved_opportunities') }}" onclick="layoutshowSpinner(event)"><span
-                                        class="border-l-4 border-secondary pl-2 uppercase font-semibold">Guardadas</span></a></li>
+                            <li><a href="{{ url_for('list_saved_opportunities') }}" onclick="layoutshowSpinner(event)">
+                                <span class="border-l-4 border-secondary pl-2 uppercase font-semibold">Guardadas</span>
+                            </a></li>
                             <li>
                                 {% if session.get('user') %}
                                     <a href="https://www.notion.so/atlanticxx/1509dd874b3a80a5ac8bce88f0d1bde3" 
@@ -224,20 +224,21 @@
                                     </a>
                                 {% endif %}
                             </li>
-                            <li><a href="{{ url_for('index') }}"><span class="border-l-4 border-black pl-2 uppercase font-semibold">Home</span></a>
-                            </li>
-                            {% if session.get('user') %}
-                            <li><a href="https://github.com/Atlanticx-Datos/100_Oportunidades" target="_blank"
-                                    rel="noopener noreferrer">
-                                    <span class="border-l-4 border-primary pl-2 uppercase font-semibold flex items-center">
-                                        GitHub
-                                        <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                                        </svg>
-                                    </span>
+                            <li><a href="{{ url_for('index') }}">
+                                <span class="border-l-4 border-black pl-2 uppercase font-semibold">Home</span>
                             </a></li>
-                            <li><a href="{{ url_for('logout') }}"><span
-                                        class="border-l-4 border-base-200 pl-2 uppercase font-semibold">Cerrar</span></a></li>
+                            {% if session.get('user') %}
+                            <li><a href="https://github.com/Atlanticx-Datos/100_Oportunidades" target="_blank" rel="noopener noreferrer">
+                                <span class="border-l-4 border-primary pl-2 uppercase font-semibold flex items-center">
+                                    GitHub
+                                    <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                    </svg>
+                                </span>
+                            </a></li>
+                            <li><a href="{{ url_for('logout') }}">
+                                <span class="border-l-4 border-base-200 pl-2 uppercase font-semibold">Cerrar</span>
+                            </a></li>
                             {% endif %}
                         </ul>
                     </div>

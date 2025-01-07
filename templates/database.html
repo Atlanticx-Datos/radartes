@@ -194,16 +194,25 @@
                             </div>
                         </div>
                         <div class="flex justify-center items-center space-x-2 mt-6 mb-4">
-                            <div id="alert-container" class="flex items-center"></div>
+                            <div id="notification" class="flex items-center"></div>
                             {% if session.get('user') %}
-                            <button type="submit" id="save-button"
-                                class="uppercase text-sm font-black tracking-tighter text-neutral-700">
-                                Guardar Seleccionados
+                            <button 
+                                hx-post="/save_user_opportunity"
+                                hx-trigger="click"
+                                hx-include="[name='selected_pages']"
+                                hx-target="#notification"
+                                hx-swap="innerHTML"
+                                class="inline-flex items-center justify-center px-4 py-2 text-sm font-bold tracking-tight text-neutral-700 bg-gray-200 hover:bg-gray-300 transition-colors duration-200 rounded-none"
+                                onclick="if(!document.querySelector('input[name=\'selected_pages\']:checked')) { alert('Por favor selecciona al menos una oportunidad'); return false; }"
+                            >
+                                <span class="uppercase">Guardar Seleccionados</span>
                             </button>
                             {% else %}
-                            <button type="button" onclick="redirectToLogin()"
-                                class="uppercase text-sm font-black tracking-tighter text-neutral-700">
-                                Iniciar sesión para guardar
+                            <button type="button" 
+                                onclick="redirectToLogin()"
+                                class="inline-flex items-center justify-center px-4 py-2 text-sm font-bold tracking-tight text-neutral-700 bg-gray-200 hover:bg-gray-300 transition-colors duration-200 rounded-none"
+                            >
+                                <span class="uppercase">Iniciar sesión para guardar</span>
                             </button>
                             {% endif %}
                         </div>
@@ -575,6 +584,28 @@
         document.body.addEventListener('htmx:responseError', function (event) {
             console.error('HTMX Response Error:', event.detail.xhr);
             toggleSpinner(false);
+        });
+
+        function redirectToLogin() {
+            // Get current URL and encode it
+            const currentUrl = encodeURIComponent(window.location.pathname);
+            // Redirect to login with next parameter
+            window.location.href = `/login?next=${currentUrl}`;
+        }
+
+        // Add HTMX event handlers
+        document.body.addEventListener('htmx:afterRequest', function(evt) {
+            if (evt.detail.successful) {
+                // Clear checkboxes after successful save
+                document.querySelectorAll('input[name="selected_pages"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                // Show success notification (will be handled by the response)
+                setTimeout(() => {
+                    document.getElementById('notification').innerHTML = '';
+                }, 2000);
+            }
         });
     </script>
 

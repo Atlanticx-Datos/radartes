@@ -122,9 +122,9 @@ else:
         SESSION_COOKIE_SECURE=True  # Ensure cookies are sent over HTTPS in production
     )
 
-# Use VERCEL environment variable to detect production
-is_production = os.environ.get("VERCEL") == "1"
-app.logger.info(f"Is Production (Vercel): {is_production}")
+# Use RENDER environment variable to detect production
+is_production = os.environ.get("RENDER") == "1"
+app.logger.info(f"Is Production (Render): {is_production}")
 
 # Get the current domain from the request
 def get_current_domain():
@@ -135,17 +135,17 @@ def get_current_domain():
     return "oportunidades.lat"
 
 # Update URLs based on environment
-if is_production:
+if not is_production:
+    AUTH0_CALLBACK_URL = "http://localhost:5001/callback"
+    BASE_URL = "http://localhost:5001"
+    SESSION_COOKIE_DOMAIN = None
+    app.logger.info("Using development URLs")
+else:
     current_domain = get_current_domain()
     AUTH0_CALLBACK_URL = f"https://{current_domain}/callback"
     BASE_URL = f"https://{current_domain}"
     SESSION_COOKIE_DOMAIN = current_domain
     app.logger.info(f"Using production URLs with domain: {current_domain}")
-else:
-    AUTH0_CALLBACK_URL = "http://localhost:5001/callback"
-    BASE_URL = "http://localhost:5001"
-    SESSION_COOKIE_DOMAIN = None
-    app.logger.info("Using development URLs")
 
 app.logger.info(f"Configured callback URL: {AUTH0_CALLBACK_URL}")
 
@@ -185,10 +185,13 @@ def login_required(f):
         try:
             if "user" not in session:
                 # Store the full URL of the current request
-                return redirect(url_for("login", next=request.url))
+                current_url = request.url
+                app.logger.info(f"Protected route accessed: {current_url}")
+                app.logger.info(f"Redirecting to login with next={current_url}")
+                return redirect(url_for("login", next=current_url))
             return f(*args, **kwargs)
         except RuntimeError as e:
-            print(f"Session error: {str(e)}")
+            app.logger.error(f"Session error: {str(e)}")
             return redirect(url_for("login"))
     return decorated_function
 
@@ -217,8 +220,16 @@ headers = {
 # Auth0 Integration
 AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
 AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
-AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN")
-AUTH0_TENANT_DOMAIN = os.environ.get("AUTH0_TENANT_DOMAIN")
+
+# Always use development domain locally
+if not is_production:
+    AUTH0_CUSTOM_DOMAIN = "dev-3klm8ed6qtx4zj6v.us.auth0.com"
+    AUTH0_TENANT_DOMAIN = "dev-3klm8ed6qtx4zj6v.us.auth0.com"
+    app.logger.info(f"Using development Auth0 domain: {AUTH0_CUSTOM_DOMAIN}")
+else:
+    AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN", "login.oportunidades.lat")
+    AUTH0_TENANT_DOMAIN = os.environ.get("AUTH0_TENANT_DOMAIN", "login.oportunidades.lat")
+    app.logger.info(f"Using production Auth0 domain: {AUTH0_CUSTOM_DOMAIN}")
 
 oauth = OAuth(app)
 
@@ -232,8 +243,9 @@ oauth.register(
     },
     api_base_url=f"https://{AUTH0_TENANT_DOMAIN}",
     access_token_url=f"https://{AUTH0_TENANT_DOMAIN}/oauth/token",
-    authorize_url=f"https://{AUTH0_CUSTOM_DOMAIN}/authorize",
-    server_metadata_url=f'https://{AUTH0_CUSTOM_DOMAIN}/.well-known/openid-configuration'
+    authorize_url=f"https://{AUTH0_TENANT_DOMAIN}/authorize",
+    server_metadata_url=f'https://{AUTH0_TENANT_DOMAIN}/.well-known/openid-configuration',
+    audience=f"https://{AUTH0_TENANT_DOMAIN}/userinfo"
 )
 
 @app.route("/login")
@@ -242,15 +254,24 @@ def login():
     app.logger.info(f"Custom Domain: {AUTH0_CUSTOM_DOMAIN}")
     app.logger.info(f"Callback URL configured: {AUTH0_CALLBACK_URL}")
     
+    # Log all request args
+    app.logger.info(f"Login request args: {request.args}")
+    
+    # Store the next URL in session
+    next_url = request.args.get('next')
+    app.logger.info(f"Next URL from request: {next_url}")
+    
+    if next_url:
+        session['next_url'] = next_url
+        app.logger.info(f"Stored next_url in session: {next_url}")
+    
     # Generate and store state in session
     state = secrets.token_urlsafe(32)
     session['state'] = state
-    session.modified = True  # Explicitly mark the session as modified
+    session.modified = True
     
-    app.logger.info(f"Generated state: {state}")
-    app.logger.info(f"Session contents after setting state: {session}")
+    app.logger.info(f"Session before redirect: {session}")
     
-    session["original_url"] = request.args.get("next") or request.referrer or url_for("index")
     return oauth.auth0.authorize_redirect(
         redirect_uri=AUTH0_CALLBACK_URL,
         state=state
@@ -296,19 +317,19 @@ def callback():
         # Clear the state after successful verification
         session.pop('state', None)
         
-        # Redirect to the original URL
-        original_url = session.pop("original_url", url_for("index"))
-        app.logger.info(f"Redirecting to: {original_url}")
-        app.logger.info(f"Final session contents: {session}")
+        # Get the next URL from session and remove it
+        next_url = session.pop('next_url', url_for('index'))
+        app.logger.info(f"Next URL from session: {next_url}")
         
         # Force session save before redirect
         session.modified = True
         
-        return redirect(original_url)
+        app.logger.info(f"Redirecting to: {next_url}")
+        return redirect(next_url)
         
     except Exception as e:
         app.logger.error(f"Error during callback processing: {str(e)}")
-        app.logger.exception("Full traceback:")  # This will log the full stack trace
+        app.logger.exception("Full traceback:")
         session.clear()
         return redirect(url_for("login"))
 
@@ -832,8 +853,15 @@ def share_opportunity(opportunity_id):
 
 
 
-@app.route("/database", methods=["GET"])
+@app.route("/database", methods=["GET", "POST"])
 def all_pages():
+    # Handle POST requests (for saving opportunities)
+    if request.method == "POST":
+        if not session.get('user'):
+            return redirect(url_for('login', next=request.url))
+        return redirect(url_for('all_pages'))
+
+    # Existing GET logic starts here
     print("\n=== Starting database route ===")
     
     # Add month mapping
