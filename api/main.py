@@ -122,12 +122,14 @@ if is_production:
         DEBUG=False,
         SESSION_COOKIE_SECURE=True  # Ensure cookies are sent over HTTPS in production
     )
+    app.logger.info("Production environment configured.")
 else:
     app.config.update(
         ENV="development",
         DEBUG=True,
         SESSION_COOKIE_SECURE=False
     )
+    app.logger.info("Development environment configured.")
 
 # Get the current domain from the request
 def get_current_domain():
@@ -285,7 +287,7 @@ def callback():
     try:
         app.logger.info("Starting callback processing")
         app.logger.info(f"Current environment: {'Production' if is_production else 'Development'}")
-        app.logger.info(f"Configured callback URL: {AUTH0_CALLBACK_URL}")
+        app.logger.info(f"Configured AUTH0_CALLBACK_URL: {AUTH0_CALLBACK_URL}")
         app.logger.info(f"Request URL: {request.url}")
         app.logger.info(f"Session contents at callback start: {session}")
         app.logger.info(f"Request args: {request.args}")
@@ -344,9 +346,7 @@ def callback():
 def logout():
     session.clear()
     return redirect(
-        "https://"
-        + AUTH0_CUSTOM_DOMAIN
-        + "/v2/logout?"
+        f"https://{AUTH0_CUSTOM_DOMAIN}/v2/logout?"
         + urlencode(
             {
                 "returnTo": url_for("index", _external=True),
