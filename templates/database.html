@@ -137,16 +137,9 @@
                         <div class="relative">
                             <input type="text" 
                                    id="search-input" 
-                                   placeholder="Buscar por nombre, disciplina, mes o por combinación" 
+                                   placeholder="Buscar por nombre, disciplina, mes o país" 
                                    class="input input-bordered rounded-none w-full pl-6 lg:ml-0 focus:ring-0 focus:ring-offset-0 focus:ring-inset md:border-r-0 bg-gray-200" 
-                                   name="search" 
-                                   hx-get="/database" 
-                                   hx-trigger="keyup changed delay:500ms" 
-                                   hx-target="#search-results" 
-                                   hx-include="[name='expanded']" 
-                                   hx-indicator="#spinner" 
-                                   hx-swap="innerHTML" 
-                                   hx-preserve="true">
+                                   name="search">
                             <div class="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center justify-center cursor-pointer"
                                  onclick="clearSearch()">
                                 <svg class="w-4 h-4" fill="none" stroke-width="1.5" stroke="currentColor"
@@ -155,9 +148,13 @@
                                 </svg>
                             </div>
                         </div>
-                        <!-- Help text below input -->
                         <div class="text-xs tracking-tighter font-medium text-neutral-500 pl-6 mt-2">
-                            (Por ejemplo: "Marzo" ︱ "Escénicas" ︱ "España, visuales" ︱ "Música, residencia")
+                            <span class="hidden md:inline">
+                                Usa comas para combinar términos: "España, visuales" ︱ "Música, residencia"
+                            </span>
+                            <span class="md:hidden">
+                                Usa comas para combinar: "España, visuales" ︱ "Música, residencia"
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -330,23 +327,35 @@
             if (searchInProgress) return;
 
             clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                const searchTerm = event.target.value.trim();
-                if (searchTerm.length >= 3) {
+            const searchTerm = event.target.value.trim();
+
+            // If empty, just clear results using HTMX
+            if (searchTerm === '') {
+                htmx.ajax('GET', '/database?clear=true', {
+                    target: '#search-results',
+                    swap: 'innerHTML',
+                    headers: { 'HX-Request': 'true' }
+                });
+                return;
+            }
+
+            // Proceed with normal search if 3+ characters
+            if (searchTerm.length >= 3) {
+                searchTimeout = setTimeout(() => {
                     searchInProgress = true;
                     trackSearch(searchTerm);
                     htmx.ajax('GET', `/database?search=${encodeURIComponent(searchTerm)}`, {
                         target: '#search-results',
                         swap: 'innerHTML',
-                        headers: { 'HX-Request': 'true' },
+                        headers: { 'HX-Request': 'true' }
                     }).then(() => {
                         searchInProgress = false;
                     }).catch(error => {
                         console.error('Search error:', error);
                         searchInProgress = false;
                     });
-                }
-            }, 500); // 500ms de debounce
+                }, 500);
+            }
         }
 
         // Función para manejar la pulsación de teclas (Enter)
@@ -380,23 +389,11 @@
             const searchInput = document.getElementById('search-input');
             if (searchInput) {
                 searchInput.value = '';
-
-                if (!searchInProgress) {
-                    searchInProgress = true;
-                    htmx.ajax('GET', '/database?clear=true', {
-                        target: '#search-results',
-                        swap: 'innerHTML',
-                        headers: { 'HX-Request': 'true' },
-                        onAfterSwap: () => {
-                            scrollToTop('search-results');
-                            searchInProgress = false;
-                        },
-                        onError: (error) => {
-                            console.error('Clear error:', error);
-                            searchInProgress = false;
-                        }
-                    });
-                }
+                htmx.ajax('GET', '/database?clear=true', {
+                    target: '#search-results',
+                    swap: 'innerHTML',
+                    headers: { 'HX-Request': 'true' }
+                });
             }
         }
 
@@ -437,6 +434,8 @@
         document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.getElementById('search-input');
             let initialContent = null;
+            let searchInProgress = false;
+            let searchTimeout = null;
 
             // Guardar el contenido inicial
             const searchResults = document.getElementById('search-results');
@@ -446,31 +445,31 @@
 
             if (searchInput) {
                 searchInput.addEventListener('input', function (event) {
+                    event.preventDefault(); // Prevent default behavior
                     if (searchInProgress) return;
 
                     clearTimeout(searchTimeout);
                     const searchTerm = event.target.value.trim();
 
-                    // Si el input está vacío, simular el comportamiento de clear_search
+                    console.log("Search term:", searchTerm); // Debugging statement
+
                     if (searchTerm === '') {
-                        window.location.href = '/database';
+                        console.log("Clearing search results"); // Debugging statement
+                        htmx.ajax('GET', '/database?clear=true', {
+                            target: '#search-results',
+                            swap: 'innerHTML',
+                            headers: { 'HX-Request': 'true' }
+                        });
                         return;
                     }
 
-                    // Proceder con la búsqueda normal si hay 3 o más caracteres
                     if (searchTerm.length >= 3) {
                         searchTimeout = setTimeout(() => {
-                            searchInProgress = true;
-                            trackSearch(searchTerm);
+                            console.log("Performing search for:", searchTerm); // Debugging statement
                             htmx.ajax('GET', `/database?search=${encodeURIComponent(searchTerm)}`, {
                                 target: '#search-results',
                                 swap: 'innerHTML',
                                 headers: { 'HX-Request': 'true' }
-                            }).then(() => {
-                                searchInProgress = false;
-                            }).catch(error => {
-                                console.error('Search error:', error);
-                                searchInProgress = false;
                             });
                         }, 500);
                     }
@@ -478,6 +477,24 @@
 
                 searchInput.addEventListener('keypress', handleKeyPress);
             }
+
+            // Ensure clearSearch is only bound once and logs its action
+            window.clearSearch = function(event) {
+                if (event) {
+                    event.preventDefault(); // Prevent default behavior
+                    event.stopPropagation(); // Stop event bubbling
+                }
+                console.log("Explicit clear search action triggered"); // Debugging statement
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) {
+                    searchInput.value = '';
+                    htmx.ajax('GET', '/database?clear=true', {
+                        target: '#search-results',
+                        swap: 'innerHTML',
+                        headers: { 'HX-Request': 'true' }
+                    });
+                }
+            };
 
             // Usar delegación de eventos para los enlaces de oportunidades y clear_search
             document.body.addEventListener('click', function (event) {
