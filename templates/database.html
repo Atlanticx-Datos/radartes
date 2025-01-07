@@ -133,18 +133,31 @@
                     </div>
 
                     <!-- Search Input -->
-                    <div class="flex-shrink-0 flex items-center relative w-full">
-                        <input type="text" id="search-input" placeholder="Buscar por nombre, tipo o mes"
-                            class="input input-bordered rounded-none w-full pl-6 lg:ml-0 focus:ring-0 focus:ring-offset-0 focus:ring-inset md:border-r-0 bg-gray-200"
-                            name="search" hx-get="/database" hx-trigger="keyup changed delay:500ms"
-                            hx-target="#search-results" hx-include="[name='expanded']" hx-indicator="#spinner"
-                            hx-swap="innerHTML" hx-preserve="true">
-                        <div class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer"
-                            onclick="clearSearch()">
-                            <svg class="w-4 h-4" fill="none" stroke-width="1.5" stroke="currentColor"
-                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
-                            </svg>
+                    <div class="flex-shrink-0 flex flex-col gap-1 relative w-full">
+                        <div class="relative">
+                            <input type="text" 
+                                   id="search-input" 
+                                   placeholder="Buscar por nombre, disciplina, mes o por combinación" 
+                                   class="input input-bordered rounded-none w-full pl-6 lg:ml-0 focus:ring-0 focus:ring-offset-0 focus:ring-inset md:border-r-0 bg-gray-200" 
+                                   name="search" 
+                                   hx-get="/database" 
+                                   hx-trigger="keyup changed delay:500ms" 
+                                   hx-target="#search-results" 
+                                   hx-include="[name='expanded']" 
+                                   hx-indicator="#spinner" 
+                                   hx-swap="innerHTML" 
+                                   hx-preserve="true">
+                            <div class="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center justify-center cursor-pointer"
+                                 onclick="clearSearch()">
+                                <svg class="w-4 h-4" fill="none" stroke-width="1.5" stroke="currentColor"
+                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <!-- Help text below input -->
+                        <div class="text-xs tracking-tighter font-medium text-neutral-500 pl-6 mt-2">
+                            (Por ejemplo: "Marzo" ︱ "Escénicas" ︱ "España, visuales" ︱ "Música, residencia")
                         </div>
                     </div>
                 </div>

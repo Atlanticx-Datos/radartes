@@ -982,20 +982,36 @@ def all_pages():
                     filtered_pages.append(page)
                     print(f"Matched page: {page.get('nombre', '')}")  # Debug log
         else:
-            normalized_query = normalize_text(search_query)
-            filtered_pages = [
-                page for page in pages
-                if normalized_query in normalize_text(str(page.get("disciplina", ""))) or
-                normalized_query in normalize_text(str(page.get("ai_keywords", ""))) or
-                normalized_query in normalize_text(str(page.get("nombre", ""))) or
-                normalized_query in normalize_text(str(page.get("país", ""))) or
-                normalized_query in normalize_text(
-                    page.get("properties", {}).get("Nombre", {}).get("title", [{}])[0].get("text", {}).get("content", "")
-                ) or
-                normalized_query in normalize_text(
-                    page.get("properties", {}).get("Resumen generado por la IA", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "")
+            search_terms = [term.strip() for term in search_query.split(',')]
+            normalized_terms = [normalize_text(term) for term in search_terms]
+            
+            filtered_pages = []
+            for page in pages:
+                # Normalize all searchable fields
+                searchable_fields = {
+                    'disciplina': normalize_text(str(page.get("disciplina", ""))),
+                    'ai_keywords': normalize_text(str(page.get("ai_keywords", ""))),
+                    'nombre': normalize_text(str(page.get("nombre", ""))),
+                    'pais': normalize_text(str(page.get("país", ""))),
+                    'categoria': normalize_text(str(page.get("categoria", ""))),
+                    'nombre_original': normalize_text(str(page.get("nombre_original", ""))),
+                    'descripcion': normalize_text(str(page.get("descripción", ""))),
+                    'nombre_prop': normalize_text(
+                        page.get("properties", {}).get("Nombre", {}).get("title", [{}])[0].get("text", {}).get("content", "")
+                    ),
+                    'resumen_ia': normalize_text(
+                        page.get("properties", {}).get("Resumen generado por la IA", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "")
+                    )
+                }
+
+                # Check if ALL search terms match ANY field
+                matches_all_terms = all(
+                    any(term in value for value in searchable_fields.values())
+                    for term in normalized_terms
                 )
-            ]
+                
+                if matches_all_terms:
+                    filtered_pages.append(page)
 
         print(f"Found {len(filtered_pages)} matching pages")  # Debug log
         
