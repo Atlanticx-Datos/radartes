@@ -58,6 +58,9 @@ import json
 
 load_dotenv()
 
+# Get the callback URL from environment variables
+AUTH0_CALLBACK_URL = os.environ.get('AUTH0_CALLBACK_URL')
+
 class RedisWrapper:
     def __init__(self, redis_client):
         self.redis_client = redis_client
