@@ -344,17 +344,24 @@ def callback():
 
 @app.route("/logout")
 def logout():
+    app.logger.info("Starting logout process")
     session.clear()
-    return redirect(
-        f"https://{AUTH0_CUSTOM_DOMAIN}/v2/logout?"
-        + urlencode(
-            {
-                "returnTo": url_for("index", _external=True),
-                "client_id": AUTH0_CLIENT_ID,
-            },
-            quote_via=quote_plus,
-        )
+    
+    # Use the Auth0 tenant domain instead of custom domain for logout
+    auth0_logout_url = f"https://{AUTH0_TENANT_DOMAIN}/v2/logout?"
+    
+    params = urlencode(
+        {
+            "returnTo": "https://www.oportunidades.lat/",  # Direct URL instead of url_for
+            "client_id": AUTH0_CLIENT_ID,
+        },
+        quote_via=quote_plus,
     )
+    
+    logout_url = auth0_logout_url + params
+    app.logger.info(f"Redirecting to logout URL: {logout_url}")
+    
+    return redirect(logout_url)
 
 # User Opportunities save
 
