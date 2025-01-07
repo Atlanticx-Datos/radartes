@@ -111,23 +111,23 @@ app = Flask(__name__, static_folder='../static', static_url_path='/static', temp
 # Set secret key first
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "default_fallback_secret_key")
 
+# Determine if the app is in production
+is_production = os.getenv("FLASK_ENV") == "production" or os.environ.get("RENDER") == "1"
+app.logger.info(f"Is Production: {is_production}")
+
 # Environment-specific configuration
-if os.getenv("FLASK_ENV") == "development":
-    app.config.update(
-        ENV="development",
-        DEBUG=True,
-        SESSION_COOKIE_SECURE=False
-    )
-else:
+if is_production:
     app.config.update(
         ENV="production",
         DEBUG=False,
         SESSION_COOKIE_SECURE=True  # Ensure cookies are sent over HTTPS in production
     )
-
-# Use RENDER environment variable to detect production
-is_production = os.environ.get("RENDER") == "1"
-app.logger.info(f"Is Production (Render): {is_production}")
+else:
+    app.config.update(
+        ENV="development",
+        DEBUG=True,
+        SESSION_COOKIE_SECURE=False
+    )
 
 # Get the current domain from the request
 def get_current_domain():
