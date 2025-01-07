@@ -281,6 +281,9 @@ def login():
 def callback():
     try:
         app.logger.info("Starting callback processing")
+        app.logger.info(f"Current environment: {'Production' if is_production else 'Development'}")
+        app.logger.info(f"Configured callback URL: {AUTH0_CALLBACK_URL}")
+        app.logger.info(f"Request URL: {request.url}")
         app.logger.info(f"Session contents at callback start: {session}")
         app.logger.info(f"Request args: {request.args}")
         
