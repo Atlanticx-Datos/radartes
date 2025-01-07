@@ -1,70 +1,176 @@
 {% if opportunities %}
 {% for opportunity in opportunities %}
 <tr>
-    <td>
-        <div class="flex items-center gap-3">
+    <td class="w-[45%] md:w-[38%] pl-6">
+        <div class="flex items-center">
             <div>
-                <div class="ml-1 md:ml-0 font-medium text-sm leading-3 md:leading-none mb-1 mt-1 md:mt-1">{{ opportunity.resumen_IA }}</div>
-                <div class="ml-1 md:ml-0 text-xs opacity-50 mb-2 leading-none">{{ opportunity.país }}</div>
+                <div class="font-medium text-sm leading-tight mb-1">
+                    <span class="md:hidden">{{ opportunity.resumen_IA | truncate(25) }}</span>
+                    <span class="hidden md:inline">{{ opportunity.resumen_IA }}</span>
+                </div>
+                <div class="text-xs opacity-50 leading-none flex items-center gap-2">
+                    {{ opportunity.país }}
+                    {% if opportunity.disciplina %}
+                        <span class="opacity-50">/</span>
+                        <div class="flex gap-1 md:flex-nowrap flex-wrap">
+                            {% set total_length = 0 %}
+                            {% set max_length = 60 %}
+                            {% set disciplinas = opportunity.disciplina.split(',') %}
+                            {% for disciplina in disciplinas %}
+                                {% set disciplina_trimmed = disciplina.strip() %}
+                                {% set disciplina_length = disciplina_trimmed | length %}
+                                {% if total_length + disciplina_length + 2 > max_length %}
+                                    <span class="truncate" title="{{ disciplina_trimmed }}">
+                                        {{ disciplina_trimmed | truncate((max_length - total_length - 3), True, "...") }}
+                                    </span>
+                                    {% set total_length = max_length %}
+                                {% else %}
+                                    <a href="#" 
+                                       class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-normal 
+                                              bg-gray-300 text-gray-700 
+                                              hover:bg-gray-400 hover:text-gray-900 transition-colors
+                                              md:max-w-none max-w-[100px] truncate"
+                                       hx-get="/find_similar_opportunities" 
+                                       hx-target="#search-results" 
+                                       hx-swap="innerHTML" 
+                                       hx-push-url="true" 
+                                       hx-vals='{"keyword": "{{ disciplina_trimmed }}"}'
+                                       title="{{ disciplina_trimmed }}">
+                                        <span class="md:hidden">{{ disciplina_trimmed[:7] + '...' if disciplina_trimmed|length > 7 else disciplina_trimmed | capitalize }}</span>
+                                        <span class="hidden md:inline">{{ disciplina_trimmed | capitalize }}</span>
+                                    </a>
+                                    {% set total_length = total_length + disciplina_length + 2 %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </td>
-    <td>
-        <div class="border-left-custom text-sm px-2 md:pl-8 py-2 capitalize-first h-12 flex items-center" style="line-height: 0.8rem;">
-            {{ (opportunity.ai_keywords | truncate(27)).capitalize() }}
+    <td class="w-[30%] md:w-[35%]">
+        <div class="border-left-custom text-sm py-2 capitalize-first h-12 flex items-center pl-6" style="line-height: 0.8rem;">
+            {{ opportunity.ai_keywords | capitalize }}
+            {% if opportunity.url_base %}
+                / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
+                    {{ opportunity.url_base }}
+                </span>
+            {% endif %}
         </div>
     </td>
-    <td>{{ opportunity.fecha_de_cierre | format_date }}</td>
-    <th>
-        <div class="flex items-center gap-2 p-2 bg-slate-100">
-            <a href="{{ opportunity.url }}" target="_blank" class="btn btn-ghost btn-xs">
-                <svg class="w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor"
-                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25">
-                    </path>
-                </svg>
-            </a>
-            <div class="dropdown dropdown-bottom dropdown-end">
-                <button tabindex="0" class="btn btn-ghost btn-xs relative right-1">
-                    <svg class="w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor"
-                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <td class="w-[10%] md:w-[12%] text-xs text-center fecha-de-cierre">
+        {{ opportunity.fecha_de_cierre | format_date }}
+    </td>
+    <th class="w-[8%] md:w-[8%] min-w-[70px] relative">
+        <div class="flex items-center justify-center">
+            <div class="inline-flex items-center gap-1.5 md:gap-3 bg-gray-200 py-2 px-3 md:px-4 ml-9 md:ml-1 mr-4">
+                <button
+                   role="button"
+                   tabindex="0"
+                   data-url="{{ opportunity.url }}"
+                   data-keywords="{{ opportunity.ai_keywords }}"
+                   data-name="{{ opportunity.resumen_IA }}"
+                   data-country="{{ opportunity.país }}"
+                   class="opportunity-link flex items-center justify-center w-4 h-4 truncate"
+                   title="{{ opportunity.resumen_IA }}">
+                    <svg class="w-3 md:w-4" data-slot="icon" fill="none"
+                        stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z">
-                        </path>
+                            d="M4.5 19.5L19.5 4.5M19.5 4.5H8.25M19.5 4.5V15.75"></path>
                     </svg>
                 </button>
-                <ul tabindex="0" class="dropdown-content z-auto menu p-2 shadow bg-white border rounded-box w-52">
-                    <li><a href="#"
-                            onclick="shareOpportunity('{{ opportunity.url }}', '{{ opportunity.resumen_IA }}', 'whatsapp')">WhatsApp</a>
-                    </li>
-                    <li><a href="#"
-                            onclick="shareOpportunity('{{ opportunity.url }}', '{{ opportunity.resumen_IA }}', 'linkedin')">LinkedIn</a>
-                    </li>
-                    <li><a href="#"
-                            onclick="shareOpportunity('{{ opportunity.url }}', '{{ opportunity.resumen_IA }}', 'gmail')">Email</a>
-                    </li>
-                </ul>
+                <div class="static">
+                    <button tabindex="0" 
+                            role="button" 
+                            class="flex items-center justify-center w-4 h-4"
+                            onclick="toggleDropdown(this)">
+                        <svg class="w-3 md:w-4" data-slot="icon" fill="none"
+                            stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"></path>
+                        </svg>
+                    </button>
+                    <ul class="dropdown-content menu p-2 shadow-xl bg-zinc-100 rounded-none w-52 border border-black mt-3 absolute right-0 hidden">
+                        <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ opportunity.url }}', '{{ opportunity.resumen_IA }}', 'whatsapp')">WhatsApp</a></li>
+                        <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ opportunity.url }}', '{{ opportunity.resumen_IA }}', 'linkedin')">LinkedIn</a></li>
+                        <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ opportunity.url }}', '{{ opportunity.resumen_IA }}', 'gmail')">Email</a></li>
+                    </ul>
+                </div>
+                <button onclick="deleteOpportunity('{{ opportunity.id }}')" 
+                        class="flex items-center justify-center w-4 h-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 md:w-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
-            <button type="button" onclick="deleteOpportunity('{{ opportunity.id }}')" class="btn btn-danger btn-xs">
-                <svg class="w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor"
-                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
-                </svg>
-            </button>
         </div>
     </th>
 </tr>
 {% endfor %}
 {% else %}
 <tr>
-    <td colspan="5">No se encontraron oportunidades guardadas.</td>
+    <td colspan="4" class="p-2 text-center">No se encontraron oportunidades guardadas.</td>
 </tr>
 {% endif %}
+
+<style>
+    .border-left-custom {
+        position: relative;
+    }
+
+    .border-left-custom::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 70%;
+        background-color: #e5e7eb;
+    }
+
+    .capitalize-first::first-letter {
+        text-transform: uppercase !important;
+    }
+
+    .fecha-de-cierre {
+        text-align: center;
+    }
+
+    /* Force solid background and proper stacking for dropdowns */
+    .dropdown-content {
+        background-color: rgb(244, 244, 245) !important;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1), 0 4px 6px -1px rgba(0,0,0,0.1) !important;
+    }
+    
+    .dropdown-content .menu-item {
+        background-color: rgb(244, 244, 245) !important;
+    }
+
+    /* Add these styles to ensure spinner visibility */
+    .spinner {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 1rem;
+        border-radius: 0.5rem;
+    }
+
+    /* Remove any conflicting spinner styles */
+    #layout-spinner img {
+        display: inline !important;
+    }
+</style>
 
 <script>
     function shareOpportunity(url, title, platform) {
         const encodedUrl = encodeURIComponent(url);
-        const encodedTitle = encodeURIComponent('\n- 𝟭𝟬𝟬 ︱ 𝗢𝗽𝗼𝗿𝘁𝘂𝗻𝗶𝗱𝗮𝗱𝗲𝘀');
+        const encodedTitle = encodeURIComponent('\n- + Oportunidades');
 
         let shareUrl = '';
 
@@ -75,7 +181,109 @@
         } else if (platform === 'gmail') {
             shareUrl = `mailto:?subject=${encodeURIComponent(encodedTitle)}&body=${encodedUrl}`;
         }
-
         window.open(shareUrl, '_blank');
+    }
+
+    function toggleDropdown(button) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        document.querySelectorAll('th .dropdown-content').forEach(d => {
+            if (d !== button.nextElementSibling) {
+                d.classList.add('hidden');
+            }
+        });
+        
+        const dropdown = button.nextElementSibling;
+        dropdown.classList.toggle('hidden');
+        
+        if (!dropdown.classList.contains('hidden')) {
+            const buttonHeight = button.offsetHeight;
+            dropdown.style.top = `${buttonHeight + 4}px`;
+            dropdown.style.right = '0';
+            dropdown.style.zIndex = '9999';
+        }
+    }
+
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('th .dropdown-content') && !event.target.closest('th button')) {
+            document.querySelectorAll('th .dropdown-content').forEach(d => {
+                d.classList.add('hidden');
+            });
+        }
+    });
+
+    function deleteOpportunity(pageId) {
+        if (!confirm('¿Estás seguro de que deseas eliminar esta oportunidad?')) {
+            return;
+        }
+
+        const layoutSpinner = document.getElementById('layout-spinner');
+        if (layoutSpinner) {
+            layoutSpinner.style.display = 'block';
+        }
+
+        fetch(`/delete_opportunity/${pageId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.status === 204) {
+                const row = document.querySelector(`button[onclick="deleteOpportunity('${pageId}')"]`).closest('tr');
+                row.remove();
+
+                const alertContainer = document.getElementById('alert-container');
+                if (alertContainer) {
+                    alertContainer.innerHTML = `
+                        <div class="alert alert-success shadow-lg mb-4">
+                            <div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span>Oportunidad eliminada exitosamente</span>
+                            </div>
+                        </div>
+                    `;
+                    setTimeout(() => alertContainer.innerHTML = '', 3000);
+                }
+
+                const tbody = document.querySelector('#my-results');
+                if (!tbody.querySelector('tr')) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="p-2 text-center">No se encontraron oportunidades guardadas.</td>
+                        </tr>
+                    `;
+                }
+            } else {
+                return response.json().then(data => {
+                    throw new Error(data.error || 'Error al eliminar la oportunidad');
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const alertContainer = document.getElementById('alert-container');
+            if (alertContainer) {
+                alertContainer.innerHTML = `
+                    <div class="alert alert-error shadow-lg mb-4">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>${error.message}</span>
+                        </div>
+                    </div>
+                `;
+            }
+        })
+        .finally(() => {
+            if (layoutSpinner) {
+                layoutSpinner.style.display = 'none';
+            }
+        });
     }
 </script>

@@ -438,58 +438,103 @@ def save_user_opportunity():
 def fetch_opportunity_details(opportunity_id):
     return get_opportunity_by_id(opportunity_id)
 
-@app.route("/saved_opportunities", methods=["GET"])
+@app.route("/saved_opportunities")
 @login_required
 def list_saved_opportunities():
-    user_id = session["user"]["sub"]
-    app.logger.info(f"=== Fetching saved opportunities for user {user_id} ===")
-
     try:
+        user_id = session["user"]["sub"]
         opportunity_ids = get_saved_opportunity_ids(user_id)
-        app.logger.info(f"Retrieved {len(opportunity_ids)} opportunity IDs: {opportunity_ids}")
+        opportunities = []
+        now_date = datetime.now().date()
+        seven_days_from_now = now_date + timedelta(days=7)
 
-        if not opportunity_ids:
-            app.logger.info("No saved opportunities found")
-            return render_template("user_opportunities.html", 
-                                opportunities=[], 
-                                og_data=get_default_og_data())
-
-        with ThreadPoolExecutor() as executor:
-            future_to_id = {executor.submit(get_opportunity_by_id, opp_id): opp_id 
-                          for opp_id in opportunity_ids}
-            
-            opportunities = []
-            for future in as_completed(future_to_id):
-                opp_id = future_to_id[future]
+        # Get saved opportunities
+        for opp_id in opportunity_ids:
+            opportunity = get_opportunity_by_id(opp_id)
+            if opportunity:
+                # Process disciplina into a list
+                if opportunity.get("disciplina"):
+                    opportunity["disciplinas"] = [d.strip() for d in opportunity["disciplina"].split(',')]
+                
+                # Add url_base from base_url or url
+                base_url = opportunity.get("base_url", "")
+                url = opportunity.get("url", "")
                 try:
-                    opportunity = future.result()
-                    if opportunity:
-                        opportunities.append(opportunity)
-                        app.logger.info(f"Successfully fetched opportunity: {opportunity.get('nombre', 'Unknown')} (ID: {opp_id})")
-                    else:
-                        app.logger.error(f"Failed to fetch opportunity {opp_id}")
+                    parsed = urlparse(base_url if base_url else url)
+                    if not parsed.netloc:
+                        parsed = urlparse(f"https://{base_url if base_url else url}")
+                    opportunity["url_base"] = parsed.netloc.replace('www.', '')
                 except Exception as e:
-                    app.logger.error(f"Error fetching opportunity {opp_id}: {str(e)}")
+                    app.logger.error(f"Error parsing URL: {e}")
+                    opportunity["url_base"] = ""
 
-        app.logger.info(f"Successfully fetched {len(opportunities)} out of {len(opportunity_ids)} opportunities")
+                opportunities.append(opportunity)
 
-        if opportunities:
-            og_data = {
-                "title": opportunities[0]["nombre"],
-                "description": opportunities[0].get("resumen_IA", "Convocatorias, Becas y Recursos Globales para Artistas."),
-                "url": request.url,
-                "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
+        # Get all closing soon opportunities from main database
+        url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
+        headers = {
+            "Authorization": "Bearer " + NOTION_TOKEN,
+            "Content-Type": "application/json",
+            "Notion-Version": "2022-06-28",
+        }
+        
+        json_body = {
+            "filter": {
+                "and": [
+                    {"property": "Publicar", "checkbox": {"equals": True}},
+                    {"property": "Fecha de cierre", "date": {"on_or_before": seven_days_from_now.isoformat()}},
+                    {"property": "Fecha de cierre", "date": {"on_or_after": now_date.isoformat()}}
+                ]
             }
-        else:
-            og_data = get_default_og_data()
+        }
 
-        return render_template("user_opportunities.html", opportunities=opportunities, og_data=og_data)
+        response = requests.post(url, headers=headers, json=json_body)
+        response.raise_for_status()
+        data = response.json()
+        
+        closing_soon_pages = []
+        for result in data.get("results", []):
+            try:
+                page = {
+                    "id": result["id"],
+                    "resumen_IA": (
+                        result["properties"]["Resumen generado por la IA"]["rich_text"][0]["text"]["content"]
+                        if result["properties"]["Resumen generado por la IA"]["rich_text"]
+                        else ""
+                    ),
+                    "url": result["properties"]["URL"].get("url", ""),
+                    "base_url": (
+                        result["properties"]["Base URL"]["rich_text"][0]["text"]["content"]
+                        if result["properties"]["Base URL"]["rich_text"]
+                        else ""
+                    ),
+                    "fecha_de_cierre": (
+                        result["properties"]["Fecha de cierre"]["date"]["start"]
+                        if result["properties"]["Fecha de cierre"]["date"]
+                        else ""
+                    )
+                }
+                closing_soon_pages.append(page)
+            except (KeyError, IndexError) as e:
+                app.logger.error(f"Error processing closing soon page: {e}")
+                continue
 
+        app.logger.info(f"Found {len(closing_soon_pages)} closing soon opportunities")
+        
+        return render_template(
+            "user_opportunities.html",
+            opportunities=opportunities,
+            closing_soon_pages=closing_soon_pages[:10],
+            og_data=get_default_og_data()
+        )
     except Exception as e:
         app.logger.error(f"Error in list_saved_opportunities: {str(e)}")
-        return render_template("user_opportunities.html", 
-                             opportunities=[], 
-                             og_data=get_default_og_data())
+        return render_template(
+            "user_opportunities.html",
+            opportunities=[],
+            closing_soon_pages=[],
+            og_data=get_default_og_data()
+        )
 
 def get_default_og_data():
     return {
