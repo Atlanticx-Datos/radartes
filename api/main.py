@@ -1547,6 +1547,10 @@ def refresh_database_cache():
 def privacy_policy():
     return render_template("privacy_policy.html")
 
+@app.route('/home')
+def home():
+    return render_template('home.html')
+
 @app.context_processor
 def utility_processor():
     def versioned_static(filename):

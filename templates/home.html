@@ -1,0 +1,385 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+<body>
+    <!-- Keep spinner -->
+    <div id="spinner" class="spinner h-8 w-8" style="display: none;">
+        <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
+    </div>
+
+    <style>
+        /* Override layout centering */
+        body {
+            justify-content: start !important;
+            align-items: start !important;
+        }
+
+        main {
+            justify-content: start !important;
+            align-items: start !important;
+        }
+
+        /* Override content wrapper centering */
+        .flex-grow {
+            justify-content: start !important;
+            align-items: start !important;
+        }
+    </style>
+
+    <div class="px-0 md:px-2 -mt-4" style="margin-left: -1rem !important; margin-right: -0.5rem !important;">
+        <!-- Main content with corrected grid -->
+        <main class="w-full relative">
+            <div class="grid grid-cols-12 gap-0 w-full">
+                <!-- First Column: Logo and Destinatario -->
+                <div class="col-span-3 flex flex-col justify-between min-w-0 md:border-r border-neutral">
+                    <div class="flex-1 flex flex-col">
+                        <!-- First section with title -->
+                        <div class="border-b border-neutral">
+                            <div class="pt-3 pr-8 h-10 mb-12">
+                                <div class="flex items-center justify-center gap-3 -mt-2">
+                                    <div class="flex flex-col">
+                                        <h2 class="text-[1.9rem] font-bold tracking-tight text-slate-700">+
+                                            Oportunidades</h2>
+                                        <p class="text-sm text-neutral-500 ml-[0.2em] tracking-wide -mt-2">Base de datos
+                                            para artistxs</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <!-- Third section with social icons -->
+                        <div class="mt-4">
+                            <div class="flex justify-center gap-8 py-4">
+                                <a href="https://www.instagram.com/atlanticx.org"
+                                    class="flex items-center bg-gray-800 text-white p-2 rounded hover:bg-gray-700 transition-colors">
+                                    <svg class="w-6 h-6" fill="white" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path
+                                            d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm5.25-2.75a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5z" />
+                                    </svg>
+                                    <span class="uppercase text-[0.6rem] tracking-tight ml-2">Instagram</span>
+                                </a>
+                                <a href="mailto:info@atlanticx.org"
+                                    class="flex items-center bg-gray-800 text-white p-2 rounded hover:bg-gray-700 transition-colors">
+                                    <svg class="w-6 h-6" fill="white" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path
+                                            d="M1.5 4.5h21a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-21a1 1 0 0 1-1-1v-13a1 1 0 0 1 1-1zm1 2v11h19v-11l-9.5 5.5L2.5 6.5zm.5-1.5l9.5 5.5L21.5 5H3z" />
+                                    </svg>
+                                    <span class="uppercase text-[0.6rem]  tracking-tight ml-2">Correo</span>
+                                </a>
+                                <a href="https://www.linkedin.com/company/atlanticx"
+                                    class="flex items-center bg-gray-800 text-white p-2 rounded hover:bg-gray-700 transition-colors">
+                                    <svg class="w-6 h-6" fill="white" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path
+                                            d="M19 0h-14C2.25 0 0 2.25 0 5v14c0 2.75 2.25 5 5 5h14c2.75 0 5-2.25 5-5V5c0-2.75-2.25-5-5-5zm-11 20H7v-8h2v8zm-1-9.25c-.65 0-1.25-.55-1.25-1.25S7.35 8.5 8 8.5s1.25.55 1.25 1.25S8.65 10.75 7.75 10.75zm12 9.25h-2v-4.5c0-1.25-.25-2.25-1.25-2.25-1 0-1.5.75-1.5 1.75v5h-2v-8h2v1.25c.5-.75 1.5-1.25 2.5-1.25 1.5 0 2.5 1 2.5 3v5z" />
+                                    </svg>
+                                    <span class="uppercase text-[0.6rem]  tracking-tight ml-2">LinkedIn</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Second Column: 6/12 width -->
+                <div class="col-span-6 min-w-0 md:border-r border-neutral">
+                    <!-- Upper Section (2/3 height) -->
+                    <div class="min-h-[450px] p-6 border-b border-t border-neutral mt-12">
+                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4 mt-16">
+                            <div class="uppercase font-bold flex gap-2 items-center">
+                                <button class="hover:text-slate-900 transition-colors" data-target="de-que-se-trata">DE
+                                    QUÉ SE TRATA</button>
+                                <span class="text-neutral-400">︱</span>
+                                <button class="hover:text-slate-900 transition-colors"
+                                    data-target="una-base-de-datos">UNA BASE DE DATOS</button>
+                                <span class="text-neutral-400">︱</span>
+                                <button class="hover:text-slate-900 transition-colors" data-target="para-artistas">PARA
+                                    ARTISTAS</button>
+                                <span class="text-neutral-400">︱</span>
+                                <button class="hover:text-slate-900 transition-colors" data-target="para-la-cultura">Y
+                                    LA CULTURA</button>
+                            </div>
+                        </h2>
+                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4 mr-28">
+                            <div class="uppercase">
+                                <span id="de-que-se-trata" class="transition-all">+ Oportunidades es un proyecto para la
+                                    cultura enmarcado en los objetivos de sostenibilidad de las Naciones Unidas. Las
+                                    becas, convocatorias, premios, fondos... (las oportunidades) son tratados aquí como
+                                    un bien público que aspira a ser parte oficial del repositorio "Digital Public Good
+                                    Alliance" (DPGA). </span>
+                                <span id="una-base-de-datos" class="transition-all">+ Oportunidades trata las
+                                    oportunidades como datos haciendo foco tanto en la accesibilidad y la transparencia
+                                    tanto como en la calidad de las fuentes de de la información que se obtiene. </span>
+                                <span id="para-artistas" class="transition-all">+ Oportunidades es un servicio
+                                    totalmente gratuito y permanentemente actualizado que aspira a dar un panoramos
+                                    global de desarrollo profesional para artistxs latinoamericanxs. </span>
+                                <span id="para-la-cultura" class="transition-all">+ Oportunidades también tiene como
+                                    destinatarixs a investigadores, gestores y estudiantes interesadxs en fondos,
+                                    formación y posibildades de movilidad.</span>
+                            </div>
+                        </h2>
+                        <!-- CTA Button -->
+                        <button type="button" onclick="window.location.href='/database'"
+                            class="inline-flex items-center justify-center px-4 py-2 text-xs font-bold tracking-tight text-neutral-700 bg-gray-200 hover:bg-gray-300 transition-colors duration-200 rounded-none mt-4">
+                            <span class="uppercase">Actualizamos cada semana</span>
+                            <svg class="w-4 h-4 ml-2" data-slot="icon" fill="none" stroke-width="1.5"
+                                stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                                aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Lower Section (1/3 height) -->
+                    <div class="min-h-[300px] p-6 border-b border-neutral mt-16">
+                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4">
+                            <div class="uppercase font-bold flex gap-2 items-center">
+                                <button class="hover:text-slate-900 transition-colors"
+                                    data-target="fuentes">FUENTES</button>
+                                <span class="text-neutral-400">︱</span>
+                                <button class="hover:text-slate-900 transition-colors"
+                                    data-target="herramientas">HERRAMIENTAS</button>
+                                <span class="text-neutral-400">︱</span>
+                                <button class="hover:text-slate-900 transition-colors"
+                                    data-target="github">GITHUB</button>
+                            </div>
+                        </h2>
+                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4 mr-8">
+                            <div class="uppercase">
+                                <span id="fuentes" class="transition-all">+ Oportunidades recopila información de forma
+                                    automatizada. Se trata de un sistema de scraping de fuentes oficiales, instituciones
+                                    culturales y plataformas especializadas.</span>
+                                <span id="herramientas" class="transition-all">+ Oportunidades ofrece herramientas
+                                    de filtrado por fechas de cierre así como un sistema de búsqueda avanzada por
+                                    combinación de palabras clave, mes y disciplina. Una vez logueado, el usuario
+                                    también puede guardar las convocatorias. Esto permite
+                                    trackear la información más allá de las fechas de cierre.</span>
+                                <span id="github" class="transition-all">+ Oportunidades es un proyecto de código
+                                    abierto disponible en GitHub, donde también se encuentra publicada, completa, la
+                                    información que nutre la base de datos.</span>
+                            </div>
+                        </h2>
+                        <!-- CTA Button -->
+                        <button type="button" onclick="window.location.href='https://github.com/Atlanticx-Datos/100_Oportunidades'"
+                            class="inline-flex items-center justify-center px-4 py-2 text-xs font-bold tracking-tight text-neutral-700 bg-gray-200 hover:bg-gray-300 transition-colors duration-200 rounded-none mt-4">
+                            <span class="uppercase">Saber más sobre el proyecto</span>
+                            <svg class="w-4 h-4 ml-2" data-slot="icon" fill="none" stroke-width="1.5"
+                                stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                                aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Third Column: 2/12 width -->
+                <div class="col-span-2 min-w-0 p-6 border-t border-b border-r border-neutral" style="align-self: start;">
+                    <!-- First section: ¿QUIÉNES SOMOS? -->
+                    <div class="border-b border-neutral -mx-6 px-6 pb-6">
+                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4">
+                            <span class="uppercase font-bold">¿QUIÉNES SOMOS?</span>
+                        </h2>
+                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4 mr-8">
+                            <prose class="uppercase">
+                                Atlanticx.org es una plataforma dedicada a conectar artistas con oportunidades globales. Nos enfocamos en la accesibilidad y transparencia de la información, ofreciendo un servicio gratuito y actualizado para apoyar el desarrollo profesional de artistas latinoamericanos.
+                            </prose>
+                        </h2>
+                    </div>
+
+                    <!-- Second section: CÓMO PARTICIPAR -->
+                    <div class="border-b border-neutral -mx-6 px-6 py-6">
+                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4">
+                            <span class="uppercase font-bold">CÓMO PARTICIPAR</span>
+                        </h2>
+                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4 mr-8">
+                            <prose class="uppercase">Si ridiculus egestas nec sollicitudin felis maximus nascetur a hendrerit ligula fusce.</prose>
+                        </h2>
+                    </div>
+
+                    <!-- Third section: CONTACTO -->
+                    <div class="-mx-6 px-6 py-6">
+                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4">
+                            <span class="uppercase font-bold">CONTACTO</span>
+                        </h2>
+                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4 mr-8">
+                            <a href="mailto:info@atlanticx.org" class="uppercase hover:text-slate-900 transition-colors">
+                                info@atlanticx.org
+                            </a>
+                        </h2>
+                    </div>
+                </div>
+                <!-- Fourth Column: 1/12 width -->
+                <div class="col-span-1 min-w-0 relative border-t border-neutral">
+                </div>
+        </main>
+
+        {% include 'footer.html' %}
+    </div>
+
+    <!-- Keep styles -->
+    <style>
+        /* Override layout centering */
+        body {
+            justify-content: start !important;
+        }
+
+        main {
+            justify-content: start !important;
+        }
+
+        /* Override content wrapper centering */
+        .flex-grow {
+            justify-content: start !important;
+            align-items: start !important;
+        }
+
+        /* Typographical highlight for active text */
+        .text-highlight {
+            font-weight: 600;
+            /* semibold */
+        }
+
+        /* Active state for navigation buttons */
+        .nav-active {
+            color: rgb(15 23 42);
+            /* text-slate-900 */
+            font-weight: 700;
+            /* bold */
+        }
+    </style>
+
+    <!-- Keep all styles -->
+    <style>
+        .spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+
+        .scrollbar-none::-webkit-scrollbar,
+        .custom-scrollbar::-webkit-scrollbar,
+        #results-container>div::-webkit-scrollbar,
+        #results-container::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+
+        .scrollbar-none,
+        .custom-scrollbar,
+        #results-container>div,
+        #results-container {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+
+        .dropdown,
+        .opportunity-link {
+            position: relative !important;
+            z-index: 10 !important;
+        }
+
+        @media (max-width: 1024px) {
+
+            #results-container,
+            #results-container>div,
+            .max-h-\[35rem\] {
+                overflow-x: auto !important;
+            }
+
+            .md\:overflow-x-hidden {
+                overflow-x: auto !important;
+            }
+
+            .max-h-\[35rem\].md\:border-r {
+                position: relative !important;
+                z-index: 20 !important;
+            }
+        }
+
+        @media (min-width: 1025px) {
+
+            #results-container,
+            #results-container>div,
+            .max-h-\[35rem\] {
+                overflow-x: hidden !important;
+            }
+        }
+    </style>
+
+    <!-- Keep minimal necessary scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Keep basic functionality for accordions
+            const accordions = document.querySelectorAll('.collapse input[type="radio"]');
+            accordions.forEach(accordion => {
+                accordion.addEventListener('change', function () {
+                    accordions.forEach(other => {
+                        if (other !== accordion) {
+                            other.checked = false;
+                        }
+                    });
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Separate selectors for upper and lower sections
+            const upperButtons = document.querySelectorAll('[data-target^="de-que-se-trata"], [data-target^="una-base-de-datos"], [data-target^="para-artistas"], [data-target^="para-la-cultura"]');
+            const lowerButtons = document.querySelectorAll('[data-target^="fuentes"], [data-target^="herramientas"], [data-target^="github"]');
+
+            function highlightUpperSection(targetId) {
+                const sections = document.querySelectorAll('[id^="de-que-se-trata"], [id^="una-base-de-datos"], [id^="para-artistas"], [id^="para-la-cultura"]');
+                sections.forEach(section => {
+                    section.classList.remove('text-highlight');
+                });
+                upperButtons.forEach(btn => {
+                    btn.classList.remove('nav-active');
+                });
+
+                const targetSection = document.getElementById(targetId);
+                const targetButton = document.querySelector(`[data-target="${targetId}"]`);
+                if (targetSection) {
+                    targetSection.classList.add('text-highlight');
+                    targetButton.classList.add('nav-active');
+                }
+            }
+
+            function highlightLowerSection(targetId) {
+                const sections = document.querySelectorAll('[id^="fuentes"], [id^="herramientas"], [id^="github"]');
+                sections.forEach(section => {
+                    section.classList.remove('text-highlight');
+                });
+                lowerButtons.forEach(btn => {
+                    btn.classList.remove('nav-active');
+                });
+
+                const targetSection = document.getElementById(targetId);
+                const targetButton = document.querySelector(`[data-target="${targetId}"]`);
+                if (targetSection) {
+                    targetSection.classList.add('text-highlight');
+                    targetButton.classList.add('nav-active');
+                }
+            }
+
+            // Upper section handlers
+            upperButtons.forEach(button => {
+                button.addEventListener('click', () => highlightUpperSection(button.dataset.target));
+                button.addEventListener('mouseenter', () => highlightUpperSection(button.dataset.target));
+            });
+
+            // Lower section handlers
+            lowerButtons.forEach(button => {
+                button.addEventListener('click', () => highlightLowerSection(button.dataset.target));
+                button.addEventListener('mouseenter', () => highlightLowerSection(button.dataset.target));
+            });
+        });
+    </script>
+</body>
+{% endblock %}
