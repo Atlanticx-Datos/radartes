@@ -166,15 +166,13 @@
     </div>
     <main class="w-full bg-zinc-100 flex flex-col
                  px-4
-                 sm:px-4
-                 md:px-12
                  max-sm:rounded-lg
                  {% if request.endpoint == 'list_saved_opportunities' %}!justify-start{% endif %}">
         <!-- Navigation - only show on non-index pages -->
         {% if request.endpoint != 'index' %}
         <div class="w-full flex-shrink-0">
             <div class="mx-auto">
-                <nav class="flex justify-end items-center h-[34px] md:h-16 pt-6 md:pt-8 z-50 md:pr-12">
+                <nav class="flex justify-end items-center h-[34px] md:h-16 pt-6 md:pt-8 z-50 md:pr-6">
                     <div class="dropdown dropdown-bottom dropdown-end z-50 relative">
                         <div tabindex="0" role="button" class="relative">
                             <div class="relative">
