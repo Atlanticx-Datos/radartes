@@ -841,6 +841,15 @@ def index():
     print("Current Session Data at Index:", session.get("user"))  # Debug: print session data
     if "user" in session:
         user = session["user"]
+        return render_template("home.html", user=user)
+    else:
+        return render_template("home.html", user=None)
+
+@app.route("/_legacy_admin")
+def legacy_admin():
+    print("Current Session Data at Legacy Admin:", session.get("user"))
+    if "user" in session:
+        user = session["user"]
         return render_template("index.html", user=user, pretty=json.dumps(user, indent=4))
     else:
         return render_template("index.html", user=None, pretty="No user data")

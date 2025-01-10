@@ -179,22 +179,24 @@
 </head>
 
 <body class="flex justify-center max-sm:items-start items-center bg-zinc-100 min-h-screen
-             {% if request.endpoint == 'list_saved_opportunities' %}!items-start{% endif %}">
+             {% if request.endpoint == 'list_saved_opportunities' %}!items-start{% endif %}
+             {% if request.endpoint == 'index' %}justify-center !important align-items-center !important{% endif %}">
     <div id="layout-spinner" class="spinner h-8 w-8" style="display: none;">
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
     </div>
     <main class="w-full bg-zinc-100 flex flex-col
                  px-4
                  max-sm:rounded-lg
-                 {% if request.endpoint == 'list_saved_opportunities' %}!justify-start{% endif %}">
-        <!-- Navigation - only show on non-index pages -->
-        {% if request.endpoint != 'index' %}
+                 {% if request.endpoint == 'list_saved_opportunities' %}!justify-start{% endif %}
+                 {% if request.endpoint == 'index' %}justify-center !important align-items-center !important{% endif %}">
+        <!-- Navigation - show on all pages except legacy_admin -->
+        {% if request.endpoint != 'legacy_admin' %}
         <div class="w-full flex-shrink-0">
             <div class="mx-auto">
-                <nav class="flex {% if request.endpoint == 'home' %}justify-end{% else %}justify-between{% endif %} items-center h-[34px] md:h-16 pt-6 md:pt-8 z-50 md:px-8">
-                    <!-- Logo Section - only show on non-home routes -->
-                    {% if request.endpoint != 'home' %}
-                    <div class="flex items-center md:ml-2">
+                <nav class="flex {% if request.endpoint == 'index' %}justify-end{% else %}justify-between{% endif %} items-center h-[34px] md:h-16 pt-6 md:pt-8 z-50 md:px-8">
+                    <!-- Logo Section - only show on non-index routes -->
+                    {% if request.endpoint != 'index' %}
+                    <div class="flex items-center">
                         <span class="text-2xl md:text-3xl font-bold tracking-tight text-neutral-700">
                             ⏺<span class="text-neutral-400">⏺</span><span class="text-red-500">⏺</span>
                             <span class="font-black">OPORTUNIDADES</span>
@@ -202,12 +204,11 @@
                     </div>
                     {% endif %}
 
-                    <!-- Existing Menu Button -->
+                    <!-- Dropdown Menu -->
                     <div class="dropdown dropdown-bottom dropdown-end z-50 relative">
                         <div tabindex="0" role="button" class="relative">
                             <div class="relative">
-                                <span
-                                    class="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 bg-gray-200 rounded-full">
+                                <span class="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 bg-gray-200 rounded-full">
                                     <svg class="w-5 h-5" data-slot="icon" fill="currentColor" viewBox="0 0 20 20"
                                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                         <path
@@ -221,8 +222,7 @@
                                 </span>
                             </div>
                         </div>
-                        <ul tabindex="0"
-                            class="dropdown-content z-[1] menu py-2 px-1 bg-base-100ß w-60 border border-black mt-3 text-gray-700 font-Poppins">
+                        <ul tabindex="0" class="dropdown-content z-[1] menu py-2 px-1 bg-base-100ß w-60 border border-black mt-3 text-gray-700 font-Poppins">
                             <li>
                                 <a href="{{ url_for('all_pages') }}" onclick="layoutshowSpinner(event)"
                                     class="flex items-center">
@@ -233,10 +233,13 @@
                                         total_nuevas }}</span>
                                 </a>
                             </li>
-                            <li><a href="{{ url_for('list_saved_opportunities') }}" onclick="layoutshowSpinner(event)">
+                            <li>
+                                <a href="{{ url_for('list_saved_opportunities') }}" onclick="layoutshowSpinner(event)">
                                     <span
                                         class="border-l-[6px] border-secondary pl-4 uppercase font-semibold">Guardadas</span>
-                                </a></li>
+                                </a>
+                            </li>
+                            <!-- Add link -->
                             <li>
                                 {% if session.get('user') %}
                                 <a href="https://www.notion.so/atlanticxx/1509dd874b3a80a5ac8bce88f0d1bde3"
@@ -268,12 +271,22 @@
                                 </a>
                                 {% endif %}
                             </li>
-                            <li><a href="{{ url_for('index') }}">
-                                    <span class="border-l-[6px] border-black pl-4 uppercase font-semibold">Home</span>
-                                </a>
+                            <!-- Admin/Home link -->
+                            <li>
+                                {% if session.get('user') %}
+                                    <a href="{{ url_for('legacy_admin') }}">
+                                        <span class="border-l-[6px] border-black pl-4 uppercase font-semibold">Admin</span>
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('index') }}">
+                                        <span class="border-l-[6px] border-black pl-4 uppercase font-semibold">Home</span>
+                                    </a>
+                                {% endif %}
                             </li>
+                            <!-- GitHub and Logout for logged-in users -->
                             {% if session.get('user') %}
-                            <li><a href="https://github.com/Atlanticx-Datos/100_Oportunidades" target="_blank"
+                            <li>
+                                <a href="https://github.com/Atlanticx-Datos/100_Oportunidades" target="_blank"
                                     rel="noopener noreferrer">
                                     <span
                                         class="border-l-[6px] border-primary pl-4 uppercase font-semibold flex items-center">
@@ -285,11 +298,14 @@
                                             </path>
                                         </svg>
                                     </span>
-                                </a></li>
-                            <li><a href="{{ url_for('logout') }}">
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('logout') }}">
                                     <span
                                         class="border-l-[6px] border-base-200 pl-4 uppercase font-semibold">Cerrar</span>
-                                </a></li>
+                                </a>
+                            </li>
                             {% endif %}
                         </ul>
                     </div>
@@ -304,10 +320,39 @@
                     sm:items-center 
                     justify-center 
                     pt-4
-                    md:pt-4">
+                    md:pt-8
+                    {% if request.endpoint == 'index' %}justify-center !important align-items-center !important{% endif %}">
             {% block body %}{% endblock %}
         </div>
     </main>
+
+    {% if request.endpoint == 'index' %}
+    <style>
+        /* Override layout centering specifically for index (former home) */
+        body {
+            justify-content: center !important;
+            align-items: center !important;
+        }
+
+        main {
+            justify-content: center !important;
+            align-items: center !important;
+        }
+
+        /* Override content wrapper centering */
+        .flex-grow {
+            justify-content: center !important;
+            align-items: center !important;
+        }
+
+        /* Container centering */
+        .content-container {
+            margin: 0 auto;
+            max-width: 1280px;
+            width: 100%;
+        }
+    </style>
+    {% endif %}
     <script>
         function layoutshowSpinner(event) {
             event.preventDefault();
