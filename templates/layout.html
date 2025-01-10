@@ -191,7 +191,18 @@
         {% if request.endpoint != 'index' %}
         <div class="w-full flex-shrink-0">
             <div class="mx-auto">
-                <nav class="flex justify-end items-center h-[34px] md:h-16 pt-6 md:pt-8 z-50 md:pr-6">
+                <nav class="flex {% if request.endpoint == 'home' %}justify-end{% else %}justify-between{% endif %} items-center h-[34px] md:h-16 pt-6 md:pt-8 z-50 md:px-8">
+                    <!-- Logo Section - only show on non-home routes -->
+                    {% if request.endpoint != 'home' %}
+                    <div class="flex items-center md:ml-2">
+                        <span class="text-2xl md:text-3xl font-bold tracking-tight text-neutral-700">
+                            ⏺<span class="text-neutral-400">⏺</span><span class="text-red-500">⏺</span>
+                            <span class="font-black">OPORTUNIDADES</span>
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Existing Menu Button -->
                     <div class="dropdown dropdown-bottom dropdown-end z-50 relative">
                         <div tabindex="0" role="button" class="relative">
                             <div class="relative">
@@ -211,7 +222,7 @@
                             </div>
                         </div>
                         <ul tabindex="0"
-                            class="dropdown-content z-[1] menu py-2 px-1 bg-base-100ß w-56 border border-black mt-3 text-gray-700 font-Poppins">
+                            class="dropdown-content z-[1] menu py-2 px-1 bg-base-100ß w-60 border border-black mt-3 text-gray-700 font-Poppins">
                             <li>
                                 <a href="{{ url_for('all_pages') }}" onclick="layoutshowSpinner(event)"
                                     class="flex items-center">
@@ -293,7 +304,7 @@
                     sm:items-center 
                     justify-center 
                     pt-4
-                    md:pt-12">
+                    md:pt-4">
             {% block body %}{% endblock %}
         </div>
     </main>

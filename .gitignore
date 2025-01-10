@@ -1,3 +1,5 @@
+# Virtual Environment
+myenv/
 .vercel
 # Byte-compiled / optimized / DLL files
 __pycache__/

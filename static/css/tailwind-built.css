@@ -1806,6 +1806,9 @@ details.collapse summary::-webkit-details-marker {
 .right-2 {
   right: 0.5rem;
 }
+.right-3 {
+  right: 0.75rem;
+}
 .top-0 {
   top: 0px;
 }
@@ -1833,13 +1836,12 @@ details.collapse summary::-webkit-details-marker {
 .col-span-1 {
   grid-column: span 1 / span 1;
 }
-.mx-4 {
-  margin-left: 1rem;
-  margin-right: 1rem;
-}
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
+}
+.-mb-6 {
+  margin-bottom: -1.5rem;
 }
 .-ml-4 {
   margin-left: -1rem;
@@ -1867,6 +1869,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .mb-1 {
   margin-bottom: 0.25rem;
+}
+.mb-16 {
+  margin-bottom: 4rem;
 }
 .mb-2 {
   margin-bottom: 0.5rem;
@@ -2159,9 +2164,6 @@ details.collapse summary::-webkit-details-marker {
 .justify-start {
   justify-content: flex-start;
 }
-.justify-end {
-  justify-content: flex-end;
-}
 .justify-center {
   justify-content: center;
 }
@@ -2447,13 +2449,13 @@ details.collapse summary::-webkit-details-marker {
 .text-center {
   text-align: center;
 }
+.text-2xl {
+  font-size: 1.35rem;
+  line-height: 2rem;
+}
 .text-3xl {
   font-size: 1.875rem;
   line-height: 2.25rem;
-}
-.text-4xl {
-  font-size: 2.25rem;
-  line-height: 2.5rem;
 }
 .text-5xl {
   font-size: 3rem;
@@ -2464,6 +2466,10 @@ details.collapse summary::-webkit-details-marker {
 }
 .text-\[4\.2rem\] {
   font-size: 4.2rem;
+}
+.text-base {
+  font-size: 1rem;
+  line-height: 1.5rem;
 }
 .text-sm {
   font-size: 0.875rem;
@@ -2497,6 +2503,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .capitalize {
   text-transform: capitalize;
+}
+.italic {
+  font-style: italic;
 }
 .leading-\[0\.95\] {
   line-height: 0.95;
@@ -2768,9 +2777,6 @@ details.collapse summary::-webkit-details-marker {
   .md\:w-4 {
     width: 1rem;
   }
-  .md\:w-8 {
-    width: 2rem;
-  }
   .md\:w-\[12\%\] {
     width: 12%;
   }
@@ -2835,6 +2841,10 @@ details.collapse summary::-webkit-details-marker {
     padding-left: 1rem;
     padding-right: 1rem;
   }
+  .md\:px-6 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
   .md\:px-8 {
     padding-left: 2rem;
     padding-right: 2rem;
@@ -2846,14 +2856,15 @@ details.collapse summary::-webkit-details-marker {
   .md\:pl-0 {
     padding-left: 0px;
   }
-  .md\:pr-6 {
-    padding-right: 1.5rem;
-  }
   .md\:pt-12 {
     padding-top: 3rem;
   }
   .md\:pt-8 {
     padding-top: 2rem;
+  }
+  .md\:text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
   }
   .md\:text-5xl {
     font-size: 3rem;
@@ -2862,10 +2873,6 @@ details.collapse summary::-webkit-details-marker {
   .md\:text-base {
     font-size: 1rem;
     line-height: 1.5rem;
-  }
-  .md\:text-black {
-    --tw-text-opacity: 1;
-    color: rgb(0 0 0 / var(--tw-text-opacity));
   }
 }
 @media (min-width: 1024px) {
