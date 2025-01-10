@@ -1,4 +1,4 @@
-#!/Users/miguelgalperin/Documents/Oportunidades/myenv/bin/python3.12
+#!/Users/miguelgalperin/Documents/Oportunidades/myenv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

@@ -40,7 +40,7 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-36M4V4L5RX"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
         gtag('config', 'G-36M4V4L5RX', {
             'anonymize_ip': true,
@@ -53,13 +53,13 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Londrina+Solid&display=swap" rel="stylesheet">
-    
+
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script src="https://unpkg.com/htmx.org@1.7.0/dist/htmx.min.js"></script>
     <style>
         /* Add a comment with timestamp to force cache invalidation */
         /* Version: 2024-03-XX-001 */
-        
+
         .spinner {
             display: none;
             position: fixed;
@@ -81,7 +81,7 @@
             position: absolute;
             z-index: 50;
             background-color: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1), 0 4px 6px -1px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         @media (min-width: 768px) {
@@ -103,31 +103,40 @@
         /* Specific positioning for database route */
         .database-logo {
             position: relative;
-            right: 5.5rem !important; /* Adjust this value as needed */
+            right: 5.5rem !important;
+            /* Adjust this value as needed */
         }
 
         @media (min-width: 768px) {
             .database-logo {
-                right: 3.5rem !important; /* Adjust for medium screens */
+                right: 3.5rem !important;
+                /* Adjust for medium screens */
             }
         }
 
         /* Custom scrollbar styles */
         .custom-scrollbar {
-            scrollbar-width: none; /* Hide the default scrollbar in Firefox */
+            scrollbar-width: none;
+            /* Hide the default scrollbar in Firefox */
         }
 
         /* Chrome, Edge, and Safari */
         .custom-scrollbar::-webkit-scrollbar {
-            width: 0; /* Hide the default scrollbar */
+            width: 0;
+            /* Hide the default scrollbar */
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background-color: #6366f1; /* indigo-500 */
-            border-radius: 50%; /* Fully rounded */
-            width: 8px; /* Circle size */
-            height: 8px; /* Circle size */
-            border: 1px solid black; /* To ensure visibility against the track */
+            background-color: #6366f1;
+            /* indigo-500 */
+            border-radius: 50%;
+            /* Fully rounded */
+            width: 8px;
+            /* Circle size */
+            height: 8px;
+            /* Circle size */
+            border: 1px solid black;
+            /* To ensure visibility against the track */
         }
     </style>
 
@@ -136,22 +145,32 @@
 
     <!-- Preload critical fonts -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" as="style">
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" as="style">
-    
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap"
+        as="style">
+
     <!-- Move critical CSS inline -->
     <style>
         /* Critical CSS */
-        body { opacity: 0; animation: fadeIn 0.3s ease-in forwards; }
-        @keyframes fadeIn { to { opacity: 1; } }
-        
+        body {
+            opacity: 0;
+            animation: fadeIn 0.3s ease-in forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
         /* Optimize loading behavior */
         .js-loading * {
             transition: none !important;
         }
     </style>
-    
+
     <!-- Defer non-critical CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind-built.css') }}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind-built.css') }}" media="print"
+        onload="this.media='all'">
 
     <!-- Favicon Links -->
     <link rel="icon" type="image/png" href="/static/public/favicon-96x96.png" sizes="96x96" />
@@ -176,7 +195,8 @@
                     <div class="dropdown dropdown-bottom dropdown-end z-50 relative">
                         <div tabindex="0" role="button" class="relative">
                             <div class="relative">
-                                <span class="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 bg-gray-200 rounded-full">
+                                <span
+                                    class="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 bg-gray-200 rounded-full">
                                     <svg class="w-5 h-5" data-slot="icon" fill="currentColor" viewBox="0 0 20 20"
                                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                         <path
@@ -190,55 +210,75 @@
                                 </span>
                             </div>
                         </div>
-                        <ul tabindex="0" class="dropdown-content z-[1] menu py-2 px-2 bg-base-100 rounded-sm w-56 border border-black mt-3 text-gray-700 font-Poppins">
+                        <ul tabindex="0"
+                            class="dropdown-content z-[1] menu py-2 px-1 bg-base-100ß w-56 border border-black mt-3 text-gray-700 font-Poppins">
                             <li>
-                                <a href="{{ url_for('all_pages') }}" onclick="layoutshowSpinner(event)" class="flex items-center">
-                                    <span class="border-l-4 border-accent pl-2 uppercase font-semibold">Oportunidades</span>
-                                    <span class="badge bg-red-500 text-white rounded-full px-2 py-1 ml-0 relative bottom-[1px]">{{ total_nuevas }}</span>
+                                <a href="{{ url_for('all_pages') }}" onclick="layoutshowSpinner(event)"
+                                    class="flex items-center">
+                                    <span
+                                        class="border-l-[6px] border-accent pl-4 uppercase font-semibold">Oportunidades</span>
+                                    <span
+                                        class="badge bg-red-500 text-white rounded-full px-2 py-1 ml-0 relative bottom-[1px]">{{
+                                        total_nuevas }}</span>
                                 </a>
                             </li>
                             <li><a href="{{ url_for('list_saved_opportunities') }}" onclick="layoutshowSpinner(event)">
-                                <span class="border-l-4 border-secondary pl-2 uppercase font-semibold">Guardadas</span>
-                            </a></li>
+                                    <span
+                                        class="border-l-[6px] border-secondary pl-4 uppercase font-semibold">Guardadas</span>
+                                </a></li>
                             <li>
                                 {% if session.get('user') %}
-                                    <a href="https://www.notion.so/atlanticxx/1509dd874b3a80a5ac8bce88f0d1bde3" 
-                                       target="_blank" 
-                                       rel="noopener noreferrer">
-                                        <span class="border-l-4 border-emerald-500 pl-2 uppercase font-semibold flex items-center">
-                                            Agregar
-                                            <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                                            </svg>
-                                        </span>
-                                    </a>
+                                <a href="https://www.notion.so/atlanticxx/1509dd874b3a80a5ac8bce88f0d1bde3"
+                                    target="_blank" rel="noopener noreferrer">
+                                    <span
+                                        class="border-l-[6px] border-emerald-500 pl-4 uppercase font-semibold flex items-center">
+                                        Agregar
+                                        <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
+                                            </path>
+                                        </svg>
+                                    </span>
+                                </a>
                                 {% else %}
-                                    <a href="{{ url_for('login', next='https://www.notion.so/atlanticxx/1509dd874b3a80a5ac8bce88f0d1bde3') }}" 
-                                       onclick="layoutshowSpinner(event)">
-                                        <span class="border-l-4 border-emerald-500 pl-2 uppercase font-semibold flex items-center">
-                                            Agregar
-                                            <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                                            </svg>
-                                        </span>
-                                    </a>
+                                <a href="{{ url_for('login', next='https://www.notion.so/atlanticxx/1509dd874b3a80a5ac8bce88f0d1bde3') }}"
+                                    onclick="layoutshowSpinner(event)">
+                                    <span
+                                        class="border-l-[6px] border-emerald-500 pl-4 uppercase font-semibold flex items-center">
+                                        Agregar
+                                        <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
+                                            </path>
+                                        </svg>
+                                    </span>
+                                </a>
                                 {% endif %}
                             </li>
                             <li><a href="{{ url_for('index') }}">
-                                <span class="border-l-4 border-black pl-2 uppercase font-semibold">Home</span>
-                            </a></li>
+                                    <span class="border-l-[6px] border-black pl-4 uppercase font-semibold">Home</span>
+                                </a>
+                            </li>
                             {% if session.get('user') %}
-                            <li><a href="https://github.com/Atlanticx-Datos/100_Oportunidades" target="_blank" rel="noopener noreferrer">
-                                <span class="border-l-4 border-primary pl-2 uppercase font-semibold flex items-center">
-                                    GitHub
-                                    <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                                    </svg>
-                                </span>
-                            </a></li>
+                            <li><a href="https://github.com/Atlanticx-Datos/100_Oportunidades" target="_blank"
+                                    rel="noopener noreferrer">
+                                    <span
+                                        class="border-l-[6px] border-primary pl-4 uppercase font-semibold flex items-center">
+                                        GitHub
+                                        <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
+                                            </path>
+                                        </svg>
+                                    </span>
+                                </a></li>
                             <li><a href="{{ url_for('logout') }}">
-                                <span class="border-l-4 border-base-200 pl-2 uppercase font-semibold">Cerrar</span>
-                            </a></li>
+                                    <span
+                                        class="border-l-[6px] border-base-200 pl-4 uppercase font-semibold">Cerrar</span>
+                                </a></li>
                             {% endif %}
                         </ul>
                     </div>

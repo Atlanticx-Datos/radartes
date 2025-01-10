@@ -12,6 +12,15 @@ module.exports = {
       'tall-phone': {'raw': '(min-height: 801px) and (max-height: 900px)'},
       'laptop': {'raw': '(min-height: 901px)'},
     },
+    borderWidth: {
+      DEFAULT: '1px',
+      '0': '0',
+      '2': '2px',
+      '3': '3px',
+      '4': '4px',
+      '6': '6px',
+      '8': '8px',
+    },
     extend: {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
