@@ -259,6 +259,22 @@
         90% { opacity: 1; }
         100% { opacity: 0; }
     }
+
+    @media (max-width: 1024px) {
+        /* Improve touch scrolling behavior */
+        #results-container > div,
+        .max-h-\[35rem\] {
+            -webkit-overflow-scrolling: touch !important;
+            overscroll-behavior-x: contain !important;
+            scroll-snap-type: x proximity !important;
+        }
+
+        /* Ensure smooth momentum scrolling */
+        table {
+            -webkit-overflow-scrolling: touch !important;
+            scroll-behavior: smooth !important;
+        }
+    }
 </style>
 
 <script>
@@ -394,4 +410,15 @@
             console.error('Error copying URL:', err);
         });
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.innerWidth <= 1024) {
+            const scrollContainers = document.querySelectorAll('#results-container > div, .max-h-\\[35rem\\]');
+            scrollContainers.forEach(container => {
+                container.addEventListener('touchmove', function(e) {
+                    e.stopPropagation();
+                }, { passive: true });
+            });
+        }
+    });
 </script>
