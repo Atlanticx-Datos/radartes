@@ -1,11 +1,11 @@
 {% if pages %}
 {% for page in pages %}
-<tr style="
+<tr data-id="{{ page.id }}" style="
     {% if page.destinatarios == 'Destacar' %}
     background-color: rgb(243, 244, 246) !important;  /* bg-gray-200 */
-    border-left: 4px solid #6366f1;  /* indigo-500 del brand */
+    border-left: 4px solid rgb(239, 68, 68);  /* Changed to red-500 */
     padding-left: 0.5rem;
-    box-shadow: inset 0 0 0 1px rgb(229, 231, 235);  /* sutil borde interno */
+    box-shadow: inset 0 0 0 1px rgb(229, 231, 235);  /* subtle inner border */
     {% else %}
     background-color: transparent;
     {% endif %}

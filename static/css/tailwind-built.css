@@ -1852,9 +1852,6 @@ details.collapse summary::-webkit-details-marker {
 .-mr-12 {
   margin-right: -3rem;
 }
-.-mr-2 {
-  margin-right: -0.5rem;
-}
 .-mr-6 {
   margin-right: -1.5rem;
 }
@@ -1902,9 +1899,6 @@ details.collapse summary::-webkit-details-marker {
 }
 .mr-1 {
   margin-right: 0.25rem;
-}
-.mr-2 {
-  margin-right: 0.5rem;
 }
 .mr-24 {
   margin-right: 6rem;
@@ -2668,6 +2662,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .ease-in-out {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ease-out {
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
 .dropdown-overlay .dropdown-content {
   background-color: white;

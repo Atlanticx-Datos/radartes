@@ -67,15 +67,14 @@
                                     {% if destacar_pages %}
                                     {% for page in destacar_pages %}
                                     <p class="relative">
-                                        <a href="{{ page.base_url if page.base_url else page.url }}" target="_blank"
-                                            data-name="{{ page.nombre }}" data-country="{{ page.País }}"
-                                            data-url="{{ page.url }}" class="accordion-link"
-                                            onclick="handleDestacadaClick(this)">
+                                        <a href="#" 
+                                           data-id="{{ page.id }}"
+                                           class="destacada-link"
+                                           onclick="event.preventDefault(); scrollToOpportunity('{{ page.id }}')">
                                             <span class="md:hidden whitespace-nowrap">
                                                 {{ page.nombre | truncate(18, true, "...") }}
                                                 {% if page.entidad %}
-                                                / <span
-                                                    class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
+                                                / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
                                                     {{ page.entidad | truncate(12, true, "...") }}
                                                 </span>
                                                 {% endif %}
@@ -83,23 +82,10 @@
                                             <span class="hidden md:inline whitespace-nowrap">
                                                 {{ page.nombre | truncate(25, true, "...") }}
                                                 {% if page.entidad %}
-                                                / <span
-                                                    class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
+                                                / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
                                                     {{ page.entidad | truncate(12, true, "...") }}
                                                 </span>
                                                 {% endif %}
-                                            </span>
-                                            <span
-                                                class="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center -mr-2">
-                                                <span
-                                                    class="flex items-center justify-center group-hover:bg-slate-200 group-hover:rounded-md transition-all duration-200 p-2">
-                                                    <svg class="w-3 h-3 z-10" data-slot="icon" fill="none"
-                                                        stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"
-                                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"></path>
-                                                    </svg>
-                                                </span>
                                             </span>
                                         </a>
                                     </p>
@@ -302,6 +288,34 @@
         #results-container::-webkit-scrollbar {
             width: 0 !important;
             height: 0 !important;
+        }
+
+        .highlighted {
+            background-color: rgb(243, 244, 246) !important;
+            transition: background-color 0.3s ease;
+        }
+
+        .destacada-link {
+            transition: background-color 0.2s ease;
+        }
+
+        .destacada-link:hover {
+            background-color: rgb(243, 244, 246);
+        }
+
+        @keyframes flashHighlight {
+            0% { border-left-width: 4px; }
+            50% { border-left-width: 12px; }
+            100% { border-left-width: 4px; }
+        }
+
+        .flash-highlight {
+            animation: flashHighlight 1s ease-out forwards;
+        }
+
+        /* Ensure smooth border transition */
+        tr[data-id] {
+            transition: border-left-width 0.3s ease;
         }
     </style>
 
@@ -587,6 +601,32 @@
                 }, 2000);
             }
         });
+
+        function scrollToOpportunity(id) {
+            const row = document.querySelector(`tr[data-id="${id}"]`);
+            if (row) {
+                // Remove highlight and flash from any previously highlighted rows
+                document.querySelectorAll('tr.highlighted').forEach(tr => {
+                    tr.classList.remove('highlighted');
+                    tr.classList.remove('flash-highlight');
+                });
+
+                // Add highlight to the target row
+                row.classList.add('highlighted');
+
+                // Scroll the row into view
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Add flash effect after scroll completes
+                setTimeout(() => {
+                    row.classList.add('flash-highlight');
+                    // Remove flash class after animation completes
+                    setTimeout(() => {
+                        row.classList.remove('flash-highlight');
+                    }, 1000); // Match this to the animation duration
+                }, 500); // Wait for scroll to complete
+            }
+        }
     </script>
 
 
