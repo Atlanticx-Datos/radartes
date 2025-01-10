@@ -196,10 +196,12 @@
                 <nav class="flex {% if request.endpoint == 'index' %}justify-end{% else %}justify-between{% endif %} items-center h-[34px] md:h-16 pt-6 md:pt-8 z-50 md:px-8">
                     <!-- Logo Section - only show on non-index routes -->
                     {% if request.endpoint != 'index' %}
-                    <div class="flex items-center">
-                        <span class="text-2xl md:text-3xl font-bold tracking-tight text-neutral-700">
-                            ⏺<span class="text-neutral-400">⏺</span><span class="text-red-500">⏺</span>
-                            <span class="font-black">OPORTUNIDADES</span>
+                    <div class="flex items-center md:ml-2">
+                        <span class="text-2xl md:text-3xl font-bold tracking-tight text-neutral-700 flex items-center gap-[2px]">
+                            <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-neutral-700"></span>
+                            <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-neutral-400"></span>
+                            <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-red-500"></span>
+                            <span class="font-black ml-1">OPORTUNIDADES</span>
                         </span>
                     </div>
                     {% endif %}

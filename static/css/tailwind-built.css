@@ -1984,6 +1984,9 @@ details.collapse summary::-webkit-details-marker {
 .h-9 {
   height: 2.25rem;
 }
+.h-\[0\.7em\] {
+  height: 0.7em;
+}
 .h-\[34px\] {
   height: 34px;
 }
@@ -2040,6 +2043,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .w-9 {
   width: 2.25rem;
+}
+.w-\[0\.7em\] {
+  width: 0.7em;
 }
 .w-\[10\%\] {
   width: 10%;
@@ -2191,6 +2197,9 @@ details.collapse summary::-webkit-details-marker {
 .gap-6 {
   gap: 1.5rem;
 }
+.gap-\[2px\] {
+  gap: 2px;
+}
 .space-x-1 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 0;
   margin-right: calc(0.25rem * var(--tw-space-x-reverse));
@@ -2328,6 +2337,14 @@ details.collapse summary::-webkit-details-marker {
 .bg-indigo-500 {
   --tw-bg-opacity: 1;
   background-color: rgb(99 102 241 / var(--tw-bg-opacity));
+}
+.bg-neutral-400 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(163 163 163 / var(--tw-bg-opacity));
+}
+.bg-neutral-700 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(64 64 64 / var(--tw-bg-opacity));
 }
 .bg-red-400 {
   --tw-bg-opacity: 1;
@@ -2860,9 +2877,6 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:pl-0 {
     padding-left: 0px;
-  }
-  .md\:pt-4 {
-    padding-top: 1rem;
   }
   .md\:pt-8 {
     padding-top: 2rem;
