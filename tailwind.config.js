@@ -5,7 +5,7 @@ module.exports = {
       'sm': '640px',
       'md': '768px',
       'lg': '1024px',
-      'xl': '1280px',
+      'xl': '1287px',
       '2xl': '1336px',
       'small-phone': {'raw': '(max-height: 667px)'},
       'mid-phone': {'raw': '(min-height: 668px) and (max-height: 800px)'},

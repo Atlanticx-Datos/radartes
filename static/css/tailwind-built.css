@@ -540,9 +540,9 @@ html {
     max-width: 1024px;
   }
 }
-@media (min-width: 1280px) {
+@media (min-width: 1287px) {
   .container {
-    max-width: 1280px;
+    max-width: 1287px;
   }
 }
 @media (min-width: 1336px) {
@@ -1268,9 +1268,6 @@ html {
     background-color: var(--btn-color, var(--fallback-b2));
     border-color: var(--btn-color, var(--fallback-b2));
   }
-  .prose :where(code):not(:where([class~="not-prose"] *, pre *)) {
-    background-color: var(--fallback-b3,oklch(var(--b3)/1));
-  }
 }
 .btn:focus-visible {
   outline-style: solid;
@@ -1868,40 +1865,6 @@ details.collapse summary::-webkit-details-marker {
   --togglehandleborder: 0 0 0 3px var(--fallback-bc,oklch(var(--bc)/1)) inset,
       var(--handleoffsetcalculator) 0 0 3px var(--fallback-bc,oklch(var(--bc)/1)) inset;
 }
-:root .prose {
-  --tw-prose-body: var(--fallback-bc,oklch(var(--bc)/0.8));
-  --tw-prose-headings: var(--fallback-bc,oklch(var(--bc)/1));
-  --tw-prose-lead: var(--fallback-bc,oklch(var(--bc)/1));
-  --tw-prose-links: var(--fallback-bc,oklch(var(--bc)/1));
-  --tw-prose-bold: var(--fallback-bc,oklch(var(--bc)/1));
-  --tw-prose-counters: var(--fallback-bc,oklch(var(--bc)/1));
-  --tw-prose-bullets: var(--fallback-bc,oklch(var(--bc)/0.5));
-  --tw-prose-hr: var(--fallback-bc,oklch(var(--bc)/0.2));
-  --tw-prose-quotes: var(--fallback-bc,oklch(var(--bc)/1));
-  --tw-prose-quote-borders: var(--fallback-bc,oklch(var(--bc)/0.2));
-  --tw-prose-captions: var(--fallback-bc,oklch(var(--bc)/0.5));
-  --tw-prose-code: var(--fallback-bc,oklch(var(--bc)/1));
-  --tw-prose-pre-code: var(--fallback-nc,oklch(var(--nc)/1));
-  --tw-prose-pre-bg: var(--fallback-n,oklch(var(--n)/1));
-  --tw-prose-th-borders: var(--fallback-bc,oklch(var(--bc)/0.5));
-  --tw-prose-td-borders: var(--fallback-bc,oklch(var(--bc)/0.2));
-}
-.prose :where(code):not(:where([class~="not-prose"] *, pre *)) {
-  padding: 1px 8px;
-  border-radius: var(--rounded-badge);
-  font-weight: initial;
-  background-color: var(--fallback-bc,oklch(var(--bc)/0.1));
-}
-.prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *))::before, .prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *))::after {
-  display: none;
-}
-.prose pre code {
-  border-radius: 0;
-  padding: 0;
-}
-.prose :where(tbody tr, thead):not(:where([class~="not-prose"] *)) {
-  border-bottom-color: var(--fallback-bc,oklch(var(--bc)/0.2));
-}
 .btm-nav-xs > *:where(.active) {
   border-top-width: 1px;
 }
@@ -2015,20 +1978,9 @@ details.collapse summary::-webkit-details-marker {
 .col-span-1 {
   grid-column: span 1 / span 1;
 }
-.col-span-2 {
-  grid-column: span 2 / span 2;
-}
-.-mx-6 {
-  margin-left: -1.5rem;
-  margin-right: -1.5rem;
-}
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
-}
-.my-96 {
-  margin-top: 24rem;
-  margin-bottom: 24rem;
 }
 .-ml-4 {
   margin-left: -1rem;
@@ -2060,9 +2012,6 @@ details.collapse summary::-webkit-details-marker {
 .mb-1 {
   margin-bottom: 0.25rem;
 }
-.mb-20 {
-  margin-bottom: 5rem;
-}
 .mb-4 {
   margin-bottom: 1rem;
 }
@@ -2077,9 +2026,6 @@ details.collapse summary::-webkit-details-marker {
 }
 .ml-1 {
   margin-left: 0.25rem;
-}
-.ml-2 {
-  margin-left: 0.5rem;
 }
 .ml-4 {
   margin-left: 1rem;
@@ -2099,23 +2045,11 @@ details.collapse summary::-webkit-details-marker {
 .mr-24 {
   margin-right: 6rem;
 }
-.mr-36 {
-  margin-right: 9rem;
-}
 .mr-4 {
   margin-right: 1rem;
 }
 .mr-6 {
   margin-right: 1.5rem;
-}
-.mr-8 {
-  margin-right: 2rem;
-}
-.mt-10 {
-  margin-top: 2.5rem;
-}
-.mt-12 {
-  margin-top: 3rem;
 }
 .mt-2 {
   margin-top: 0.5rem;
@@ -2128,6 +2062,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .mt-6 {
   margin-top: 1.5rem;
+}
+.mt-\[20vh\] {
+  margin-top: 20vh;
 }
 .\!block {
   display: block !important;
@@ -2200,12 +2137,6 @@ details.collapse summary::-webkit-details-marker {
 }
 .min-h-\[20rem\] {
   min-height: 20rem;
-}
-.min-h-\[300px\] {
-  min-height: 300px;
-}
-.min-h-\[320px\] {
-  min-height: 320px;
 }
 .min-h-screen {
   min-height: 100vh;
@@ -2567,9 +2498,6 @@ details.collapse summary::-webkit-details-marker {
 .p-4 {
   padding: 1rem;
 }
-.p-6 {
-  padding: 1.5rem;
-}
 .px-0 {
   padding-left: 0px;
   padding-right: 0px;
@@ -2589,10 +2517,6 @@ details.collapse summary::-webkit-details-marker {
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
-}
-.px-40 {
-  padding-left: 10rem;
-  padding-right: 10rem;
 }
 .px-5 {
   padding-left: 1.25rem;
@@ -2626,9 +2550,13 @@ details.collapse summary::-webkit-details-marker {
   padding-top: 0.625rem;
   padding-bottom: 0.625rem;
 }
-.py-6 {
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
+.py-3 {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+.py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 .pb-3 {
   padding-bottom: 0.75rem;
@@ -2648,9 +2576,6 @@ details.collapse summary::-webkit-details-marker {
 .pr-8 {
   padding-right: 2rem;
 }
-.pt-12 {
-  padding-top: 3rem;
-}
 .pt-4 {
   padding-top: 1rem;
 }
@@ -2666,19 +2591,23 @@ details.collapse summary::-webkit-details-marker {
 .text-center {
   text-align: center;
 }
-.text-2xl {
-  font-size: 1.35rem;
-  line-height: 2rem;
-}
 .text-3xl {
   font-size: 1.875rem;
   line-height: 2.25rem;
+}
+.text-5xl {
+  font-size: 3rem;
+  line-height: 1;
 }
 .text-\[1\.8rem\] {
   font-size: 1.8rem;
 }
 .text-\[4\.2rem\] {
   font-size: 4.2rem;
+}
+.text-base {
+  font-size: 1rem;
+  line-height: 1.5rem;
 }
 .text-sm {
   font-size: 0.875rem;
@@ -2712,9 +2641,6 @@ details.collapse summary::-webkit-details-marker {
 }
 .capitalize {
   text-transform: capitalize;
-}
-.leading-3 {
-  line-height: .75rem;
 }
 .leading-\[0\.95\] {
   line-height: 0.95;
@@ -2884,10 +2810,6 @@ details.collapse summary::-webkit-details-marker {
   --tw-text-opacity: 1;
   color: rgb(17 24 39 / var(--tw-text-opacity));
 }
-.hover\:text-slate-900:hover {
-  --tw-text-opacity: 1;
-  color: rgb(15 23 42 / var(--tw-text-opacity));
-}
 .hover\:shadow-indigo-500\/50:hover {
   --tw-shadow-color: rgb(99 102 241 / 0.5);
   --tw-shadow: var(--tw-shadow-colored);
@@ -2919,17 +2841,8 @@ details.collapse summary::-webkit-details-marker {
   }
 }
 @media (min-width: 768px) {
-  .md\:col-span-2 {
-    grid-column: span 2 / span 2;
-  }
-  .md\:col-span-3 {
-    grid-column: span 3 / span 3;
-  }
   .md\:col-span-5 {
     grid-column: span 5 / span 5;
-  }
-  .md\:col-span-6 {
-    grid-column: span 6 / span 6;
   }
   .md\:col-span-7 {
     grid-column: span 7 / span 7;
@@ -3047,6 +2960,10 @@ details.collapse summary::-webkit-details-marker {
     padding-left: 1rem;
     padding-right: 1rem;
   }
+  .md\:px-6 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
   .md\:px-8 {
     padding-left: 2rem;
     padding-right: 2rem;
@@ -3054,6 +2971,10 @@ details.collapse summary::-webkit-details-marker {
   .md\:py-2 {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
+  }
+  .md\:py-4 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
   }
   .md\:pl-0 {
     padding-left: 0px;

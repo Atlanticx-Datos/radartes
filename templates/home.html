@@ -2,227 +2,66 @@
 
 {% block body %}
 
-<body>
+<body class="w-full">
     <!-- Keep spinner -->
     <div id="spinner" class="spinner h-8 w-8" style="display: none;">
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
     </div>
 
     <style>
-        /* Override layout centering */
+        /* Override layout centering specifically for home */
         body {
-            justify-content: start !important;
-            align-items: start !important;
+            justify-content: center !important;
+            align-items: center !important;
         }
 
         main {
-            justify-content: start !important;
-            align-items: start !important;
+            justify-content: center !important;
+            align-items: center !important;
         }
 
         /* Override content wrapper centering */
         .flex-grow {
-            justify-content: start !important;
-            align-items: start !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+
+        /* Container centering */
+        .content-container {
+            margin: 0 auto;
+            max-width: 1280px; /* max-w-7xl equivalent */
+            width: 100%;
         }
     </style>
 
-    <div class="px-0 md:px-2 -mt-4" style="margin-left: -1rem !important; margin-right: -0.5rem !important;">
+    <div class="content-container px-4 md:px-8">
         <!-- Main content with corrected grid -->
         <main class="w-full relative">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-0 w-full">
-                <!-- First Column: Logo and Destinatario -->
-                <div class="col-span-1 md:col-span-3 flex flex-col justify-between min-w-0 md:border-r border-neutral">
+            <div class="flex flex-col min-h-screen">
+                <!-- First Section: Logo (viewport height) -->
+                <div class="w-full flex flex-col justify-between min-h-screen">
                     <!-- Logo Section -->
-                    <div class="flex justify-center items-center p-4 mt-10 mr-6">
-                        <span
-                            class="md:border border-neutral-300 md:px-4 md:py-2 text-2xl font-bold tracking-tight text-neutral-700">
-                            ⏺<span class="text-neutral-400">⏺</span><span class="text-red-500">⏺</span> OPORTUNIDADES
-                        </span>
-                    </div>
-                    <div class="flex justify-center p-2 mr-6 text-gray-500 text-xs">
-                        ---------
-                    </div>
-                    <div class="flex justify-center py-2 px-40 uppercase text-xs font-bold relative right-2 leading-3">
-                        Base de datos para artistxs
-                    </div>
-
-                    <div class="flex-1 flex flex-col">
-                        <!-- First section with title -->
-                        <div class="border-t border-neutral my-96 pt-12">
-                            <div class="pr-8 h-10">
-                                <div class="flex items-center justify-center gap-3 ml-6">
-                                    IG <span class="text-neutral-400 font-bold">︱</span> IN
-                                </div>
-                            </div>
+                    <div class="flex flex-col justify-start mt-[20vh]">
+                        <div class="flex justify-center items-center p-4">
+                            <span class="text-5xl font-bold tracking-tight text-neutral-700">
+                                ⏺<span class="text-neutral-400">⏺</span><span class="text-red-500">⏺</span> OPORTUNIDADES
+                            </span>
+                        </div>
+                        <div class="flex justify-center p-2 mr-6 text-gray-500 text-xs">
+                            ---------
+                        </div>
+                        <div class="flex justify-center py-3 uppercase text-base font-bold relative right-2">
+                            Base de datos para artistxs
                         </div>
                     </div>
-                </div>
 
-                <!-- Second Column: 6/12 width -->
-                <div class="col-span-1 md:col-span-6 min-w-0 md:border-r border-neutral">
-                    <!-- Upper Section (2/3 height) -->
-                    <div class="min-h-[320px] p-6 border-b border-t border-neutral mt-12">
-                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4">
-                            <div class="uppercase font-bold flex gap-2 items-center">
-                                <button class="hover:text-slate-900 transition-colors" data-target="de-que-se-trata">DE
-                                    QUÉ SE TRATA</button>
-                                <span class="text-neutral-400">︱</span>
-                                <button class="hover:text-slate-900 transition-colors"
-                                    data-target="una-base-de-datos">UNA BASE DE CONVOCATORIAS</button>
-                                <span class="text-neutral-400">︱</span>
-                                <button class="hover:text-slate-900 transition-colors"
-                                    data-target="para-artistas">GRATIS PARA
-                                    ARTISTAS</button>
-                                <span class="text-neutral-400">︱</span>
-                                <button class="hover:text-slate-900 transition-colors" data-target="para-la-cultura">Y
-                                    LA CULTURA</button>
+                    <!-- Social Links -->
+                    <div class="flex flex-col mb-8">
+                        <div class="border-t border-neutral mx-auto w-full max-w-md">
+                            <div class="flex items-center justify-center gap-3 py-4">
+                                IG <span class="text-neutral-400 font-bold">︱</span> IN
                             </div>
-                        </h2>
-                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4 mr-36">
-                            <div class="uppercase">
-                                <span id="de-que-se-trata" class="transition-all">+ Oportunidades es un proyecto
-                                    enmarcado en los objetivos de sostenibilidad de las Naciones Unidas: la base lista
-                                    enlaza y contextualiza
-                                    becas, convocatorias, premios y fondos disponibles. Oportunidades que, en lugar de
-                                    ser monetizadas, son tratados aquí como
-                                    un bien público que de hecho aspira a ser parte oficial del repositorio "Digital
-                                    Public Good
-                                    Alliance" (DPGA). </span>
-                                <span id="una-base-de-datos" class="transition-all">+ Oportunidades procesa sus datos
-                                    haciendo foco en la accesibilidad y la transparencia tanto como en la calidad de las
-                                    fuentes desde las que obtiene, de forma automatizada, la información. </span>
-                                <span id="para-artistas" class="transition-all">+ Oportunidades es un servicio
-                                    totalmente gratuito y permanentemente actualizado que aspira a dar un panoramos
-                                    global de desarrollo profesional para artistxs latinoamericanxs. </span>
-                                <span id="para-la-cultura" class="transition-all">+ Oportunidades también tiene como
-                                    destinatarixs a investigadores, gestores y estudiantes interesadxs en becas,
-                                    trabajos,
-                                    instancias de formación y posibildades de movilidad.</span>
-                            </div>
-                        </h2>
-                        <!-- CTA Button -->
-                        <button type="button" onclick="window.location.href='/database'"
-                            class="inline-flex items-center justify-center px-4 py-2 text-xs font-bold tracking-tight text-neutral-700 bg-gray-200 hover:bg-gray-300 transition-colors duration-200 rounded-none mt-4">
-                            <span class="uppercase">Actualizamos cada semana</span>
-                            <svg class="w-4 h-4 ml-2" data-slot="icon" fill="none" stroke-width="1.5"
-                                stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
-                                aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"></path>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- Lower Section (1/3 height) -->
-                    <div class="min-h-[300px] p-6 border-b border-neutral">
-                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4">
-                            <div class="uppercase font-bold flex gap-2 items-center">
-                                <button class="hover:text-slate-900 transition-colors" data-target="fuentes">LAS
-                                    FUENTES SCRAPPEADAS</button>
-                                <span class="text-neutral-400">︱</span>
-                                <button class="hover:text-slate-900 transition-colors" data-target="herramientas">LAS
-                                    HERRAMIENTAS DISPONIBLES</button>
-                                <span class="text-neutral-400">︱</span>
-                                <button class="hover:text-slate-900 transition-colors" data-target="github">PARA
-                                    DESARROLLADORES</button>
-                            </div>
-                        </h2>
-                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4 mr-36">
-                            <div class="uppercase">
-                                <span id="fuentes" class="transition-all">+ Oportunidades recopila información que se
-                                    actualiza semanalmente. Se trata de un sistema de scraping de fuentes oficiales,
-                                    instituciones
-                                    culturales y plataformas especializadas.</span>
-                                <span id="herramientas" class="transition-all">La visualización de la información se
-                                    realiza a través de una vista de fácil interacción. El sistema muestra las
-                                    convocatorias abiertas, las que cierran pronto y oportunidades destacadas.
-                                    Se incluye además un sistema de búsqueda avanzada por combinación de palabras clave,
-                                    por mes de cierre y por nombre y/o tipo de convovaotria y/o disciplina. Por otro
-                                    lado, para permitir un trackeo de información fuera de cierre y facilitar áun más el
-                                    uso de la base, una vez logueado, el usuario
-                                    también puede guardar las convocatorias.</span>
-                                <span id="github" class="transition-all">+ Oportunidades es un proyecto de código
-                                    abierto disponible en GitHub, donde también se encuentra publicada, completa, la
-                                    información que nutre la base de datos.</span>
-                            </div>
-                        </h2>
-                        <!-- CTA Button -->
-                        <button type="button"
-                            onclick="window.location.href='https://github.com/Atlanticx-Datos/100_Oportunidades'"
-                            class="inline-flex items-center justify-center px-4 py-2 text-xs font-bold tracking-tight text-neutral-700 bg-gray-200 hover:bg-gray-300 transition-colors duration-200 rounded-none mt-4">
-                            <span class="uppercase">Saber más sobre el proyecto</span>
-                            <svg class="w-4 h-4 ml-2" data-slot="icon" fill="none" stroke-width="1.5"
-                                stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
-                                aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Third Column: 1/12 width -->
-                <div class="col-span-2 md:col-span-3 min-w-0 p-6 border-t border-b border-r border-neutral w-2/3"
-                    style="align-self: start;">
-                    <!-- First section: ¿QUIÉNES SOMOS? -->
-                    <div class="border-b border-neutral -mx-6 px-6">
-                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4 mt-12">
-                            <span class="uppercase font-bold">¿QUIÉNES SOMOS?</span>
-                        </h2>
-                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4 mr-8">
-                            <prose class="uppercase">
-                                Atlanticx.org es una plataforma dedicada a conectar artistas con oportunidades globales.
-                                Nos enfocamos en la accesibilidad y transparencia de la información, ofreciendo un
-                                servicio gratuito y actualizado para apoyar el desarrollo profesional de artistas
-                                latinoamericanos.
-                            </prose>
-                        </h2>
-                        <button type="button" onclick="window.location.href='https://atlanticx.org'" target="_blank"
-                            class="inline-flex items-center justify-center px-4 py-2 text-xs font-bold tracking-tight text-neutral-700 bg-gray-200 hover:bg-gray-300 transition-colors duration-200 rounded-none mt-4 mb-20">
-                            <span class="uppercase">Ir a Atlanticx</span>
-                            <svg class="w-4 h-4 ml-2" data-slot="icon" fill="none" stroke-width="1.5"
-                                stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
-                                aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"></path>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- Second section: CÓMO PARTICIPAR -->
-                    <div class="border-b border-neutral -mx-6 px-6 py-6">
-                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4 mt-12">
-                            <span class="uppercase font-bold">CÓMO PARTICIPAR</span>
-                        </h2>
-                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4 mr-8">
-                            <prose class="uppercase">Si querés sumar tu convocatoria, podés hacerlo a través de nuestro
-                                formulario de contacto. Si sos desarrollador, podés contribuir al proyecto a través de
-                                nuestro repositorio en GitHub.</prose>
-                        </h2>
-                        <button type="button" onclick="window.location.href='https://atlanticx.org'" target="_blank"
-                            class="inline-flex items-center justify-center px-4 py-2 text-xs font-bold tracking-tight text-neutral-700 bg-gray-200 hover:bg-gray-300 transition-colors duration-200 rounded-none mt-4 mb-20">
-                            <span class="uppercase">Ir a Atlanticx</span>
-                            <svg class="w-4 h-4 ml-2" data-slot="icon" fill="none" stroke-width="1.5"
-                                stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
-                                aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"></path>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- Third section: CONTACTO -->
-                    <div class="-mx-6 px-6 py-6">
-                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4">
-                            <span class="uppercase font-bold">CONTACTO</span>
-                        </h2>
-                        <h2 class="text-xs tracking-tighter text-neutral-700 mb-4 mr-8">
-                            <a href="mailto:info@atlanticx.org"
-                                class="uppercase hover:text-slate-900 transition-colors">
-                                info@atlanticx.org
-                            </a>
-                        </h2>
+                        </div>
                     </div>
                 </div>
         </main>
@@ -323,74 +162,5 @@
             }
         }
     </style>
-
-    <!-- Keep minimal necessary scripts -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Keep basic functionality for accordions
-            const accordions = document.querySelectorAll('.collapse input[type="radio"]');
-            accordions.forEach(accordion => {
-                accordion.addEventListener('change', function () {
-                    accordions.forEach(other => {
-                        if (other !== accordion) {
-                            other.checked = false;
-                        }
-                    });
-                });
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function () {
-            // Separate selectors for upper and lower sections
-            const upperButtons = document.querySelectorAll('[data-target^="de-que-se-trata"], [data-target^="una-base-de-datos"], [data-target^="para-artistas"], [data-target^="para-la-cultura"]');
-            const lowerButtons = document.querySelectorAll('[data-target^="fuentes"], [data-target^="herramientas"], [data-target^="github"]');
-
-            function highlightUpperSection(targetId) {
-                const sections = document.querySelectorAll('[id^="de-que-se-trata"], [id^="una-base-de-datos"], [id^="para-artistas"], [id^="para-la-cultura"]');
-                sections.forEach(section => {
-                    section.classList.remove('text-highlight');
-                });
-                upperButtons.forEach(btn => {
-                    btn.classList.remove('nav-active');
-                });
-
-                const targetSection = document.getElementById(targetId);
-                const targetButton = document.querySelector(`[data-target="${targetId}"]`);
-                if (targetSection) {
-                    targetSection.classList.add('text-highlight');
-                    targetButton.classList.add('nav-active');
-                }
-            }
-
-            function highlightLowerSection(targetId) {
-                const sections = document.querySelectorAll('[id^="fuentes"], [id^="herramientas"], [id^="github"]');
-                sections.forEach(section => {
-                    section.classList.remove('text-highlight');
-                });
-                lowerButtons.forEach(btn => {
-                    btn.classList.remove('nav-active');
-                });
-
-                const targetSection = document.getElementById(targetId);
-                const targetButton = document.querySelector(`[data-target="${targetId}"]`);
-                if (targetSection) {
-                    targetSection.classList.add('text-highlight');
-                    targetButton.classList.add('nav-active');
-                }
-            }
-
-            // Upper section handlers
-            upperButtons.forEach(button => {
-                button.addEventListener('click', () => highlightUpperSection(button.dataset.target));
-                button.addEventListener('mouseenter', () => highlightUpperSection(button.dataset.target));
-            });
-
-            // Lower section handlers
-            lowerButtons.forEach(button => {
-                button.addEventListener('click', () => highlightLowerSection(button.dataset.target));
-                button.addEventListener('mouseenter', () => highlightLowerSection(button.dataset.target));
-            });
-        });
-    </script>
 </body>
 {% endblock %}
