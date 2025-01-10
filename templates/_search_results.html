@@ -143,6 +143,9 @@
                         </svg>
                     </button>
                     <ul class="dropdown-content menu p-2 shadow-xl bg-zinc-100 rounded-none w-52 border border-black mt-3 absolute right-0 hidden">
+                        <li class="menu-item">
+                            <a href="#" onclick="copyUrl('{{ page.base_url if page.base_url else page.url }}'); return false;">Copiar URL</a>
+                        </li>
                         <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'whatsapp')">WhatsApp</a></li>
                         <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'linkedin')">LinkedIn</a></li>
                         <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'gmail')">Email</a></li>
@@ -228,6 +231,34 @@
         max-width: 10rem; /* Adjust as needed */
     }
     
+    .alert {
+        position: fixed;
+        bottom: 34px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 0.5rem 0.5rem;
+        background-color: #4CAF50;
+        color: white;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 0rem !important;
+        line-height: 1.25rem;
+        z-index: 9999;
+        animation: fadeInOut 3s ease-in-out;
+        max-width: 140px;
+        text-align: center;
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    @keyframes fadeInOut {
+        0% { opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { opacity: 0; }
+    }
 </style>
 
 <script>
@@ -348,4 +379,19 @@
             event.stopPropagation();
         }
     });
+
+    function copyUrl(url) {
+        navigator.clipboard.writeText(url).then(() => {
+            const alert = document.createElement('div');
+            alert.className = 'alert';
+            alert.textContent = 'URL COPIADO';
+            document.body.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);  // Increased to 3 seconds
+        }).catch(err => {
+            console.error('Error copying URL:', err);
+        });
+    }
 </script>

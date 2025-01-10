@@ -1903,6 +1903,9 @@ details.collapse summary::-webkit-details-marker {
 .mr-1 {
   margin-right: 0.25rem;
 }
+.mr-2 {
+  margin-right: 0.5rem;
+}
 .mr-24 {
   margin-right: 6rem;
 }
@@ -2214,6 +2217,11 @@ details.collapse summary::-webkit-details-marker {
   --tw-space-x-reverse: 0;
   margin-right: calc(2rem * var(--tw-space-x-reverse));
   margin-left: calc(2rem * calc(1 - var(--tw-space-x-reverse)));
+}
+.space-y-0 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0px * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0px * var(--tw-space-y-reverse));
 }
 .overflow-auto {
   overflow: auto;
