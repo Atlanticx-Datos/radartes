@@ -604,28 +604,64 @@
         });
 
         function scrollToOpportunity(id) {
-            const row = document.querySelector(`tr[data-id="${id}"]`);
-            if (row) {
-                // Remove highlight and flash from any previously highlighted rows
-                document.querySelectorAll('tr.highlighted').forEach(tr => {
-                    tr.classList.remove('highlighted');
-                    tr.classList.remove('flash-highlight');
-                });
-
-                // Add highlight to the target row
-                row.classList.add('highlighted');
-
-                // Scroll the row into view
-                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-                // Add flash effect after scroll completes
-                setTimeout(() => {
-                    row.classList.add('flash-highlight');
-                    // Remove flash class after animation completes
+            // First, clear the search if it's active
+            const searchInput = document.getElementById('search-input');
+            if (searchInput && searchInput.value) {
+                // Clear the search input
+                searchInput.value = '';
+                
+                // Use HTMX to restore full results
+                htmx.ajax('GET', '/database?clear=true', {
+                    target: '#search-results',
+                    swap: 'innerHTML',
+                    headers: { 'HX-Request': 'true' }
+                }).then(() => {
+                    // After results are restored, find and scroll to the row
                     setTimeout(() => {
-                        row.classList.remove('flash-highlight');
-                    }, 1000); // Match this to the animation duration
-                }, 500); // Wait for scroll to complete
+                        const row = document.querySelector(`tr[data-id="${id}"]`);
+                        if (row) {
+                            // Remove highlight and flash from any previously highlighted rows
+                            document.querySelectorAll('tr.highlighted').forEach(tr => {
+                                tr.classList.remove('highlighted');
+                                tr.classList.remove('flash-highlight');
+                            });
+
+                            // Add highlight to the target row
+                            row.classList.add('highlighted');
+
+                            // Scroll the row into view
+                            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                            // Add flash effect after scroll completes
+                            setTimeout(() => {
+                                row.classList.add('flash-highlight');
+                                // Remove flash class after animation completes
+                                setTimeout(() => {
+                                    row.classList.remove('flash-highlight');
+                                }, 1000);
+                            }, 500);
+                        }
+                    }, 100); // Small delay to ensure DOM is updated
+                });
+            } else {
+                // If no search is active, proceed with normal scroll behavior
+                const row = document.querySelector(`tr[data-id="${id}"]`);
+                if (row) {
+                    document.querySelectorAll('tr.highlighted').forEach(tr => {
+                        tr.classList.remove('highlighted');
+                        tr.classList.remove('flash-highlight');
+                    });
+
+                    row.classList.add('highlighted');
+                    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    setTimeout(() => {
+                        row.classList.add('flash-highlight');
+                        setTimeout(() => {
+                            row.classList.remove('flash-highlight');
+                        }, 1000);
+                    }, 500);
+                }
             }
         }
     </script>
