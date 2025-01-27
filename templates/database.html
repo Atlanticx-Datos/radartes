@@ -28,22 +28,26 @@
                                     {% if closing_soon_pages %}
                                     {% for page in closing_soon_pages[:3] %}
                                     <p class="relative">
-                                        <a href="#" 
+                                        <a href="{{ url }}" 
                                            data-id="{{ page.id }}"
                                            data-name="{{ page.nombre }}" 
                                            data-country="{{ page.País }}"
-                                           class="cierran-pronto-link"
-                                           onclick="event.preventDefault(); scrollToOpportunity('{{ page.id }}')">
+                                           data-summary="{{ page.Og_Resumida }}"
+                                           class="cierran-pronto-link prevent-default">
                                             {{ page.nombre | truncate(50) }}
-                                            <span class="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center -mr-1">
-                                                <span class="flex items-center justify-center group-hover:bg-slate-200 group-hover:rounded-md transition-all duration-200 p-2">
-                                                    <svg class="w-3 h-3 z-10" data-slot="icon" fill="none"
-                                                        stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"
-                                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"></path>
+                                            <span class="inline-block ml-2 opportunity-link cursor-pointer">
+                                                <button role="button" 
+                                                        tabindex="0" 
+                                                        data-url="{{ page.url }}"
+                                                        data-name="{{ page.nombre }}"
+                                                        data-country="{{ page.país }}"
+                                                        data-summary="{{ page.og_resumida }}"
+                                                        class="opportunity-link flex items-center justify-center w-4 h-4 truncate" 
+                                                        title="{{ page.nombre }}">
+                                                    <svg class="w-3 md:w-4" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5L19.5 4.5M19.5 4.5H8.25M19.5 4.5V15.75"></path>
                                                     </svg>
-                                                </span>
+                                                </button>
                                             </span>
                                         </a>
                                     </p>
@@ -318,6 +322,34 @@
         tr[data-id] {
             transition: border-left-width 0.3s ease;
         }
+
+        .modal-open {
+            overflow: hidden;
+        }
+
+        .modal-content {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+        }
+
+        .modal-content::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+
+        @keyframes modalEntry {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-animate {
+            animation: modalEntry 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
     </style>
 
 
@@ -435,7 +467,9 @@
         }
 
         // Inicialización de eventos al cargar el DOM
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, setting up listeners');
+
             const searchInput = document.getElementById('search-input');
             let initialContent = null;
             let searchInProgress = false;
@@ -500,40 +534,49 @@
                 }
             };
 
-            // Usar delegación de eventos para los enlaces de oportunidades y clear_search
-            document.body.addEventListener('click', function (event) {
-                // Manejar enlaces de oportunidades
-                const opportunityLink = event.target.closest('.opportunity-link');
-                if (opportunityLink) {
-                    event.preventDefault();
+            // Handle opportunity links (modal opening)
+            document.body.addEventListener('click', function(event) {
+                const clickedElement = event.target;
+                const svg = clickedElement.closest('svg');
+                
+                if (svg) {
+                    const opportunityButton = svg.closest('.opportunity-link');
+                    
+                    if (opportunityButton) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        
+                        const targetUrl = opportunityButton.getAttribute('data-url');
+                        const name = opportunityButton.getAttribute('data-name');
+                        const country = opportunityButton.getAttribute('data-country');
+                        const summary = opportunityButton.getAttribute('data-summary');
+                        
+                        console.log('Modal data:', { targetUrl, name, country, summary }); // Debug log
+                        
+                        if (!targetUrl) {
+                            console.error('No URL found');
+                            return;
+                        }
 
-                    // Obtener datos para analytics
-                    const eventData = {
-                        'opportunity_name': opportunityLink.dataset.name || '',
-                        'country': opportunityLink.dataset.country || 'sin país',
-                        'opportunity_keywords': opportunityLink.dataset.keywords || '',
-                        'event_category': 'Oportunidad',
-                        'section': 'main'
-                    };
-
-                    // Enviar evento a Google Analytics
-                    console.log('Sending event data:', eventData);
-                    gtag('event', 'opportunity_click', eventData);
-
-                    // Abrir enlace en nueva pestaña
-                    const url = opportunityLink.getAttribute('data-url');
-                    if (url) {
-                        window.open(url, '_blank', 'noopener,noreferrer');
+                        showPreviewModal(targetUrl, name, country, summary);
                     }
-                    return false;
                 }
+            });
 
-                // Manejar clear_search
+            // 2. Handle clear search button (preserve existing functionality)
+            document.body.addEventListener('click', function (event) {
                 const clearButton = event.target.closest('[onclick="clearSearch()"]');
                 if (clearButton) {
                     event.preventDefault();
                     window.location.href = '/database';
                     return false;
+                }
+            });
+
+            // 3. Handle modal close clicks
+            document.body.addEventListener('click', function(event) {
+                if (event.target.classList.contains('fixed') && event.target.classList.contains('inset-0')) {
+                    event.target.remove();
                 }
             });
 
@@ -664,8 +707,128 @@
                 }
             }
         }
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modals = document.querySelectorAll('.fixed.inset-0');
+                if (modals.length > 0) {
+                    modals[modals.length - 1].remove();
+                }
+            }
+        });
     </script>
 
+    <!-- JavaScript for Modal -->
+    <script>
+        // Function to create and show the modal
+        function showPreviewModal(url, name, country, summary) {
+            const modalId = `modal-${Date.now()}`;
+            const modal = document.createElement('div');
+            modal.id = modalId;
+            modal.className = 'fixed inset-0 z-50 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center p-4';
+            
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg w-full max-w-lg overflow-hidden border border-neutral modal-animate">
+                    <div class="flex items-center justify-between p-3 border-b border-neutral bg-gray-50">
+                        <h3 class="text-lg font-medium text-gray-900">Vista previa de la oportunidad</h3>
+                        <button class="text-neutral-700 hover:text-neutral-900 px-3 py-1 transition-colors" 
+                                onclick="document.getElementById('${modalId}').remove()">
+                            ✕
+                        </button>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-sm text-gray-500">Nombre</p>
+                                <p class="mt-1 text-sm text-gray-900">${name || 'No disponible'}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">País</p>
+                                <p class="mt-1 text-sm text-gray-900">${country || 'No disponible'}</p>
+                            </div>
+                            ${summary ? `
+                            <div>
+                                <p class="text-sm text-gray-500">Resumen</p>
+                                <div class="mt-2 p-4 bg-gray-50 rounded-lg">
+                                    <p class="text-sm text-gray-700 whitespace-pre-line">${summary}</p>
+                                </div>
+                            </div>
+                            ` : ''}
+                            <div>
+                                <p class="text-sm text-gray-500">URL</p>
+                                <a href="${url}" class="mt-1 text-sm text-blue-600 hover:text-blue-800 break-all" target="_blank">
+                                    ${url}
+                                </a>
+                            </div>
+                            <div class="mt-6 flex justify-end space-x-3">
+                                <button onclick="document.getElementById('${modalId}').remove()" 
+                                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
+                                    Cerrar
+                                </button>
+                                <a href="${url}" 
+                                   target="_blank" 
+                                   class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">
+                                    Ir al sitio web
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+            
+            // Add class to prevent body scrolling
+            document.body.classList.add('modal-open');
+
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.remove();
+                    document.body.classList.remove('modal-open');
+                }
+            });
+
+            // Close modal with ESC key
+            document.addEventListener('keydown', function escListener(event) {
+                if (event.key === 'Escape') {
+                    modal.remove();
+                    document.body.classList.remove('modal-open');
+                    document.removeEventListener('keydown', escListener);
+                }
+            });
+        }
+    </script>
+
+    <!-- CSS for Modal Animations -->
+    <style>
+        /* Fade-in animation */
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fade-in 0.3s ease-out forwards;
+        }
+
+        /* Ensure the modal overlay is hidden initially */
+        #custom-modal.hidden {
+            display: none;
+        }
+
+        /* Optional: Prevent background scrolling when modal is open */
+        .modal-open {
+            overflow: hidden;
+        }
+    </style>
 
 </body>
 {% endblock %}

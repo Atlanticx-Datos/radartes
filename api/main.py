@@ -1390,6 +1390,14 @@ def refresh_database_cache():
                 if "Publicar" in page["properties"] and page["properties"]["Publicar"]["checkbox"]:
                     page_data = {"id": page["id"], "created_time": page["created_time"]}
 
+                    # Add Og_Resumida to the page_data
+                    if "Og_Resumida" in page["properties"]:
+                        page_data["og_resumida"] = (
+                            page["properties"]["Og_Resumida"]["rich_text"][0]["text"]["content"]
+                            if page["properties"]["Og_Resumida"]["rich_text"]
+                            else ""
+                        )
+
                     if "Resumen generado por la IA" in page["properties"]:
                         page_data["nombre"] = (
                             page["properties"]["Resumen generado por la IA"]["rich_text"][0]["text"]["content"]
@@ -1565,6 +1573,18 @@ def utility_processor():
     def versioned_static(filename):
         return url_for('static', filename=filename, v=1.0)  # Incrementa este número cuando hagas cambios
     return dict(versioned_static=versioned_static)
+
+@app.route('/proxy')
+def proxy():
+    url = request.args.get('url')
+    if not url:
+        return 'No URL provided', 400
+    
+    try:
+        response = requests.get(url)
+        return response.text
+    except Exception as e:
+        return str(e), 500
 
 if __name__ == "__main__":
     # Ensure session directory exists
