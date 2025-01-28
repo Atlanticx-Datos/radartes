@@ -54,12 +54,55 @@ from flask_session import Session
 
 import base64
 import json
+from collections import defaultdict
 
 
 load_dotenv()
 
 # Get the callback URL from environment variables
 AUTH0_CALLBACK_URL = os.environ.get('AUTH0_CALLBACK_URL')
+
+DISCIPLINE_GROUPS = {
+    'visuales': {
+        'pintura', 'escultura', 'cerámica', 'dibujo', 'instalación', 'fotografía',
+        'artes visuales', 'visuales', 'grabado', 'arte plástica', 'muralismo',
+        'arte urbano', 'arte público', 'nuevos medios', 'arte digital', 'ilustración'
+    },
+    'música': {
+        'música', 'composición', 'piano', 'guitarra', 'vientos', 'electrónica',
+        'coral', 'arte sonoro', 'instrumentos', 'multidisciplinar'
+    },
+    'video': {
+        'videoarte', 'cine', 'documental', 'cortos', 'animación', 'cortometrajes',
+        'artes audiovisuales', 'multidisciplinar'
+    },
+    'escénicas': {
+        'teatro', 'danza', 'performance', 'circo', 'coreografía', 'artes escénicas',
+        'teatro físico', 'danza contemporánea', 'multidisciplinar'
+    },
+    'literatura': {
+        'literatura', 'poesía', 'narrativa', 'ensayo', 'escritura creativa',
+        'traducción literaria', 'guion', 'multidisciplinar'
+    },
+    'diseño': {
+        'diseño', 'diseño gráfico', 'diseño industrial', 'diseño textil',
+        'diseño editorial', 'gráfica', 'multidisciplinar'
+    },
+    'investigación': {
+        'investigación', 'creación', 'curaduría', 'gestión cultural',
+        'teoría artística', 'historia del arte', 'mediación cultural',
+        'conservación patrimonial', 'investigación-creación'
+    },
+    'arquitectura': {
+        'arquitectura', 'urbanismo', 'paisajismo', 'intervención urbana',
+        'arte ambiental', 'diseño de espacios', 'multidisciplinar'
+    },
+    'artesanía': {
+        'artesanía', 'arte textil', 'cerámica tradicional', 'orfebrería',
+        'talla en madera', 'técnicas tradicionales', 'multidisciplinar'
+    }
+}
+
 
 class RedisWrapper:
     def __init__(self, redis_client):
@@ -793,26 +836,47 @@ def get_similar_opportunities(keywords, exclude_ids):
 
 @app.route("/find_similar_opportunities", methods=["GET"])
 def find_similar_opportunities():
-    search_term = request.args.get("keyword", "").lower()
+    search_term = request.args.get("keyword", "").strip().lower()
     
-    # Obtener las oportunidades desde el caché
+    # Get cached opportunities
     cached_content = get_cached_database_content()
     if not cached_content:
         return render_template("_search_results.html", pages=[])
 
     all_opportunities = cached_content['pages']
+    similar_opportunities = []
 
-    similar_opportunities = [
-        opp for opp in all_opportunities
-        if search_term in opp.get("ai_keywords", "").lower() or
-           search_term in opp.get("categoria", "").lower() or
-           search_term in opp.get("nombre_original", "").lower() or
-           search_term in opp.get("nombre", "").lower() or
-           search_term in opp.get("disciplina", "").lower()
-    ]
+    # Check if search term matches a discipline group
+    discipline_group = DISCIPLINE_GROUPS.get(search_term, set())
+    search_fields = ['ai_keywords', 'categoria', 'nombre_original', 'nombre', 'disciplina']
+
+    for opp in all_opportunities:
+        # Maintain original functionality for non-discipline searches
+        if not discipline_group:
+            match = any(
+                search_term in str(opp.get(field, "")).lower()
+                for field in search_fields
+            )
+        else:
+            # Enhanced discipline group search
+            opp_disciplines = {d.strip().lower() for d in str(opp.get('disciplina', '')).split(',')}
+            match = any(
+                search_term in str(opp.get(field, "")).lower() or  # Original field matching
+                bool(opp_disciplines & discipline_group)           # Discipline group matching
+                for field in search_fields
+            )
+
+        if match:
+            similar_opportunities.append(opp)
 
     return render_template(
-        "_search_results.html", pages=similar_opportunities
+        "_search_results.html",
+        pages=similar_opportunities,
+        search_meta={
+            'total_results': len(similar_opportunities),
+            'discipline_counts': get_discipline_counts(),
+            'original_search': search_term
+        }
     )
 
 # Context
@@ -1113,12 +1177,26 @@ def all_pages():
         if is_htmx:
             return render_template("_search_results.html", pages=filtered_pages)
 
-    # Default return for non-HTMX requests
+    # Get discipline counts for sidebar/facets
+    discipline_counts = get_discipline_counts()
+    main_discipline_counts = {
+        main: sum(
+            count for disc, count in discipline_counts['main'].items()
+            if disc in subs or disc == main
+        )
+        for main, subs in DISCIPLINE_GROUPS.items()
+    }
+
     return render_template(
         "database.html",
         pages=filtered_pages,
         closing_soon_pages=closing_soon_pages[:7],
         destacar_pages=destacar_pages,
+        search_meta={
+            'total_results': len(filtered_pages),
+            'main_discipline_counts': main_discipline_counts,
+            'original_search': search_query
+        },
         og_data={
             "title": "100 ︱ Oportunidades",
             "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
@@ -1585,6 +1663,42 @@ def proxy():
         return response.text
     except Exception as e:
         return str(e), 500
+
+def get_discipline_counts():
+    try:
+        cached_content = get_cached_database_content()
+        if not cached_content:
+            app.logger.debug("No cached content available for discipline counts")
+            return {'raw': {}, 'main': {}}
+        
+        raw_counts = defaultdict(int)
+        main_counts = defaultdict(int)
+        
+        for page in cached_content['pages']:
+            disciplines = [d.strip().lower() for d in page.get('disciplina', '').split(',')]
+            
+            # Count raw disciplines
+            for d in disciplines:
+                raw_counts[d] += 1
+                
+            # Count main disciplines
+            for main, subs in DISCIPLINE_GROUPS.items():
+                if any(d in subs for d in disciplines):
+                    main_counts[main] += 1
+
+        # Debug logging
+        app.logger.debug(f"Discipline count results - Raw: {dict(raw_counts)}")
+        app.logger.debug(f"Main discipline counts: {dict(main_counts)}")
+        app.logger.info(f"Processed discipline counts for {len(cached_content['pages'])} pages")
+        
+        return {
+            'raw': dict(raw_counts),
+            'main': dict(main_counts)
+        }
+        
+    except Exception as e:
+        app.logger.error(f"Error generating discipline counts: {str(e)}", exc_info=True)
+        return {'raw': {}, 'main': {}}
 
 if __name__ == "__main__":
     # Ensure session directory exists
