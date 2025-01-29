@@ -768,71 +768,6 @@ def delete_opportunity(page_id):
         print("Error:", str(e))
         return jsonify({"error": str(e)}), 400
 
-def get_similar_opportunities(keywords, exclude_ids):
-    url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
-    headers = {
-        "Authorization": "Bearer " + NOTION_TOKEN,
-        "Content-Type": "application/json",
-        "Notion-Version": "2022-06-28",
-    }
-
-    # Create filters for keywords and disciplines
-    keyword_filters = [
-        {"property": "AI keywords", "multi_select": {"contains": keyword}}
-        for keyword in keywords
-    ]
-    
-    discipline_filters = [
-        {"property": "Disciplina", "rich_text": {"contains": keyword}}
-        for keyword in keywords
-    ]
-
-    json_body = {
-        "filter": {"or": keyword_filters + discipline_filters},
-        "page_size": 10,  # Limit the number of results
-    }
-
-    # Log the payload for debugging
-    print("Query Payload:", json_body)
-
-    response = requests.post(url, headers=headers, json=json_body)
-    response.raise_for_status()  # Raise an exception for HTTP errors
-    data = response.json()
-
-    opportunities = []
-    for result in data["results"]:
-        if result["id"] not in exclude_ids:  # Exclude already saved opportunities
-            opportunity = {
-                "id": result["id"],
-                "nombre": (
-                    result["properties"]["Nombre"]["title"][0]["text"]["content"]
-                    if result["properties"]["Nombre"]["title"]
-                    else ""
-                ),
-                "país": (
-                    result["properties"]["País"]["rich_text"][0]["text"]["content"]
-                    if result["properties"]["País"]["rich_text"]
-                    else ""
-                ),
-                "destinatarios": (
-                    result["properties"]["Destinatarios"]["rich_text"][0]["text"]["content"]
-                    if result["properties"]["Destinatarios"]["rich_text"]
-                    else ""
-                ),
-                "url": (
-                    result["properties"]["URL"]["url"]
-                    if result["properties"]["URL"].get("url")
-                    else ""
-                ),
-                "disciplina": (
-                    result["properties"]["Disciplina"]["rich_text"][0]["text"]["content"]
-                    if result["properties"]["Disciplina"]["rich_text"]
-                    else ""
-                ),
-            }
-            opportunities.append(opportunity)
-
-    return opportunities
 
 @app.route("/find_similar_opportunities")
 def find_similar_opportunities():
@@ -1086,17 +1021,16 @@ def all_pages():
 
         if is_expanded:
             search_terms = search_query.split('|')
-            print(f"Expanded search terms: {search_terms}")  # Debug log
+            app.logger.debug(f"Expanded search terms: {search_terms}")
             
             filtered_pages = []
             for page in pages:
-                # Normalize the relevant fields
+                # Keep all existing normalized fields
                 keywords = normalize_text(str(page.get("ai_keywords", "")))
                 nombre = normalize_text(str(page.get("nombre", "")))
                 descripcion = normalize_text(str(page.get("descripción", "")))
                 disciplina = normalize_text(str(page.get("disciplina", "")))
                 
-                # Access and normalize "Nombre" and "Resumen Generado por la IA"
                 nombre_prop = normalize_text(
                     page.get("properties", {}).get("Nombre", {}).get("title", [{}])[0].get("text", {}).get("content", "")
                 )
@@ -1109,7 +1043,6 @@ def all_pages():
                     "artist residency", "residencia de artistas"
                 ])
                 
-                # Consider adding more related terms manually
                 related_terms = ["composicion", "cancion", "opera"]
                 
                 if any(normalize_text(term) in keywords or 
@@ -1124,14 +1057,35 @@ def all_pages():
                       any(rt in keywords for rt in related_terms)
                       for term in search_terms):
                     filtered_pages.append(page)
-                    print(f"Matched page: {page.get('nombre', '')}")  # Debug log
+                    app.logger.debug(f"Matched page: {page.get('nombre', '')}")
         else:
             search_terms = [term.strip() for term in search_query.split(',')]
-            normalized_terms = [normalize_text(term) for term in search_terms]
+            
+            # Only expand disciplines if it's a single search term
+            if len(search_terms) == 1:
+                # Expand search terms using DISCIPLINE_GROUPS
+                expanded_terms = []
+                is_discipline_search = False
+                for term in search_terms:
+                    normalized_term = normalize_text(term)
+                    if normalized_term in DISCIPLINE_GROUPS:
+                        app.logger.debug(f"Found main discipline: {normalized_term}")
+                        expanded_terms.extend(DISCIPLINE_GROUPS[normalized_term])
+                        is_discipline_search = True
+                        app.logger.debug(f"Added subdisciplines: {DISCIPLINE_GROUPS[normalized_term]}")
+                    else:
+                        expanded_terms.append(term)
+            else:
+                # For comma-separated searches, use terms as-is
+                expanded_terms = search_terms
+                is_discipline_search = False
+                app.logger.debug(f"Multiple search terms, no expansion: {search_terms}")
+            
+            normalized_terms = [normalize_text(term) for term in expanded_terms]
+            app.logger.debug(f"Final search terms: {normalized_terms}")
             
             filtered_pages = []
             for page in pages:
-                # Normalize all searchable fields
                 searchable_fields = {
                     'disciplina': normalize_text(str(page.get("disciplina", ""))),
                     'ai_keywords': normalize_text(str(page.get("ai_keywords", ""))),
@@ -1148,16 +1102,22 @@ def all_pages():
                     )
                 }
 
-                # Check if ALL search terms match ANY field
-                matches_all_terms = all(
-                    any(term in value for value in searchable_fields.values())
-                    for term in normalized_terms
-                )
+                # Use ANY for single discipline searches, ALL for everything else
+                if is_discipline_search:
+                    matches = any(
+                        any(term in value for value in searchable_fields.values())
+                        for term in normalized_terms
+                    )
+                else:
+                    matches = all(
+                        any(term in value for value in searchable_fields.values())
+                        for term in normalized_terms
+                    )
                 
-                if matches_all_terms:
+                if matches:
                     filtered_pages.append(page)
 
-        print(f"Found {len(filtered_pages)} matching pages")  # Debug log
+            app.logger.debug(f"Found {len(filtered_pages)} matching pages")
         
         if is_htmx:
             return render_template("_search_results.html", pages=filtered_pages)
