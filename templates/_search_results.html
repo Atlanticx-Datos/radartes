@@ -122,13 +122,13 @@
                    data-name="{{ page.nombre }}"
                    data-country="{{ page.país }}"
                    data-summary="{{ page.og_resumida }}"
-                   class="opportunity-link flex items-center justify-center w-4 h-4 truncate"
+                   class="opportunity-link flex items-center justify-center w-5 h-5 truncate bg-neutral-400 rounded-full"
                    title="{{ page.nombre }}">
-                    <svg class="w-3 md:w-4" data-slot="icon" fill="none"
+                    <svg class="w-4 md:w-6 text-white" data-slot="icon" fill="none"
                         stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M4.5 19.5L19.5 4.5M19.5 4.5H8.25M19.5 4.5V15.75"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" 
+                              d="M12 4.5v15m7.5-7.5h-15"/>
                     </svg>
                 </button>
                 <div class="static">
