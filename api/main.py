@@ -1098,6 +1098,7 @@ def all_pages():
                     'categoria': normalize_text(str(page.get("categoria", ""))),
                     'nombre_original': normalize_text(str(page.get("nombre_original", ""))),
                     'descripcion': normalize_text(str(page.get("descripción", ""))),
+                    'og_resumida': normalize_text(str(page.get("og_resumida", ""))),
                     'nombre_prop': normalize_text(
                         page.get("properties", {}).get("Nombre", {}).get("title", [{}])[0].get("text", {}).get("content", "")
                     ),
