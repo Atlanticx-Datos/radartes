@@ -949,6 +949,7 @@ def all_pages():
             pages=[],
             closing_soon_pages=[],
             destacar_pages=[],
+            total_opportunities=0,
             og_data={
                 "title": "100 ︱ Oportunidades",
                 "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
@@ -956,6 +957,8 @@ def all_pages():
                 "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
             }
         )
+
+    total_opportunities = len(cached_content['pages'])
 
     is_htmx = request.headers.get('HX-Request', 'false').lower() == 'true'
     is_clear = request.args.get("clear", "false").lower() == "true"
@@ -988,6 +991,7 @@ def all_pages():
             pages=pages,
             closing_soon_pages=closing_soon_pages[:7],
             destacar_pages=destacar_pages,
+            total_opportunities=total_opportunities,
             og_data={
                 "title": "100 ︱ Oportunidades",
                 "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
@@ -1137,6 +1141,7 @@ def all_pages():
         pages=filtered_pages,
         closing_soon_pages=closing_soon_pages[:7],
         destacar_pages=destacar_pages,
+        total_opportunities=total_opportunities,
         search_meta={
             'total_results': len(filtered_pages),
             'main_discipline_counts': main_discipline_counts,
@@ -1644,6 +1649,85 @@ def get_discipline_counts():
     except Exception as e:
         app.logger.error(f"Error generating discipline counts: {str(e)}", exc_info=True)
         return {'raw': {}, 'main': {}}
+
+@app.route("/filter_by_discipline/<discipline>")
+def filter_by_discipline(discipline):
+    try:
+        # Normalize the discipline parameter
+        def normalize_discipline(text):
+            return unicodedata.normalize('NFKD', text.lower()) \
+                .encode('ASCII', 'ignore') \
+                .decode('ASCII').strip()
+
+        normalized_discipline = normalize_discipline(discipline)
+        app.logger.debug(f"Normalized discipline: {normalized_discipline}")
+
+        cached_content = get_cached_database_content()
+        is_htmx = request.headers.get('HX-Request', 'false').lower() == 'true'
+        
+        if not cached_content:
+            app.logger.error("No cached content available")
+            return render_template("_search_results.html", pages=[])
+
+        # Get required data from cache
+        pages = cached_content['pages']
+        closing_soon_pages = cached_content['closing_soon_pages'][:7]
+        destacar_pages = cached_content['destacar_pages']
+        total_opportunities = len(pages)
+        
+        # Validate against normalized discipline names
+        valid_disciplines = {
+            normalize_discipline(d): d 
+            for d in DISCIPLINE_GROUPS.keys()
+        }
+        
+        if normalized_discipline not in valid_disciplines:
+            app.logger.error(f"Invalid discipline: {discipline} (normalized: {normalized_discipline})")
+            return render_template("_search_results.html", pages=[])
+
+        # Get original casing for display
+        original_discipline = valid_disciplines[normalized_discipline]
+        subdisciplines = DISCIPLINE_GROUPS[original_discipline]
+
+        # Filter pages with normalization
+        filtered_pages = []
+        for page in pages:
+            page_disciplina = normalize_discipline(page.get('disciplina', ''))
+            if any(normalize_discipline(sub) in page_disciplina for sub in subdisciplines):
+                filtered_pages.append(page)
+
+        app.logger.debug(f"Found {len(filtered_pages)} matches for {original_discipline}")
+
+        # Prepare template context
+        og_data = {
+            "title": f"Oportunidades en {original_discipline.capitalize()}",
+            "description": f"Convocatorias y becas relacionadas con {original_discipline}",
+            "url": request.url,
+            "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
+        }
+
+        if is_htmx:
+            return render_template("_search_results.html", pages=filtered_pages)
+        else:
+            return render_template(
+                "database.html",
+                pages=filtered_pages,
+                closing_soon_pages=closing_soon_pages,
+                destacar_pages=destacar_pages,
+                total_opportunities=total_opportunities,
+                search_meta={
+                    'total_results': len(filtered_pages),
+                    'main_discipline_counts': get_discipline_counts()['main'],
+                    'current_discipline': original_discipline
+                },
+                og_data=og_data
+            )
+
+    except Exception as e:
+        app.logger.error(f"Discipline filter error: {str(e)}", exc_info=True)
+        if is_htmx:
+            return render_template("_search_results.html", pages=[])
+        return render_template("error.html"), 500
 
 if __name__ == "__main__":
     # Ensure session directory exists

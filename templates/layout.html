@@ -231,8 +231,9 @@
                                     <span
                                         class="border-l-[6px] border-accent pl-4 uppercase font-semibold">Oportunidades</span>
                                     <span
-                                        class="badge bg-red-500 text-white rounded-full px-2 py-1 ml-0 relative bottom-[1px]">{{
-                                        total_nuevas }}</span>
+                                        class="badge bg-red-500 text-white rounded-full px-2 py-1 ml-0 relative bottom-[1px]">
+                                        {{ total_opportunities if total_opportunities is defined else 0 }}
+                                    </span>
                                 </a>
                             </li>
                             <li>

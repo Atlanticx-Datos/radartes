@@ -2941,6 +2941,9 @@ details.collapse summary::-webkit-details-marker {
   .md\:w-4 {
     width: 1rem;
   }
+  .md\:w-6 {
+    width: 1.5rem;
+  }
   .md\:w-\[12\%\] {
     width: 12%;
   }
