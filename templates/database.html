@@ -35,7 +35,8 @@
                                            data-name="{{ page.nombre }}" 
                                            data-country="{{ page.País }}"
                                            data-summary="{{ page.Og_Resumida }}"
-                                           class="cierran-pronto-link prevent-default">
+                                           class="cierran-pronto-link prevent-default"
+                                           onclick="event.preventDefault(); scrollToOpportunity('{{ page.id }}')">
                                             {{ page.nombre | truncate(50) }}
                                             <span class="inline-block ml-2 opportunity-link cursor-pointer">
                                                 <button role="button" 

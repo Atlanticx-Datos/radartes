@@ -1656,6 +1656,13 @@ def get_discipline_counts():
 @app.route("/filter_by_discipline/<discipline>")
 def filter_by_discipline(discipline):
     try:
+        is_clear = request.args.get("clear", "false").lower() == "true"
+        is_htmx = request.headers.get('HX-Request', 'false').lower() == 'true'
+        
+        if is_clear:
+            # Reuse the existing clear functionality from all_pages
+            return redirect(url_for('all_pages', clear='true'))
+            
         # Normalize the discipline parameter
         def normalize_discipline(text):
             return unicodedata.normalize('NFKD', text.lower()) \
@@ -1665,7 +1672,6 @@ def filter_by_discipline(discipline):
         app.logger.debug(f"Normalized discipline: {normalized_discipline}")
 
         cached_content = get_cached_database_content()
-        is_htmx = request.headers.get('HX-Request', 'false').lower() == 'true'
         
         if not cached_content:
             app.logger.error("No cached content available")
