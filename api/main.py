@@ -834,50 +834,35 @@ def get_similar_opportunities(keywords, exclude_ids):
 
     return opportunities
 
-@app.route("/find_similar_opportunities", methods=["GET"])
+@app.route("/find_similar_opportunities")
 def find_similar_opportunities():
-    search_term = request.args.get("keyword", "").strip().lower()
-    
-    # Get cached opportunities
-    cached_content = get_cached_database_content()
-    if not cached_content:
-        return render_template("_search_results.html", pages=[])
+    keyword = request.args.get("keyword", "").strip().lower()
+    is_htmx = request.headers.get('HX-Request', 'false').lower() == 'true'
 
-    all_opportunities = cached_content['pages']
     similar_opportunities = []
-
-    # Check if search term matches a discipline group
-    discipline_group = DISCIPLINE_GROUPS.get(search_term, set())
-    search_fields = ['ai_keywords', 'categoria', 'nombre_original', 'nombre', 'disciplina']
-
-    for opp in all_opportunities:
-        # Maintain original functionality for non-discipline searches
-        if not discipline_group:
-            match = any(
-                search_term in str(opp.get(field, "")).lower()
-                for field in search_fields
+    if keyword:
+        all_pages = get_cached_database_content().get('pages', [])
+        search_terms = [term.strip() for term in keyword.split(',')]
+        
+        similar_opportunities = [
+            page for page in all_pages
+            if any(
+                term in page.get('disciplina', '').lower()
+                for term in search_terms
             )
-        else:
-            # Enhanced discipline group search
-            opp_disciplines = {d.strip().lower() for d in str(opp.get('disciplina', '')).split(',')}
-            match = any(
-                search_term in str(opp.get(field, "")).lower() or  # Original field matching
-                bool(opp_disciplines & discipline_group)           # Discipline group matching
-                for field in search_fields
-            )
+        ]
 
-        if match:
-            similar_opportunities.append(opp)
-
-    return render_template(
-        "_search_results.html",
-        pages=similar_opportunities,
-        search_meta={
-            'total_results': len(similar_opportunities),
-            'discipline_counts': get_discipline_counts(),
-            'original_search': search_term
-        }
-    )
+    if is_htmx:
+        return render_template("_search_results.html", pages=similar_opportunities)
+    else:
+        cached_content = get_cached_database_content()
+        return render_template(
+            "database.html",
+            pages=similar_opportunities,
+            closing_soon_pages=cached_content.get('cierran_pronto_pages', [])[:3],
+            destacar_pages=cached_content.get('destacar_pages', []),
+            search_term=keyword
+        )
 
 # Context
 

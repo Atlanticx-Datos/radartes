@@ -1,8 +1,10 @@
 {% extends 'layout.html' %}
 
 {% block body %}
+    {% if request.endpoint == 'find_similar_opportunities' %}
 
-<body>
+    {% endif %}
+    
     <div id="spinner" class="spinner h-8 w-8" style="display: none;">
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
     </div>
@@ -192,7 +194,6 @@
         </main>
         {% include 'footer.html' %}
     </div>
-
 
     <style>
         .spinner {
@@ -717,6 +718,16 @@
                 }
             }
         });
+
+        // Add this script to maintain search state
+        document.addEventListener('DOMContentLoaded', function() {
+            // Preserve search input value
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchParam = urlParams.get('keyword');
+            if (searchParam) {
+                document.getElementById('search-input').value = decodeURIComponent(searchParam);
+            }
+        });
     </script>
 
     <!-- JavaScript for Modal -->
@@ -829,6 +840,4 @@
             overflow: hidden;
         }
     </style>
-
-</body>
 {% endblock %}
