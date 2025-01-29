@@ -2050,14 +2050,17 @@ details.collapse summary::-webkit-details-marker {
 .h-\[400px\] {
   height: 400px;
 }
+.h-\[calc\(100vh-10rem\)\] {
+  height: calc(100vh - 10rem);
+}
 .h-full {
   height: 100%;
 }
 .max-h-\[35rem\] {
   max-height: 35rem;
 }
-.min-h-\[20rem\] {
-  min-height: 20rem;
+.min-h-\[35rem\] {
+  min-height: 35rem;
 }
 .min-h-screen {
   min-height: 100vh;
@@ -2869,8 +2872,8 @@ details.collapse summary::-webkit-details-marker {
   .sm\:h-screen {
     height: 100vh;
   }
-  .sm\:items-center {
-    align-items: center;
+  .sm\:items-start {
+    align-items: flex-start;
   }
 }
 @media (min-width: 768px) {
@@ -2976,6 +2979,9 @@ details.collapse summary::-webkit-details-marker {
   }
   .md\:gap-3 {
     gap: 0.75rem;
+  }
+  .md\:gap-4 {
+    gap: 1rem;
   }
   .md\:space-x-2 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-x-reverse: 0;

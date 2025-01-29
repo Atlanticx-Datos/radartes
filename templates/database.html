@@ -9,13 +9,13 @@
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
     </div>
 
-    <div class="px-0 md:px-8 mt-4 md:mt-0" style="margin-left: -1rem !important; margin-right: -0.5rem !important;">
+    <div class="px-4 md:px-8 mt-4 md:mt-0">
         <!-- Main content -->
         <main class="w-full relative">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-0">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-0 md:gap-4 h-[calc(100vh-10rem)]">
                 <!-- First Column: Accordions -->
                 <div
-                    class="col-span-1 md:col-span-5 lg:col-span-4 flex flex-col justify-between min-w-0 md:border-r border-neutral">
+                    class="col-span-1 md:col-span-5 lg:col-span-4 flex flex-col justify-between min-w-0 md:border-r border-neutral h-full">
                     <div class="flex-1 flex flex-col gap-2">
                         <!-- Accordion 1 -->
                         <div class="join join-vertical w-full">
@@ -133,12 +133,12 @@
                 </div>
 
                 <!-- Second Column: Table -->
-                <div class="col-span-1 md:col-span-7 lg:col-span-8 mt-2 lg:mt-0 min-w-0" id="table-container"
+                <div class="col-span-1 md:col-span-7 lg:col-span-8 mt-2 lg:mt-0 min-w-0 h-full" id="table-container"
                     hx-preserve="true">
                     <form id="save-form" method="POST">
                         <div class="border-b border-neutral" id="results-container">
                             <div
-                                class="max-h-[35rem] min-h-[20rem] overflow-y-auto overflow-x-hidden pl-4 md:pl-0 md:scrollbar-none custom-scrollbar md:border-t border-black md:border-r md:border-r-black">
+                                class="max-h-[35rem] min-h-[35rem] overflow-y-auto overflow-x-hidden pl-4 md:pl-0 md:scrollbar-none custom-scrollbar md:border-t border-black md:border-r md:border-r-black">
                                 <div
                                     class="w-[120%] md:w-full -ml-4 md:ml-0 overflow-x-auto md:overflow-x-hidden scrollbar-none">
                                     <div class="min-w-full">
@@ -158,7 +158,7 @@
                                                     <th class="w-[8%] pt-4 pb-3"></th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="search-results" class="relative z-30">
+                                            <tbody id="search-results" class="relative z-30" style="min-height: 35rem;">
                                                 {% include "_search_results.html" %}
                                             </tbody>
                                         </table>

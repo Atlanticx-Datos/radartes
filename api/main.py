@@ -1616,40 +1616,35 @@ def proxy():
         return str(e), 500
 
 def get_discipline_counts():
-    try:
-        cached_content = get_cached_database_content()
-        if not cached_content:
-            app.logger.debug("No cached content available for discipline counts")
-            return {'raw': {}, 'main': {}}
-        
-        raw_counts = defaultdict(int)
-        main_counts = defaultdict(int)
-        
-        for page in cached_content['pages']:
-            disciplines = [d.strip().lower() for d in page.get('disciplina', '').split(',')]
-            
-            # Count raw disciplines
-            for d in disciplines:
-                raw_counts[d] += 1
-                
-            # Count main disciplines
-            for main, subs in DISCIPLINE_GROUPS.items():
-                if any(d in subs for d in disciplines):
-                    main_counts[main] += 1
+    cached_content = get_cached_database_content()
+    if not cached_content:
+        return {'main': {}, 'sub': {}}
 
-        # Debug logging
-        app.logger.debug(f"Discipline count results - Raw: {dict(raw_counts)}")
-        app.logger.debug(f"Main discipline counts: {dict(main_counts)}")
-        app.logger.info(f"Processed discipline counts for {len(cached_content['pages'])} pages")
+    # Rebuild counts using the same logic as filtering
+    main_counts = defaultdict(int)
+    sub_counts = defaultdict(int)
+    
+    for page in cached_content['pages']:
+        page_disciplines = set(
+            d.strip().lower() 
+            for d in page.get('disciplina', '').split(',')
+        )
         
-        return {
-            'raw': dict(raw_counts),
-            'main': dict(main_counts)
-        }
+        # Count subdisciplines
+        for sub in page_disciplines:
+            sub_counts[sub] += 1
         
-    except Exception as e:
-        app.logger.error(f"Error generating discipline counts: {str(e)}", exc_info=True)
-        return {'raw': {}, 'main': {}}
+        # Count main disciplines using actual filtering logic
+        for main, subs in DISCIPLINE_GROUPS.items():
+            normalized_subs = {s.lower().strip() for s in subs}
+            if any(d in normalized_subs for d in page_disciplines):
+                main_counts[main] += 1
+                break  # Only count once per main category
+
+    return {
+        'main': dict(main_counts),
+        'sub': dict(sub_counts)
+    }
 
 @app.route("/filter_by_discipline/<discipline>")
 def filter_by_discipline(discipline):
@@ -1672,7 +1667,7 @@ def filter_by_discipline(discipline):
 
         # Get required data from cache
         pages = cached_content['pages']
-        closing_soon_pages = cached_content['closing_soon_pages'][:7]
+        closing_soon_pages = cached_content['closing_soon_pages']
         destacar_pages = cached_content['destacar_pages']
         total_opportunities = len(pages)
         
