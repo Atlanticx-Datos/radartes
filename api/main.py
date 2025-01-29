@@ -822,12 +822,19 @@ def inject_total_nuevas():
 
 @app.route("/")
 def index():
-    print("Current Session Data at Index:", session.get("user"))  # Debug: print session data
+    print("Current Session Data at Index:", session.get("user"))
+    cached_content = get_cached_database_content()
+    total_opportunities = len(cached_content['pages']) if cached_content else 0
+    
     if "user" in session:
         user = session["user"]
-        return render_template("home.html", user=user)
+        return render_template("home.html", 
+                            user=user,
+                            total_opportunities=total_opportunities)
     else:
-        return render_template("home.html", user=None)
+        return render_template("home.html", 
+                            user=None,
+                            total_opportunities=total_opportunities)
 
 @app.route("/_legacy_admin")
 def legacy_admin():
@@ -1654,7 +1661,6 @@ def filter_by_discipline(discipline):
             return unicodedata.normalize('NFKD', text.lower()) \
                 .encode('ASCII', 'ignore') \
                 .decode('ASCII').strip()
-
         normalized_discipline = normalize_discipline(discipline)
         app.logger.debug(f"Normalized discipline: {normalized_discipline}")
 
