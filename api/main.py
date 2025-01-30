@@ -269,18 +269,21 @@ headers = {
 AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
 AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
 
-# Always use development domain locally
+# Update Auth0 configuration to fully use custom domain
 if not is_production:
+    # Development configuration remains the same
     AUTH0_CUSTOM_DOMAIN = "dev-3klm8ed6qtx4zj6v.us.auth0.com"
     AUTH0_TENANT_DOMAIN = "dev-3klm8ed6qtx4zj6v.us.auth0.com"
     app.logger.info(f"Using development Auth0 domain: {AUTH0_CUSTOM_DOMAIN}")
 else:
-    AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN", "login.oportunidades.lat")
-    AUTH0_TENANT_DOMAIN = os.environ.get("AUTH0_TENANT_DOMAIN", "login.oportunidades.lat")
+    # Production configuration using custom domain
+    AUTH0_CUSTOM_DOMAIN = "login.oportunidades.lat"
+    AUTH0_TENANT_DOMAIN = AUTH0_CUSTOM_DOMAIN  # Use same domain for tenant
     app.logger.info(f"Using production Auth0 domain: {AUTH0_CUSTOM_DOMAIN}")
 
 oauth = OAuth(app)
 
+# Update all Auth0 endpoints to use custom domain
 oauth.register(
     "auth0",
     client_id=AUTH0_CLIENT_ID,
@@ -289,11 +292,11 @@ oauth.register(
         "scope": "openid profile email",
         "response_type": "code"
     },
-    api_base_url=f"https://{AUTH0_TENANT_DOMAIN}",
-    access_token_url=f"https://{AUTH0_TENANT_DOMAIN}/oauth/token",
-    authorize_url=f"https://{AUTH0_TENANT_DOMAIN}/authorize",
-    server_metadata_url=f'https://{AUTH0_TENANT_DOMAIN}/.well-known/openid-configuration',
-    audience=f"https://{AUTH0_TENANT_DOMAIN}/userinfo"
+    api_base_url=f"https://{AUTH0_CUSTOM_DOMAIN}",
+    access_token_url=f"https://{AUTH0_CUSTOM_DOMAIN}/oauth/token",
+    authorize_url=f"https://{AUTH0_CUSTOM_DOMAIN}/authorize",
+    server_metadata_url=f'https://{AUTH0_CUSTOM_DOMAIN}/.well-known/openid-configuration',
+    audience=f"https://{AUTH0_CUSTOM_DOMAIN}/userinfo"  # Use custom domain for audience
 )
 
 @app.route("/login")
