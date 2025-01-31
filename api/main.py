@@ -971,6 +971,7 @@ def all_pages():
     total_opportunities = len(cached_content['pages'])
 
     is_htmx = request.headers.get('HX-Request', 'false').lower() == 'true'
+    scroll_id = request.args.get('scroll_id')
     is_clear = request.args.get("clear", "false").lower() == "true"
     search_query = request.args.get("search", "").lower()
     is_expanded = request.args.get("expanded", "false").lower() == "true"
@@ -1146,6 +1147,18 @@ def all_pages():
         )
         for main, subs in DISCIPLINE_GROUPS.items()
     }
+
+    # Check if it's an HTMX request
+    is_htmx = request.headers.get('HX-Request', 'false').lower() == 'true'
+    scroll_id = request.args.get('scroll_id')
+
+    # Handle HTMX partial response
+    if is_htmx and scroll_id:
+        return render_template(
+            "_search_results.html",
+            pages=filtered_pages,
+            scroll_target=scroll_id
+        )
 
     return render_template(
         "database.html",

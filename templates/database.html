@@ -648,32 +648,43 @@
             spinner.style.display = 'block';
 
             if (targetRow) {
-                // If row exists, scroll to it and hide spinner
+                // If row exists, scroll and hide spinner
                 targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 spinner.style.display = 'none';
             } else {
-                // Load content via HTMX without full page refresh
+                // HTMX request with proper configuration
                 htmx.ajax('GET', `/database?scroll_id=${id}`, {
                     target: '#search-results',
                     swap: 'innerHTML',
-                    headers: { 'HX-Request': 'true' }
+                    headers: { 
+                        'HX-Request': 'true',
+                        'HX-Target': '#search-results'
+                    },
+                    pushHistory: false
                 });
             }
         }
 
-        // Handle HTMX events to hide spinner
+        // HTMX event handlers
+        document.body.addEventListener('htmx:beforeRequest', function() {
+            document.getElementById('layout-spinner').style.display = 'block';
+        });
+
         document.body.addEventListener('htmx:afterSwap', function() {
             const spinner = document.getElementById('layout-spinner');
             spinner.style.display = 'none';
             
-            // Scroll to target after content loads
+            // Handle scroll after content loads
             const urlParams = new URLSearchParams(window.location.search);
             const scrollId = urlParams.get('scroll_id');
             if (scrollId) {
-                const targetRow = document.querySelector(`tr[data-id="${scrollId}"]`);
-                if (targetRow) {
-                    targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
+                // Small delay to ensure DOM is ready
+                setTimeout(() => {
+                    const targetRow = document.querySelector(`tr[data-id="${scrollId}"]`);
+                    if (targetRow) {
+                        targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 50);
             }
         });
 
