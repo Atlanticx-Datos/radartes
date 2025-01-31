@@ -639,27 +639,31 @@
             }
         });
 
+        let scrollTimeout;
         function scrollToOpportunity(id, event) {
             event.preventDefault();
-            const spinner = document.getElementById('layout-spinner');
-            const targetRow = document.querySelector(`tr[data-id="${id}"]`);
+            clearTimeout(scrollTimeout);
             
+            const spinner = document.getElementById('layout-spinner');
             spinner.style.display = 'block';
-
-            if (targetRow) {
-                targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            scrollTimeout = setTimeout(() => {
+                const targetRow = document.querySelector(`tr[data-id="${id}"]`);
+                if (targetRow) {
+                    targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    htmx.ajax('GET', `/database?scroll_id=${id}`, {
+                        target: '#search-results',
+                        swap: 'innerHTML',
+                        headers: { 
+                            'HX-Request': 'true',
+                            'HX-Target': '#search-results'
+                        },
+                        pushHistory: false
+                    });
+                }
                 spinner.style.display = 'none';
-            } else {
-                htmx.ajax('GET', `/database?scroll_id=${id}`, {
-                    target: '#search-results',
-                    swap: 'innerHTML',
-                    headers: { 
-                        'HX-Request': 'true',
-                        'HX-Target': '#search-results'
-                    },
-                    pushHistory: false
-                });
-            }
+            }, 300); // Wait 300ms before executing
         }
 
         // HTMX event handlers

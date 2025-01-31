@@ -1344,32 +1344,16 @@ def update_total_nuevas():
         }), 500
 
 def get_cached_database_content():
-    try:
-        if not redis:
-            print("\n=== Redis not available ===")
-            return None
-
-        print("\n=== Checking Redis cache ===")
-        sys.stdout.flush()
-        
-        cached_content = redis.get('database_content')
-        if not cached_content:
-            print("\n=== CACHE MISS: No cached content found ===")
-            return None
-
-        # Decode and parse JSON
-        try:
-            decoded_content = cached_content.decode('utf-8') if isinstance(cached_content, bytes) else cached_content
-            parsed_content = json.loads(decoded_content)
-            print(f"\n=== CACHE HIT: Found {len(parsed_content.get('pages', []))} pages ===")
-            return parsed_content
-        except json.JSONDecodeError as e:
-            print(f"\n=== JSON Parse Error: {str(e)} ===")
-            return None
-            
-    except Exception as e:
-        print(f"\n=== CACHE ERROR: {str(e)} ===")
-        return None
+    cached = redis.get('database_content')
+    if cached:
+        data = json.loads(cached)
+        # Return pre-filtered sections
+        return {
+            'pages': data['pages'],
+            'closing_soon_pages': data['closing_soon_pages'],
+            'destacar_pages': data['destacar_pages']
+        }
+    return None
 
 @app.route("/refresh_database_cache", methods=["POST"])
 def refresh_database_cache():
@@ -1390,40 +1374,26 @@ def refresh_database_cache():
                 "filter": {
                     "and": [
                         {"property": "Publicar", "checkbox": {"equals": True}},
-                        {
-                            "or": [
-                                {"property": "Fecha de cierre", "date": {"is_empty": True}},
-                                {"property": "Fecha de cierre", "date": {"after": datetime.now().strftime('%Y-%m-%d')}}
-                            ]
-                        }
-                    ],
-                    "page_size": 100
-                }
+                        {"or": [
+                            {"property": "Fecha de cierre", "date": {"is_empty": True}},
+                            {"property": "Fecha de cierre", "date": {"after": datetime.now().isoformat()}}
+                        ]}
+                    ]
+                },
+                "page_size": 100  # Max allowed by Notion
             }
 
             all_pages = []
-            has_more = True
-            start_cursor = None
-            request_count = 0
-            max_requests = 3
-
-            while has_more and request_count < max_requests:
-                request_count += 1
-                try:
-                    if start_cursor:
-                        json_body["start_cursor"] = start_cursor
-
-                    res = requests.post(url, headers=headers, json=json_body, timeout=30)
-                    res.raise_for_status()
-                    data = res.json()
-                    all_pages.extend(data.get("results", []))
-                    has_more = data.get("has_more", False)
-                    start_cursor = data.get("next_cursor")
-
-                except Exception as e:
-                    print(f"Request failed: {str(e)}")
+            while True:
+                response = requests.post(url, headers=headers, json=json_body)
+                data = response.json()
+                all_pages.extend(data.get("results", []))
+                
+                if not data.get("has_more"):
                     break
-
+                    
+                json_body["start_cursor"] = data.get("next_cursor")
+            
             return all_pages
 
         all_pages = fetch_notion_pages()
