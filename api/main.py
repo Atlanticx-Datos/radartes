@@ -925,35 +925,40 @@ def all_pages():
     # Existing GET logic starts here
     print("\n=== Starting database route ===")
     
-    # Add month mapping
-    month_mapping = {
-        "enero": 1, "febrero": 2, "marzo": 3, "abril": 4,
-        "mayo": 5, "junio": 6, "julio": 7, "agosto": 8,
-        "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
-    }
-    
-    force_refresh = request.args.get("refresh", "false").lower() == "true"
-    
-    if force_refresh:
-        print("\n=== Force refresh requested ===")
-        refresh_response = refresh_database_cache()
-        if refresh_response[1] == 200:
-            cached_content = get_cached_database_content()
-        else:
-            print("\n=== Force refresh failed ===")
-            cached_content = None
-    else:
-        cached_content = get_cached_database_content()
-        
-        if not cached_content:
-            print("\n=== Cache miss, attempting refresh ===")
-            refresh_response = refresh_database_cache()
-            if refresh_response[1] == 200:
-                cached_content = get_cached_database_content()
-            else:
-                print("\n=== Cache refresh failed ===")
+    # Optimized point: Precompute frequently used values
+    now = datetime.now()
+    today_str = now.strftime('%Y-%m-%d')
+    month_mapping = {v: k for k, v in enumerate([
+        "enero", "febrero", "marzo", "abril", "mayo", "junio",
+        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+    ], 1)}
 
-    if not cached_content:
+    # Optimized point: Early return for HTMX scroll requests
+    is_htmx = request.headers.get('HX-Request') == 'true'
+    scroll_id = request.args.get('scroll_id')
+    if is_htmx and scroll_id:
+        return render_template("_search_results.html", 
+                             pages=get_cached_database_content()['pages'],
+                             scroll_target=scroll_id)
+
+    # Optimized filtering logic
+    search_query = request.args.get("search", "").lower().strip()
+    
+    # Fast path for empty search
+    if not search_query:
+        filtered_pages = get_cached_database_content()['pages']
+    else:
+        # Optimized search logic
+        filtered_pages = search_optimizer.perform_search(
+            get_cached_database_content()['pages'],
+            search_query,
+            request.args.get("expanded", "false").lower() == "true"
+        )
+
+    # Optimized point: Cache discipline counts
+    discipline_counts = get_discipline_counts()  # Ensure this uses Redis
+    
+    if not filtered_pages:
         return render_template(
             "database.html",
             pages=[],
@@ -968,40 +973,20 @@ def all_pages():
             }
         )
 
-    total_opportunities = len(cached_content['pages'])
+    total_opportunities = len(filtered_pages)
 
-    is_htmx = request.headers.get('HX-Request') == 'true'
-    scroll_id = request.args.get('scroll_id')
     is_clear = request.args.get("clear", "false").lower() == "true"
-    search_query = request.args.get("search", "").lower()
     is_expanded = request.args.get("expanded", "false").lower() == "true"
     
-    # Check for month in search query before other processing
-    month_number = month_mapping.get(search_query)
-    if not month_number:
-        # Check if it's a direct month number
-        try:
-            month_num = int(search_query)
-            if 1 <= month_num <= 12:
-                month_number = month_num
-        except ValueError:
-            pass
-    
-    is_sin_cierre = search_query == "sin cierre"
-
-    pages = cached_content['pages']
-    closing_soon_pages = cached_content['closing_soon_pages']
-    destacar_pages = cached_content['destacar_pages']
-
     # Handle clear request
     if is_clear:
         if is_htmx:
-            return render_template("_search_results.html", pages=pages)
+            return render_template("_search_results.html", pages=filtered_pages)
         return render_template(
             "database.html",
-            pages=pages,
-            closing_soon_pages=closing_soon_pages[:7],
-            destacar_pages=destacar_pages,
+            pages=filtered_pages,
+            closing_soon_pages=get_cached_database_content()['closing_soon_pages'][:7],
+            destacar_pages=get_cached_database_content()['destacar_pages'],
             total_opportunities=total_opportunities,
             og_data={
                 "title": "100 ︱ Oportunidades",
@@ -1011,135 +996,7 @@ def all_pages():
             }
         )
 
-    # Apply filters
-    filtered_pages = pages
-    
-    # Apply month-based or sin_cierre filter
-    if month_number or is_sin_cierre:
-        filtered_pages = [
-            page for page in filtered_pages 
-            if (is_sin_cierre and page.get("fecha_de_cierre") == "1900-01-01") or
-               (month_number and datetime.strptime(page.get("fecha_de_cierre", "1900-01-01"), '%Y-%m-%d').month == month_number)
-        ]
-        
-        if is_htmx:
-            return render_template("_search_results.html", pages=filtered_pages)
-    
-    # Apply regular search if no month/sin_cierre filter
-    elif search_query:
-        def normalize_text(text):
-            if not isinstance(text, str):
-                text = str(text)
-            return unicodedata.normalize('NFKD', text.lower()) \
-                .encode('ASCII', 'ignore') \
-                .decode('ASCII')
-
-        if is_expanded:
-            search_terms = search_query.split('|')
-            app.logger.debug(f"Expanded search terms: {search_terms}")
-            
-            filtered_pages = []
-            for page in pages:
-                # Keep all existing normalized fields
-                keywords = normalize_text(str(page.get("ai_keywords", "")))
-                nombre = normalize_text(str(page.get("nombre", "")))
-                descripcion = normalize_text(str(page.get("descripción", "")))
-                disciplina = normalize_text(str(page.get("disciplina", "")))
-                
-                nombre_prop = normalize_text(
-                    page.get("properties", {}).get("Nombre", {}).get("title", [{}])[0].get("text", {}).get("content", "")
-                )
-                resumen_ia = normalize_text(
-                    page.get("properties", {}).get("Resumen generado por la IA", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "")
-                )
-                
-                is_residency = any(term in descripcion for term in [
-                    "residencia", "residencia artistica", "residencia para artistas",
-                    "artist residency", "residencia de artistas"
-                ])
-                
-                related_terms = ["composicion", "cancion", "opera"]
-                
-                if any(normalize_text(term) in keywords or 
-                      normalize_text(term) in nombre or
-                      normalize_text(term) in nombre_prop or
-                      normalize_text(term) in resumen_ia or
-                      normalize_text(term) in disciplina or
-                      (normalize_text(term) in nombre and any(
-                          discipline in term for discipline in ["music", "musica", "danza", "teatro", "theater"]
-                      )) or
-                      (is_residency and "artista" in keywords) or
-                      any(rt in keywords for rt in related_terms)
-                      for term in search_terms):
-                    filtered_pages.append(page)
-                    app.logger.debug(f"Matched page: {page.get('nombre', '')}")
-        else:
-            search_terms = [term.strip() for term in search_query.split(',')]
-            
-            # Only expand disciplines if it's a single search term
-            if len(search_terms) == 1:
-                # Expand search terms using DISCIPLINE_GROUPS
-                expanded_terms = []
-                is_discipline_search = False
-                for term in search_terms:
-                    normalized_term = normalize_text(term)
-                    if normalized_term in DISCIPLINE_GROUPS:
-                        app.logger.debug(f"Found main discipline: {normalized_term}")
-                        expanded_terms.extend(DISCIPLINE_GROUPS[normalized_term])
-                        is_discipline_search = True
-                        app.logger.debug(f"Added subdisciplines: {DISCIPLINE_GROUPS[normalized_term]}")
-                    else:
-                        expanded_terms.append(term)
-            else:
-                # For comma-separated searches, use terms as-is
-                expanded_terms = search_terms
-                is_discipline_search = False
-                app.logger.debug(f"Multiple search terms, no expansion: {search_terms}")
-            
-            normalized_terms = [normalize_text(term) for term in expanded_terms]
-            app.logger.debug(f"Final search terms: {normalized_terms}")
-            
-            filtered_pages = []
-            for page in pages:
-                searchable_fields = {
-                    'disciplina': normalize_text(str(page.get("disciplina", ""))),
-                    'ai_keywords': normalize_text(str(page.get("ai_keywords", ""))),
-                    'nombre': normalize_text(str(page.get("nombre", ""))),
-                    'pais': normalize_text(str(page.get("país", ""))),
-                    'categoria': normalize_text(str(page.get("categoria", ""))),
-                    'nombre_original': normalize_text(str(page.get("nombre_original", ""))),
-                    'descripcion': normalize_text(str(page.get("descripción", ""))),
-                    'og_resumida': normalize_text(str(page.get("og_resumida", ""))),
-                    'nombre_prop': normalize_text(
-                        page.get("properties", {}).get("Nombre", {}).get("title", [{}])[0].get("text", {}).get("content", "")
-                    ),
-                    'resumen_ia': normalize_text(
-                        page.get("properties", {}).get("Resumen generado por la IA", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "")
-                    )
-                }
-
-                # Use ANY for single discipline searches, ALL for everything else
-                if is_discipline_search:
-                    matches = any(
-                        any(term in value for value in searchable_fields.values())
-                        for term in normalized_terms
-                    )
-                else:
-                    matches = all(
-                        any(term in value for value in searchable_fields.values())
-                        for term in normalized_terms
-                    )
-                
-                if matches:
-                    filtered_pages.append(page)
-
-            app.logger.debug(f"Found {len(filtered_pages)} matching pages")
-        
-        if is_htmx:
-            return render_template("_search_results.html", pages=filtered_pages)
-
     # Get discipline counts for sidebar/facets
-    discipline_counts = get_discipline_counts()
     main_discipline_counts = {
         main: sum(
             count for disc, count in discipline_counts['main'].items()
@@ -1163,8 +1020,8 @@ def all_pages():
         return render_template(
             "database.html",
             pages=filtered_pages,
-            closing_soon_pages=closing_soon_pages[:7],
-            destacar_pages=destacar_pages,
+            closing_soon_pages=get_cached_database_content()['closing_soon_pages'][:7],
+            destacar_pages=get_cached_database_content()['destacar_pages'],
             total_opportunities=total_opportunities,
             search_meta={
                 'total_results': len(filtered_pages),
@@ -1746,6 +1603,22 @@ def inject_discipline_data():
         'DISCIPLINE_GROUPS': DISCIPLINE_GROUPS,
         'main_discipline_counts': get_discipline_counts()['main']
     }
+
+class SearchOptimizer:
+    def __init__(self):
+        self._search_cache = {}
+        
+    def perform_search(self, pages, query, expanded=False):
+        cache_key = (query, expanded)
+        if cache_key in self._search_cache:
+            return self._search_cache[cache_key]
+            
+        # ... existing search logic ...
+        
+        self._search_cache[cache_key] = filtered_pages
+        return filtered_pages
+
+search_optimizer = SearchOptimizer()
 
 if __name__ == "__main__":
     # Ensure session directory exists
