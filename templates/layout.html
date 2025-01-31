@@ -4,8 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ og_data.title if og_data else "100 + Oportunidades" }}</title>
-    <meta property="og:title" content="{{ og_data.title if og_data else '100 + Oportunidades' }}">
+    <title>
+        {% if request.path == '/database' %}
+            Oportunidades: {{ total_opportunities }} en total
+        {% else %}
+            {{ og_data.title if og_data else "100 + Oportunidades" }}
+        {% endif %}
+    </title>
+    <meta property="og:title" content="
+        {% if request.path == '/database' %}
+            Oportunidades: {{ total_opportunities }} en total
+        {% else %}
+            {{ og_data.title if og_data else '100 + Oportunidades' }}
+        {% endif %}">
     <meta property="og:description"
         content="{{ og_data.description if og_data else 'Convocatorias, Becas y Recursos Globales para Artistas.' }}">
     <meta property="og:url" content="{{ og_data.url if og_data else 'http://oportunidades.lat' }}">
@@ -236,6 +247,23 @@
                                     </span>
                                 </a>
                             </li>
+                            {# Discipline filters with counts #}
+                            {% for discipline in DISCIPLINE_GROUPS.keys() %}
+                                {% if not request.path.startswith('/filter_by_discipline/' + discipline) %}
+                                <li>
+                                    <a href="{{ url_for('filter_by_discipline', discipline=discipline) }}" 
+                                       onclick="layoutshowSpinner(event)"
+                                       class="flex items-center justify-between">
+                                        <span class="border-l-[6px] border-indigo-500 pl-4 uppercase font-semibold">
+                                            {{ discipline|capitalize }}
+                                        </span>
+                                        <span class="badge bg-indigo-500 text-white rounded-full px-2 py-1 ml-2">
+                                            {{ get_discipline_counts()['main'].get(discipline, 0) }}
+                                        </span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
                             <li>
                                 <a href="{{ url_for('list_saved_opportunities') }}" onclick="layoutshowSpinner(event)">
                                     <span

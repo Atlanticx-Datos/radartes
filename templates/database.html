@@ -30,13 +30,7 @@
                                     {% if closing_soon_pages %}
                                     {% for page in closing_soon_pages[:3] %}
                                     <p class="relative">
-                                        <a href="{{ url }}" 
-                                           data-id="{{ page.id }}"
-                                           data-name="{{ page.nombre }}" 
-                                           data-country="{{ page.País }}"
-                                           data-summary="{{ page.Og_Resumida }}"
-                                           class="cierran-pronto-link prevent-default"
-                                           onclick="event.preventDefault(); scrollToOpportunity('{{ page.id }}')">
+                                        <a href="/database#{{ page.id }}" class="cierran-pronto-link">
                                             {{ page.nombre | truncate(50) }}
                                             <span class="inline-block ml-2 opportunity-link cursor-pointer">
                                                 <button role="button" 
@@ -75,10 +69,7 @@
                                     {% if destacar_pages %}
                                     {% for page in destacar_pages %}
                                     <p class="relative">
-                                        <a href="#" 
-                                           data-id="{{ page.id }}"
-                                           class="destacada-link"
-                                           onclick="event.preventDefault(); scrollToOpportunity('{{ page.id }}')">
+                                        <a href="/database#{{ page.id }}" class="destacada-link">
                                             <span class="md:hidden whitespace-nowrap">
                                                 {{ page.nombre | truncate(18, true, "...") }}
                                                 {% if page.entidad %}
@@ -649,63 +640,28 @@
         });
 
         function scrollToOpportunity(id) {
-            // First, clear the search if it's active
-            const searchInput = document.getElementById('search-input');
-            if (searchInput && searchInput.value) {
-                // Clear the search input
-                searchInput.value = '';
+            const targetRow = document.querySelector(`tr[data-id="${id}"]`);
+            const currentPath = window.location.pathname;
+
+            if (targetRow) {
+                // Reset animation state
+                targetRow.style.animation = 'none';
+                void targetRow.offsetWidth;
                 
-                // Use HTMX to restore full results
-                htmx.ajax('GET', '/database?clear=true', {
-                    target: '#search-results',
-                    swap: 'innerHTML',
-                    headers: { 'HX-Request': 'true' }
-                }).then(() => {
-                    // After results are restored, find and scroll to the row
-                    setTimeout(() => {
-                        const row = document.querySelector(`tr[data-id="${id}"]`);
-                        if (row) {
-                            // Remove highlight and flash from any previously highlighted rows
-                            document.querySelectorAll('tr.highlighted').forEach(tr => {
-                                tr.classList.remove('highlighted');
-                                tr.classList.remove('flash-highlight');
-                            });
+                targetRow.style.animation = 'highlight 2s ease-in-out';
+                targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-                            // Add highlight to the target row
-                            row.classList.add('highlighted');
-
-                            // Scroll the row into view
-                            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-                            // Add flash effect after scroll completes
-                            setTimeout(() => {
-                                row.classList.add('flash-highlight');
-                                // Remove flash class after animation completes
-                                setTimeout(() => {
-                                    row.classList.remove('flash-highlight');
-                                }, 1000);
-                            }, 500);
-                        }
-                    }, 100); // Small delay to ensure DOM is updated
-                });
+                // Clean up animation
+                setTimeout(() => {
+                    targetRow.style.animation = '';
+                }, 2000);
             } else {
-                // If no search is active, proceed with normal scroll behavior
-                const row = document.querySelector(`tr[data-id="${id}"]`);
-                if (row) {
-                    document.querySelectorAll('tr.highlighted').forEach(tr => {
-                        tr.classList.remove('highlighted');
-                        tr.classList.remove('flash-highlight');
-                    });
-
-                    row.classList.add('highlighted');
-                    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-                    setTimeout(() => {
-                        row.classList.add('flash-highlight');
-                        setTimeout(() => {
-                            row.classList.remove('flash-highlight');
-                        }, 1000);
-                    }, 500);
+                if (currentPath.includes('/filter_by_discipline/')) {
+                    // Add scroll flag to URL
+                    window.location.href = `/database?scroll=true#${id}`;
+                } else if (currentPath === '/database') {
+                    // Force reload with hash
+                    window.location.href = `/database#${id}`;
                 }
             }
         }
@@ -729,6 +685,56 @@
                 document.getElementById('search-input').value = decodeURIComponent(searchParam);
             }
         });
+
+        // Enhanced hash handler
+        function handleHashScroll() {
+            if (window.location.hash) {
+                const id = window.location.hash.substring(1);
+                const targetRow = document.querySelector(`tr[data-id="${id}"]`);
+                const urlParams = new URLSearchParams(window.location.search);
+                const scrollFlag = urlParams.get('scroll');
+
+                if (targetRow) {
+                    // If coming from redirect, clear the scroll parameter
+                    if (scrollFlag) {
+                        window.history.replaceState(null, null, window.location.pathname + window.location.hash);
+                    }
+
+                    // Trigger animation
+                    targetRow.style.animation = 'none';
+                    void targetRow.offsetWidth;
+                    targetRow.style.animation = 'highlight 2s ease-in-out';
+                    
+                    targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    setTimeout(() => {
+                        targetRow.style.animation = '';
+                    }, 2000);
+                } else if (scrollFlag) {
+                    // If scroll flag is present but row not found, check again after HTMX swaps
+                    const observer = new MutationObserver(() => {
+                        const newTarget = document.querySelector(`tr[data-id="${id}"]`);
+                        if (newTarget) {
+                            observer.disconnect();
+                            newTarget.style.animation = 'highlight 2s ease-in-out';
+                            newTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            setTimeout(() => {
+                                newTarget.style.animation = '';
+                            }, 2000);
+                        }
+                    });
+
+                    observer.observe(document.body, {
+                        childList: true,
+                        subtree: true
+                    });
+                }
+            }
+        }
+
+        // Initialize listeners
+        document.addEventListener('DOMContentLoaded', handleHashScroll);
+        document.body.addEventListener('htmx:afterSwap', handleHashScroll);
     </script>
 
     <!-- JavaScript for Modal -->

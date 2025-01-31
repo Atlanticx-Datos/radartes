@@ -1625,36 +1625,53 @@ def proxy():
     except Exception as e:
         return str(e), 500
 
+# Add this context processor to make function available in all templates
+@app.context_processor
+def inject_utilities():
+    return {
+        'get_discipline_counts': get_discipline_counts,
+        'DISCIPLINE_GROUPS': DISCIPLINE_GROUPS
+    }
+
+# Update the get_discipline_counts function
 def get_discipline_counts():
     cached_content = get_cached_database_content()
     if not cached_content:
         return {'main': {}, 'sub': {}}
 
-    # Rebuild counts using the same logic as filtering
     main_counts = defaultdict(int)
     sub_counts = defaultdict(int)
     
     for page in cached_content['pages']:
+        raw_disciplines = page.get('disciplina', '')
         page_disciplines = set(
-            d.strip().lower() 
-            for d in page.get('disciplina', '').split(',')
+            normalize_discipline(d.strip())
+            for d in raw_disciplines.split(',')
+            if d.strip()
         )
         
         # Count subdisciplines
         for sub in page_disciplines:
             sub_counts[sub] += 1
         
-        # Count main disciplines using actual filtering logic
+        # Count main disciplines
         for main, subs in DISCIPLINE_GROUPS.items():
-            normalized_subs = {s.lower().strip() for s in subs}
+            normalized_subs = {normalize_discipline(s) for s in subs}
             if any(d in normalized_subs for d in page_disciplines):
                 main_counts[main] += 1
-                break  # Only count once per main category
+                # Remove break to allow multidisciplinar in multiple categories
+                # break
 
     return {
         'main': dict(main_counts),
         'sub': dict(sub_counts)
     }
+
+# Add this normalization function if not already present
+def normalize_discipline(text):
+    return unicodedata.normalize('NFKD', text.lower()) \
+        .encode('ASCII', 'ignore') \
+        .decode('ASCII').strip()
 
 @app.route("/filter_by_discipline/<discipline>")
 def filter_by_discipline(discipline):
@@ -1739,6 +1756,13 @@ def filter_by_discipline(discipline):
         if is_htmx:
             return render_template("_search_results.html", pages=[])
         return render_template("error.html"), 500
+
+@app.context_processor
+def inject_discipline_data():
+    return {
+        'DISCIPLINE_GROUPS': DISCIPLINE_GROUPS,
+        'main_discipline_counts': get_discipline_counts()['main']
+    }
 
 if __name__ == "__main__":
     # Ensure session directory exists

@@ -2,13 +2,16 @@
 {% for page in pages %}
 <tr data-id="{{ page.id }}" style="
     {% if page.destinatarios == 'Destacar' %}
-    background-color: rgb(243, 244, 246) !important;  /* bg-gray-200 */
-    border-left: 4px solid rgb(239, 68, 68);  /* Changed to red-500 */
-    padding-left: 0.5rem;
-    box-shadow: inset 0 0 0 1px rgb(229, 231, 235);  /* subtle inner border */
+    background-color: rgb(243, 244, 246);
+    border-left: 4px solid rgb(239, 68, 68);  /* Red for destacadas */
+    {% elif page.is_closing_soon %}
+    background-color: rgb(254, 252, 232);     /* Yellow background */
+    border-left: 4px solid rgb(234, 179, 8);  /* Amber border for closing soon */
     {% else %}
     background-color: transparent;
     {% endif %}
+    padding-left: 0.5rem;
+    box-shadow: inset 0 0 0 1px rgb(229, 231, 235);  /* subtle inner border */
 ;">
     <th class="w-[7%]">
         <label class="flex justify-center items-center w-full h-full">
