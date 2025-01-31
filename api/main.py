@@ -970,7 +970,7 @@ def all_pages():
 
     total_opportunities = len(cached_content['pages'])
 
-    is_htmx = request.headers.get('HX-Request', 'false').lower() == 'true'
+    is_htmx = request.headers.get('HX-Request') == 'true'
     scroll_id = request.args.get('scroll_id')
     is_clear = request.args.get("clear", "false").lower() == "true"
     search_query = request.args.get("search", "").lower()
@@ -1148,11 +1148,7 @@ def all_pages():
         for main, subs in DISCIPLINE_GROUPS.items()
     }
 
-    # Check if it's an HTMX request
-    is_htmx = request.headers.get('HX-Request', 'false').lower() == 'true'
-    scroll_id = request.args.get('scroll_id')
-
-    # Handle HTMX partial response
+    # Handle HTMX scroll requests first
     if is_htmx and scroll_id:
         return render_template(
             "_search_results.html",
@@ -1160,24 +1156,28 @@ def all_pages():
             scroll_target=scroll_id
         )
 
-    return render_template(
-        "database.html",
-        pages=filtered_pages,
-        closing_soon_pages=closing_soon_pages[:7],
-        destacar_pages=destacar_pages,
-        total_opportunities=total_opportunities,
-        search_meta={
-            'total_results': len(filtered_pages),
-            'main_discipline_counts': main_discipline_counts,
-            'original_search': search_query
-        },
-        og_data={
-            "title": "100 ︱ Oportunidades",
-            "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
-            "url": request.url,
-            "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
-        }
-    )
+    # Final return for full page requests
+    if is_htmx:
+        return render_template("_search_results.html", pages=filtered_pages)
+    else:
+        return render_template(
+            "database.html",
+            pages=filtered_pages,
+            closing_soon_pages=closing_soon_pages[:7],
+            destacar_pages=destacar_pages,
+            total_opportunities=total_opportunities,
+            search_meta={
+                'total_results': len(filtered_pages),
+                'main_discipline_counts': main_discipline_counts,
+                'original_search': search_query
+            },
+            og_data={
+                "title": "100 ︱ Oportunidades",
+                "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
+                "url": request.url,
+                "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
+            }
+        )
 
 # Custom Jinja2 filter for date
 @app.template_filter('format_date')
@@ -1396,9 +1396,9 @@ def refresh_database_cache():
                                 {"property": "Fecha de cierre", "date": {"after": datetime.now().strftime('%Y-%m-%d')}}
                             ]
                         }
-                    ]
-                },
-                "page_size": 100
+                    ],
+                    "page_size": 100
+                }
             }
 
             all_pages = []

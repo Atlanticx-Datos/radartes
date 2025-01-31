@@ -644,15 +644,12 @@
             const spinner = document.getElementById('layout-spinner');
             const targetRow = document.querySelector(`tr[data-id="${id}"]`);
             
-            // Show spinner immediately
             spinner.style.display = 'block';
 
             if (targetRow) {
-                // If row exists, scroll and hide spinner
                 targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 spinner.style.display = 'none';
             } else {
-                // HTMX request with proper configuration
                 htmx.ajax('GET', `/database?scroll_id=${id}`, {
                     target: '#search-results',
                     swap: 'innerHTML',
