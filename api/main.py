@@ -791,6 +791,7 @@ def find_similar_opportunities():
         ]
 
     if is_htmx:
+        print("HTMX RESPONSE: Returning _search_results.html partial")
         return render_template("_search_results.html", pages=similar_opportunities)
     else:
         cached_content = get_cached_database_content()
@@ -922,80 +923,80 @@ def all_pages():
             return redirect(url_for('login', next=request.url))
         return redirect(url_for('all_pages'))
 
-    # Existing GET logic starts here
-    print("\n=== Starting database route ===")
+    # Get cached content and pages
+    cached_content = get_cached_database_content()
+    pages = cached_content.get('pages', []) if cached_content else []
     
-    # Optimized point: Precompute frequently used values
-    now = datetime.now()
-    today_str = now.strftime('%Y-%m-%d')
-    month_mapping = {v: k for k, v in enumerate([
-        "enero", "febrero", "marzo", "abril", "mayo", "junio",
-        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
-    ], 1)}
-
-    # Optimized point: Early return for HTMX scroll requests
-    is_htmx = request.headers.get('HX-Request') == 'true'
+    # Define HTMX and scroll variables early
+    is_htmx = request.headers.get('HX-Request', 'false').lower() == 'true'
     scroll_id = request.args.get('scroll_id')
-    if is_htmx and scroll_id:
-        return render_template("_search_results.html", 
-                             pages=get_cached_database_content()['pages'],
-                             scroll_target=scroll_id)
-
-    # Optimized filtering logic
-    search_query = request.args.get("search", "").lower().strip()
     
-    # Fast path for empty search
-    if not search_query:
-        filtered_pages = get_cached_database_content()['pages']
+    # Define month mapping
+    month_mapping = {
+        "enero": 1, "febrero": 2, "marzo": 3, "abril": 4,
+        "mayo": 5, "junio": 6, "julio": 7, "agosto": 8,
+        "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
+    }
+    
+    # Original search implementation
+    search_query = request.args.get("search", "").strip().lower()
+    print(f"Search query: {search_query}")  # Debug print
+    
+    filtered_pages = []
+    if search_query:
+        # Check if it's a month search first
+        month_terms = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
+                      "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+        
+        if search_query in month_terms:
+            print(f"Month search detected: {search_query}")  # Debug print
+            month_num = month_mapping[search_query]
+            filtered_pages = [
+                page for page in pages
+                if page.get("fecha_de_cierre") and 
+                page["fecha_de_cierre"] != "1900-01-01" and
+                datetime.strptime(page["fecha_de_cierre"], '%Y-%m-%d').month == month_num
+            ]
+            print(f"Found {len(filtered_pages)} pages for month {search_query}")  # Debug print
+        else:
+            # Regular search with AND logic
+            search_terms = [term.strip() for term in search_query.split(',')]
+            print(f"Search terms: {search_terms}")  # Debug print
+            
+            for page in pages:
+                # ALL terms must match (AND logic)
+                all_terms_match = True
+                for term in search_terms:
+                    term_found = False
+                    normalized_term = normalize_text(term)
+                    for field in ['disciplina', 'ai_keywords', 'nombre', 
+                                'país', 'categoria', 'nombre_original',
+                                'descripción', 'og_resumida']:
+                        field_value = normalize_text(str(page.get(field, "")))
+                        if normalized_term in field_value:
+                            term_found = True
+                            break
+                    if not term_found:
+                        all_terms_match = False
+                        break
+                
+                if all_terms_match:
+                    filtered_pages.append(page)
+            
+            print(f"Found {len(filtered_pages)} pages matching all terms")  # Debug print
     else:
-        # Optimized search logic
-        filtered_pages = search_optimizer.perform_search(
-            get_cached_database_content()['pages'],
-            search_query,
-            request.args.get("expanded", "false").lower() == "true"
-        )
+        filtered_pages = pages
+
+    # Handle ALL HTMX requests first
+    if is_htmx:
+        print(f"HTMX: Returning {len(filtered_pages)} results")
+        return render_template("_search_results.html", 
+                            pages=filtered_pages,
+                            no_results=not filtered_pages)
 
     # Optimized point: Cache discipline counts
     discipline_counts = get_discipline_counts()  # Ensure this uses Redis
     
-    if not filtered_pages:
-        return render_template(
-            "database.html",
-            pages=[],
-            closing_soon_pages=[],
-            destacar_pages=[],
-            total_opportunities=0,
-            og_data={
-                "title": "100 ︱ Oportunidades",
-                "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
-                "url": request.url,
-                "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
-            }
-        )
-
-    total_opportunities = len(filtered_pages)
-
-    is_clear = request.args.get("clear", "false").lower() == "true"
-    is_expanded = request.args.get("expanded", "false").lower() == "true"
-    
-    # Handle clear request
-    if is_clear:
-        if is_htmx:
-            return render_template("_search_results.html", pages=filtered_pages)
-        return render_template(
-            "database.html",
-            pages=filtered_pages,
-            closing_soon_pages=get_cached_database_content()['closing_soon_pages'][:7],
-            destacar_pages=get_cached_database_content()['destacar_pages'],
-            total_opportunities=total_opportunities,
-            og_data={
-                "title": "100 ︱ Oportunidades",
-                "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
-                "url": request.url,
-                "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
-            }
-        )
-
     # Get discipline counts for sidebar/facets
     main_discipline_counts = {
         main: sum(
@@ -1005,36 +1006,27 @@ def all_pages():
         for main, subs in DISCIPLINE_GROUPS.items()
     }
 
-    # Handle HTMX scroll requests first
-    if is_htmx and scroll_id:
-        return render_template(
-            "_search_results.html",
-            pages=filtered_pages,
-            scroll_target=scroll_id
-        )
+    total_opportunities = len(filtered_pages)
 
     # Final return for full page requests
-    if is_htmx:
-        return render_template("_search_results.html", pages=filtered_pages)
-    else:
-        return render_template(
-            "database.html",
-            pages=filtered_pages,
-            closing_soon_pages=get_cached_database_content()['closing_soon_pages'][:7],
-            destacar_pages=get_cached_database_content()['destacar_pages'],
-            total_opportunities=total_opportunities,
-            search_meta={
-                'total_results': len(filtered_pages),
-                'main_discipline_counts': main_discipline_counts,
-                'original_search': search_query
-            },
-            og_data={
-                "title": "100 ︱ Oportunidades",
-                "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
-                "url": request.url,
-                "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
-            }
-        )
+    return render_template(
+        "database.html",
+        pages=filtered_pages,
+        closing_soon_pages=get_cached_database_content()['closing_soon_pages'][:7],
+        destacar_pages=get_cached_database_content()['destacar_pages'],
+        total_opportunities=total_opportunities,
+        search_meta={
+            'total_results': len(filtered_pages),
+            'main_discipline_counts': main_discipline_counts,
+            'original_search': search_query
+        },
+        og_data={
+            "title": "100 ︱ Oportunidades",
+            "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
+            "url": request.url,
+            "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
+        }
+    )
 
 # Custom Jinja2 filter for date
 @app.template_filter('format_date')
@@ -1231,13 +1223,15 @@ def refresh_database_cache():
                 "filter": {
                     "and": [
                         {"property": "Publicar", "checkbox": {"equals": True}},
-                        {"or": [
-                            {"property": "Fecha de cierre", "date": {"is_empty": True}},
-                            {"property": "Fecha de cierre", "date": {"after": datetime.now().isoformat()}}
-                        ]}
+                        {
+                            "or": [
+                                {"property": "Fecha de cierre", "date": {"is_empty": True}},
+                                {"property": "Fecha de cierre", "date": {"after": datetime.now().strftime('%Y-%m-%d')}}
+                            ]
+                        }
                     ]
                 },
-                "page_size": 100  # Max allowed by Notion
+                "page_size": 100
             }
 
             all_pages = []
@@ -1528,6 +1522,7 @@ def filter_by_discipline(discipline):
             return unicodedata.normalize('NFKD', text.lower()) \
                 .encode('ASCII', 'ignore') \
                 .decode('ASCII').strip()
+
         normalized_discipline = normalize_discipline(discipline)
         app.logger.debug(f"Normalized discipline: {normalized_discipline}")
 
@@ -1575,6 +1570,7 @@ def filter_by_discipline(discipline):
         }
 
         if is_htmx:
+            print("HTMX RESPONSE: Returning _search_results.html partial")
             return render_template("_search_results.html", pages=filtered_pages)
         else:
             return render_template(
@@ -1604,21 +1600,13 @@ def inject_discipline_data():
         'main_discipline_counts': get_discipline_counts()['main']
     }
 
-class SearchOptimizer:
-    def __init__(self):
-        self._search_cache = {}
-        
-    def perform_search(self, pages, query, expanded=False):
-        cache_key = (query, expanded)
-        if cache_key in self._search_cache:
-            return self._search_cache[cache_key]
-            
-        # ... existing search logic ...
-        
-        self._search_cache[cache_key] = filtered_pages
-        return filtered_pages
-
-search_optimizer = SearchOptimizer()
+def normalize_text(text):
+    """
+    Normalize text by removing accents and converting to lowercase
+    """
+    return unicodedata.normalize('NFKD', str(text).lower()) \
+        .encode('ASCII', 'ignore') \
+        .decode('ASCII')
 
 if __name__ == "__main__":
     # Ensure session directory exists

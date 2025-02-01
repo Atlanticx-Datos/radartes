@@ -69,7 +69,11 @@
                                     {% if destacar_pages %}
                                     {% for page in destacar_pages %}
                                     <p class="relative">
-                                        <a href="/database#{{ page.id }}" class="destacada-link">
+                                        <a href="/database#{{ page.id }}" class="destacada-link"
+                                           data-url="{{ page.url }}"
+                                           data-name="{{ page.nombre }}"
+                                           data-country="{{ page.país }}"
+                                           data-summary="{{ page.og_resumida }}">
                                             <span class="md:hidden whitespace-nowrap">
                                                 {{ page.nombre | truncate(18, true, "...") }}
                                                 {% if page.entidad %}
@@ -101,10 +105,14 @@
                     <div class="flex-shrink-0 flex flex-col gap-1 relative w-full">
                         <div class="relative">
                             <input type="text" 
-                                   id="search-input" 
-                                   placeholder="Buscar por nombre, disciplina, mes o país" 
-                                   class="input input-bordered rounded-none w-full pl-6 lg:ml-0 focus:ring-0 focus:ring-offset-0 focus:ring-inset md:border-r-0 bg-gray-200" 
-                                   name="search">
+                                   id="search-input"
+                                   name="search"
+                                   hx-get="/database"
+                                   hx-trigger="keyup changed delay:500ms"
+                                   hx-target="#search-results"
+                                   hx-swap="innerHTML"
+                                   class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                                   placeholder="Buscar oportunidades...">
                             <div class="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center justify-center cursor-pointer"
                                  onclick="clearSearch()">
                                 <svg class="w-4 h-4" fill="none" stroke-width="1.5" stroke="currentColor"
@@ -125,27 +133,21 @@
                 </div>
 
                 <!-- Second Column: Table -->
-                <div class="col-span-1 md:col-span-7 lg:col-span-8 mt-2 lg:mt-0 min-w-0 h-full" id="table-container"
-                    hx-preserve="true">
+                <div class="col-span-1 md:col-span-7 lg:col-span-8 mt-2 lg:mt-0 min-w-0 h-full" id="table-container">
                     <form id="save-form" method="POST">
                         <div class="border-b border-neutral" id="results-container">
-                            <div
-                                class="max-h-[35rem] min-h-[35rem] overflow-y-auto overflow-x-hidden pl-4 md:pl-0 md:scrollbar-none custom-scrollbar md:border-t border-black md:border-r md:border-r-black">
-                                <div
-                                    class="w-[120%] md:w-full -ml-4 md:ml-0 overflow-x-auto md:overflow-x-hidden scrollbar-none">
+                            <div class="max-h-[35rem] min-h-[35rem] overflow-y-auto overflow-x-hidden pl-4 md:pl-0 md:scrollbar-none custom-scrollbar md:border-t border-black md:border-r md:border-r-black">
+                                <div class="w-[120%] md:w-full -ml-4 md:ml-0 overflow-x-auto md:overflow-x-hidden scrollbar-none">
                                     <div class="min-w-full">
                                         <table class="w-full h-full table-fixed relative isolate">
                                             <thead class="sticky top-0 bg-zinc-100 z-20">
                                                 <tr>
-                                                    <th class="w-[7%] 3 pt-4 pb-3">✓</th>
-                                                    <th
-                                                        class="w-[38%] text-xs tracking-tighter text-neutral-700 text-left pl-6 pt-4 pb-3">
+                                                    <th class="w-[7%] pt-4 pb-3">✓</th>
+                                                    <th class="w-[38%] text-xs tracking-tighter text-neutral-700 text-left pl-6 pt-4 pb-3">
                                                         Oportunidad</th>
-                                                    <th
-                                                        class="w-[35%] text-xs tracking-tighter text-neutral-700 text-left pl-6 pt-4 pb-3">
+                                                    <th class="w-[35%] text-xs tracking-tighter text-neutral-700 text-left pl-6 pt-4 pb-3">
                                                         Descripción</th>
-                                                    <th
-                                                        class="w-[12%] text-xs tracking-tighter text-neutral-700 text-center pt-4 pb-3">
+                                                    <th class="w-[12%] text-xs tracking-tighter text-neutral-700 text-center pt-4 pb-3">
                                                         Cierre</th>
                                                     <th class="w-[8%] pt-4 pb-3"></th>
                                                 </tr>
@@ -639,59 +641,65 @@
             }
         });
 
-        let scrollTimeout;
-        function scrollToOpportunity(id, event) {
-            event.preventDefault();
-            clearTimeout(scrollTimeout);
-            
-            const spinner = document.getElementById('layout-spinner');
-            spinner.style.display = 'block';
-            
-            scrollTimeout = setTimeout(() => {
-                const targetRow = document.querySelector(`tr[data-id="${id}"]`);
-                if (targetRow) {
-                    targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                } else {
-                    htmx.ajax('GET', `/database?scroll_id=${id}`, {
-                        target: '#search-results',
-                        swap: 'innerHTML',
-                        headers: { 
-                            'HX-Request': 'true',
-                            'HX-Target': '#search-results'
-                        },
-                        pushHistory: false
-                    });
-                }
-                spinner.style.display = 'none';
-            }, 300); // Wait 300ms before executing
-        }
-
-        // HTMX event handlers
-        document.body.addEventListener('htmx:beforeRequest', function() {
-            document.getElementById('layout-spinner').style.display = 'block';
-        });
-
-        document.body.addEventListener('htmx:afterSwap', function() {
-            const spinner = document.getElementById('layout-spinner');
-            spinner.style.display = 'none';
-            
-            // Handle scroll after content loads
-            const urlParams = new URLSearchParams(window.location.search);
-            const scrollId = urlParams.get('scroll_id');
-            if (scrollId) {
-                // Small delay to ensure DOM is ready
-                setTimeout(() => {
-                    const targetRow = document.querySelector(`tr[data-id="${scrollId}"]`);
-                    if (targetRow) {
-                        targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // New global click event listener for table opportunities triggered by the SVG click.
+        document.body.addEventListener('click', function(event) {
+            // Check if the click originated from an SVG element within an opportunity link.
+            const svg = event.target.closest('svg');
+            if (svg) {
+                const opportunityButton = svg.closest('.opportunity-link');
+                if (opportunityButton) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    
+                    const targetUrl = opportunityButton.getAttribute('data-url');
+                    const name = opportunityButton.getAttribute('data-name');
+                    const country = opportunityButton.getAttribute('data-country');
+                    const summary = opportunityButton.getAttribute('data-summary');
+                    
+                    console.log('Opening opportunity modal from table:', { targetUrl, name, country, summary });
+                    
+                    if (!targetUrl) {
+                        console.error('No URL found for the opportunity.');
+                        return;
                     }
-                }, 50);
+                    
+                    showPreviewModal(targetUrl, name, country, summary);
+                }
             }
         });
 
-        // Error handling
-        document.body.addEventListener('htmx:responseError', function() {
-            document.getElementById('layout-spinner').style.display = 'none';
+        // Modified event listener for accordion opportunities (cierran pronto and destacadas)
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.cierran-pronto-link, .destacada-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Try to retrieve opportunity data from a child button if available.
+                    let targetUrl, name, country, summary;
+                    const btn = link.querySelector('button.opportunity-link');
+                    if (btn) {
+                        targetUrl = btn.getAttribute('data-url');
+                        name = btn.getAttribute('data-name') || link.textContent.trim();
+                        country = btn.getAttribute('data-country') || '';
+                        summary = btn.getAttribute('data-summary') || '';
+                    } else {
+                        // Fallback: check if the link itself carries the required data attributes.
+                        targetUrl = link.getAttribute('data-url');
+                        name = link.getAttribute('data-name') || link.textContent.trim();
+                        country = link.getAttribute('data-country') || '';
+                        summary = link.getAttribute('data-summary') || '';
+                    }
+                    
+                    if (!targetUrl) {
+                        console.error('Opportunity data not found on the accordion link.');
+                        return;
+                    }
+                    
+                    console.log('Opening modal for accordion opportunity:', { targetUrl, name, country, summary });
+                    showPreviewModal(targetUrl, name, country, summary);
+                });
+            });
         });
 
         // Close modal with ESC key
@@ -714,55 +722,9 @@
             }
         });
 
-        // Enhanced hash handler
-        function handleHashScroll() {
-            if (window.location.hash) {
-                const id = window.location.hash.substring(1);
-                const targetRow = document.querySelector(`tr[data-id="${id}"]`);
-                const urlParams = new URLSearchParams(window.location.search);
-                const scrollFlag = urlParams.get('scroll');
-
-                if (targetRow) {
-                    // If coming from redirect, clear the scroll parameter
-                    if (scrollFlag) {
-                        window.history.replaceState(null, null, window.location.pathname + window.location.hash);
-                    }
-
-                    // Trigger animation
-                    targetRow.style.animation = 'none';
-                    void targetRow.offsetWidth;
-                    targetRow.style.animation = 'highlight 2s ease-in-out';
-                    
-                    targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-                    setTimeout(() => {
-                        targetRow.style.animation = '';
-                    }, 2000);
-                } else if (scrollFlag) {
-                    // If scroll flag is present but row not found, check again after HTMX swaps
-                    const observer = new MutationObserver(() => {
-                        const newTarget = document.querySelector(`tr[data-id="${id}"]`);
-                        if (newTarget) {
-                            observer.disconnect();
-                            newTarget.style.animation = 'highlight 2s ease-in-out';
-                            newTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            setTimeout(() => {
-                                newTarget.style.animation = '';
-                            }, 2000);
-                        }
-                    });
-
-                    observer.observe(document.body, {
-                        childList: true,
-                        subtree: true
-                    });
-                }
-            }
-        }
-
-        // Initialize listeners
-        document.addEventListener('DOMContentLoaded', handleHashScroll);
-        document.body.addEventListener('htmx:afterSwap', handleHashScroll);
+        // Add this at the end of your scripts
+        htmx.config.defaultSwapStyle = 'innerHTML';  // Explicit swap method
+        htmx.config.defaultTarget = '#search-results';  // Explicit default target
     </script>
 
     <!-- JavaScript for Modal -->

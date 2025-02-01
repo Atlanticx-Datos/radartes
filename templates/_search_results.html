@@ -1,4 +1,3 @@
-{% if pages %}
 {% for page in pages %}
 <tr data-id="{{ page.id }}" style="
     {% if page.destinatarios == 'Destacar' %}
@@ -12,7 +11,7 @@
     {% endif %}
     padding-left: 0.5rem;
     box-shadow: inset 0 0 0 1px rgb(229, 231, 235);  /* subtle inner border */
-;">
+">
     <th class="w-[7%]">
         <label class="flex justify-center items-center w-full h-full">
             <input type="checkbox" 
@@ -160,9 +159,12 @@
     </th>
 </tr>
 {% endfor %}
-{% else %}
+
+{% if no_results %}
 <tr>
-    <td colspan="5" class="p-2 text-center">No se encontró nada relevante.</td>
+    <td colspan="5" class="text-center py-4 text-gray-500">
+        No se encontraron resultados
+    </td>
 </tr>
 {% endif %}
 
@@ -426,159 +428,3 @@
         }
     });
 </script>
-
-<tbody id="search-results" 
-       class="relative z-30" 
-       style="min-height: 35rem;"
-       {% if scroll_target %}data-scroll-target="{{ scroll_target }}"{% endif %}>
-    {% for page in pages %}
-    <tr class="group hover:bg-gray-50 transition-colors" 
-        data-id="{{ page.id }}">
-        <th class="w-[7%]">
-            <label class="flex justify-center items-center w-full h-full">
-                <input type="checkbox" 
-                       name="selected_pages" 
-                       value="{{ page.id }}"
-                       class="checkbox rounded-none h-4 w-4">
-            </label>
-        </th>
-        <td class="w-[45%] md:w-[38%] pl-6">
-            <div class="flex items-center">
-                <div>
-                    <div class="font-medium text-sm leading-tight mb-1">
-                        <span class="md:hidden">{{ page.nombre | truncate(25) }}</span>
-                        <span class="hidden md:inline">{{ page.nombre }}</span>
-                    </div>
-                    <div class="text-xs opacity-50 leading-none flex items-center gap-2">
-                        {{ page.país }}
-                        {% if page.disciplina %}
-                            <span class="opacity-50">/</span>
-                            <div class="flex gap-1 md:flex-nowrap flex-wrap">
-                                {% set total_length = 0 %}
-                                {% set max_length = 60 %}  {# Adjust max_length as needed #}
-                                {% set disciplinas = page.disciplina.split(',') %}
-                                {% for disciplina in disciplinas %}
-                                    {% set disciplina_trimmed = disciplina.strip() %}
-                                    {% set disciplina_length = disciplina_trimmed | length %}
-                                    {% if total_length + disciplina_length + 2 > max_length %}
-                                        <span class="truncate" title="{{ disciplina_trimmed }}">
-                                            {{ disciplina_trimmed | truncate((max_length - total_length - 3), True, "...") }}
-                                        </span>
-                                        {% set total_length = max_length %} {# Set total_length to max_length to prevent further additions #}
-                                    {% else %}
-                                        <a href="#" 
-                                           class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-normal 
-                                                  bg-gray-300 text-gray-700 
-                                                  hover:bg-gray-400 hover:text-gray-900 transition-colors
-                                                  md:max-w-none max-w-[100px] truncate"
-                                           hx-get="/find_similar_opportunities" 
-                                           hx-target="#search-results" 
-                                           hx-swap="innerHTML" 
-                                           hx-push-url="true" 
-                                           hx-vals='{"keyword": "{{ disciplina_trimmed }}"}'
-                                           title="{{ disciplina_trimmed }}">
-                                            <span class="md:hidden">{{ disciplina_trimmed[:7] + '...' if disciplina_trimmed|length > 7 else disciplina_trimmed | capitalize }}</span>
-                                            <span class="hidden md:inline">{{ disciplina_trimmed | capitalize }}</span>
-                                        </a>
-                                        {% set total_length = total_length + disciplina_length + 2 %}
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            <input type="hidden" name="name_{{ page.id }}" value="{{ page.nombre }}">
-            <input type="hidden" name="country_{{ page.id }}" value="{{ page.país }}">
-            <input type="hidden" name="url_{{ page.id }}" value="{{ page.base_url if page.base_url else page.url }}">
-            <input type="hidden" name="recipients_{{ page.id }}" value="{{ page.destinatarios }}">
-            <input type="hidden" name="fecha_de_cierre_{{ page.id }}" value="{{ page.fecha_de_cierre }}">
-        </td>
-        <td class="w-[30%] md:w-[35%]">
-            <div class="border-left-custom text-sm py-2 capitalize-first h-12 flex items-center pl-6" style="line-height: 0.8rem;">
-                <span class="md:hidden whitespace-nowrap">
-                    {% for keyword in page.ai_keywords.split(',') %}
-                        <a href="#" 
-                           class="opportunity-link truncate" 
-                           hx-get="/find_similar_opportunities" 
-                           hx-target="#search-results" 
-                           hx-swap="innerHTML" 
-                           hx-push-url="true" 
-                           hx-vals='{"keyword": "{{ keyword.strip() }}"}'
-                           title="{{ keyword.strip() | capitalize }}">
-                           {{ keyword | capitalize }}
-                        </a>
-                    {% endfor %}
-                    / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
-                        {{ page.url_base }}
-                    </span>
-                </span>
-                <span class="hidden md:inline whitespace-nowrap">
-                    {% for keyword in page.ai_keywords.split(',') %}
-                        <a href="#" 
-                           class="opportunity-link truncate" 
-                           hx-get="/find_similar_opportunities" 
-                           hx-target="#search-results" 
-                           hx-swap="innerHTML" 
-                           hx-push-url="true" 
-                           hx-vals='{"keyword": "{{ keyword.strip() }}"}'
-                           title="{{ keyword.strip() | capitalize }}">
-                           {{ keyword | capitalize }}
-                        </a>
-                    {% endfor %}
-                    / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
-                        {{ page.url_base }}
-                    </span>
-                </span>
-            </div>
-        </td>
-        <td class="w-[10%] md:w-[12%] text-xs text-center fecha-de-cierre">
-            {{ page.fecha_de_cierre | default("Sin cierre") | format_date }}
-        </td>
-        <th class="w-[8%] md:w-[8%] min-w-[70px] relative">
-            <div class="flex items-center justify-center">
-                <div class="inline-flex items-center gap-1.5 md:gap-3 bg-gray-200 py-2 px-3 md:px-4 ml-9 md:ml-1 mr-4">
-                    <button
-                       role="button"
-                       tabindex="0"
-                       data-url="{{ page.base_url if page.base_url else page.url }}"
-                       data-keywords="{{ page.ai_keywords }}"
-                       data-name="{{ page.nombre }}"
-                       data-country="{{ page.país }}"
-                       data-summary="{{ page.og_resumida }}"
-                       class="opportunity-link flex items-center justify-center w-5 h-5 truncate bg-neutral-400 rounded-full"
-                       title="{{ page.nombre }}">
-                        <svg class="w-4 md:w-6 text-white" data-slot="icon" fill="none"
-                            stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" 
-                                  d="M12 4.5v15m7.5-7.5h-15"/>
-                        </svg>
-                    </button>
-                    <div class="static">
-                        <button tabindex="0" 
-                                role="button" 
-                                class="flex items-center justify-center w-4 h-4"
-                                onclick="toggleDropdown(this)">
-                            <svg class="w-3 md:w-4" data-slot="icon" fill="none"
-                                stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"></path>
-                            </svg>
-                        </button>
-                        <ul class="dropdown-content menu p-2 shadow-xl bg-zinc-100 rounded-none w-52 border border-black mt-3 absolute right-0 hidden">
-                            <li class="menu-item">
-                                <a href="#" onclick="copyUrl('{{ page.base_url if page.base_url else page.url }}'); return false;">Copiar URL</a>
-                            </li>
-                            <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'whatsapp')">WhatsApp</a></li>
-                            <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'linkedin')">LinkedIn</a></li>
-                            <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'gmail')">Email</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </th>
-    </tr>
-    {% endfor %}
-</tbody>
