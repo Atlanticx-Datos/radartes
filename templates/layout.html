@@ -206,7 +206,9 @@
         hx-preserve="true">
     </div>
     <div id="layout-spinner" class="spinner h-8 w-8" style="display: none;">
-        <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
+        <img src="{{ url_for('static', filename='public/spinner.gif') }}" 
+             alt="Loading..." 
+             class="h-full w-full object-contain">
     </div>
     <main class="w-full bg-zinc-100 flex flex-col
                  px-4

@@ -1,119 +1,136 @@
-{% if opportunities %}
-{% for opportunity in opportunities %}
-<tr>
-    <td class="w-[45%] md:w-[38%] pl-6">
-        <div class="flex items-center">
-            <div>
-                <div class="font-medium text-sm leading-tight mb-1">
-                    <span class="md:hidden">{{ opportunity.resumen_IA | truncate(25) }}</span>
-                    <span class="hidden md:inline">{{ opportunity.resumen_IA }}</span>
-                </div>
-                <div class="text-xs opacity-50 leading-none flex items-center gap-2">
-                    {{ opportunity.país }}
-                    {% if opportunity.disciplina %}
-                        <span class="opacity-50">/</span>
-                        <div class="flex gap-1 md:flex-nowrap flex-wrap">
-                            {% set total_length = 0 %}
-                            {% set max_length = 60 %}
-                            {% set disciplinas = opportunity.disciplina.split(',') %}
-                            {% for disciplina in disciplinas %}
-                                {% set disciplina_trimmed = disciplina.strip() %}
-                                {% set disciplina_length = disciplina_trimmed | length %}
-                                {% if total_length + disciplina_length + 2 > max_length %}
-                                    <span class="truncate" title="{{ disciplina_trimmed }}">
-                                        {{ disciplina_trimmed | truncate((max_length - total_length - 3), True, "...") }}
-                                    </span>
-                                    {% set total_length = max_length %}
-                                {% else %}
-                                    <a href="#" 
-                                       class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-normal 
-                                              bg-gray-300 text-gray-700 
-                                              hover:bg-gray-400 hover:text-gray-900 transition-colors
-                                              md:max-w-none max-w-[100px] truncate"
-                                       hx-get="/find_similar_opportunities" 
-                                       hx-target="#search-results" 
-                                       hx-swap="innerHTML" 
-                                       hx-push-url="true" 
-                                       hx-vals='{"keyword": "{{ disciplina_trimmed }}"}'
-                                       title="{{ disciplina_trimmed }}">
-                                        <span class="md:hidden">{{ disciplina_trimmed[:7] + '...' if disciplina_trimmed|length > 7 else disciplina_trimmed | capitalize }}</span>
-                                        <span class="hidden md:inline">{{ disciplina_trimmed | capitalize }}</span>
-                                    </a>
-                                    {% set total_length = total_length + disciplina_length + 2 %}
-                                {% endif %}
-                            {% endfor %}
+<div id="my-results">
+    <!-- Add alert container at the top -->
+    <div id="alert-container" class="mb-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} px-4 py-3 rounded relative" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+    {% if opportunities %}
+    <table class="w-full">
+        {% for opportunity in opportunities %}
+        <tr>
+            <td class="w-[45%] md:w-[38%] pl-6">
+                <div class="flex items-center">
+                    <div>
+                        <div class="font-medium text-sm leading-tight mb-1">
+                            <span class="md:hidden">{{ opportunity.resumen_IA | truncate(25) }}</span>
+                            <span class="hidden md:inline">{{ opportunity.resumen_IA }}</span>
                         </div>
+                        <div class="text-xs opacity-50 leading-none flex items-center gap-2">
+                            {{ opportunity.país }}
+                            {% if opportunity.disciplina %}
+                                <span class="opacity-50">/</span>
+                                <div class="flex gap-1 md:flex-nowrap flex-wrap">
+                                    {% set total_length = 0 %}
+                                    {% set max_length = 60 %}
+                                    {% set disciplinas = opportunity.disciplina.split(',') %}
+                                    {% for disciplina in disciplinas %}
+                                        {% set disciplina_trimmed = disciplina.strip() %}
+                                        {% set disciplina_length = disciplina_trimmed | length %}
+                                        {% if total_length + disciplina_length + 2 > max_length %}
+                                            <span class="truncate" title="{{ disciplina_trimmed }}">
+                                                {{ disciplina_trimmed | truncate((max_length - total_length - 3), True, "...") }}
+                                            </span>
+                                            {% set total_length = max_length %}
+                                        {% else %}
+                                            <a href="#" 
+                                               class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-normal 
+                                                      bg-gray-300 text-gray-700 
+                                                      hover:bg-gray-400 hover:text-gray-900 transition-colors
+                                                      md:max-w-none max-w-[100px] truncate"
+                                               hx-get="/find_similar_opportunities" 
+                                               hx-target="#search-results" 
+                                               hx-swap="innerHTML" 
+                                               hx-push-url="true" 
+                                               hx-vals='{"keyword": "{{ disciplina_trimmed }}"}'
+                                               title="{{ disciplina_trimmed }}">
+                                                <span class="md:hidden">{{ disciplina_trimmed[:7] + '...' if disciplina_trimmed|length > 7 else disciplina_trimmed | capitalize }}</span>
+                                                <span class="hidden md:inline">{{ disciplina_trimmed | capitalize }}</span>
+                                            </a>
+                                            {% set total_length = total_length + disciplina_length + 2 %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td class="w-[30%] md:w-[35%]">
+                <div class="border-left-custom text-sm py-2 capitalize-first h-12 flex items-center pl-6" style="line-height: 0.8rem;">
+                    {{ opportunity.ai_keywords | capitalize }}
+                    {% if opportunity.url_base %}
+                        / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
+                            {{ opportunity.url_base }}
+                        </span>
                     {% endif %}
                 </div>
-            </div>
-        </div>
-    </td>
-    <td class="w-[30%] md:w-[35%]">
-        <div class="border-left-custom text-sm py-2 capitalize-first h-12 flex items-center pl-6" style="line-height: 0.8rem;">
-            {{ opportunity.ai_keywords | capitalize }}
-            {% if opportunity.url_base %}
-                / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
-                    {{ opportunity.url_base }}
-                </span>
-            {% endif %}
-        </div>
-    </td>
-    <td class="w-[10%] md:w-[12%] text-xs text-center fecha-de-cierre">
-        {{ opportunity.fecha_de_cierre | format_date }}
-    </td>
-    <th class="w-[8%] md:w-[8%] min-w-[70px] relative">
-        <div class="flex items-center justify-center">
-            <div class="inline-flex items-center gap-1.5 md:gap-3 bg-gray-200 py-2 px-3 md:px-4 ml-9 md:ml-1 mr-4">
-                <button
-                   role="button"
-                   tabindex="0"
-                   data-url="{{ opportunity.url }}"
-                   data-keywords="{{ opportunity.ai_keywords }}"
-                   data-name="{{ opportunity.resumen_IA }}"
-                   data-country="{{ opportunity.país }}"
-                   class="opportunity-link flex items-center justify-center w-4 h-4 truncate"
-                   title="{{ opportunity.resumen_IA }}">
-                    <svg class="w-3 md:w-4" data-slot="icon" fill="none"
-                        stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M4.5 19.5L19.5 4.5M19.5 4.5H8.25M19.5 4.5V15.75"></path>
-                    </svg>
-                </button>
-                <div class="static">
-                    <button tabindex="0" 
-                            role="button" 
-                            class="flex items-center justify-center w-4 h-4"
-                            onclick="toggleDropdown(this)">
-                        <svg class="w-3 md:w-4" data-slot="icon" fill="none"
-                            stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"></path>
-                        </svg>
-                    </button>
-                    <ul class="dropdown-content menu p-2 shadow-xl bg-zinc-100 rounded-none w-52 border border-black mt-3 absolute right-0 hidden">
-                        <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ opportunity.url }}', '{{ opportunity.resumen_IA }}', 'whatsapp')">WhatsApp</a></li>
-                        <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ opportunity.url }}', '{{ opportunity.resumen_IA }}', 'linkedin')">LinkedIn</a></li>
-                        <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ opportunity.url }}', '{{ opportunity.resumen_IA }}', 'gmail')">Email</a></li>
-                    </ul>
+            </td>
+            <td class="w-[10%] md:w-[12%] text-xs text-center fecha-de-cierre">
+                {{ opportunity.fecha_de_cierre | format_date }}
+            </td>
+            <th class="w-[8%] md:w-[8%] min-w-[70px] relative">
+                <div class="flex items-center justify-center">
+                    <div class="inline-flex items-center gap-1.5 md:gap-3 bg-gray-200 py-2 px-3 md:px-4 ml-9 md:ml-1 mr-4">
+                        <button
+                           role="button"
+                           tabindex="0"
+                           data-url="{{ opportunity.url }}"
+                           data-keywords="{{ opportunity.ai_keywords }}"
+                           data-name="{{ opportunity.resumen_IA }}"
+                           data-country="{{ opportunity.país }}"
+                           class="opportunity-link flex items-center justify-center w-4 h-4 truncate"
+                           title="{{ opportunity.resumen_IA }}">
+                            <svg class="w-3 md:w-4" data-slot="icon" fill="none"
+                                stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4.5 19.5L19.5 4.5M19.5 4.5H8.25M19.5 4.5V15.75"></path>
+                            </svg>
+                        </button>
+                        <div class="static">
+                            <button tabindex="0" 
+                                    role="button" 
+                                    class="flex items-center justify-center w-4 h-4"
+                                    onclick="toggleDropdown(this)">
+                                <svg class="w-3 md:w-4" data-slot="icon" fill="none"
+                                    stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"></path>
+                                </svg>
+                            </button>
+                            <ul class="dropdown-content menu p-2 shadow-xl bg-zinc-100 rounded-none w-52 border border-black mt-3 absolute right-0 hidden">
+                                <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ opportunity.url }}', '{{ opportunity.resumen_IA }}', 'whatsapp')">WhatsApp</a></li>
+                                <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ opportunity.url }}', '{{ opportunity.resumen_IA }}', 'linkedin')">LinkedIn</a></li>
+                                <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ opportunity.url }}', '{{ opportunity.resumen_IA }}', 'gmail')">Email</a></li>
+                            </ul>
+                        </div>
+                        <button hx-delete="/delete_opportunity/{{ opportunity.id }}"
+                                hx-target="#my-results"
+                                hx-swap="outerHTML"
+                                class="flex items-center justify-center w-4 h-4 opportunity-delete">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-                <button onclick="deleteOpportunity('{{ opportunity.id }}')" 
-                        class="flex items-center justify-center w-4 h-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 md:w-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </th>
-</tr>
-{% endfor %}
-{% else %}
-<tr>
-    <td colspan="4" class="p-2 text-center">No se encontraron oportunidades guardadas.</td>
-</tr>
-{% endif %}
+            </th>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <div class="p-2 text-center">No se encontraron oportunidades guardadas.</div>
+    {% endif %}
+</div>
 
 <style>
     .border-left-custom {

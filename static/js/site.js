@@ -560,6 +560,43 @@
         const spinners = document.getElementsByClassName('spinner');
         console.log('Found spinners by class:', spinners.length);
     }
+
+    // Add HTMX delete handler with confirmation
+    document.body.addEventListener('htmx:beforeRequest', function(evt) {
+        if (evt.detail.pathInfo?.requestPath.startsWith('/delete_opportunity/')) {
+            const spinner = document.getElementById('layout-spinner');
+            if (spinner) spinner.style.display = 'block';
+            
+            // Handle confirmation
+            if (!confirm('¿Estás seguro de que deseas eliminar esta oportunidad?')) {
+                evt.preventDefault();
+                if (spinner) spinner.style.display = 'none';
+            }
+        }
+    });
+
+    document.body.addEventListener('htmx:afterRequest', function(evt) {
+        if (evt.detail.pathInfo?.requestPath.startsWith('/delete_opportunity/')) {
+            const spinner = document.getElementById('layout-spinner');
+            if (spinner) spinner.style.display = 'none';
+            
+            // Check for flash messages in response headers
+            const hxTrigger = evt.detail.xhr.getResponseHeader('HX-Trigger');
+            if (hxTrigger && hxTrigger.includes('showAlert')) {
+                const alertMessage = evt.detail.xhr.getResponseHeader('Alert-Message');
+                const alertType = evt.detail.xhr.getResponseHeader('Alert-Type');
+                if (alertMessage && alertType) {
+                    window.showAlert(alertMessage, alertType);
+                }
+            }
+        }
+    });
+
+    // Add error handler
+    document.body.addEventListener('htmx:targetError', function(evt) {
+        console.error('HTMX target error:', evt.detail);
+        window.location.reload(); // Fallback refresh
+    });
   });
 
   // ============================================================================
@@ -664,34 +701,22 @@
     },
 
     // Handle delete operations
-    delete: function(opportunityId) {
+    delete: function(event, opportunityId) {
+        event.preventDefault();
+        event.stopPropagation();
+        
         if (!confirm('¿Estás seguro de que deseas eliminar esta oportunidad?')) return;
         
-        // Show spinner using the layout function
-        layoutshowSpinner();
-        
-        fetch(`/delete_opportunity/${opportunityId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
+        // Use HTMX to trigger the deletion and refresh the results
+        htmx.ajax('DELETE', `/delete_opportunity/${opportunityId}`, {
+            target: '#my-results',
+            swap: 'innerHTML',
+            beforeRequest: function() {
+                layoutshowSpinner();
+            },
+            afterRequest: function() {
+                hideSpinner();
             }
-        })
-        .then(response => {
-            if (response.status === 204) {
-                this.removeRow(opportunityId);
-                window.showAlert(MESSAGES.DELETED, 'success');
-            } else {
-                throw new Error(MESSAGES.ERROR);
-            }
-        })
-        .catch(error => {
-            console.error('Delete error:', error);
-            window.showAlert(error.message, 'error');
-        })
-        .finally(() => {
-            // Hide spinner when complete
-            hideSpinner();
         });
     },
 
@@ -720,7 +745,7 @@
 
   // Keep legacy function names for HTML compatibility
   window.deleteOpportunity = function(opportunityId) {
-    window.opportunityHandler.delete(opportunityId);
+    window.opportunityHandler.delete(null, opportunityId);
   };
 
   // Modified event delegation to handle both old and new HTML
@@ -742,7 +767,7 @@
         }
         
         if (opportunityId) {
-          window.opportunityHandler.delete(opportunityId);
+          window.opportunityHandler.delete(e, opportunityId);
         }
       }
     });

@@ -675,20 +675,22 @@ def delete_saved_opportunity(user_id, page_id):
 @login_required
 def delete_opportunity(page_id):
     user_id = session["user"]["sub"]
-
+    
     try:
-        print("Attempting to delete saved opportunity with ID:", page_id)
-
-        # Delete the saved opportunity from the user's saved opportunities
         delete_saved_opportunity(user_id, page_id)
+        opportunity_ids = get_saved_opportunity_ids(user_id)
+        opportunities = [get_opportunity_by_id(opp_id) for opp_id in opportunity_ids if opp_id]
+        
+        flash("Oportunidad eliminada exitosamente", "success")
+        return render_template(
+            "_my_results.html",
+            opportunities=opportunities
+        )
 
-        # Redirect to /saved_opportunities after deletion
-        response = make_response("", 204)
-        response.headers["HX-Redirect"] = "/saved_opportunities"
-        return response
     except Exception as e:
-        print("Error:", str(e))
-        return jsonify({"error": str(e)}), 400
+        app.logger.error(f"Error deleting opportunity: {str(e)}")
+        flash("Error al eliminar la oportunidad", "error")
+        return render_template("_error.html", error_message="Error deleting opportunity"), 400
 
 
 @app.route("/find_similar_opportunities")
