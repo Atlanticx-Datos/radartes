@@ -1,8 +1,0 @@
-{% for similar in similar_opportunities %}
-<div class="opportunity">
-    <p><strong>Name:</strong> {{ similar.nombre }}</p>
-    <p><strong>Country:</strong> {{ similar.país }}</p>
-    <p><strong>Recipients:</strong> {{ similar.destinatarios }}</p>
-    <p><strong>URL:</strong> <a href="{{ similar.url }}" target="_blank">{{ similar.url }}</a></p>
-</div>
-{% endfor %}
