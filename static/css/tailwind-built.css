@@ -2243,6 +2243,10 @@ details.collapse summary::-webkit-details-marker {
 .bg-opacity-75 {
   --tw-bg-opacity: 0.75;
 }
+.object-contain {
+  -o-object-fit: contain;
+     object-fit: contain;
+}
 .object-cover {
   -o-object-fit: cover;
      object-fit: cover;

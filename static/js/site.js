@@ -580,14 +580,9 @@
             const spinner = document.getElementById('layout-spinner');
             if (spinner) spinner.style.display = 'none';
             
-            // Check for flash messages in response headers
-            const hxTrigger = evt.detail.xhr.getResponseHeader('HX-Trigger');
-            if (hxTrigger && hxTrigger.includes('showAlert')) {
-                const alertMessage = evt.detail.xhr.getResponseHeader('Alert-Message');
-                const alertType = evt.detail.xhr.getResponseHeader('Alert-Type');
-                if (alertMessage && alertType) {
-                    window.showAlert(alertMessage, alertType);
-                }
+            if (evt.detail.successful) {
+                // Use the same showAlert function as the save flow
+                showAlert("Oportunidad eliminada correctamente", "success");
             }
         }
     });
