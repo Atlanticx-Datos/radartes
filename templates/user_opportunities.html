@@ -61,22 +61,4 @@
         </div>
     </main>
 </div>
-
-<!-- Update the spinner element -->
-<div id="layout-spinner" class="spinner h-8 w-8" style="display: none;">
-    <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
-</div>
-
-<style>
-    .spinner {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 1000;
-    }
-</style>
-
-
 {% endblock %}

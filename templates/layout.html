@@ -73,7 +73,7 @@
     <script src="https://unpkg.com/htmx.org@1.7.0/dist/htmx.min.js"></script>
     <style>
         /* Add a comment with timestamp to force cache invalidation */
-        /* Version: 2024-03-XX-001 */
+        /* Version: 2024-03-XX-005 */
 
         .spinner {
             display: none;
@@ -82,6 +82,24 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 1000;
+        }
+
+        /* More specific override */
+        body[data-route="list_saved_opportunities"] #layout-spinner {
+            display: none;
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            z-index: 9999 !important;
+            width: 2rem !important;
+            height: 2rem !important;
+        }
+
+        body[data-route="list_saved_opportunities"] #layout-spinner img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain !important;
         }
 
         /* Navigation dropdown specific styles */
@@ -195,7 +213,8 @@
 
 <body class="flex justify-center max-sm:items-start items-center bg-zinc-100 min-h-screen
              {% if request.endpoint == 'list_saved_opportunities' %}!items-start{% endif %}
-             {% if request.endpoint == 'index' %}justify-center !important align-items-center !important{% endif %}">
+             {% if request.endpoint == 'index' %}justify-center !important align-items-center !important{% endif %}"
+      data-route="{{ request.endpoint }}">
     <!-- Alert container -->
     <div id="alert-container" hx-preserve="true"></div>
 
@@ -210,6 +229,15 @@
              alt="Loading..." 
              class="h-full w-full object-contain">
     </div>
+
+    <!-- New dedicated spinner for saved opportunities -->
+    {% if request.endpoint == 'list_saved_opportunities' %}
+    <div id="saved-spinner" class="spinner h-8 w-8" style="display: none;">
+        <img src="{{ url_for('static', filename='public/spinner.gif') }}?v=1.0" 
+             alt="Loading..." 
+             class="h-full w-full object-contain">
+    </div>
+    {% endif %}
     <main class="w-full bg-zinc-100 flex flex-col
                  px-4
                  max-sm:rounded-lg
