@@ -7,6 +7,8 @@
     <title>
         {% if request.path == '/database' %}
             Oportunidades: {{ total_opportunities }} en total
+        {% elif request.path == '/saved_opportunities' %}
+            Oportunidades Guardadas
         {% else %}
             {{ og_data.title if og_data else "100 + Oportunidades" }}
         {% endif %}
@@ -14,6 +16,8 @@
     <meta property="og:title" content="
         {% if request.path == '/database' %}
             Oportunidades: {{ total_opportunities }} en total
+        {% elif request.path == '/saved_opportunities' %}
+            Oportunidades Guardadas
         {% else %}
             {{ og_data.title if og_data else '100 + Oportunidades' }}
         {% endif %}">
@@ -192,6 +196,15 @@
 <body class="flex justify-center max-sm:items-start items-center bg-zinc-100 min-h-screen
              {% if request.endpoint == 'list_saved_opportunities' %}!items-start{% endif %}
              {% if request.endpoint == 'index' %}justify-center !important align-items-center !important{% endif %}">
+    <!-- Alert container -->
+    <div id="alert-container" hx-preserve="true"></div>
+
+    <!-- Server notification target (hidden) -->
+    <div 
+        id="notification" 
+        class="hidden"
+        hx-preserve="true">
+    </div>
     <div id="layout-spinner" class="spinner h-8 w-8" style="display: none;">
         <img src="{{ url_for('static', filename='public/spinner.gif') }}" alt="Loading...">
     </div>
@@ -206,7 +219,7 @@
             <div class="mx-auto">
                 <nav class="flex {% if request.endpoint == 'index' %}justify-end{% else %}justify-between{% endif %} items-center h-[34px] md:h-16 pt-6 md:pt-8 z-50 md:px-8">
                     <!-- Logo Section - only show on non-index routes -->
-                    {% if request.endpoint != 'index' %}
+                    {% if request.endpoint not in ['index', 'legacy_admin'] %}
                     <div class="flex items-center md:ml-2">
                         <span class="text-2xl md:text-3xl font-bold tracking-tight text-neutral-700 flex items-center gap-[2px]">
                             <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-neutral-700"></span>
@@ -384,13 +397,14 @@
         }
     </style>
     {% endif %}
-    <script>
-        function layoutshowSpinner(event) {
-            event.preventDefault();
-            document.getElementById('layout-spinner').style.display = 'block';
-            window.location.href = event.currentTarget.href;
+    <script src="{{ url_for('static', filename='js/site.js') }}"></script>
+    <style>
+        /* Add smooth transitions for alerts */
+        #alert-container > div {
+            opacity: 1;
+            transition: all 0.3s ease-in-out;
         }
-    </script>
+    </style>
 </body>
 
 </html>

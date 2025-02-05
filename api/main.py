@@ -487,100 +487,19 @@ def fetch_opportunity_details(opportunity_id):
 @app.route("/saved_opportunities")
 @login_required
 def list_saved_opportunities():
-    try:
-        user_id = session["user"]["sub"]
-        opportunity_ids = get_saved_opportunity_ids(user_id)
-        opportunities = []
-        now_date = datetime.now().date()
-        seven_days_from_now = now_date + timedelta(days=7)
+    user_id = session["user"]["sub"]
+    opportunity_ids = get_saved_opportunity_ids(user_id)
+    opportunities = [get_opportunity_by_id(opp_id) for opp_id in opportunity_ids if opp_id]
+    
+    # Get closing_soon_pages from cached content
+    cached_content = get_cached_database_content()
+    closing_soon_pages = cached_content.get('closing_soon_pages', [])[:3] if cached_content else []
 
-        # Get saved opportunities
-        for opp_id in opportunity_ids:
-            opportunity = get_opportunity_by_id(opp_id)
-            if opportunity:
-                # Process disciplina into a list
-                if opportunity.get("disciplina"):
-                    opportunity["disciplinas"] = [d.strip() for d in opportunity["disciplina"].split(',')]
-                
-                # Add url_base from base_url or url
-                base_url = opportunity.get("base_url", "")
-                url = opportunity.get("url", "")
-                try:
-                    parsed = urlparse(base_url if base_url else url)
-                    if not parsed.netloc:
-                        parsed = urlparse(f"https://{base_url if base_url else url}")
-                    opportunity["url_base"] = parsed.netloc.replace('www.', '')
-                except Exception as e:
-                    app.logger.error(f"Error parsing URL: {e}")
-                    opportunity["url_base"] = ""
-
-                opportunities.append(opportunity)
-
-        # Get all closing soon opportunities from main database
-        url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
-        headers = {
-            "Authorization": "Bearer " + NOTION_TOKEN,
-            "Content-Type": "application/json",
-            "Notion-Version": "2022-06-28",
-        }
-        
-        json_body = {
-            "filter": {
-                "and": [
-                    {"property": "Publicar", "checkbox": {"equals": True}},
-                    {"property": "Fecha de cierre", "date": {"on_or_before": seven_days_from_now.isoformat()}},
-                    {"property": "Fecha de cierre", "date": {"on_or_after": now_date.isoformat()}}
-                ]
-            }
-        }
-
-        response = requests.post(url, headers=headers, json=json_body)
-        response.raise_for_status()
-        data = response.json()
-        
-        closing_soon_pages = []
-        for result in data.get("results", []):
-            try:
-                page = {
-                    "id": result["id"],
-                    "resumen_IA": (
-                        result["properties"]["Resumen generado por la IA"]["rich_text"][0]["text"]["content"]
-                        if result["properties"]["Resumen generado por la IA"]["rich_text"]
-                        else ""
-                    ),
-                    "url": result["properties"]["URL"].get("url", ""),
-                    "base_url": (
-                        result["properties"]["Base URL"]["rich_text"][0]["text"]["content"]
-                        if result["properties"]["Base URL"]["rich_text"]
-                        else ""
-                    ),
-                    "fecha_de_cierre": (
-                        result["properties"]["Fecha de cierre"]["date"]["start"]
-                        if result["properties"]["Fecha de cierre"]["date"]
-                        else ""
-                    )
-                }
-                closing_soon_pages.append(page)
-            except (KeyError, IndexError) as e:
-                app.logger.error(f"Error processing closing soon page: {e}")
-                continue
-
-        app.logger.info(f"Found {len(closing_soon_pages)} closing soon opportunities")
-        
-        return render_template(
-            "user_opportunities.html",
-            opportunities=opportunities,
-            closing_soon_pages=closing_soon_pages[:10],
-            og_data=get_default_og_data()
-        )
-    except Exception as e:
-        app.logger.error(f"Error in list_saved_opportunities: {str(e)}")
-        return render_template(
-            "user_opportunities.html",
-            opportunities=[],
-            closing_soon_pages=[],
-            og_data=get_default_og_data()
-        )
+    return render_template(
+        "user_opportunities.html",
+        opportunities=opportunities,
+        closing_soon_pages=closing_soon_pages
+    )
 
 def get_default_og_data():
     return {
@@ -1428,7 +1347,6 @@ def refresh_database_cache():
             "status": "success", 
             "message": f"Cache refreshed with {len(sorted_pages)} pages"
         }), 200
-
     except Exception as e:
         app.logger.error(f"Cache refresh error: {str(e)}")
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -1607,6 +1525,16 @@ def normalize_text(text):
     return unicodedata.normalize('NFKD', str(text).lower()) \
         .encode('ASCII', 'ignore') \
         .decode('ASCII')
+
+@app.context_processor
+def inject_total_opportunities():
+    def get_total_opportunities():
+        cached_content = get_cached_database_content()
+        if cached_content and 'pages' in cached_content:
+            return len(cached_content['pages'])
+        return 0
+    
+    return dict(total_opportunities=get_total_opportunities())
 
 if __name__ == "__main__":
     # Ensure session directory exists
