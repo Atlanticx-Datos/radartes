@@ -27,13 +27,9 @@
    * @param {boolean} show - Whether to show the spinner.
    */
   function toggleSpinner(show) {
-    console.log('toggleSpinner called with:', show);
-    var spinner = document.getElementById("spinner");
+    const spinner = document.getElementById('layout-spinner');
     if (spinner) {
-      spinner.style.display = show ? "block" : "none";
-      console.log('Spinner display set to:', spinner.style.display);
-    } else {
-      console.log('Spinner element not found');
+        spinner.style.display = show ? 'block' : 'none';
     }
   }
 
@@ -126,81 +122,117 @@
    */
   window.showPreviewModal = function(url, name, country, summary) {
     var modalId = "modal-" + Date.now();
-    var modal = document.createElement("div");
-    modal.id = modalId;
-    modal.className =
-      "fixed inset-0 z-50 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center p-4";
-    modal.innerHTML = `
-      <div class="bg-white rounded-lg w-full max-w-lg overflow-hidden border border-neutral modal-animate">
-          <div class="flex items-center justify-between p-3 border-b border-neutral bg-gray-50">
-              <h3 class="text-lg font-medium text-gray-900">Vista previa de la oportunidad</h3>
-              <button class="text-neutral-700 hover:text-neutral-900 px-3 py-1 transition-colors" 
-                      onclick="document.getElementById('${modalId}').remove()">
-                  ✕
-              </button>
-          </div>
-          <div class="p-6">
-              <div class="space-y-4">
-                  <div>
-                      <p class="text-sm text-gray-500">Nombre</p>
-                      <p class="mt-1 text-sm text-gray-900">${name || "No disponible"}</p>
+
+    // Create an overlay element that covers the entire viewport and applies blur
+    var overlay = document.createElement("div");
+    overlay.id = modalId + "-overlay";
+    overlay.style.position = "fixed";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100%";
+    overlay.style.height = "100%";
+    overlay.style.background = "rgba(0, 0, 0, 0.3)";
+    overlay.style.backdropFilter = "blur(4px)";
+    overlay.style.WebkitBackdropFilter = "blur(4px)";
+    overlay.style.zIndex = "50";
+    overlay.style.opacity = "0";
+    overlay.style.transition = "opacity 300ms ease-out";
+
+    // Create the modal content container
+    var modalContent = document.createElement("div");
+    modalContent.id = modalId;
+    // Removed the earlier modal-animate class in favor of inline transition styles.
+    modalContent.className = "bg-white rounded-lg w-full max-w-lg overflow-hidden border border-neutral";
+    modalContent.style.position = "fixed";
+    modalContent.style.top = "50%";
+    modalContent.style.left = "50%";
+    // Start slightly above the final position (for a gentle slide effect)
+    modalContent.style.transform = "translate(-50%, -45%)";
+    modalContent.style.zIndex = "51";
+    modalContent.style.opacity = "0";
+    modalContent.style.transition = "opacity 300ms ease-out, transform 300ms ease-out";
+
+    modalContent.innerHTML = `
+      <div class="flex items-center justify-between p-3 border-b border-neutral bg-gray-50">
+          <h3 class="text-lg font-medium text-gray-900">Vista previa de la oportunidad</h3>
+          <button class="text-neutral-700 hover:text-neutral-900 px-3 py-1 transition-colors" 
+                  onclick="document.getElementById('${modalId}-overlay').remove(); document.getElementById('${modalId}').remove(); document.body.classList.remove('modal-open');">
+              ✕
+          </button>
+      </div>
+      <div class="p-6">
+          <div class="space-y-4">
+              <div>
+                  <p class="text-sm text-gray-500">Nombre</p>
+                  <p class="mt-1 text-sm text-gray-900">${name || "No disponible"}</p>
+              </div>
+              <div>
+                  <p class="text-sm text-gray-500">País</p>
+                  <p class="mt-1 text-sm text-gray-900">${country || "No disponible"}</p>
+              </div>
+              ${ summary ? `
+              <div>
+                  <p class="text-sm text-gray-500">Resumen</p>
+                  <div class="mt-2 p-4 bg-gray-50 rounded-lg">
+                      <p class="text-sm text-gray-700 whitespace-pre-line">${summary}</p>
                   </div>
-                  <div>
-                      <p class="text-sm text-gray-500">País</p>
-                      <p class="mt-1 text-sm text-gray-900">${country || "No disponible"}</p>
-                  </div>
-                  ${
-                    summary
-                      ? `
-                  <div>
-                      <p class="text-sm text-gray-500">Resumen</p>
-                      <div class="mt-2 p-4 bg-gray-50 rounded-lg">
-                          <p class="text-sm text-gray-700 whitespace-pre-line">${summary}</p>
-                      </div>
-                  </div>`
-                      : ""
-                  }
-                  <div>
-                      <p class="text-sm text-gray-500">URL</p>
-                      <a href="${url}" class="mt-1 text-sm text-blue-600 hover:text-blue-800 break-all" target="_blank">
-                          ${url}
-                      </a>
-                  </div>
-                  <div class="mt-6 flex justify-end space-x-3">
-                      <button onclick="document.getElementById('${modalId}').remove()" 
-                              class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
-                          Cerrar
-                      </button>
-                      <a href="${url}" 
-                         target="_blank" 
-                         class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">
-                          Ir al sitio web
-                      </a>
-                  </div>
+              </div>` : "" }
+              <div>
+                  <p class="text-sm text-gray-500">URL</p>
+                  <a href="${url}" class="mt-1 text-sm text-blue-600 hover:text-blue-800 break-all" target="_blank">
+                      ${url}
+                  </a>
+              </div>
+              <div class="mt-6 flex justify-end space-x-3">
+                  <button onclick="document.getElementById('${modalId}-overlay').remove(); document.getElementById('${modalId}').remove(); document.body.classList.remove('modal-open');" 
+                          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
+                      Cerrar
+                  </button>
+                  <a href="${url}" target="_blank" 
+                     class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">
+                      Ir al sitio web
+                  </a>
               </div>
           </div>
       </div>`;
-    document.body.appendChild(modal);
 
-    // Prevent background scrolling while modal is open.
+    // Append to the document
+    document.body.appendChild(overlay);
+    document.body.appendChild(modalContent);
     document.body.classList.add("modal-open");
 
-    // Close modal on clicking outside
-    modal.addEventListener("click", function(event) {
-      if (event.target === modal) {
-        modal.remove();
-        document.body.classList.remove("modal-open");
-      }
+    // Trigger animations after mounting (using requestAnimationFrame to ensure CSS changes take effect)
+    requestAnimationFrame(() => {
+        overlay.style.opacity = "1";
+        modalContent.style.opacity = "1";
+        modalContent.style.transform = "translate(-50%, -50%)";
     });
 
-    // Close modal with Escape key
-    document.addEventListener("keydown", function escListener(event) {
-      if (event.key === "Escape") {
-        modal.remove();
-        document.body.classList.remove("modal-open");
-        document.removeEventListener("keydown", escListener);
-      }
+    // Animate close on clicking the overlay
+    overlay.addEventListener("click", function() {
+        overlay.style.opacity = "0";
+        modalContent.style.opacity = "0";
+        setTimeout(() => {
+            overlay.remove();
+            modalContent.remove();
+            document.body.classList.remove("modal-open");
+        }, 300);
     });
+
+    // Animate close on pressing the Escape key
+    function escListener(event) {
+        if (event.key === "Escape") {
+            overlay.style.opacity = "0";
+            modalContent.style.opacity = "0";
+            setTimeout(() => {
+                overlay.remove();
+                modalContent.remove();
+                document.body.classList.remove("modal-open");
+            }, 300);
+            document.removeEventListener("keydown", escListener);
+        }
+    }
+    document.addEventListener("keydown", escListener);
   };
 
   // ============================================================================
@@ -214,12 +246,21 @@
    * @param {Event} event - The click event.
    */
   window.layoutshowSpinner = function(event) {
-    event.preventDefault();
-    var spinner = document.getElementById("layout-spinner");
-    if (spinner) {
-      spinner.style.display = "block";
+    if (event) {
+        event.preventDefault();
     }
-    window.location.href = event.currentTarget.href;
+    const spinner = document.getElementById('layout-spinner');
+    if (spinner) {
+        spinner.style.display = 'block';
+    }
+  };
+
+  // Hide spinner function
+  window.hideSpinner = function() {
+    const spinner = document.getElementById('layout-spinner');
+    if (spinner) {
+        spinner.style.display = 'none';
+    }
   };
 
   // ============================================================================
@@ -412,23 +453,23 @@
     // --------------------------------------------------------------------------
     document.body.addEventListener("htmx:beforeRequest", function(evt) {
       console.log('HTMX beforeRequest:', evt.detail.pathInfo?.requestPath);
-      toggleSpinner(true);
+      layoutshowSpinner();
     });
 
     document.body.addEventListener("htmx:afterRequest", function(evt) {
       console.log('HTMX afterRequest - hiding spinner');
-      toggleSpinner(false);
+      hideSpinner();
     });
 
     document.body.addEventListener("htmx:responseError", function(evt) {
       console.log('HTMX responseError - hiding spinner');
-      toggleSpinner(false);
+      hideSpinner();
     });
 
     // Global error handler to ensure spinner state consistency.
     window.addEventListener("error", function(event) {
       console.error("Global error:", event.error);
-      toggleSpinner(false);
+      hideSpinner();
       searchInProgress = false;
     });
 
@@ -511,9 +552,17 @@
     // --------------------------------------------------------------------------
     document.body.addEventListener('htmx:beforeRequest', function(evt) {
         if (evt.detail.pathInfo?.requestPath === '/save_user_opportunity') {
-            toggleSpinner(true);
+            layoutshowSpinner();
         }
     });
+
+    // First, let's verify the spinner exists when the page loads
+    const spinner = document.getElementById('layout-spinner');
+    console.log('Initial spinner check:', spinner);
+    if (!spinner) {
+        const spinners = document.getElementsByClassName('spinner');
+        console.log('Found spinners by class:', spinners.length);
+    }
   });
 
   // ============================================================================
@@ -584,52 +633,128 @@
     }, 3000);
   };
 
-  /**
-   * Deletes an opportunity given its ID.
-   * This function sends a DELETE request to the server and handles the UI updates.
-   *
-   * @param {string} opportunityId - The ID of the opportunity to delete.
-   */
-  window.deleteOpportunity = function(opportunityId) {
-    if (!confirm('¿Estás seguro de que deseas eliminar esta oportunidad?')) return;
-
-    toggleSpinner(true);
-
-    fetch(`/delete_opportunity/${opportunityId}`, {
-        method: 'DELETE',
+  // Unified opportunity management functions
+  window.opportunityHandler = {
+    // Handle save operations
+    save: function(checkbox) {
+      layoutshowSpinner();
+      const opportunityId = checkbox.value;
+      const isSaved = checkbox.checked;
+      
+      fetch(`/save_user_opportunity/${opportunityId}`, {
+        method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
-    })
-    .then(response => {
-        if (response.status === 204) {
-            var row = document.querySelector(`button[onclick="deleteOpportunity('${opportunityId}')"]`);
-            if(row) {
-                var tr = row.closest('tr');
-                if(tr) tr.remove();
-            }
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ save: isSaved })
+      })
+      .then(response => {
+        if (!response.ok) throw new Error(MESSAGES.ERROR);
+        return response.json();
+      })
+      .then(data => {
+        window.showAlert(MESSAGES.SAVED, 'success');
+        checkbox.checked = false; // Always uncheck after save
+      })
+      .catch(error => {
+        window.showAlert(error.message, 'error');
+        checkbox.checked = false;
+      })
+      .finally(() => {
+        hideSpinner();
+      });
+    },
 
-            window.showAlert(MESSAGES.DELETED);
-
-            var tbody = document.querySelector('#my-results');
-            if (tbody && !tbody.querySelector('tr')) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="p-2 text-center">No se encontraron oportunidades guardadas.</td>
-                    </tr>
-                `;
+    // Handle delete operations
+    delete: function(opportunityId) {
+        if (!confirm('¿Estás seguro de que deseas eliminar esta oportunidad?')) return;
+        
+        // Show spinner using the layout function
+        layoutshowSpinner();
+        
+        fetch(`/delete_opportunity/${opportunityId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             }
-        } else {
-            throw new Error(MESSAGES.ERROR);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        window.showAlert(error.message, "error");
-    })
-    .finally(() => {
-        toggleSpinner(false);
-    });
+        })
+        .then(response => {
+            if (response.status === 204) {
+                this.removeRow(opportunityId);
+                window.showAlert(MESSAGES.DELETED, 'success');
+            } else {
+                throw new Error(MESSAGES.ERROR);
+            }
+        })
+        .catch(error => {
+            console.error('Delete error:', error);
+            window.showAlert(error.message, 'error');
+        })
+        .finally(() => {
+            // Hide spinner when complete
+            hideSpinner();
+        });
+    },
+
+    // DOM manipulation methods
+    removeRow: function(opportunityId) {
+      const row = document.querySelector(`tr[data-opportunity-id="${opportunityId}"]`);
+      if (row) {
+        row.remove();
+        this.checkEmptyState();
+      }
+    },
+
+    checkEmptyState: function() {
+      const tbody = document.getElementById('my-results');
+      if (tbody && tbody.children.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="4" class="p-2 text-center">
+              No se encontraron oportunidades guardadas.
+            </td>
+          </tr>
+        `;
+      }
+    }
   };
+
+  // Keep legacy function names for HTML compatibility
+  window.deleteOpportunity = function(opportunityId) {
+    window.opportunityHandler.delete(opportunityId);
+  };
+
+  // Modified event delegation to handle both old and new HTML
+  document.addEventListener('DOMContentLoaded', function() {
+    // Handle both old onclick="deleteOpportunity()" and new data attributes
+    document.body.addEventListener('click', function(e) {
+      const deleteButton = e.target.closest('[data-delete-opportunity], [onclick*="deleteOpportunity("]');
+      if (deleteButton) {
+        let opportunityId;
+        
+        // New data attribute format
+        if (deleteButton.dataset.deleteOpportunity) {
+          opportunityId = deleteButton.dataset.deleteOpportunity;
+        }
+        // Legacy onclick format
+        else if (deleteButton.onclick) {
+          const match = deleteButton.onclick.toString().match(/deleteOpportunity\('([^']+)'\)/);
+          opportunityId = match ? match[1] : null;
+        }
+        
+        if (opportunityId) {
+          window.opportunityHandler.delete(opportunityId);
+        }
+      }
+    });
+
+    // Existing checkbox handler remains the same
+    document.body.addEventListener('click', function(e) {
+      if (e.target.matches('input[type="checkbox"][hx-trigger="click"]')) {
+        window.opportunityHandler.save(e.target);
+      }
+    });
+  });
 })();
