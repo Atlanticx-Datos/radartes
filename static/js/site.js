@@ -93,18 +93,19 @@
   // Expose clearSearch globally because it is called via inline HTML attributes.
   window.clearSearch = function(event) {
     if (event) {
-      event.preventDefault();
-      event.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
     }
     console.log("Explicit clear search action triggered");
     var searchInput = document.getElementById("search-input");
     if (searchInput) {
-      searchInput.value = "";
-      htmx.ajax("GET", "/database?clear=true", {
-        target: "#search-results",
-        swap: "innerHTML",
-        headers: { "HX-Request": "true" },
-      });
+        searchInput.value = "";
+        history.replaceState(null, null, window.location.pathname);
+        htmx.ajax("GET", "/database?clear=true", {
+            target: "#search-results",
+            swap: "innerHTML",
+            headers: { "HX-Request": "true" },
+        });
     }
   };
 
@@ -411,18 +412,6 @@
           return;
         }
         window.showPreviewModal(targetUrl, name, country, summary);
-      }
-    });
-
-    // --------------------------------------------------------------------------
-    // Clear search button click handling.
-    // --------------------------------------------------------------------------
-    document.body.addEventListener("click", function(event) {
-      var clearButton = event.target.closest('[onclick="clearSearch()"]');
-      if (clearButton) {
-        event.preventDefault();
-        window.location.href = "/database";
-        return false;
       }
     });
 
