@@ -246,9 +246,6 @@
    * @param {Event} event - The click event.
    */
   window.layoutshowSpinner = function(event) {
-    if (event) {
-        event.preventDefault();
-    }
     const spinner = document.getElementById('layout-spinner');
     if (spinner) {
         spinner.style.display = 'block';
