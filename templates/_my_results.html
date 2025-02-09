@@ -1,46 +1,32 @@
 {% if opportunities %}
     {% for opportunity in opportunities %}
-    <tr>
+    <tr class="group hover:bg-gray-50 transition-colors duration-200">
         <td class="w-[45%] md:w-[38%] pl-6">
             <div class="flex items-center">
                 <div>
                     <div class="font-medium text-sm leading-tight mb-1">
-                        <span class="md:hidden">{{ opportunity.resumen_IA | truncate(25) }}</span>
+                        <span class="md:hidden truncate-multiline">{{ opportunity.resumen_IA | truncate(25) }}</span>
                         <span class="hidden md:inline">{{ opportunity.resumen_IA }}</span>
                     </div>
-                    <div class="text-xs opacity-50 leading-none flex items-center gap-2">
+                    <div class="text-xs text-gray-500 leading-none flex items-center gap-2">
                         {{ opportunity.país }}
                         {% if opportunity.disciplina %}
                             <span class="opacity-50">/</span>
                             <div class="flex gap-1 md:flex-nowrap flex-wrap">
-                                {% set total_length = 0 %}
-                                {% set max_length = 60 %}
                                 {% set disciplinas = opportunity.disciplina.split(',') %}
                                 {% for disciplina in disciplinas %}
                                     {% set disciplina_trimmed = disciplina.strip() %}
-                                    {% set disciplina_length = disciplina_trimmed | length %}
-                                    {% if total_length + disciplina_length + 2 > max_length %}
-                                        <span class="truncate" title="{{ disciplina_trimmed }}">
-                                            {{ disciplina_trimmed | truncate((max_length - total_length - 3), True, "...") }}
-                                        </span>
-                                        {% set total_length = max_length %}
-                                    {% else %}
-                                        <a href="#" 
-                                           class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-normal 
-                                                  bg-gray-300 text-gray-700 
-                                                  hover:bg-gray-400 hover:text-gray-900 transition-colors
-                                                  md:max-w-none max-w-[100px] truncate"
-                                           hx-get="/find_similar_opportunities" 
-                                           hx-target="#search-results" 
-                                           hx-swap="innerHTML" 
-                                           hx-push-url="true" 
-                                           hx-vals='{"keyword": "{{ disciplina_trimmed }}"}'
-                                           title="{{ disciplina_trimmed }}">
-                                            <span class="md:hidden">{{ disciplina_trimmed[:7] + '...' if disciplina_trimmed|length > 7 else disciplina_trimmed | capitalize }}</span>
-                                            <span class="hidden md:inline">{{ disciplina_trimmed | capitalize }}</span>
-                                        </a>
-                                        {% set total_length = total_length + disciplina_length + 2 %}
-                                    {% endif %}
+                                    <a href="#" 
+                                       class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-normal bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors truncate touch-optimized"
+                                       hx-get="/find_similar_opportunities" 
+                                       hx-target="#search-results" 
+                                       hx-swap="innerHTML" 
+                                       hx-push-url="true" 
+                                       hx-vals='{"keyword": "{{ disciplina_trimmed }}"}'
+                                       title="{{ disciplina_trimmed }}">
+                                        <span class="md:hidden">{{ disciplina_trimmed[:7] + '...' if disciplina_trimmed|length > 7 else disciplina_trimmed | capitalize }}</span>
+                                        <span class="hidden md:inline">{{ disciplina_trimmed | capitalize }}</span>
+                                    </a>
                                 {% endfor %}
                             </div>
                         {% endif %}
@@ -49,16 +35,16 @@
             </div>
         </td>
         <td class="w-[30%] md:w-[35%]">
-            <div class="border-left-custom text-sm py-2 capitalize-first h-12 flex items-center pl-6" style="line-height: 0.8rem;">
+            <div class="border-left-custom text-sm py-2 first-letter:uppercase h-12 flex items-center pl-6 leading-[0.8rem]">
                 {{ opportunity.ai_keywords | capitalize }}
                 {% if opportunity.url_base %}
-                    / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
+                    / <span class="bg-gray-200/75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
                         {{ opportunity.url_base }}
                     </span>
                 {% endif %}
             </div>
         </td>
-        <td class="w-[10%] md:w-[12%] text-xs text-center fecha-de-cierre">
+        <td class="w-[10%] md:w-[12%] text-xs text-center">
             {{ opportunity.fecha_de_cierre | format_date }}
         </td>
         <th class="w-[8%] md:w-[8%] min-w-[70px] relative">
@@ -115,7 +101,9 @@
     {% endfor %}
 {% else %}
     <tr>
-        <td colspan="4" class="p-2 text-center">No se encontraron oportunidades guardadas.</td>
+        <td colspan="4" class="p-2 text-center text-gray-500">
+            No se encontraron oportunidades guardadas.
+        </td>
     </tr>
 {% endif %}
 

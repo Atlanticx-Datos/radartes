@@ -1,0 +1,163 @@
+/* static/css/site.css */
+/* ====================================
+   CUSTOM SCROLLBARS
+   Used in: database.html, _search_results.html
+   Purpose: Hide scrollbars while maintaining scroll functionality
+   Why custom: Requires vendor prefixes and !important overrides
+==================================== */
+.custom-scrollbar {
+    scrollbar-width: none;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+/* ====================================
+   CUSTOM NAV DROPDOWNS
+   Used in: home.html, layout.html, database.html, 
+   Purpose: Custom dropdowns for navigation and table share
+   Why custom: Different styling needed for nav vs table dropdowns
+==================================== */
+
+/* General dropdown positioning - least specific */
+.dropdown-content {
+    right: 0;
+    transform-origin: top right;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    border: 1px solid black;
+    margin-top: 0.75rem;
+}
+
+/* Navigation dropdowns - more specific */
+nav .dropdown-content,
+.nav-dropdown {
+    position: fixed;
+    z-index: 999999;
+    background-color: rgb(244, 244, 245) !important;
+}
+
+/* Table share dropdowns - more specific */
+.table-fixed .dropdown-content {
+    position: absolute;
+    z-index: 50;
+    background-color: rgb(244, 244, 245) !important;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* ====================================
+     TABLE ANIMATIONS
+     Used in: database.html
+     Purpose: Highlight newly added or updated rows
+     Why custom: Complex keyframe animations not possible with Tailwind
+  ==================================== */
+@keyframes flashHighlight {
+    0% {
+        border-left-width: 0;
+    }
+
+    50% {
+        border-left-width: 12px;
+    }
+
+    100% {
+        border-left-width: 0;
+    }
+}
+
+.flash-highlight {
+    animation: flashHighlight 1s ease-out;
+}
+
+/* ====================================
+     MODAL STYLES
+     Used in: database.html, _search_results.html
+     Purpose: Handle modal scrolling and animations
+     Why custom: Scrollbar styling and custom animations
+  ==================================== */
+.modal-content {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.modal-animate {
+    animation: modalEntry 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ====================================
+     MOBILE RESPONSIVE OVERRIDES FOR TABLES
+     Used in: database.html
+     Purpose: Handle table overflow on mobile devices
+     Why custom: Requires !important to override table defaults
+  ==================================== */
+@media (max-width: 1024px) {
+    .mobile-table-overflow {
+        overflow-x: auto !important;
+    }
+
+    .mobile-table-width {
+        width: 150% !important;
+        table-layout: fixed !important;
+    }
+}
+
+/* ====================================
+     MULTI-LINE TEXT TRUNCATION
+     Used in: _search_results.html, _my_results.html
+     Purpose: Truncate text after 2 lines with ellipsis
+     Why custom: Not possible with standard Tailwind truncate
+  ==================================== */
+.truncate-multiline {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ====================================
+     ROW HIGHLIGHT ANIMATION
+     Used in: _search_results.html
+     Purpose: Fade out highlight effect for row updates
+     Why custom: Requires RGBA color transition
+  ==================================== */
+@keyframes rowHighlight {
+    from {
+        background-color: rgba(254, 240, 138, 0.5);
+    }
+
+    to {
+        background-color: transparent;
+    }
+}
+
+.highlight-row {
+    animation: rowHighlight 1.5s ease-out;
+}
+
+
+/* ====================================
+     MOBILE TOUCH OPTIMIZATIONS
+     Used in: All interactive elements on mobile
+     Purpose: Improve touch target behavior
+     Why custom: Requires vendor-specific properties
+  ==================================== */
+@media (max-width: 640px) {
+    .touch-optimized {
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+}
+
+/* ====================================
+     MOBILE ACTION OVERFLOW
+     Used in: _my_results.html
+     Purpose: Handle action button overflow on mobile
+     Why custom: Specific positioning requirements
+  ==================================== */
+@media (max-width: 768px) {
+    .mobile-action-overflow {
+        margin-left: -1rem;  /* -ml-4 in Tailwind equals -1rem */
+        overflow-x: visible;
+    }
+}

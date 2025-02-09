@@ -66,40 +66,42 @@ DISCIPLINE_GROUPS = {
     'visuales': {
         'pintura', 'escultura', 'cerámica', 'dibujo', 'instalación', 'fotografía',
         'artes visuales', 'visuales', 'grabado', 'arte plástica', 'muralismo',
-        'arte urbano', 'arte público', 'nuevos medios', 'arte digital', 'ilustración'
+        'arte urbano', 'arte público', 'nuevos medios', 'arte digital', 'ilustración', 
+        'artesanía', 'cerámica', 'orfebrería', 'talla en madera', 'técnicas tradicionales', 
+        'digital', 'arte digital', 'nft', '3d', 'grabado', 'estampa', 'medios mixtos', 'digitales'
     },
     'música': {
-        'música', 'composición', 'piano', 'guitarra', 'vientos', 'electrónica',
-        'coral', 'arte sonoro', 'instrumentos', 'multidisciplinar'
+        'música', 'composición', 'piano', 'guitarra', 'vientos', 'electrónica', 'ópera'
+        'coral', 'arte sonoro', 'instrumentos', 'multidisciplinar', 'experimental', 'canto', 'contemporánea'
     },
     'video': {
-        'videoarte', 'cine', 'documental', 'cortos', 'animación', 'cortometrajes',
-        'artes audiovisuales', 'multidisciplinar'
+        'videoarte', 'cine', 'documental', 'cortos', 'animación', 'cortometrajes', 'mapping'
+        'artes audiovisuales', 'multidisciplinar', 'largometraje', 'corto', 'televisión',
     },
     'escénicas': {
         'teatro', 'danza', 'performance', 'circo', 'coreografía', 'artes escénicas',
-        'teatro físico', 'danza contemporánea', 'multidisciplinar'
+        'teatro físico', 'danza contemporánea', 'multidisciplinar', 'performance',
+        'happening', 'intervención', 'inmersiva',
     },
     'literatura': {
-        'literatura', 'poesía', 'narrativa', 'ensayo', 'escritura creativa',
-        'traducción literaria', 'guion', 'multidisciplinar'
+        'literatura', 'poesía', 'narrativa', 'ensayo', 'escritura', 'edición', 'publicaciones',
+        'traducción', 'guion', 'multidisciplinar', 'libretto', 'libreto', 'cuento', 'cuentos'
     },
     'diseño': {
-        'diseño', 'diseño gráfico', 'diseño industrial', 'diseño textil',
-        'diseño editorial', 'gráfica', 'multidisciplinar'
+        'diseño', 'gráfico', 'industrial', 'textil',
+        'editorial', 'gráfica', 'multidisciplinar', 'ilustración',
+        'moda', 'interiores', 'tipografía',
     },
     'investigación': {
-        'investigación', 'creación', 'curaduría', 'gestión cultural',
-        'teoría artística', 'historia del arte', 'mediación cultural',
-        'conservación patrimonial', 'investigación-creación'
+        'investigación', 'creación', 'curaduría', 'gestión cultural', 'comisariado', 'comisario'
+        'teoría artística', 'historia del arte', 'mediación cultural', 'mediación', 'patrimonio',
+        'conservación patrimonial', 'investigación-creación', 'multidisciplinar', 'restauración', 
+        'restaurador', 'conservación', 'archivo', 'creación', 'crítica', 'ecología', 'feminismo',
+        'cultura', 'curaduría', 'documentación', 'comunidad', 'público', 'audiencia'
     },
     'arquitectura': {
         'arquitectura', 'urbanismo', 'paisajismo', 'intervención urbana',
         'arte ambiental', 'diseño de espacios', 'multidisciplinar'
-    },
-    'artesanía': {
-        'artesanía', 'arte textil', 'cerámica tradicional', 'orfebrería',
-        'talla en madera', 'técnicas tradicionales', 'multidisciplinar'
     }
 }
 
@@ -856,46 +858,30 @@ def all_pages():
     
     filtered_pages = []
     if search_query:
-        # Check if it's a month search first
-        month_terms = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
-                      "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+        search_terms = [term.strip() for term in search_query.split(',')]
         
-        if search_query in month_terms:
-            print(f"Month search detected: {search_query}")  # Debug print
-            month_num = month_mapping[search_query]
-            filtered_pages = [
-                page for page in pages
-                if page.get("fecha_de_cierre") and 
-                page["fecha_de_cierre"] != "1900-01-01" and
-                datetime.strptime(page["fecha_de_cierre"], '%Y-%m-%d').month == month_num
-            ]
-            print(f"Found {len(filtered_pages)} pages for month {search_query}")  # Debug print
-        else:
-            # Regular search with AND logic
-            search_terms = [term.strip() for term in search_query.split(',')]
-            print(f"Search terms: {search_terms}")  # Debug print
-            
-            for page in pages:
-                # ALL terms must match (AND logic)
-                all_terms_match = True
-                for term in search_terms:
-                    term_found = False
-                    normalized_term = normalize_text(term)
-                    for field in ['disciplina', 'ai_keywords', 'nombre', 
-                                'país', 'categoria', 'nombre_original',
-                                'descripción', 'og_resumida']:
-                        field_value = normalize_text(str(page.get(field, "")))
-                        if normalized_term in field_value:
-                            term_found = True
-                            break
-                    if not term_found:
-                        all_terms_match = False
-                        break
-                
-                if all_terms_match:
-                    filtered_pages.append(page)
-            
-            print(f"Found {len(filtered_pages)} pages matching all terms")  # Debug print
+        # Score and filter pages
+        scored_pages = []
+        for page in pages:
+            score = calculate_relevance_score(page, search_terms)
+            if score > 0:  # Only include pages with matches
+                scored_pages.append((score, page))
+        
+        # Sort by score (descending) and extract just the pages
+        filtered_pages = [
+            page for score, page in sorted(
+                scored_pages, 
+                key=lambda x: x[0], 
+                reverse=True
+            )
+        ]
+        
+        app.logger.debug(f"Found {len(filtered_pages)} relevant pages")
+        
+        # Add score to page data for debugging if needed
+        if app.debug:
+            for score, page in scored_pages[:5]:
+                app.logger.debug(f"Score {score}: {page.get('nombre_original', '')}")
     else:
         filtered_pages = pages
 
@@ -1425,25 +1411,17 @@ def filter_by_discipline(discipline):
         is_htmx = request.headers.get('HX-Request', 'false').lower() == 'true'
         
         if is_clear:
-            # Reuse the existing clear functionality from all_pages
             return redirect(url_for('all_pages', clear='true'))
             
         # Normalize the discipline parameter
-        def normalize_discipline(text):
-            return unicodedata.normalize('NFKD', text.lower()) \
-                .encode('ASCII', 'ignore') \
-                .decode('ASCII').strip()
-
         normalized_discipline = normalize_discipline(discipline)
         app.logger.debug(f"Normalized discipline: {normalized_discipline}")
 
         cached_content = get_cached_database_content()
-        
         if not cached_content:
             app.logger.error("No cached content available")
             return render_template("_search_results.html", pages=[])
 
-        # Get required data from cache
         pages = cached_content['pages']
         closing_soon_pages = cached_content['closing_soon_pages']
         destacar_pages = cached_content['destacar_pages']
@@ -1456,21 +1434,71 @@ def filter_by_discipline(discipline):
         }
         
         if normalized_discipline not in valid_disciplines:
-            app.logger.error(f"Invalid discipline: {discipline} (normalized: {normalized_discipline})")
+            app.logger.error(f"Invalid discipline: {discipline}")
             return render_template("_search_results.html", pages=[])
 
         # Get original casing for display
         original_discipline = valid_disciplines[normalized_discipline]
         subdisciplines = DISCIPLINE_GROUPS[original_discipline]
 
-        # Filter pages with normalization
-        filtered_pages = []
+        # Score and filter pages
+        scored_pages = []
         for page in pages:
-            page_disciplina = normalize_discipline(page.get('disciplina', ''))
-            if any(normalize_discipline(sub) in page_disciplina for sub in subdisciplines):
-                filtered_pages.append(page)
+            score = 0
+            page_disciplina = normalize_text(page.get('disciplina', ''))
+            
+            # Direct match with main discipline (highest weight)
+            if normalize_discipline(original_discipline) in page_disciplina:
+                score += 10
+            
+            # Matches with subdisciplines
+            matched_subdisciplines = 0
+            for sub in subdisciplines:
+                if normalize_discipline(sub) in page_disciplina:
+                    matched_subdisciplines += 1
+                    score += 5  # Points for each matching subdiscipline
+            
+            # Bonus for multiple subdiscipline matches
+            if matched_subdisciplines > 1:
+                score += 3 * matched_subdisciplines
+            
+            # Additional context scoring
+            if page.get('ai_keywords'):
+                if any(normalize_discipline(sub) in normalize_text(page['ai_keywords']) 
+                      for sub in subdisciplines):
+                    score += 4
+            
+            # Recency bonus (if closing date exists and is in the future)
+            if page.get('fecha_de_cierre') and page['fecha_de_cierre'] != '1900-01-01':
+                try:
+                    closing_date = datetime.strptime(page['fecha_de_cierre'], '%Y-%m-%d')
+                    if closing_date > datetime.now():
+                        days_until_close = (closing_date - datetime.now()).days
+                        if days_until_close <= 7:  # Extra weight for urgent opportunities
+                            score += 3
+                        elif days_until_close <= 30:
+                            score += 2
+                except ValueError:
+                    pass
+            
+            if score > 0:
+                scored_pages.append((score, page))
+
+        # Sort by score and extract pages
+        filtered_pages = [
+            page for score, page in sorted(
+                scored_pages, 
+                key=lambda x: x[0], 
+                reverse=True
+            )
+        ]
 
         app.logger.debug(f"Found {len(filtered_pages)} matches for {original_discipline}")
+
+        # Debug logging for top results
+        if app.debug:
+            for score, page in sorted(scored_pages, key=lambda x: x[0], reverse=True)[:5]:
+                app.logger.debug(f"Score {score}: {page.get('nombre_original', '')}")
 
         # Prepare template context
         og_data = {
@@ -1481,7 +1509,6 @@ def filter_by_discipline(discipline):
         }
 
         if is_htmx:
-            print("HTMX RESPONSE: Returning _search_results.html partial")
             return render_template("_search_results.html", pages=filtered_pages)
         else:
             return render_template(
@@ -1528,6 +1555,58 @@ def inject_total_opportunities():
         return 0
     
     return dict(total_opportunities=get_total_opportunities())
+
+def calculate_relevance_score(page, search_terms, discipline_groups=DISCIPLINE_GROUPS):
+    """
+    Calculate a relevance score for a page based on search terms and discipline groups.
+    
+    Scoring weights:
+    - Exact match in title: 10 points
+    - Exact match in discipline: 8 points
+    - Match in discipline group: 6 points
+    - Match in other key fields: 4 points
+    - Partial match in any field: 2 points
+    """
+    score = 0
+    
+    # Normalize search terms and page fields for comparison
+    normalized_terms = [normalize_text(term) for term in search_terms]
+    
+    # Get discipline group context for search terms
+    term_discipline_groups = {}
+    for term in normalized_terms:
+        for group_name, disciplines in discipline_groups.items():
+            if term in {normalize_text(d) for d in disciplines}:
+                term_discipline_groups[term] = group_name
+    
+    for term in normalized_terms:
+        # Title matches (highest weight)
+        if term in normalize_text(page.get('nombre_original', '')):
+            score += 10
+        
+        # Discipline matches
+        page_discipline = normalize_text(page.get('disciplina', ''))
+        if term in page_discipline:
+            score += 8
+        
+        # Discipline group matches
+        if term in term_discipline_groups:
+            group_name = term_discipline_groups[term]
+            group_disciplines = discipline_groups[group_name]
+            if any(normalize_text(d) in page_discipline for d in group_disciplines):
+                score += 6
+        
+        # Other key fields matches
+        key_fields = ['país', 'categoria', 'ai_keywords', 'destinatarios']
+        for field in key_fields:
+            if term in normalize_text(str(page.get(field, ''))):
+                score += 4
+        
+        # Partial matches in description
+        if term in normalize_text(page.get('og_resumida', '')):
+            score += 2
+    
+    return score
 
 if __name__ == "__main__":
     # Ensure session directory exists
