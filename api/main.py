@@ -326,10 +326,62 @@ def login():
     
     app.logger.info(f"Session before redirect: {session}")
     
+    # Check if user is first time visitor by looking up their preferences
+    user_id = session.get('user', {}).get('sub')
+    if user_id:
+        has_preferences = check_user_preferences(user_id)
+        if not has_preferences:
+            session['needs_preferences'] = True
+            session.modified = True
+    
     return oauth.auth0.authorize_redirect(
         redirect_uri=AUTH0_CALLBACK_URL,
         state=state
     )
+
+def check_user_preferences(user_id):
+    """Check if user has any preferences stored"""
+    url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
+    headers = {
+        "Authorization": "Bearer " + NOTION_TOKEN,
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+    }
+    
+    # Ensure we're using the full Auth0 user ID
+    if not user_id.startswith('auth0|'):
+        app.logger.warning(f"User ID {user_id} doesn't have Auth0 prefix")
+        user_id = f"auth0|{user_id}"
+    
+    # Query for any preference entries
+    json_body = {
+        "filter": {
+            "and": [
+                {"property": "User ID", "title": {"equals": user_id}},
+                {"property": "Opportunity ID", "rich_text": {"is_empty": True}},
+                {"property": "Preferences", "rich_text": {"is_not_empty": True}}
+            ]
+        },
+        "page_size": 1
+    }
+    
+    try:
+        app.logger.info(f"Checking preferences for Auth0 user {user_id}")
+        app.logger.info(f"Query: {json.dumps(json_body, indent=2)}")
+        
+        response = requests.post(url, headers=headers, json=json_body)
+        response.raise_for_status()
+        data = response.json()
+        
+        has_preferences = len(data.get("results", [])) > 0
+        app.logger.info(f"Auth0 user {user_id} has preferences: {has_preferences}")
+        app.logger.debug(f"Query results: {json.dumps(data.get('results', []), indent=2)}")
+        
+        return has_preferences
+    except Exception as e:
+        app.logger.error(f"Error checking user preferences: {str(e)}")
+        app.logger.error(f"Response content: {response.content if 'response' in locals() else 'No response'}")
+        return False
 
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
@@ -374,6 +426,14 @@ def callback():
         # Clear the state after successful verification
         session.pop('state', None)
         
+        # Check if user has preferences
+        user_id = user_info['sub']
+        has_preferences = check_user_preferences(user_id)
+        
+        if not has_preferences:
+            app.logger.info(f"First-time user {user_id} detected, redirecting to preferences")
+            return redirect(url_for('preferences'))
+            
         # Get the next URL from session and remove it
         next_url = session.pop('next_url', url_for('index'))
         app.logger.info(f"Next URL from session: {next_url}")
@@ -1618,6 +1678,70 @@ def test_filters():
                              total_opportunities=0,
                              DISCIPLINE_GROUPS=DISCIPLINE_GROUPS,
                              og_data=get_default_og_data())
+
+@app.route("/preferences", methods=["GET", "POST"])
+@login_required
+def preferences():
+    if request.method == "POST":
+        user_id = session["user"]["sub"]
+        selected_disciplines = request.form.getlist("disciplines")
+        
+        # Store preferences using existing DB structure
+        try:
+            save_user_preferences(user_id, selected_disciplines)
+            flash("Preferences saved successfully!", "success")
+            return redirect(url_for("index"))
+        except Exception as e:
+            app.logger.error(f"Error saving preferences: {str(e)}")
+            flash("Error saving preferences. Please try again.", "error")
+            return redirect(url_for("preferences"))
+    
+    return render_template(
+        "preferences.html",
+        disciplines=DISCIPLINE_GROUPS.keys()
+    )
+
+def save_user_preferences(user_id, preferences):
+    """Save user preferences to Notion DB using rich_text"""
+    url = "https://api.notion.com/v1/pages"
+    headers = {
+        "Authorization": "Bearer " + NOTION_TOKEN,
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+    }
+    
+    # Ensure we're using the full Auth0 user ID
+    if not user_id.startswith('auth0|'):
+        app.logger.warning(f"User ID {user_id} doesn't have Auth0 prefix")
+        user_id = f"auth0|{user_id}"
+    
+    data = {
+        "parent": {"database_id": OPORTUNIDADES_ID},
+        "properties": {
+            "User ID": {
+                "title": [{"text": {"content": user_id}}]
+            },
+            "Opportunity ID": {
+                "rich_text": [{"text": {"content": ""}}]
+            },
+            "Preferences": {
+                "rich_text": [{"text": {"content": ",".join(preferences)}}]
+            }
+        }
+    }
+    
+    app.logger.info(f"Saving preferences for Auth0 user {user_id}: {preferences}")
+    app.logger.info(f"Request data: {json.dumps(data, indent=2)}")
+    
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+        app.logger.info(f"Successfully saved preferences for Auth0 user {user_id}")
+        return response.json()
+    except Exception as e:
+        app.logger.error(f"Error saving preferences: {str(e)}")
+        app.logger.error(f"Response content: {response.content if 'response' in locals() else 'No response'}")
+        raise
 
 if __name__ == "__main__":
     # Ensure session directory exists
