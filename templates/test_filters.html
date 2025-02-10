@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold mb-6">Test Filters</h1>
+    
+    <!-- Data container with proper escaping -->
+    <div id="prefiltered-data" 
+         data-results="{{ prefiltered_results|tojson|forceescape }}"
+         data-pages="{{ pages|tojson|forceescape }}"
+         class="hidden">
+    </div>
+    
+    <!-- Filter sections -->
+    <div class="space-y-6">
+        <!-- Discipline filters -->
+        <div>
+            <h2 class="text-lg font-semibold mb-3">Filtrar por disciplina</h2>
+            <div class="flex flex-wrap gap-2">
+                <button class="filter-btn px-4 py-2 rounded-full border bg-blue-600 text-white"
+                    data-discipline-filter="todos">
+                    Todos
+                </button>
+                {% for discipline in discipline_groups.keys() %}
+                <button class="filter-btn px-4 py-2 rounded-full border border-gray-300 text-gray-700"
+                    data-discipline-filter="{{ discipline }}">
+                    {{ discipline|title }}
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Month filters -->
+        <div>
+            <h2 class="text-lg font-semibold mb-3">Filtrar por mes</h2>
+            <div class="flex flex-wrap gap-2">
+                <button class="filter-btn px-4 py-2 rounded-full border bg-blue-600 text-white"
+                    data-month-filter="todos">
+                    Todos
+                </button>
+                {% for month, number in month_mapping.items() %}
+                <button class="filter-btn px-4 py-2 rounded-full border border-gray-300 text-gray-700"
+                    data-month-filter="{{ number }}">
+                    {{ month|title }}
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div class="text-sm text-gray-600 my-4" id="results-counter"></div>
+    <div id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+</div>
+{% endblock %}

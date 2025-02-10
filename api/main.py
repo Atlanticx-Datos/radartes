@@ -55,6 +55,7 @@ from flask_session import Session
 import base64
 import json
 from collections import defaultdict
+from html import escape
 
 
 load_dotenv()
@@ -845,12 +846,15 @@ def all_pages():
     is_htmx = request.headers.get('HX-Request', 'false').lower() == 'true'
     scroll_id = request.args.get('scroll_id')
     
-    # Define month mapping
+    # Define month mapping (keep this for filtering)
     month_mapping = {
         "enero": 1, "febrero": 2, "marzo": 3, "abril": 4,
         "mayo": 5, "junio": 6, "julio": 7, "agosto": 8,
         "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
     }
+    
+    # Get month filter from request
+    month_filter = request.args.get("month")
     
     # Original search implementation
     search_query = request.args.get("search", "").strip().lower()
@@ -878,12 +882,21 @@ def all_pages():
         
         app.logger.debug(f"Found {len(filtered_pages)} relevant pages")
         
-        # Add score to page data for debugging if needed
-        if app.debug:
-            for score, page in scored_pages[:5]:
-                app.logger.debug(f"Score {score}: {page.get('nombre_original', '')}")
     else:
         filtered_pages = pages
+
+    # Apply month filter if present (restore this functionality)
+    if month_filter:
+        try:
+            month_number = int(month_filter)
+            filtered_pages = [
+                page for page in filtered_pages
+                if page.get('fecha_de_cierre') 
+                and page['fecha_de_cierre'] != '1900-01-01'
+                and datetime.strptime(page['fecha_de_cierre'], '%Y-%m-%d').month == month_number
+            ]
+        except (ValueError, TypeError) as e:
+            app.logger.error(f"Error filtering by month: {str(e)}")
 
     # Handle ALL HTMX requests first
     if is_htmx:
@@ -1444,42 +1457,7 @@ def filter_by_discipline(discipline):
         # Score and filter pages
         scored_pages = []
         for page in pages:
-            score = 0
-            page_disciplina = normalize_text(page.get('disciplina', ''))
-            
-            # Direct match with main discipline (highest weight)
-            if normalize_discipline(original_discipline) in page_disciplina:
-                score += 10
-            
-            # Matches with subdisciplines
-            matched_subdisciplines = 0
-            for sub in subdisciplines:
-                if normalize_discipline(sub) in page_disciplina:
-                    matched_subdisciplines += 1
-                    score += 5  # Points for each matching subdiscipline
-            
-            # Bonus for multiple subdiscipline matches
-            if matched_subdisciplines > 1:
-                score += 3 * matched_subdisciplines
-            
-            # Additional context scoring
-            if page.get('ai_keywords'):
-                if any(normalize_discipline(sub) in normalize_text(page['ai_keywords']) 
-                      for sub in subdisciplines):
-                    score += 4
-            
-            # Recency bonus (if closing date exists and is in the future)
-            if page.get('fecha_de_cierre') and page['fecha_de_cierre'] != '1900-01-01':
-                try:
-                    closing_date = datetime.strptime(page['fecha_de_cierre'], '%Y-%m-%d')
-                    if closing_date > datetime.now():
-                        days_until_close = (closing_date - datetime.now()).days
-                        if days_until_close <= 7:  # Extra weight for urgent opportunities
-                            score += 3
-                        elif days_until_close <= 30:
-                            score += 2
-                except ValueError:
-                    pass
+            score = calculate_relevance_score(page, [original_discipline], DISCIPLINE_GROUPS)
             
             if score > 0:
                 scored_pages.append((score, page))
@@ -1556,57 +1534,90 @@ def inject_total_opportunities():
     
     return dict(total_opportunities=get_total_opportunities())
 
-def calculate_relevance_score(page, search_terms, discipline_groups=DISCIPLINE_GROUPS):
+def calculate_relevance_score(page, target_disciplines, discipline_groups):
     """
-    Calculate a relevance score for a page based on search terms and discipline groups.
-    
-    Scoring weights:
-    - Exact match in title: 10 points
-    - Exact match in discipline: 8 points
-    - Match in discipline group: 6 points
-    - Match in other key fields: 4 points
-    - Partial match in any field: 2 points
+    Calculate relevance score for a page based on exact discipline group matches
     """
-    score = 0
+    if not target_disciplines or 'todos' in target_disciplines:
+        return 0  # No score when filtering all
     
-    # Normalize search terms and page fields for comparison
-    normalized_terms = [normalize_text(term) for term in search_terms]
+    page_disciplines = set()
+    # Normalize page disciplines
+    if 'disciplina' in page:
+        disciplines = page['disciplina'].lower().split(',')
+        page_disciplines.update(d.strip() for d in disciplines)
     
-    # Get discipline group context for search terms
-    term_discipline_groups = {}
-    for term in normalized_terms:
-        for group_name, disciplines in discipline_groups.items():
-            if term in {normalize_text(d) for d in disciplines}:
-                term_discipline_groups[term] = group_name
+    # Get all allowed keywords for target disciplines
+    allowed_keywords = set()
+    for discipline in target_disciplines:
+        allowed_keywords.update(discipline_groups.get(discipline, set()))
     
-    for term in normalized_terms:
-        # Title matches (highest weight)
-        if term in normalize_text(page.get('nombre_original', '')):
-            score += 10
-        
-        # Discipline matches
-        page_discipline = normalize_text(page.get('disciplina', ''))
-        if term in page_discipline:
-            score += 8
-        
-        # Discipline group matches
-        if term in term_discipline_groups:
-            group_name = term_discipline_groups[term]
-            group_disciplines = discipline_groups[group_name]
-            if any(normalize_text(d) in page_discipline for d in group_disciplines):
-                score += 6
-        
-        # Other key fields matches
-        key_fields = ['país', 'categoria', 'ai_keywords', 'destinatarios']
-        for field in key_fields:
-            if term in normalize_text(str(page.get(field, ''))):
-                score += 4
-        
-        # Partial matches in description
-        if term in normalize_text(page.get('og_resumida', '')):
-            score += 2
+    # Calculate exact matches
+    exact_matches = page_disciplines.intersection(allowed_keywords)
     
-    return score
+    # Return score based on number of exact matches
+    return len(exact_matches)
+
+@app.route("/test-filters")
+def test_filters():
+    """Test page for client-side discipline filtering"""
+    try:
+        cached_content = get_cached_database_content()
+        if not cached_content:
+            return render_template("error.html", 
+                                message="No cached content available",
+                                total_opportunities=0,
+                                DISCIPLINE_GROUPS=DISCIPLINE_GROUPS,
+                                og_data=get_default_og_data())
+
+        pages = cached_content.get('pages', [])
+        
+        # Pre-filter pages for each main discipline
+        prefiltered_results = {}
+        for main_discipline in DISCIPLINE_GROUPS.keys():
+            scored_pages = []
+            for page in pages:
+                score = calculate_relevance_score(page, [main_discipline], DISCIPLINE_GROUPS)
+                if score > 0:
+                    scored_pages.append((score, page))
+            
+            prefiltered_results[main_discipline] = [
+                page for score, page in sorted(
+                    scored_pages,
+                    key=lambda x: x[0],
+                    reverse=True
+                )
+            ][:50]
+
+        month_mapping = {
+            "enero": 1, "febrero": 2, "marzo": 3, "abril": 4,
+            "mayo": 5, "junio": 6, "julio": 7, "agosto": 8,
+            "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
+        }
+        
+        # Debug logging
+        app.logger.info(f"Prefiltered results keys: {list(prefiltered_results.keys())}")
+        app.logger.info(f"Sample discipline data: {list(prefiltered_results.values())[0][0] if prefiltered_results else 'None'}")
+        app.logger.info(f"Total pages passed to template: {len(pages)}")
+        
+        return render_template(
+            "test_filters.html",
+            prefiltered_results=prefiltered_results,
+            discipline_groups=DISCIPLINE_GROUPS,
+            month_mapping=month_mapping,
+            pages=pages,
+            total_opportunities=len(pages),
+            DISCIPLINE_GROUPS=DISCIPLINE_GROUPS,
+            og_data=get_default_og_data()
+        )
+        
+    except Exception as e:
+        app.logger.error(f"Error in test-filters: {str(e)}")
+        return render_template("error.html", 
+                             message=str(e),
+                             total_opportunities=0,
+                             DISCIPLINE_GROUPS=DISCIPLINE_GROUPS,
+                             og_data=get_default_og_data())
 
 if __name__ == "__main__":
     # Ensure session directory exists

@@ -14,7 +14,7 @@
  */
 (function() {
   "use strict";
-
+  
   // ============================================================================
   // Module: Search & HTMX Handling
   // ============================================================================
@@ -581,6 +581,158 @@
         console.error('HTMX target error:', evt.detail);
         window.location.reload(); // Fallback refresh
     });
+
+    // ============================================================================
+    // Module: Test Filters
+    // ============================================================================
+    
+    let prefilteredResults = null;
+    let allPages = null;
+
+    function handleDisciplineFilter(button) {
+        const disciplineButtons = document.querySelectorAll('[data-discipline-filter]');
+        
+        // Update active state
+        disciplineButtons.forEach(btn => {
+            btn.classList.remove('bg-blue-600', 'text-white');
+            btn.classList.add('border-gray-300', 'text-gray-700');
+        });
+        button.classList.add('bg-blue-600', 'text-white');
+        button.classList.remove('border-gray-300', 'text-gray-700');
+        
+        // Show filtered results
+        const discipline = button.dataset.disciplineFilter;
+        if (discipline === 'todos') {
+            showResults(allPages);
+        } else {
+            showFilteredResults(discipline);
+        }
+    }
+
+    function handleMonthFilter(button) {
+        const monthButtons = document.querySelectorAll('[data-month-filter]');
+        const month = button.dataset.monthFilter;
+        
+        // Update active state
+        monthButtons.forEach(btn => {
+            btn.classList.remove('bg-blue-600', 'text-white');
+            btn.classList.add('border-gray-300', 'text-gray-700');
+        });
+        button.classList.add('bg-blue-600', 'text-white');
+        button.classList.remove('border-gray-300', 'text-gray-700');
+        
+        if (month === 'todos') {
+            showResults(allPages);
+        } else {
+            // Filter by month
+            const filteredPages = allPages.filter(page => {
+                if (!page.fecha_de_cierre || page.fecha_de_cierre === '1900-01-01') return false;
+                const pageMonth = new Date(page.fecha_de_cierre).getMonth() + 1;
+                return pageMonth === parseInt(month);
+            });
+            showResults(filteredPages);
+        }
+    }
+
+    function showFilteredResults(discipline) {
+        const results = prefilteredResults[discipline] || [];
+        showResults(results);
+    }
+
+    function showResults(results) {
+        const container = document.getElementById('results-container');
+        const counter = document.getElementById('results-counter');
+        
+        if (counter) {
+            counter.textContent = `${results.length} oportunidades encontradas`;
+        }
+        
+        if (container) {
+            container.innerHTML = results.map(page => {
+                const nombre = escapeHTML(page.nombre_original || 'Sin nombre');
+                const resumida = escapeHTML(page.og_resumida || '');
+                const pais = escapeHTML(page.país || '');
+                const url = escapeHTML(page.url);
+                
+                return `
+                    <div class="opportunity-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+                        <h3 class="font-bold text-lg mb-2">${nombre}</h3>
+                        <p class="text-sm text-gray-600 mb-2">${resumida}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">${pais}</span>
+                            <button 
+                                onclick="showPreviewModal('${url}', '${nombre}', '${pais}', '${resumida}')"
+                                class="text-blue-600 hover:underline text-sm">
+                                Ver más
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+
+    // Initialize filters if we're on the test page
+    const preFilteredData = document.getElementById('prefiltered-data');
+    if (preFilteredData) {
+        try {
+            // Use a temporary parser to decode HTML entities
+            const tempParser = new DOMParser();
+            const resultsString = tempParser.parseFromString(preFilteredData.dataset.results, 'text/html').body.textContent;
+            const pagesString = tempParser.parseFromString(preFilteredData.dataset.pages, 'text/html').body.textContent;
+            
+            const results = JSON.parse(resultsString);
+            const pages = JSON.parse(pagesString);
+            
+            console.log('Initializing filters with:', { 
+                resultCount: Object.keys(results).length,
+                pageCount: pages.length,
+                firstResult: Object.keys(results)[0],
+                firstPage: pages[0]
+            });
+            
+            prefilteredResults = results;
+            allPages = pages;
+            
+            // Show initial results
+            showResults(allPages);
+            
+            // Initialize button states
+            document.querySelectorAll('[data-discipline-filter="todos"]').forEach(btn => {
+                btn.classList.add('bg-blue-600', 'text-white');
+            });
+            document.querySelectorAll('[data-month-filter="todos"]').forEach(btn => {
+                btn.classList.add('bg-blue-600', 'text-white');
+            });
+
+        } catch (e) {
+            console.error('Filter initialization error:', e);
+        }
+    }
+
+    // Add these event listeners in the DOMContentLoaded callback
+    document.querySelectorAll('[data-discipline-filter]').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleDisciplineFilter(button);
+        });
+    });
+
+    document.querySelectorAll('[data-month-filter]').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleMonthFilter(button);
+        });
+    });
+
+    // Add HTML escaping utility
+    function escapeHTML(str) {
+        return str.replace(/&/g, "&amp;")
+                  .replace(/</g, "&lt;")
+                  .replace(/>/g, "&gt;")
+                  .replace(/"/g, "&quot;")
+                  .replace(/'/g, "&#039;");
+    }
   });
 
   // ============================================================================
@@ -650,117 +802,4 @@
         alert.remove();
     }, 3000);
   };
-
-  // Unified opportunity management functions
-  window.opportunityHandler = {
-    // Handle save operations
-    save: function(checkbox) {
-      layoutshowSpinner();
-      const opportunityId = checkbox.value;
-      const isSaved = checkbox.checked;
-      
-      fetch(`/save_user_opportunity/${opportunityId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ save: isSaved })
-      })
-      .then(response => {
-        if (!response.ok) throw new Error(MESSAGES.ERROR);
-        return response.json();
-      })
-      .then(data => {
-        window.showAlert(MESSAGES.SAVED, 'success');
-        checkbox.checked = false; // Always uncheck after save
-      })
-      .catch(error => {
-        window.showAlert(error.message, 'error');
-        checkbox.checked = false;
-      })
-      .finally(() => {
-        hideSpinner();
-      });
-    },
-
-    // Handle delete operations
-    delete: function(event, opportunityId) {
-        event.preventDefault();
-        event.stopPropagation();
-        
-        if (!confirm('¿Estás seguro de que deseas eliminar esta oportunidad?')) return;
-        
-        // Use HTMX to trigger the deletion and refresh the results
-        htmx.ajax('DELETE', `/delete_opportunity/${opportunityId}`, {
-            target: '#my-results',
-            swap: 'innerHTML',
-            beforeRequest: function() {
-                layoutshowSpinner();
-            },
-            afterRequest: function() {
-                hideSpinner();
-            }
-        });
-    },
-
-    // DOM manipulation methods
-    removeRow: function(opportunityId) {
-      const row = document.querySelector(`tr[data-opportunity-id="${opportunityId}"]`);
-      if (row) {
-        row.remove();
-        this.checkEmptyState();
-      }
-    },
-
-    checkEmptyState: function() {
-      const tbody = document.getElementById('my-results');
-      if (tbody && tbody.children.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="4" class="p-2 text-center">
-              No se encontraron oportunidades guardadas.
-            </td>
-          </tr>
-        `;
-      }
-    }
-  };
-
-  // Keep legacy function names for HTML compatibility
-  window.deleteOpportunity = function(opportunityId) {
-    window.opportunityHandler.delete(null, opportunityId);
-  };
-
-  // Modified event delegation to handle both old and new HTML
-  document.addEventListener('DOMContentLoaded', function() {
-    // Handle both old onclick="deleteOpportunity()" and new data attributes
-    document.body.addEventListener('click', function(e) {
-      const deleteButton = e.target.closest('[data-delete-opportunity], [onclick*="deleteOpportunity("]');
-      if (deleteButton) {
-        let opportunityId;
-        
-        // New data attribute format
-        if (deleteButton.dataset.deleteOpportunity) {
-          opportunityId = deleteButton.dataset.deleteOpportunity;
-        }
-        // Legacy onclick format
-        else if (deleteButton.onclick) {
-          const match = deleteButton.onclick.toString().match(/deleteOpportunity\('([^']+)'\)/);
-          opportunityId = match ? match[1] : null;
-        }
-        
-        if (opportunityId) {
-          window.opportunityHandler.delete(e, opportunityId);
-        }
-      }
-    });
-
-    // Existing checkbox handler remains the same
-    document.body.addEventListener('click', function(e) {
-      if (e.target.matches('input[type="checkbox"][hx-trigger="click"]')) {
-        window.opportunityHandler.save(e.target);
-      }
-    });
-  });
 })();
