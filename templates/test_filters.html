@@ -48,8 +48,123 @@
         </div>
     </div>
 
+    <!-- Modify the search input div to include a clear button -->
+    <div class="mt-4 mb-6 relative">
+        <input type="text" 
+               id="open-search" 
+               placeholder="Buscar (ej: pintura, españa o beca, alemania)..." 
+               class="w-full p-2 pr-10 border rounded-lg"
+               oninput="performSearch()">
+        <button 
+            id="clear-search"
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            onclick="clearTestSearch()"
+            style="display: none;">
+            ✕
+        </button>
+    </div>
+
     <!-- Results -->
     <div class="text-sm text-gray-600 my-4" id="results-counter"></div>
     <div id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 </div>
+
+<!-- Update the script section -->
+<script>
+function clearTestSearch() {
+    const searchInput = document.getElementById('open-search');
+    const clearButton = document.getElementById('clear-search');
+    searchInput.value = '';
+    clearButton.style.display = 'none';
+    performSearch();
+}
+
+function performSearch() {
+    const searchInput = document.getElementById('open-search');
+    const clearButton = document.getElementById('clear-search');
+    const searchValue = searchInput.value.trim();
+    
+    // Show/hide clear button based on whether there's text
+    clearButton.style.display = searchValue ? 'block' : 'none';
+    
+    const allPages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
+    
+    if (!searchValue) {
+        updateResults(allPages);
+        return;
+    }
+
+    // Split search terms by comma and trim each term
+    const searchTerms = searchValue.split(',').map(term => term.trim().toLowerCase());
+
+    const filtered = allPages.filter(page => {
+        // If we have multiple search terms, all must match
+        return searchTerms.every(term => {
+            // Normalize all relevant fields for searching
+            const normalizedPage = {
+                nombre: normalizeText(page.nombre || ''),
+                og_resumida: normalizeText(page.og_resumida || ''),
+                entidad: normalizeText(page.entidad || ''),
+                categoria: normalizeText(page.categoria || ''),
+                disciplina: normalizeText(page.disciplina || ''),
+                pais: normalizeText(page.pais || '')
+            };
+
+            // Check if the term matches any field
+            const allFieldsText = Object.values(normalizedPage).join(' ');
+            
+            // Special handling for common categories
+            if (term === 'beca' && normalizedPage.categoria.includes('beca')) return true;
+            if (term === 'premio' && normalizedPage.categoria.includes('premio')) return true;
+            if (term === 'residencia' && normalizedPage.categoria.includes('residencia')) return true;
+
+            // Check if the term exactly matches país or disciplina
+            if (term === normalizedPage.pais) return true;
+            if (term === normalizedPage.disciplina) return true;
+            
+            // If no special match, look for the term in all fields
+            return allFieldsText.includes(normalizeText(term));
+        });
+    });
+
+    updateResults(filtered);
+}
+
+function normalizeText(text) {
+    return text.normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+}
+
+function updateResults(results) {
+    const container = document.getElementById('results-container');
+    const counter = document.getElementById('results-counter');
+
+    if (results.length === 0) {
+        container.innerHTML = '<p>No se encontraron resultados.</p>';
+        counter.textContent = '0 resultados encontrados';
+        return;
+    }
+
+    container.innerHTML = results.map(page => `
+        <div class="border p-4 rounded-lg">
+            <h3 class="font-bold">${page.nombre || ''}</h3>
+            <p class="text-sm text-gray-600">${page.og_resumida || ''}</p>
+            <div class="mt-2">
+                <span class="text-sm text-gray-500">${page.disciplina || ''}</span>
+                ${page.url ? `<a href="${page.url}" class="ml-2 text-blue-500 hover:underline" target="_blank">Ver más</a>` : ''}
+            </div>
+        </div>
+    `).join('');
+
+    counter.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''}`;
+}
+
+// Initialize with all results on load
+document.addEventListener('DOMContentLoaded', function() {
+    const initialPages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
+    updateResults(initialPages);
+});
+</script>
 {% endblock %}
