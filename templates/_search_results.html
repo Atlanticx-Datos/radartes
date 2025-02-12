@@ -63,42 +63,38 @@
     <td class="w-[30%] md:w-[35%]">
         <div class="border-left-custom text-sm py-2 capitalize-first h-12 flex items-center pl-6" style="line-height: 0.8rem;">
             <span class="md:hidden whitespace-nowrap">
-                {% for keyword in page.ai_keywords.split(',') %}
-                    <a href="#" 
-                       class="opportunity-link truncate" 
-                       hx-get="/find_similar_opportunities" 
-                       hx-target="#search-results" 
-                       hx-swap="innerHTML" 
-                       hx-push-url="true" 
-                       hx-vals='{"keyword": "{{ keyword.strip() }}"}'
-                       title="{{ keyword.strip() | capitalize }}">
-                       {{ keyword | capitalize }}
-                    </a>
-                {% endfor %}
+                <a href="#" 
+                   class="opportunity-link truncate" 
+                   hx-get="/find_similar_opportunities" 
+                   hx-target="#search-results" 
+                   hx-swap="innerHTML" 
+                   hx-push-url="true" 
+                   hx-vals='{"keyword": "{{ page.categoria.strip() }}"}'
+                   title="{{ page.categoria.strip() | capitalize }}">
+                   {{ page.categoria | capitalize }}
+                </a>
                 / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
                     {{ page.url_base }}
                 </span>
             </span>
             <span class="hidden md:inline whitespace-nowrap">
-                {% for keyword in page.ai_keywords.split(',') %}
-                    <a href="#" 
-                       class="opportunity-link truncate" 
-                       hx-get="/find_similar_opportunities" 
-                       hx-target="#search-results" 
-                       hx-swap="innerHTML" 
-                       hx-push-url="true" 
-                       hx-vals='{"keyword": "{{ keyword.strip() }}"}'
-                       title="{{ keyword.strip() | capitalize }}">
-                       {{ keyword | capitalize }}
-                    </a>
-                {% endfor %}
+                <a href="#" 
+                   class="opportunity-link truncate" 
+                   hx-get="/find_similar_opportunities" 
+                   hx-target="#search-results" 
+                   hx-swap="innerHTML" 
+                   hx-push-url="true" 
+                   hx-vals='{"keyword": "{{ page.categoria.strip() }}"}'
+                   title="{{ page.categoria.strip() | capitalize }}">
+                   {{ page.categoria | capitalize }}
+                </a>
                 / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
                     {{ page.url_base }}
                 </span>
             </span>
         </div>
     </td>
-    <td class="w-[10%] md:w-[12%] text-xs text-center fecha-de-cierre">
+    <td class="w-[10%] md:w-[12%] text-xs text-center fecha-de-cierre {% if page.fecha_de_cierre|is_today %}text-red-600 font-bold{% endif %}">
         {{ page.fecha_de_cierre | default("Sin cierre") | format_date }}
     </td>
     <th class="w-[8%] md:w-[8%] min-w-[70px] relative">

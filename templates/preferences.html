@@ -2,13 +2,31 @@
 
 {% block body %}
 <div class="w-full max-w-4xl mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold mb-6">¡Bienvenido! Selecciona tus intereses</h1>
+    <h1 class="text-2xl font-bold mb-6">
+        {% if user_name %}
+            ¡Bienvenido/a {{ user_name }}!
+        {% else %}
+            ¡Bienvenido/a!
+        {% endif %}
+    </h1>
     
-    <form method="POST" action="{{ url_for('preferences') }}" class="bg-white shadow-lg rounded-lg p-6">
+    <form method="POST" action="{{ url_for('preferences') }}" class="bg-white shadow-lg rounded-lg p-6" data-form-type="preferences">
         <div class="space-y-4">
             <p class="text-gray-600 mb-4">
-                Elige las disciplinas que te interesan. Puedes seleccionar múltiples opciones.
+                Selecciona tus disciplinas artísticas de interés y actualiza tu correo para recibir novedades. 
+                Puedes modificar estas preferencias en cualquier momento.
             </p>
+            
+            <!-- New email field -->
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2">
+                    Correo para newsletter (opcional)
+                </label>
+                <input type="email" name="email" 
+                       class="w-full px-3 py-2 border rounded-lg" 
+                       placeholder="tucorreo@ejemplo.com"
+                       value="{{ existing_email if existing_email }}">
+            </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {% for discipline in disciplines %}

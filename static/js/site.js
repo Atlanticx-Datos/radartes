@@ -649,7 +649,7 @@
         
         if (container) {
             container.innerHTML = results.map(page => {
-                const nombre = escapeHTML(page.nombre_original || 'Sin nombre');
+                const nombre = escapeHTML(page.nombre || 'Sin nombre');
                 const resumida = escapeHTML(page.og_resumida || '');
                 const pais = escapeHTML(page.país || '');
                 const url = escapeHTML(page.url);
@@ -733,6 +733,34 @@
                   .replace(/"/g, "&quot;")
                   .replace(/'/g, "&#039;");
     }
+
+    // --------------------------------------------------------------------------
+    // Preferences Form Handling
+    // --------------------------------------------------------------------------
+    document.querySelector('form[data-form-type="preferences"]')?.addEventListener('submit', function(e) {
+        // Client-side validation
+        if (!this.checkValidity()) {
+            return true; // Let browser handle native validation
+        }
+        
+        const submitBtn = this.querySelector('button[type="submit"]');
+        
+        // Show global spinner and disable button
+        window.layoutshowSpinner();
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Guardando...';
+        }
+        
+        // Fallback cleanup in case submission fails
+        window.addEventListener('unload', function() {
+            window.hideSpinner();
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Guardar Preferencias';
+            }
+        });
+    });
   });
 
   // ============================================================================

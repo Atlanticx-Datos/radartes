@@ -1647,7 +1647,7 @@ def test_filters():
                     key=lambda x: x[0],
                     reverse=True
                 )
-            ][:50]
+            ]
 
         month_mapping = {
             "enero": 1, "febrero": 2, "marzo": 3, "abril": 4,
@@ -1682,66 +1682,132 @@ def test_filters():
 @app.route("/preferences", methods=["GET", "POST"])
 @login_required
 def preferences():
+    user_id = session["user"]["sub"]
+    user_info = session.get("user", {})
+    
+    # Extract name from different possible sources
+    user_name = user_info.get("name") or \
+                user_info.get("nickname") or \
+                user_info.get("email", "").split("@")[0]
+
     if request.method == "POST":
-        user_id = session["user"]["sub"]
         selected_disciplines = request.form.getlist("disciplines")
+        email = request.form.get("email", "").strip()
         
-        # Store preferences using existing DB structure
         try:
-            save_user_preferences(user_id, selected_disciplines)
-            flash("Preferences saved successfully!", "success")
+            save_user_preferences(user_id, selected_disciplines, email)
+            flash("¡Preferencias guardadas!", "success")
             return redirect(url_for("index"))
         except Exception as e:
             app.logger.error(f"Error saving preferences: {str(e)}")
-            flash("Error saving preferences. Please try again.", "error")
+            flash("Error al guardar preferencias", "error")
             return redirect(url_for("preferences"))
     
+    # Get existing preferences for display
+    existing_prefs = get_existing_preferences(user_id)
     return render_template(
         "preferences.html",
-        disciplines=DISCIPLINE_GROUPS.keys()
+        user_name=user_name.capitalize() if user_name else None,
+        disciplines=DISCIPLINE_GROUPS.keys(),
+        existing_email=existing_prefs.get('email', ''),
+        selected_disciplines=existing_prefs.get('disciplines', [])
     )
 
-def save_user_preferences(user_id, preferences):
-    """Save user preferences to Notion DB using rich_text"""
-    url = "https://api.notion.com/v1/pages"
-    headers = {
-        "Authorization": "Bearer " + NOTION_TOKEN,
-        "Content-Type": "application/json",
-        "Notion-Version": "2022-06-28",
+def get_existing_preferences_page_id(user_id):
+    """Get Notion page ID for existing preferences entry"""
+    url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
+    query = {
+        "filter": {
+            "and": [
+                {"property": "User ID", "title": {"equals": user_id}},
+                {"property": "Opportunity ID", "rich_text": {"is_empty": True}}
+            ]
+        },
+        "page_size": 1
     }
     
-    # Ensure we're using the full Auth0 user ID
-    if not user_id.startswith('auth0|'):
-        app.logger.warning(f"User ID {user_id} doesn't have Auth0 prefix")
-        user_id = f"auth0|{user_id}"
+    try:
+        response = requests.post(url, headers=headers, json=query)
+        result = response.json().get("results", [])
+        return result[0]["id"] if result else None
+    except Exception as e:
+        app.logger.error(f"Error fetching preferences page ID: {str(e)}")
+        return None
+
+def save_user_preferences(user_id, preferences, email):
+    """Save user preferences to Notion DB with email"""
+    # Check for existing preferences entry
+    existing_page_id = get_existing_preferences_page_id(user_id)
     
-    data = {
-        "parent": {"database_id": OPORTUNIDADES_ID},
-        "properties": {
-            "User ID": {
-                "title": [{"text": {"content": user_id}}]
-            },
-            "Opportunity ID": {
-                "rich_text": [{"text": {"content": ""}}]
-            },
-            "Preferences": {
-                "rich_text": [{"text": {"content": ",".join(preferences)}}]
-            }
+    url = f"https://api.notion.com/v1/pages/{existing_page_id}" if existing_page_id else "https://api.notion.com/v1/pages"
+    method = "PATCH" if existing_page_id else "POST"
+    
+    properties = {
+        "User ID": {
+            "title": [{"text": {"content": user_id}}]
+        },
+        "Opportunity ID": {
+            "rich_text": [{"text": {"content": ""}}]
+        },
+        "Preferences": {
+            "rich_text": [{"text": {"content": ",".join(preferences)}}]
+        },
+        "Contact Email": {
+            "email": email if email else None
         }
     }
     
-    app.logger.info(f"Saving preferences for Auth0 user {user_id}: {preferences}")
-    app.logger.info(f"Request data: {json.dumps(data, indent=2)}")
+    data = {
+        "properties": properties
+    }
+    
+    if not existing_page_id:
+        data["parent"] = {"database_id": OPORTUNIDADES_ID}
     
     try:
-        response = requests.post(url, headers=headers, json=data)
+        response = requests.request(method, url, headers=headers, json=data)
         response.raise_for_status()
-        app.logger.info(f"Successfully saved preferences for Auth0 user {user_id}")
         return response.json()
     except Exception as e:
         app.logger.error(f"Error saving preferences: {str(e)}")
-        app.logger.error(f"Response content: {response.content if 'response' in locals() else 'No response'}")
         raise
+
+@app.template_filter('is_today')
+def is_today_filter(date_str):
+    if not date_str or date_str == "Sin cierre":
+        return False
+    try:
+        page_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        return page_date == datetime.now().date()
+    except:
+        return False
+
+def get_existing_preferences(user_id):
+    """Get existing preferences including email"""
+    url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
+    query = {
+        "filter": {
+            "and": [
+                {"property": "User ID", "title": {"equals": user_id}},
+                {"property": "Opportunity ID", "rich_text": {"is_empty": True}}
+            ]
+        },
+        "page_size": 1
+    }
+    
+    try:
+        response = requests.post(url, headers=headers, json=query)
+        result = response.json().get("results", [])
+        if result:
+            props = result[0]["properties"]
+            return {
+                "email": props.get("Contact Email", {}).get("email"),
+                "disciplines": props.get("Preferences", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "").split(",")
+            }
+        return {}
+    except Exception as e:
+        app.logger.error(f"Error fetching preferences: {str(e)}")
+        return {}
 
 if __name__ == "__main__":
     # Ensure session directory exists
@@ -1752,3 +1818,14 @@ if __name__ == "__main__":
         # Development server
         port = int(os.environ.get("PORT", 5001))
         app.run(host="0.0.0.0", port=port, debug=True)
+
+        
+@app.template_filter('is_today')
+def is_today_filter(date_str):
+    if not date_str or date_str == "Sin cierre":
+        return False
+    try:
+        page_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        return page_date == datetime.now().date()
+    except:
+        return False
