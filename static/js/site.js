@@ -556,7 +556,6 @@
             const spinner = document.getElementById('layout-spinner');
             if (spinner) spinner.style.display = 'block';
             
-            // Handle confirmation
             if (!confirm('¿Estás seguro de que deseas eliminar esta oportunidad?')) {
                 evt.preventDefault();
                 if (spinner) spinner.style.display = 'none';
@@ -570,8 +569,10 @@
             if (spinner) spinner.style.display = 'none';
             
             if (evt.detail.successful) {
-                // Use the same showAlert function as the save flow
                 showAlert("Oportunidad eliminada correctamente", "success");
+                // HTMX will automatically update the list through the response
+            } else if (evt.detail.failed) {
+                showAlert("Error al eliminar oportunidad", "error");
             }
         }
     });

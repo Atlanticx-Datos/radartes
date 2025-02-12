@@ -1,0 +1,63 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="w-full max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold mb-6">
+        {% if user_name %}
+            ¡Bienvenido/a {{ user_name }} a tu espacio!
+        {% else %}
+            ¡Tu espacio personal!
+        {% endif %}
+    </h1>
+
+    <div class="space-y-8">
+        <!-- Preferences Section -->
+        <section class="bg-white shadow-lg rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Preferencias y Newsletter</h2>
+            <form method="POST" action="{{ url_for('mi_espacio') }}" class="space-y-4" data-form-type="mi-espacio">
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                        Correo para newsletter
+                    </label>
+                    <input type="email" name="email" 
+                           class="w-full px-3 py-2 border rounded-lg" 
+                           placeholder="tucorreo@ejemplo.com"
+                           value="{{ existing_email if existing_email }}">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for discipline in disciplines %}
+                    <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                        <input type="checkbox" 
+                               name="disciplines" 
+                               value="{{ discipline }}"
+                               class="form-checkbox h-5 w-5 text-blue-600"
+                               {% if discipline in selected_disciplines %}checked{% endif %}>
+                        <span class="text-gray-700 text-lg">{{ discipline|title }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-8 flex justify-end">
+                    <button type="submit" 
+                            class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Saved Opportunities Section -->
+        <section class="bg-white shadow-lg rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Tus Oportunidades Guardadas</h2>
+            <div class="border-b border-t border-neutral overflow-auto">
+                <table class="table-fixed w-full">
+                    <tbody id="saved-opportunities-list">
+                        {% include "_saved_opportunities_list.html" %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,42 @@
+{% if saved_opportunities %}
+    {% for opportunity in saved_opportunities %}
+    <tr class="group hover:bg-gray-50 transition-colors duration-200">
+        <td class="w-[45%] md:w-[38%] pl-6">
+            <div class="flex items-center">
+                <div>
+                    <div class="font-medium text-sm leading-tight mb-1">
+                        <span class="md:hidden truncate-multiline">{{ opportunity.resumen_IA | truncate(25) }}</span>
+                        <span class="hidden md:inline">{{ opportunity.resumen_IA }}</span>
+                    </div>
+                    <div class="text-xs text-gray-500 leading-none">
+                        {{ opportunity.país }}
+                    </div>
+                </div>
+            </div>
+        </td>
+        <td class="w-[30%] md:w-[35%]">
+            <div class="border-left-custom text-sm py-2 first-letter:uppercase">
+                {{ opportunity.ai_keywords | capitalize }}
+            </div>
+        </td>
+        <td class="w-[10%] md:w-[12%] text-xs text-center">
+            {{ opportunity.fecha_de_cierre | format_date }}
+        </td>
+        <td class="w-[8%] md:w-[8%] text-center">
+            <button hx-delete="/delete_opportunity/{{ opportunity.id }}"
+                    hx-target="#saved-opportunities-list"
+                    hx-swap="outerHTML"
+                    class="text-red-500 hover:text-red-700 transition-colors"
+                    title="Eliminar de mi espacio">
+                ✕
+            </button>
+        </td>
+    </tr>
+    {% endfor %}
+{% else %}
+    <tr>
+        <td colspan="4" class="p-4 text-center text-gray-500">
+            No hay oportunidades guardadas
+        </td>
+    </tr>
+{% endif %} 

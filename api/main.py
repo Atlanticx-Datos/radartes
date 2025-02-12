@@ -230,6 +230,17 @@ jwt = JWTManager(app)
 
 p = inflect.engine()
 
+
+# Add this custom filter
+@app.template_filter('is_today')
+def is_today_filter(date_str):
+    """Check if a date string matches today's date"""
+    try:
+        input_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        return input_date == datetime.today().date()
+    except (ValueError, TypeError):
+        return False
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -706,45 +717,55 @@ def get_opportunity_by_id(opportunity_id):
         print(f"Error processing opportunity {opportunity_id}: {str(e)}")
         return None
 
-def delete_saved_opportunity(user_id, page_id):
-    url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
-    headers = {
-        "Authorization": "Bearer " + NOTION_TOKEN,
-        "Content-Type": "application/json",
-        "Notion-Version": "2022-06-28",
-    }
-    json_body = {
-        "filter": {
-            "and": [
-                {"property": "User ID", "title": {"equals": user_id}},
-                {"property": "Opportunity ID", "rich_text": {"equals": page_id}},
-            ]
-        }
-    }
-
-    response = requests.post(url, headers=headers, json=json_body)
-    response.raise_for_status()  # Raise an exception for HTTP errors
-    data = response.json()
-
-    if data["results"]:
-        page_id_to_delete = data["results"][0]["id"]
-        delete_url = f"https://api.notion.com/v1/pages/{page_id_to_delete}"
-        delete_response = requests.patch(
-            delete_url, headers=headers, json={"archived": True}
-        )
-        delete_response.raise_for_status()  # Raise an exception for HTTP errors
-
-@app.route("/delete_opportunity/<page_id>", methods=["DELETE"])
+@app.route("/delete_opportunity/<identifier>", methods=["DELETE"])
 @login_required
-def delete_opportunity(page_id):
+def delete_opportunity(identifier):
+    """Delete a saved opportunity from user's space"""
     user_id = session["user"]["sub"]
+    
     try:
-        delete_saved_opportunity(user_id, page_id)
-        opportunities = [get_opportunity_by_id(opp_id) for opp_id in get_saved_opportunity_ids(user_id) if opp_id]
-        return render_template("_my_results.html", opportunities=opportunities)
+        # First find the record in OPORTUNIDADES_ID that matches both user_id and opportunity_id
+        query_url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
+        query = {
+            "filter": {
+                "and": [
+                    {"property": "User ID", "title": {"equals": user_id}},
+                    {"property": "Opportunity ID", "rich_text": {"equals": identifier}}
+                ]
+            }
+        }
+        
+        response = requests.post(query_url, headers=headers, json=query)
+        response.raise_for_status()
+        results = response.json().get("results", [])
+        
+        if not results:
+            return "Record not found", 404
+            
+        # Get the ID of the record to delete
+        record_id = results[0]["id"]
+        
+        # First archive the page
+        archive_url = f"https://api.notion.com/v1/pages/{record_id}"
+        archive_data = {
+            "archived": True
+        }
+        
+        app.logger.debug(f"Archiving record {record_id}")
+        archive_response = requests.patch(archive_url, headers=headers, json=archive_data)
+        archive_response.raise_for_status()
+        
+        app.logger.debug("Archive response status: ", archive_response.status_code)
+        
+        # Return the updated list partial
+        saved_opportunities = get_saved_opportunities(user_id)
+        return render_template("_saved_opportunities_list.html", 
+                             saved_opportunities=saved_opportunities)
+        
     except Exception as e:
         app.logger.error(f"Error deleting opportunity: {str(e)}")
-        return render_template("_my_results.html", opportunities=opportunities), 400
+        app.logger.error(f"Response content: {archive_response.content if 'archive_response' in locals() else 'No response'}")
+        return "Error deleting opportunity", 500
 
 
 @app.route("/find_similar_opportunities")
@@ -1442,7 +1463,7 @@ def get_discipline_counts():
     cached_content = get_cached_database_content()
     if not cached_content:
         return {'main': {}, 'sub': {}}
-
+    
     main_counts = defaultdict(int)
     sub_counts = defaultdict(int)
     
@@ -1679,42 +1700,197 @@ def test_filters():
                              DISCIPLINE_GROUPS=DISCIPLINE_GROUPS,
                              og_data=get_default_og_data())
 
-@app.route("/preferences", methods=["GET", "POST"])
+def get_saved_opportunities(user_id):
+    """Get user's saved opportunities from Notion"""
+    # First query the opportunity_id database to get user's saved opportunities
+    saved_opps_url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
+    saved_query = {
+        "filter": {
+            "and": [
+                {"property": "User ID", "title": {"equals": user_id}},
+                {"property": "Opportunity ID", "rich_text": {"is_not_empty": True}}
+            ]
+        }
+    }
+    
+    try:
+        # Get saved opportunity IDs for this user
+        response = requests.post(saved_opps_url, headers=headers, json=saved_query)
+        response.raise_for_status()
+        saved_refs = response.json().get("results", [])
+        
+        app.logger.debug(f"Found {len(saved_refs)} saved references for user {user_id}")
+        
+        # Extract opportunity IDs - these are Notion page IDs
+        opportunity_ids = []
+        for ref in saved_refs:
+            opp_id = ref.get("properties", {}).get("Opportunity ID", {}).get("rich_text", [])
+            if opp_id:
+                opportunity_ids.append(opp_id[0]["plain_text"])
+        
+        app.logger.debug(f"Extracted opportunity IDs: {opportunity_ids}")
+        
+        if not opportunity_ids:
+            return []
+            
+        # For each ID, directly fetch the page
+        opportunities = []
+        for page_id in opportunity_ids:
+            try:
+                page_url = f"https://api.notion.com/v1/pages/{page_id}"
+                page_response = requests.get(page_url, headers=headers)
+                page_response.raise_for_status()
+                opp_data = page_response.json()
+                app.logger.debug(f"Raw opportunity data: {opp_data}")  # Debug log
+                opportunities.append(opp_data)
+            except Exception as e:
+                app.logger.error(f"Error fetching page {page_id}: {str(e)}")
+                continue
+        
+        app.logger.debug(f"Found {len(opportunities)} matching opportunities")
+        
+        return [parse_opportunity(opp) for opp in opportunities]
+        
+    except Exception as e:
+        app.logger.error(f"Error fetching saved opportunities: {str(e)}")
+        app.logger.exception(e)
+        return []
+
+def parse_opportunity(page):
+    """Parse Notion page into opportunity dict"""
+    # Properties are now a dictionary in the response
+    props = page.get("properties", {})
+    
+    return {
+        "id": page["id"],  # Root level ID
+        "nombre": get_prop_value(props.get("Nombre", {})),
+        "resumen_IA": get_prop_value(props.get("Resumen generado por la IA", {})),
+        "país": get_prop_value(props.get("País", {})),
+        "ai_keywords": get_prop_value(props.get("AI keywords", {})),
+        "fecha_de_cierre": get_date_value(props.get("Fecha de cierre", {})),
+        "url": props.get("URL", {}).get("url", ""),
+        "entidad": get_prop_value(props.get("Entidad", {}))
+    }
+
+def get_prop_value(prop):
+    """Helper function to extract values from different property types"""
+    prop_type = prop.get("type", "")
+    
+    if prop_type == "title":
+        title_array = prop.get("title", [])
+        return title_array[0].get("plain_text", "") if title_array else ""
+    
+    elif prop_type == "rich_text":
+        rich_text_array = prop.get("rich_text", [])
+        return rich_text_array[0].get("plain_text", "") if rich_text_array else ""
+    
+    elif prop_type == "multi_select":
+        return [option.get("name", "") for option in prop.get("multi_select", [])]
+    
+    return ""
+
+def get_date_value(prop):
+    """Helper function to extract date values"""
+    if prop.get("type") == "date":
+        date_value = prop.get("date", {})
+        return date_value.get("start", "") if date_value else ""
+    return ""
+
+@app.route("/mi_espacio", methods=["GET", "POST"])
 @login_required
-def preferences():
+def mi_espacio():
     user_id = session["user"]["sub"]
     user_info = session.get("user", {})
     
-    # Extract name from different possible sources
+    # Extract user name
     user_name = user_info.get("name") or \
                 user_info.get("nickname") or \
                 user_info.get("email", "").split("@")[0]
 
+    # Handle form submission
     if request.method == "POST":
         selected_disciplines = request.form.getlist("disciplines")
         email = request.form.get("email", "").strip()
         
         try:
             save_user_preferences(user_id, selected_disciplines, email)
-            flash("¡Preferencias guardadas!", "success")
-            return redirect(url_for("index"))
+            flash("¡Cambios guardados!", "success")
+            return redirect(url_for("mi_espacio"))
         except Exception as e:
             app.logger.error(f"Error saving preferences: {str(e)}")
-            flash("Error al guardar preferencias", "error")
-            return redirect(url_for("preferences"))
-    
-    # Get existing preferences for display
+            flash("Error al guardar cambios", "error")
+            return redirect(url_for("mi_espacio"))
+
+    # GET request handling
     existing_prefs = get_existing_preferences(user_id)
+    saved_opportunities = get_saved_opportunities(user_id)
+    
+    # Handle HTMX partial requests
+    if request.headers.get('HX-Request'):
+        return render_template("_saved_opportunities_list.html",
+                             saved_opportunities=saved_opportunities)
+    
     return render_template(
-        "preferences.html",
+        "mi_espacio.html",
         user_name=user_name.capitalize() if user_name else None,
         disciplines=DISCIPLINE_GROUPS.keys(),
         existing_email=existing_prefs.get('email', ''),
-        selected_disciplines=existing_prefs.get('disciplines', [])
+        selected_disciplines=existing_prefs.get('disciplines', []),
+        saved_opportunities=saved_opportunities
     )
 
+# Maintain existing preferences route
+@app.route("/preferences", methods=["GET", "POST"])
+@login_required
+def preferences():
+    return redirect(url_for("mi_espacio"))
+
+# Maintain existing saved_opportunities route 
+@app.route("/saved_opportunities")
+@login_required
+def saved_opportunities():
+    return redirect(url_for("mi_espacio"))
+
+def save_user_preferences(user_id, disciplines, email):
+    """Save user preferences to Notion"""
+    page_id = get_existing_preferences_page_id(user_id)
+    url = f"https://api.notion.com/v1/pages/{page_id}" if page_id else "https://api.notion.com/v1/pages"
+    
+    data = {
+        "parent": {"database_id": OPORTUNIDADES_ID},
+        "properties": {
+            "User ID": {
+                "title": [
+                    {
+                        "text": {
+                            "content": user_id
+                        }
+                    }
+                ]
+            },
+            "Disciplines": {
+                "multi_select": [{"name": d} for d in disciplines]
+            },
+            "Email": {
+                "email": email
+            }
+        }
+    }
+    
+    try:
+        if page_id:
+            response = requests.patch(url, headers=headers, json=data)
+        else:
+            response = requests.post(url, headers=headers, json=data)
+        
+        response.raise_for_status()
+        return True
+    except Exception as e:
+        app.logger.error(f"Error saving preferences: {str(e)}")
+        raise e
+
 def get_existing_preferences_page_id(user_id):
-    """Get Notion page ID for existing preferences entry"""
+    """Get existing preferences page ID for user"""
     url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
     query = {
         "filter": {
@@ -1731,83 +1907,30 @@ def get_existing_preferences_page_id(user_id):
         result = response.json().get("results", [])
         return result[0]["id"] if result else None
     except Exception as e:
-        app.logger.error(f"Error fetching preferences page ID: {str(e)}")
+        app.logger.error(f"Error fetching preferences page: {str(e)}")
         return None
 
-def save_user_preferences(user_id, preferences, email):
-    """Save user preferences to Notion DB with email"""
-    # Check for existing preferences entry
-    existing_page_id = get_existing_preferences_page_id(user_id)
-    
-    url = f"https://api.notion.com/v1/pages/{existing_page_id}" if existing_page_id else "https://api.notion.com/v1/pages"
-    method = "PATCH" if existing_page_id else "POST"
-    
-    properties = {
-        "User ID": {
-            "title": [{"text": {"content": user_id}}]
-        },
-        "Opportunity ID": {
-            "rich_text": [{"text": {"content": ""}}]
-        },
-        "Preferences": {
-            "rich_text": [{"text": {"content": ",".join(preferences)}}]
-        },
-        "Contact Email": {
-            "email": email if email else None
-        }
-    }
-    
-    data = {
-        "properties": properties
-    }
-    
-    if not existing_page_id:
-        data["parent"] = {"database_id": OPORTUNIDADES_ID}
-    
-    try:
-        response = requests.request(method, url, headers=headers, json=data)
-        response.raise_for_status()
-        return response.json()
-    except Exception as e:
-        app.logger.error(f"Error saving preferences: {str(e)}")
-        raise
-
-@app.template_filter('is_today')
-def is_today_filter(date_str):
-    if not date_str or date_str == "Sin cierre":
-        return False
-    try:
-        page_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-        return page_date == datetime.now().date()
-    except:
-        return False
-
 def get_existing_preferences(user_id):
-    """Get existing preferences including email"""
-    url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
-    query = {
-        "filter": {
-            "and": [
-                {"property": "User ID", "title": {"equals": user_id}},
-                {"property": "Opportunity ID", "rich_text": {"is_empty": True}}
-            ]
-        },
-        "page_size": 1
-    }
+    """Get existing user preferences from Notion"""
+    page_id = get_existing_preferences_page_id(user_id)
+    if not page_id:
+        return {'disciplines': [], 'email': ''}
     
+    url = f"https://api.notion.com/v1/pages/{page_id}"
     try:
-        response = requests.post(url, headers=headers, json=query)
-        result = response.json().get("results", [])
-        if result:
-            props = result[0]["properties"]
-            return {
-                "email": props.get("Contact Email", {}).get("email"),
-                "disciplines": props.get("Preferences", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "").split(",")
-            }
-        return {}
+        response = requests.get(url, headers=headers)
+        page = response.json()
+        props = page.get("properties", {})
+        
+        return {
+            'disciplines': [d["name"] for d in props.get("Disciplines", {}).get("multi_select", [])],
+            'email': props.get("Email", {}).get("email", "")
+        }
     except Exception as e:
         app.logger.error(f"Error fetching preferences: {str(e)}")
-        return {}
+        return {'disciplines': [], 'email': ''}
+
+
 
 if __name__ == "__main__":
     # Ensure session directory exists
@@ -1819,13 +1942,3 @@ if __name__ == "__main__":
         port = int(os.environ.get("PORT", 5001))
         app.run(host="0.0.0.0", port=port, debug=True)
 
-        
-@app.template_filter('is_today')
-def is_today_filter(date_str):
-    if not date_str or date_str == "Sin cierre":
-        return False
-    try:
-        page_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-        return page_date == datetime.now().date()
-    except:
-        return False
