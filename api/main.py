@@ -42,6 +42,7 @@ from flask_caching import Cache
 
 import unicodedata
 import inflect
+import re
 
 from flask_caching import Cache
 
@@ -943,12 +944,16 @@ def all_pages():
     
     filtered_pages = []
     if search_query:
-        search_terms = [term.strip() for term in search_query.split(',')]
+        # Normalize and split search terms
+        search_terms = [
+            normalize_discipline(term.strip())
+            for term in search_query.split(',')
+        ]
         
         # Score and filter pages
         scored_pages = []
         for page in pages:
-            score = calculate_relevance_score(page, search_terms)
+            score = calculate_relevance_score(page, search_terms, DISCIPLINE_GROUPS)
             if score > 0:  # Only include pages with matches
                 scored_pages.append((score, page))
         
@@ -1615,29 +1620,55 @@ def inject_total_opportunities():
     
     return dict(total_opportunities=get_total_opportunities())
 
-def calculate_relevance_score(page, target_disciplines, discipline_groups):
-    """
-    Calculate relevance score for a page based on exact discipline group matches
-    """
-    if not target_disciplines or 'todos' in target_disciplines:
-        return 0  # No score when filtering all
-    
-    page_disciplines = set()
-    # Normalize page disciplines
-    if 'disciplina' in page:
-        disciplines = page['disciplina'].lower().split(',')
-        page_disciplines.update(d.strip() for d in disciplines)
-    
-    # Get all allowed keywords for target disciplines
-    allowed_keywords = set()
-    for discipline in target_disciplines:
-        allowed_keywords.update(discipline_groups.get(discipline, set()))
-    
-    # Calculate exact matches
-    exact_matches = page_disciplines.intersection(allowed_keywords)
-    
-    # Return score based on number of exact matches
-    return len(exact_matches)
+def calculate_relevance_score(page, search_terms, discipline_groups):
+    """Calculate relevance score with field-specific weighting"""
+    score = 0
+    field_weights = {
+        'resumen_generado_por_la_ia': 3,  # Highest priority
+        'nombre': 2,                       # Second priority
+        'entidad': 1,
+        'og_resumida': 1,
+        'categoría': 1,
+        'país': 1,
+        'disciplina': 2  # Higher weight for discipline matches
+    }
+
+    # Normalize all page fields
+    normalized_fields = {
+        field: normalize_discipline(page.get(field, ''))
+        for field in field_weights
+    }
+
+    # Check each search term against all fields
+    for term in search_terms:
+        normalized_term = normalize_discipline(term)
+        
+        # 1. Check discipline groups first
+        if normalized_term in discipline_groups:
+            page_disciplines = set(normalized_fields['disciplina'].split(','))
+            group_keywords = discipline_groups[normalized_term]
+            score += len(page_disciplines.intersection(group_keywords)) * 3
+        
+        # 2. Check weighted field matches
+        for field, weight in field_weights.items():
+            field_value = normalized_fields[field]
+            if normalized_term in field_value:
+                # Add bonus for exact match
+                if normalized_term == field_value.strip():
+                    score += weight * 2
+                else:
+                    score += weight
+
+    return score
+
+def normalize_discipline(text):
+    """Normalize text for comparison: lowercase, remove accents/special chars"""
+    if not text:
+        return ''
+    # Remove accents
+    text = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('utf-8')
+    # Remove special characters and extra spaces
+    return re.sub(r'[^a-z0-9\s]', '', text.lower()).strip()
 
 @app.route("/test-filters")
 def test_filters():
