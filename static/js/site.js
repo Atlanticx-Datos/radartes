@@ -843,6 +843,19 @@ import { initSearchEnhancements } from './search.js';
         
         // ... rest of your existing DOMContentLoaded code ...
     });
+
+    // Add this near other event listeners in site.js
+    document.addEventListener('click', function(e) {
+      const previewBtn = e.target.closest('.preview-btn');
+      if (previewBtn) {
+        e.preventDefault();
+        const url = previewBtn.dataset.url;
+        const name = previewBtn.dataset.name;
+        const country = previewBtn.dataset.country;
+        const summary = previewBtn.dataset.summary;
+        showPreviewModal(url, name, country, summary);
+      }
+    });
   });
 
   // ============================================================================
