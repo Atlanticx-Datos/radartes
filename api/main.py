@@ -738,45 +738,24 @@ def get_opportunity_by_id(opportunity_id):
         print(f"Error processing opportunity {opportunity_id}: {str(e)}")
         return None
 
-@app.route("/delete_opportunity/<identifier>", methods=["DELETE"])
+@app.route("/delete_opportunity/<page_id>", methods=["DELETE"])
 @login_required
-def delete_opportunity(identifier):
+def delete_opportunity(page_id):
     """Delete a saved opportunity from user's space"""
     user_id = session["user"]["sub"]
     
     try:
-        # First find the record in OPORTUNIDADES_ID that matches both user_id and opportunity_id
-        query_url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
-        query = {
-            "filter": {
-                "and": [
-                    {"property": "User ID", "title": {"equals": user_id}},
-                    {"property": "Opportunity ID", "rich_text": {"equals": identifier}}
-                ]
-            }
-        }
-        
-        response = requests.post(query_url, headers=headers, json=query)
-        response.raise_for_status()
-        results = response.json().get("results", [])
-        
-        if not results:
-            return "Record not found", 404
-            
-        # Get the ID of the record to delete
-        record_id = results[0]["id"]
-        
-        # First archive the page
-        archive_url = f"https://api.notion.com/v1/pages/{record_id}"
+        # Archive the page directly since we have its ID
+        archive_url = f"https://api.notion.com/v1/pages/{page_id}"
         archive_data = {
             "archived": True
         }
         
-        app.logger.debug(f"Archiving record {record_id}")
+        app.logger.debug(f"Archiving record {page_id}")
         archive_response = requests.patch(archive_url, headers=headers, json=archive_data)
         archive_response.raise_for_status()
         
-        app.logger.debug("Archive response status: ", archive_response.status_code)
+        app.logger.debug(f"Archive response status: {archive_response.status_code}")
         
         # Return the updated list partial
         saved_opportunities = get_saved_opportunities(user_id)
