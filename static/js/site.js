@@ -12,6 +12,8 @@
  * This refactoring does not change any functionality or ordering—it simply
  * exposes better documentation, clearer structure, and a separation of concerns.
  */
+import { initSearchEnhancements } from './search.js';
+
 (function() {
   "use strict";
   
@@ -342,6 +344,9 @@
   // ============================================================================
 
   document.addEventListener("DOMContentLoaded", function() {
+    // Initialize search enhancements
+    initSearchEnhancements();
+    
     // --------------------------------------------------------------------------
     // Setup search input event listeners.
     // --------------------------------------------------------------------------
@@ -761,6 +766,96 @@
                 submitBtn.textContent = 'Guardar Preferencias';
             }
         });
+    });
+
+    // Add to the top of the file with other constants
+    const AUTOCOMPLETE_DATA = {
+        disciplines: ['visuales', 'música', 'video', 'escénicas', 'literatura', 'diseño', 'investigación', 'arquitectura'],
+        subdisciplines: [
+            'pintura', 'escultura', 'fotografía', 'danza', 'teatro', 'poesía', 
+            'diseño gráfico', 'urbanismo', 'cerámica', 'performance', 'arte digital',
+            'ilustración', 'gestión cultural', 'arquitectura', 'arte sonoro', 'cine',
+            'animación', 'moda', 'curaduría'
+        ],
+        countries: [
+            'España', 'Argentina', 'México', 'Colombia', 'EEUU', 'Reino Unido',
+            'Italia', 'Francia', 'Alemania', 'Portugal', 'Múltiples países'
+        ],
+        categories: ['beca', 'premio', 'residencia', 'convocatoria', 'exposición', 'festival'],
+        entities: [
+            'Arquetopia', 'Datarte', 'LoosenArt', 'Fundación Botín', 'CEWE',
+            'Festival Annecy', 'Pollock-Krasner Foundation', 'Guarimba Film Festival'
+        ]
+    };
+
+    // Add these helper functions
+    function initAutocomplete() {
+        const searchInput = document.getElementById('open-search');
+        const autocompleteList = document.getElementById('autocomplete-list');
+
+        if (!searchInput || !autocompleteList) return;
+
+        searchInput.addEventListener('input', function(e) {
+            const query = this.value.trim().toLowerCase();
+            autocompleteList.innerHTML = '';
+            autocompleteList.classList.add('hidden');
+
+            if (query.length < 2) return;
+
+            const suggestions = [];
+            Object.entries(AUTOCOMPLETE_DATA).forEach(([category, items]) => {
+                items.forEach(item => {
+                    if (normalizeText(item).includes(normalizeText(query))) {
+                        suggestions.push({ category, item });
+                    }
+                });
+            });
+
+            if (suggestions.length > 0) {
+                autocompleteList.classList.remove('hidden');
+                suggestions.slice(0, 7).forEach(({ category, item }) => {
+                    const div = document.createElement('div');
+                    div.className = 'px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm';
+                    div.innerHTML = `
+                        <span class="text-gray-500 text-xs">${category}:</span>
+                        <span class="ml-2 text-gray-700">${highlightMatch(item, query)}</span>
+                    `;
+                    div.onclick = () => {
+                        searchInput.value = item;
+                        autocompleteList.classList.add('hidden');
+                        // Use the existing search mechanism
+                        if (searchInput.value.length >= 3) {
+                            htmx.ajax("GET", "/database?search=" + encodeURIComponent(item), {
+                                target: "#search-results",
+                                swap: "innerHTML",
+                                headers: { "HX-Request": "true" },
+                            });
+                        }
+                    };
+                    autocompleteList.appendChild(div);
+                });
+            }
+        });
+
+        // Close autocomplete when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#search-container')) {
+                autocompleteList.classList.add('hidden');
+            }
+        });
+    }
+
+    function highlightMatch(text, query) {
+        const regex = new RegExp(`(${query})`, 'gi');
+        return text.replace(regex, '<span class="font-semibold text-cyan-600">$1</span>');
+    }
+
+    // Update the DOMContentLoaded event listener to include autocomplete initialization
+    document.addEventListener("DOMContentLoaded", function() {
+        // Add this line to initialize autocomplete
+        initAutocomplete();
+        
+        // ... rest of your existing DOMContentLoaded code ...
     });
   });
 
