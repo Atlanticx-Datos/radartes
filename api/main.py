@@ -58,6 +58,8 @@ import json
 from collections import defaultdict
 from html import escape
 
+from werkzeug.urls import url_parse  # Add to existing imports
+
 
 load_dotenv()
 
@@ -107,6 +109,16 @@ DISCIPLINE_GROUPS = {
     }
 }
 
+MAIN_DISCIPLINES = [
+    'visuales',
+    'música',
+    'video',
+    'escénicas',
+    'literatura',
+    'diseño',
+    'investigación',
+    'arquitectura'
+]
 
 class RedisWrapper:
     def __init__(self, redis_client):
@@ -210,7 +222,7 @@ app.config.update(
     SESSION_COOKIE_SAMESITE="Lax",
     SESSION_COOKIE_DOMAIN=SESSION_COOKIE_DOMAIN,
     SESSION_USE_SIGNER=True,
-    PERMANENT_SESSION_LIFETIME=timedelta(hours=24)
+    PERMANENT_SESSION_LIFETIME=timedelta(days=30)
 )
 
 # Mark all sessions as permanent and set cookie policy
@@ -351,6 +363,12 @@ def login():
         state=state
     )
 
+def safe_next_url(next_url):
+    """Validate next URL to prevent open redirects"""
+    if next_url and url_parse(next_url).netloc == '':
+        return next_url
+    return None
+
 def check_user_preferences(user_id):
     """Check if user has any preferences stored"""
     url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
@@ -440,21 +458,23 @@ def callback():
         
         # Check if user has preferences
         user_id = user_info['sub']
-        has_preferences = check_user_preferences(user_id)
+        app.logger.info(f"Checking preferences for user: {user_id}")
         
-        if not has_preferences:
-            app.logger.info(f"First-time user {user_id} detected, redirecting to preferences")
-            return redirect(url_for('preferences'))
-            
-        # Get the next URL from session and remove it
-        next_url = session.pop('next_url', url_for('index'))
-        app.logger.info(f"Next URL from session: {next_url}")
+        preferences = get_existing_preferences(user_id)
+        app.logger.debug(f"Retrieved preferences: {preferences}")
         
-        # Force session save before redirect
-        session.modified = True
+        # Determine redirect target
+        if not preferences.get('disciplines'):
+            app.logger.info(f"User {user_id} needs preferences setup")
+            target = url_for('mi_espacio', first_time=1)
+        else:
+            app.logger.info(f"User {user_id} has existing preferences")
+            target = url_for('index')
         
-        app.logger.info(f"Redirecting to: {next_url}")
-        return redirect(next_url)
+        # Final redirect with proper session commit
+        response = redirect(target)
+        session.modified = True  # Force session save
+        return response
         
     except Exception as e:
         app.logger.error(f"Error during callback processing: {str(e)}")
@@ -1772,59 +1792,53 @@ def test_filters():
                              og_data=get_default_og_data())
 
 def get_saved_opportunities(user_id):
-    """Get user's saved opportunities from Notion"""
-    # First query the opportunity_id database to get user's saved opportunities
-    saved_opps_url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
-    saved_query = {
-        "filter": {
-            "and": [
-                {"property": "User ID", "title": {"equals": user_id}},
-                {"property": "Opportunity ID", "rich_text": {"is_not_empty": True}}
-            ]
-        }
-    }
-    
+    """Get saved opportunities with specific fields for display"""
     try:
-        # Get saved opportunity IDs for this user
-        response = requests.post(saved_opps_url, headers=headers, json=saved_query)
+        url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
+        query = {
+            "filter": {
+                "and": [
+                    {"property": "User ID", "title": {"equals": user_id}},
+                    {"property": "Opportunity ID", "rich_text": {"is_not_empty": True}}
+                ]
+            }
+        }
+        
+        response = requests.post(url, headers=headers, json=query)
         response.raise_for_status()
-        saved_refs = response.json().get("results", [])
+        saved_items = []
         
-        app.logger.debug(f"Found {len(saved_refs)} saved references for user {user_id}")
-        
-        # Extract opportunity IDs - these are Notion page IDs
-        opportunity_ids = []
-        for ref in saved_refs:
-            opp_id = ref.get("properties", {}).get("Opportunity ID", {}).get("rich_text", [])
-            if opp_id:
-                opportunity_ids.append(opp_id[0]["plain_text"])
-        
-        app.logger.debug(f"Extracted opportunity IDs: {opportunity_ids}")
-        
-        if not opportunity_ids:
-            return []
-            
-        # For each ID, directly fetch the page
-        opportunities = []
-        for page_id in opportunity_ids:
+        for item in response.json().get("results", []):
             try:
-                page_url = f"https://api.notion.com/v1/pages/{page_id}"
-                page_response = requests.get(page_url, headers=headers)
-                page_response.raise_for_status()
-                opp_data = page_response.json()
-                app.logger.debug(f"Raw opportunity data: {opp_data}")  # Debug log
-                opportunities.append(opp_data)
+                opp_id = item.get("properties", {}).get("Opportunity ID", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "")
+                if not opp_id:
+                    continue
+                
+                # Fetch full opportunity details from main database
+                opp_url = f"https://api.notion.com/v1/pages/{opp_id}"
+                opp_response = requests.get(opp_url, headers=headers)
+                opp_response.raise_for_status()
+                opp_data = opp_response.json()
+                
+                # Get only the specific fields we need
+                props = opp_data.get("properties", {})
+                saved_items.append({
+                    "id": item["id"],  # Save ID for deletion
+                    "resumen_generado_por_la_ia": get_prop_value(props.get("Resumen generado por la IA", {})),
+                    "categoría": get_prop_value(props.get("Categoría", {})),
+                    "país": get_prop_value(props.get("País", {})),
+                    "fecha_de_cierre": get_date_value(props.get("Fecha de cierre", {}))
+                })
+                
             except Exception as e:
-                app.logger.error(f"Error fetching page {page_id}: {str(e)}")
+                app.logger.error(f"Error processing opportunity {opp_id}: {str(e)}")
                 continue
         
-        app.logger.debug(f"Found {len(opportunities)} matching opportunities")
-        
-        return [parse_opportunity(opp) for opp in opportunities]
+        app.logger.debug(f"Retrieved {len(saved_items)} saved opportunities")
+        return saved_items
         
     except Exception as e:
-        app.logger.error(f"Error fetching saved opportunities: {str(e)}")
-        app.logger.exception(e)
+        app.logger.error(f"Error getting saved opportunities: {str(e)}")
         return []
 
 def parse_opportunity(page):
@@ -1870,45 +1884,47 @@ def get_date_value(prop):
 @app.route("/mi_espacio", methods=["GET", "POST"])
 @login_required
 def mi_espacio():
-    user_id = session["user"]["sub"]
-    user_info = session.get("user", {})
-    
-    # Extract user name
-    user_name = user_info.get("name") or \
-                user_info.get("nickname") or \
-                user_info.get("email", "").split("@")[0]
+    try:
+        # Get user_id from sub field
+        user_id = session["user"].get("sub")
+        if not user_id:
+            app.logger.error("No user sub in session")
+            return redirect(url_for("login"))
 
-    # Handle form submission
-    if request.method == "POST":
-        selected_disciplines = request.form.getlist("disciplines")
-        email = request.form.get("email", "").strip()
+        app.logger.debug(f"Processing mi_espacio for user: {user_id}")
         
-        try:
-            save_user_preferences(user_id, selected_disciplines, email)
-            flash("¡Cambios guardados!", "success")
-            return redirect(url_for("mi_espacio"))
-        except Exception as e:
-            app.logger.error(f"Error saving preferences: {str(e)}")
-            flash("Error al guardar cambios", "error")
-            return redirect(url_for("mi_espacio"))
+        if request.method == "POST":
+            disciplines = request.form.getlist('disciplines')
+            email = request.form.get('email', '').strip()
+            
+            if not disciplines:
+                flash("Debes seleccionar al menos una disciplina", "error")
+                return redirect(url_for('mi_espacio'))
+            
+            save_user_preferences(user_id, disciplines, email)
+            flash("Preferencias guardadas correctamente", "success")
+            return redirect(url_for('index'))
+            
+        # GET request
+        preferences = get_existing_preferences(user_id)
+        app.logger.debug(f"Retrieved preferences for display: {preferences}")
+        
+        # Fetch saved opportunities
+        saved_opportunities = get_saved_opportunities(user_id)
+        app.logger.debug(f"Retrieved saved opportunities: {saved_opportunities}")
+        
+        return render_template(
+            "mi_espacio.html",
+            disciplines=MAIN_DISCIPLINES,
+            selected_disciplines=preferences['disciplines'],
+            existing_email=preferences['email'],
+            saved_opportunities=saved_opportunities  # Add saved opportunities to template
+        )
 
-    # GET request handling
-    existing_prefs = get_existing_preferences(user_id)
-    saved_opportunities = get_saved_opportunities(user_id)
-    
-    # Handle HTMX partial requests
-    if request.headers.get('HX-Request'):
-        return render_template("_saved_opportunities_list.html",
-                             saved_opportunities=saved_opportunities)
-    
-    return render_template(
-        "mi_espacio.html",
-        user_name=user_name.capitalize() if user_name else None,
-        disciplines=DISCIPLINE_GROUPS.keys(),
-        existing_email=existing_prefs.get('email', ''),
-        selected_disciplines=existing_prefs.get('disciplines', []),
-        saved_opportunities=saved_opportunities
-    )
+    except Exception as e:
+        app.logger.error(f"mi_espacio error: {str(e)}")
+        flash("Error al procesar tus preferencias", "error")
+        return redirect(url_for('index'))
 
 # Maintain existing preferences route
 @app.route("/preferences", methods=["GET", "POST"])
@@ -1923,91 +1939,73 @@ def saved_opportunities():
     return redirect(url_for("mi_espacio"))
 
 def save_user_preferences(user_id, disciplines, email):
-    """Save user preferences to Notion with validation"""
-    # Validate input
-    if not isinstance(disciplines, list) or any(not isinstance(d, str) for d in disciplines):
-        raise ValueError("Invalid disciplines format")
-    
-    if email and not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-        raise ValueError("Invalid email format")
+    """Save to OPORTUNIDADES_ID with proper Notion property formats"""
+    try:
+        page_id = get_existing_preferences_page_id(user_id)
+        url = f"https://api.notion.com/v1/pages/{page_id}" if page_id else "https://api.notion.com/v1/pages"
         
-    page_id = get_existing_preferences_page_id(user_id)
-    url = f"https://api.notion.com/v1/pages/{page_id}" if page_id else "https://api.notion.com/v1/pages"
-    
-    data = {
-        "parent": {"database_id": OPORTUNIDADES_ID},
-        "properties": {
-            "User ID": {
-                "title": [
-                    {
-                        "text": {"content": user_id}
-                    }
-                ]
-            },
-            "Preferences": {
-                "rich_text": [
-                    {
-                        "text": {"content": ", ".join(disciplines)}
-                    }
-                ]
-            },
-            "Contact Email": {
-                "email": email
-            },
-            "Opportunity ID": {
-                "rich_text": [
-                    {
-                        "text": {"content": ""}
-                    }
-                ]
+        # Base properties structure
+        data = {
+            "parent": {"database_id": OPORTUNIDADES_ID},
+            "properties": {
+                "User ID": {
+                    "title": [{"text": {"content": user_id}}]
+                },
+                "Preferences": {
+                    "rich_text": [{"text": {"content": ", ".join(disciplines)}}]
+                },
+                "Contact Email": {
+                    "email": email if email else None  # Must be null, not empty string
+                },
+                "Opportunity ID": {
+                    "rich_text": []  # Empty array for no content
+                }
             }
         }
-    }
-
-    try:
-        if page_id:
-            # Update existing - remove parent for PATCH
-            del data["parent"]
-            response = requests.patch(url, headers=headers, json=data)
-        else:
-            # Create new - include all required fields
-            response = requests.post(url, headers=headers, json=data)
-
-        response.raise_for_status()
-        return True
         
-    except requests.exceptions.HTTPError as e:
-        app.logger.error(f"Notion API Error: {e.response.status_code}")
-        app.logger.error(f"Response body: {e.response.text}")
-        raise Exception(f"Notion API Error: {e.response.text}")
+        # If creating new page
+        if not page_id:
+            response = requests.post(url, headers=headers, json=data)
+        # If updating existing page
+        else:
+            response = requests.patch(url, headers=headers, json=data)
+            
+        response.raise_for_status()
+        app.logger.debug(f"Successfully saved preferences for user {user_id}")
+        return response.json()
         
     except Exception as e:
-        app.logger.error(f"Unexpected error: {str(e)}")
-        raise
+        app.logger.error(f"Notion API Error: {response.status_code}")
+        app.logger.error(f"Response body: {response.text}")
+        raise Exception(f"Notion API Error: {response.text}")
 
 def get_existing_preferences_page_id(user_id):
-    """Get existing preferences page ID with consistency checks"""
-    url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
-    query = {
-        "filter": {
-            "and": [
-                {"property": "User ID", "title": {"equals": user_id}},
-                {"property": "Opportunity ID", "rich_text": {"is_empty": True}}
-            ]
-        },
-        "page_size": 1
-    }
-        
+    """Get existing preferences page ID with debug logging"""
     try:
+        app.logger.debug(f"Querying preferences for user: {user_id}")
+        url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
+        query = {
+            "filter": {
+                "and": [
+                    {"property": "User ID", "title": {"equals": user_id}},
+                    {"property": "Opportunity ID", "rich_text": {"is_empty": True}}
+                ]
+            },
+            "page_size": 1
+        }
+        
         response = requests.post(url, headers=headers, json=query)
+        response.raise_for_status()
         result = response.json().get("results", [])
+        app.logger.debug(f"Query response: {json.dumps(result, indent=2)}")
+        
         return result[0]["id"] if result else None
     except Exception as e:
         app.logger.error(f"Error fetching preferences page: {str(e)}")
         return None
 
 def get_existing_preferences(user_id):
-    """Get existing user preferences from Notion with fallbacks"""
+    """Get preferences from OPORTUNIDADES_ID where Opportunity ID is empty"""
     try:
         page_id = get_existing_preferences_page_id(user_id)
         if not page_id:
@@ -2019,13 +2017,14 @@ def get_existing_preferences(user_id):
         page = response.json()
         props = page.get("properties", {})
         
+        # Maintain existing frontend structure
         return {
             'disciplines': [d.strip() for d in props.get("Preferences", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "").split(",") if d.strip()],
             'email': props.get("Contact Email", {}).get("email", "")
         }
         
     except Exception as e:
-        app.logger.error(f"Error fetching preferences: {str(e)}")
+        app.logger.error(f"Error getting prefs: {str(e)}")
         return {'disciplines': [], 'email': ''}
 
 
