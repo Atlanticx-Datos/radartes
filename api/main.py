@@ -822,20 +822,60 @@ def inject_total_nuevas():
     return dict(total_nuevas=total_nuevas)
 
 @app.route("/")
-def index():
-    print("Current Session Data at Index:", session.get("user"))
-    cached_content = get_cached_database_content()
-    total_opportunities = len(cached_content['pages']) if cached_content else 0
-    
-    if "user" in session:
-        user = session["user"]
-        return render_template("home.html", 
-                            user=user,
-                            total_opportunities=total_opportunities)
-    else:
-        return render_template("home.html", 
-                            user=None,
-                            total_opportunities=total_opportunities)
+def index():  # Changed from test_filters
+    """Main entry point with client-side filtering"""
+    try:
+        cached_content = get_cached_database_content()
+        if not cached_content:
+            return render_template("error.html", 
+                                message="No cached content available",
+                                total_opportunities=0,
+                                DISCIPLINE_GROUPS=DISCIPLINE_GROUPS,
+                                og_data=get_default_og_data())
+
+        pages = cached_content.get('pages', [])
+        
+        # Pre-filter pages for each main discipline
+        prefiltered_results = {}
+        for main_discipline in DISCIPLINE_GROUPS.keys():
+            scored_pages = []
+            for page in pages:
+                score = calculate_relevance_score(page, [main_discipline], DISCIPLINE_GROUPS)
+                if score > 0:
+                    scored_pages.append((score, page))
+            
+            prefiltered_results[main_discipline] = [
+                page for score, page in sorted(
+                    scored_pages,
+                    key=lambda x: x[0],
+                    reverse=True
+                )
+            ]
+
+        month_mapping = {
+            "enero": 1, "febrero": 2, "marzo": 3, "abril": 4,
+            "mayo": 5, "junio": 6, "julio": 7, "agosto": 8,
+            "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
+        }
+        
+        return render_template(
+            "index.html",  # Changed from test_filters.html
+            prefiltered_results=prefiltered_results,
+            discipline_groups=DISCIPLINE_GROUPS,
+            month_mapping=month_mapping,
+            pages=pages,
+            total_opportunities=len(pages),
+            DISCIPLINE_GROUPS=DISCIPLINE_GROUPS,
+            og_data=get_default_og_data()
+        )
+        
+    except Exception as e:
+        app.logger.error(f"Error in main index: {str(e)}")
+        return render_template("error.html", 
+                             message=str(e),
+                             total_opportunities=0,
+                             DISCIPLINE_GROUPS=DISCIPLINE_GROUPS,
+                             og_data=get_default_og_data())
 
 @app.route("/_legacy_admin")
 def legacy_admin():
@@ -1883,7 +1923,14 @@ def saved_opportunities():
     return redirect(url_for("mi_espacio"))
 
 def save_user_preferences(user_id, disciplines, email):
-    """Save user preferences to Notion"""
+    """Save user preferences to Notion with validation"""
+    # Validate input
+    if not isinstance(disciplines, list) or any(not isinstance(d, str) for d in disciplines):
+        raise ValueError("Invalid disciplines format")
+    
+    if email and not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        raise ValueError("Invalid email format")
+        
     page_id = get_existing_preferences_page_id(user_id)
     url = f"https://api.notion.com/v1/pages/{page_id}" if page_id else "https://api.notion.com/v1/pages"
     
@@ -1893,35 +1940,53 @@ def save_user_preferences(user_id, disciplines, email):
             "User ID": {
                 "title": [
                     {
-                        "text": {
-                            "content": user_id
-                        }
+                        "text": {"content": user_id}
                     }
                 ]
             },
-            "Disciplines": {
-                "multi_select": [{"name": d} for d in disciplines]
+            "Preferences": {
+                "rich_text": [
+                    {
+                        "text": {"content": ", ".join(disciplines)}
+                    }
+                ]
             },
-            "Email": {
+            "Contact Email": {
                 "email": email
+            },
+            "Opportunity ID": {
+                "rich_text": [
+                    {
+                        "text": {"content": ""}
+                    }
+                ]
             }
         }
     }
-    
+
     try:
         if page_id:
+            # Update existing - remove parent for PATCH
+            del data["parent"]
             response = requests.patch(url, headers=headers, json=data)
         else:
+            # Create new - include all required fields
             response = requests.post(url, headers=headers, json=data)
-        
+
         response.raise_for_status()
         return True
+        
+    except requests.exceptions.HTTPError as e:
+        app.logger.error(f"Notion API Error: {e.response.status_code}")
+        app.logger.error(f"Response body: {e.response.text}")
+        raise Exception(f"Notion API Error: {e.response.text}")
+        
     except Exception as e:
-        app.logger.error(f"Error saving preferences: {str(e)}")
-        raise e
+        app.logger.error(f"Unexpected error: {str(e)}")
+        raise
 
 def get_existing_preferences_page_id(user_id):
-    """Get existing preferences page ID for user"""
+    """Get existing preferences page ID with consistency checks"""
     url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
     query = {
         "filter": {
@@ -1932,7 +1997,7 @@ def get_existing_preferences_page_id(user_id):
         },
         "page_size": 1
     }
-    
+        
     try:
         response = requests.post(url, headers=headers, json=query)
         result = response.json().get("results", [])
@@ -1942,21 +2007,23 @@ def get_existing_preferences_page_id(user_id):
         return None
 
 def get_existing_preferences(user_id):
-    """Get existing user preferences from Notion"""
-    page_id = get_existing_preferences_page_id(user_id)
-    if not page_id:
-        return {'disciplines': [], 'email': ''}
-    
-    url = f"https://api.notion.com/v1/pages/{page_id}"
+    """Get existing user preferences from Notion with fallbacks"""
     try:
+        page_id = get_existing_preferences_page_id(user_id)
+        if not page_id:
+            return {'disciplines': [], 'email': ''}
+        
+        url = f"https://api.notion.com/v1/pages/{page_id}"
         response = requests.get(url, headers=headers)
+        response.raise_for_status()
         page = response.json()
         props = page.get("properties", {})
         
         return {
-            'disciplines': [d["name"] for d in props.get("Disciplines", {}).get("multi_select", [])],
-            'email': props.get("Email", {}).get("email", "")
+            'disciplines': [d.strip() for d in props.get("Preferences", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "").split(",") if d.strip()],
+            'email': props.get("Contact Email", {}).get("email", "")
         }
+        
     except Exception as e:
         app.logger.error(f"Error fetching preferences: {str(e)}")
         return {'disciplines': [], 'email': ''}

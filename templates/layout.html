@@ -99,9 +99,8 @@
     <link rel="shortcut icon" href="/static/public/favicon.ico" />
 </head>
 
-<body class="flex justify-center max-sm:items-start items-center bg-zinc-100 min-h-screen
-             {% if request.endpoint == 'list_saved_opportunities' %}!items-start{% endif %}
-             {% if request.endpoint == 'index' %}justify-center !important align-items-center !important{% endif %}"
+<body class="flex justify-center max-sm:items-start bg-zinc-100 min-h-screen
+             {% if request.endpoint == 'list_saved_opportunities' %}!items-start{% endif %}"
       data-route="{{ request.endpoint }}">
     <!-- Alert container -->
     <div id="alert-container" hx-preserve="true"></div>
@@ -129,8 +128,7 @@
     <main class="w-full bg-zinc-100 flex flex-col
                  px-4
                  max-sm:rounded-lg
-                 {% if request.endpoint == 'list_saved_opportunities' %}!justify-start{% endif %}
-                 {% if request.endpoint == 'index' %}justify-center !important align-items-center !important{% endif %}">
+                 {% if request.endpoint == 'list_saved_opportunities' %}!justify-start{% endif %}">
         <!-- Navigation - show on all pages -->
         <div class="w-full flex-shrink-0">
             <div class="mx-auto">
@@ -274,36 +272,27 @@
                     sm:items-start 
                     justify-start 
                     pt-4
-                    md:pt-8
-                    {% if request.endpoint == 'index' %}justify-center !important align-items-center !important{% endif %}">
+                    md:pt-8">
             {% block body %}{% endblock %}
         </div>
     </main>
 
     {% if request.endpoint == 'index' %}
     <style>
-        /* Override layout centering specifically for index (former home) */
+        /* Remove centering overrides since index is now main view */
         body {
-            justify-content: center !important;
-            align-items: center !important;
+            justify-content: normal !important;
+            align-items: normal !important;
         }
 
         main {
-            justify-content: center !important;
-            align-items: center !important;
+            justify-content: normal !important;
+            align-items: normal !important;
         }
 
-        /* Override content wrapper centering */
         .flex-grow {
-            justify-content: center !important;
-            align-items: center !important;
-        }
-
-        /* Container centering */
-        .content-container {
-            margin: 0 auto;
-            max-width: 1280px;
-            width: 100%;
+            justify-content: normal !important;
+            align-items: normal !important;
         }
     </style>
     {% endif %}
