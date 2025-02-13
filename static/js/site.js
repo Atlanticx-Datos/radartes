@@ -390,33 +390,19 @@ import { initSearchEnhancements } from './search.js';
     // Opportunity modal trigger for table, accordion, "destacadas", and "cierran pronto" links.
     // --------------------------------------------------------------------------
     document.body.addEventListener("click", function(event) {
-      // Listen for clicks on elements with any of the relevant classes.
-      var modalLink = event.target.closest(".opportunity-link, .destacada-link, .cierran-pronto-link");
+      const modalLink = event.target.closest(".opportunity-link, .destacada-link, .cierran-pronto-link");
       if (modalLink) {
         event.preventDefault();
         event.stopPropagation();
 
-        // Ensure we have the element that contains the data attributes.
-        // In "cierran pronto" cases, the outer anchor may not have them so we search within.
-        if (!modalLink.getAttribute("data-url")) {
-          var nested = modalLink.querySelector("[data-url]");
-          if (nested) {
-            modalLink = nested;
-          }
+        const targetUrl = modalLink.dataset.url;
+        const name = modalLink.dataset.name;
+        const country = modalLink.dataset.country;
+        const summary = modalLink.dataset.summary;
+
+        if (targetUrl) {
+          window.showPreviewModal(targetUrl, name, country, summary);
         }
-
-        var targetUrl = modalLink.getAttribute("data-url");
-        var name = modalLink.getAttribute("data-name");
-        var country = modalLink.getAttribute("data-country");
-        var summary = modalLink.getAttribute("data-summary");
-
-        console.log("Triggering modal with data:", { targetUrl, name, country, summary });
-
-        if (!targetUrl) {
-          console.error("No URL found for the opportunity.");
-          return;
-        }
-        window.showPreviewModal(targetUrl, name, country, summary);
       }
     });
 

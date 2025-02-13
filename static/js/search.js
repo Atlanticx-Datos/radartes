@@ -16,12 +16,12 @@ const fieldWeights = {
 };
 
 const AUTOCOMPLETE_DATA = {
-    disciplines: ['visuales', 'música', 'video', 'escénicas', 'literatura', 'diseño', 'investigación', 'arquitectura'],
-    countries: [
+    disciplinas: ['visuales', 'música', 'video', 'escénicas', 'literatura', 'diseño', 'investigación', 'arquitectura'],
+    paises: [
         'España', 'Argentina', 'México', 'Colombia', 'EEUU', 'Reino Unido',
-        'Italia', 'Francia', 'Alemania', 'Portugal', 'Múltiples países'
+        'Italia', 'Francia', 'Alemania', 'Portugal', 'Múltiples países', 'China', 'Japón', 'Brasil', 'Chile', 'Perú', 'Venezuela',
     ],
-    categories: ['beca', 'premio', 'residencia', 'convocatoria', 'exposición', 'festival']
+    categorías: ['beca', 'premio', 'residencia', 'convocatoria', 'exposición', 'festival']
 };
 
 function normalizeText(text) {
