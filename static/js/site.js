@@ -652,7 +652,7 @@ const month_mapping = {
         const counter = document.getElementById('results-counter');
         
         if (counter) {
-            counter.textContent = `${results.length} oportunidades encontradas`;
+            counter.textContent = `${results.length} oportunidades ordenadas por fecha de cierre (más próximas primero)`;
         }
         
         if (container) {
