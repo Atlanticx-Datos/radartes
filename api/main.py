@@ -1663,13 +1663,13 @@ def calculate_relevance_score(page, search_terms, discipline_groups):
     """Calculate relevance score with field-specific weighting"""
     score = 0
     field_weights = {
-        'resumen_generado_por_la_ia': 3,  # Highest priority
-        'nombre': 2,                       # Second priority
+        'disciplina': 4,        # ↑ From 2 → 4 (primary relevance signal)
+        'og_resumida': 3,       # ↑ From 1 → 3 (rich secondary context)
+        'resumen_generado_por_la_ia': 2,  # ↓ From 3 → 2 (contains redundant info)
+        'nombre': 1,            # ↓ From 2 → 1 (English, less critical)
         'entidad': 1,
-        'og_resumida': 1,
         'categoría': 1,
-        'país': 1,
-        'disciplina': 2  # Higher weight for discipline matches
+        'país': 1
     }
 
     # Normalize all page fields

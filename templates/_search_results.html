@@ -152,3 +152,19 @@
 </tr>
 {% endif %}
 
+<div class="opportunity-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+    <h3 class="font-bold text-lg mb-2">${nombre}</h3>
+    <p class="text-sm text-gray-600 mb-2">${resumida}</p>
+    <div class="flex justify-between items-center">
+        <span class="text-sm text-gray-500">${pais}</span>
+        <button 
+            class="preview-btn text-blue-600 hover:underline text-sm"
+            data-url="${url}"
+            data-name="${nombre}"
+            data-country="${pais}"
+            data-summary="${resumida}">
+            Ver más
+        </button>
+    </div>
+</div>
+
