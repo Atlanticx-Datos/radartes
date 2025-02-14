@@ -2,112 +2,98 @@
 
 {% block body %}
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold mb-6">Test Filters</h1>
+    <h1 class="text-3xl font-bold">OPORTUNIDADES GRATIS [EN CONSTRUCCIÓN]!!!
+        <h2 class="text-xl mb-6">Toda la info sobre nuestro proyecto <a href="https://github.com/Atlanticx-Datos/100_Oportunidades"
+                class="underline">está en GitHub</a></h2>
+    </h1>
 
     <!-- Data container with proper escaping -->
     <div id="prefiltered-data" data-results="{{ prefiltered_results|tojson|forceescape }}"
         data-pages="{{ pages|tojson|forceescape }}" class="hidden">
     </div>
 
-    <!-- Filter sections -->
+    <!-- Filter Buttons Section (Discipline) -->
     <div class="space-y-6">
-        <!-- Discipline filters -->
-        <div>
-            <h2 class="text-lg font-semibold mb-3">Filtrar por disciplina</h2>
-            <div class="flex flex-wrap gap-2">
-                <button class="filter-btn px-4 py-2 rounded-full border bg-blue-600 text-white"
-                    data-discipline-filter="todos">
-                    Todos
-                </button>
-                {% for discipline in discipline_groups.keys() %}
-                <button class="filter-btn px-4 py-2 rounded-full border border-gray-300 text-gray-700"
-                    data-discipline-filter="{{ discipline }}">
-                    {{ discipline|title }}
-                </button>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Month filters -->
-        <div>
-            <h2 class="text-lg font-semibold mb-3">Filtrar por mes</h2>
-            <div class="flex flex-wrap gap-2">
-                <button class="filter-btn px-4 py-2 rounded-full border bg-blue-600 text-white"
-                    data-month-filter="todos">
-                    Todos
-                </button>
-                {% for month, number in month_mapping.items() %}
-                <button class="filter-btn px-4 py-2 rounded-full border border-gray-300 text-gray-700"
-                    data-month-filter="{{ number }}">
-                    {{ month|title }}
-                </button>
-                {% endfor %}
-            </div>
+        <h2 class="text-lg font-semibold mb-3">Obtener resultados por disciplina</h2>
+        <div class="flex flex-wrap gap-2">
+            <button class="filter-btn px-4 py-2 rounded-full border bg-blue-600 text-white"
+                data-discipline-filter="todos">
+                Todos
+            </button>
+            {% for discipline in discipline_groups.keys() %}
+            <button class="filter-btn px-4 py-2 rounded-full border border-gray-300 text-gray-700"
+                data-discipline-filter="{{ discipline }}">
+                {{ discipline|title }}
+            </button>
+            {% endfor %}
         </div>
     </div>
 
     <!-- Replace the current search input div with this -->
     <div class="mt-4 mb-6 relative">
         <div class="relative flex items-center">
-            <input 
-                type="text" 
-                id="open-search" 
-                placeholder="Buscar (ej: pintura, españa o beca, alemania)..." 
-                class="w-full p-2 pr-24 border rounded-lg" 
-                oninput="performSearch()">
-            
+            <input type="text" id="open-search" placeholder="Buscar (ej: pintura, españa o beca, alemania)..."
+                class="w-full p-2 pr-24 border rounded-lg" oninput="performSearch()">
+
             <!-- Filter trigger button -->
-            <button 
-                id="filter-dropdown-trigger"
+            <button id="filter-dropdown-trigger"
                 class="absolute right-10 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600"
                 aria-label="Open filters">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+                    <path fill-rule="evenodd"
+                        d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
+                        clip-rule="evenodd" />
                 </svg>
             </button>
-            
+
             <!-- Clear search button -->
-            <button 
-                id="clear-search" 
+            <button id="clear-search"
                 class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                onclick="clearTestSearch()" 
-                style="display: none;">
+                onclick="clearTestSearch()" style="display: none;">
                 ✕
             </button>
         </div>
-        
+
         <!-- New structured filters dropdown -->
-        <div id="structured-filters" class="hidden absolute z-50 mt-1 w-80 right-0 bg-white rounded-lg shadow-lg border border-gray-200 p-3">
+        <div id="structured-filters"
+            class="hidden absolute z-50 mt-1 w-80 right-0 bg-white rounded-lg shadow-lg border border-gray-200 p-3">
             <!-- Categories Section -->
             <div class="mb-4">
                 <h3 class="text-sm font-semibold mb-2">Categorías</h3>
                 <div class="grid grid-cols-2 gap-2">
-                    <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50" 
-                            data-category="beca">
+                    <button
+                        class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                        data-category="beca">
                         Beca
                     </button>
-                    <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50" 
-                            data-category="residencia">
+                    <button
+                        class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                        data-category="residencia">
                         Residencia
                     </button>
-                    <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50" 
-                            data-category="premio">
+                    <button
+                        class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                        data-category="premio">
                         Premio
                     </button>
-                    <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50" 
-                            data-category="convocatoria">
+                    <button
+                        class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                        data-category="convocatoria">
                         Convocatoria
                     </button>
-                    <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50" 
-                            data-category="oportunidad">
+                    <button
+                        class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                        data-category="oportunidad">
                         Oportunidad
                     </button>
-                    <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50" 
-                            data-category="fondos">
+                    <button
+                        class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                        data-category="fondos">
                         Fondos
                     </button>
-                    <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50" 
-                            data-category="apoyo">
+                    <button
+                        class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                        data-category="apoyo">
                         Apoyo
                     </button>
                 </div>
@@ -132,8 +118,8 @@
             </div>
 
             <!-- Search Button -->
-            <button id="apply-filters" 
-                    class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button id="apply-filters"
+                class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                 Buscar
             </button>
         </div>
@@ -149,10 +135,10 @@
     // Add HTML escaping utility at the top of the script
     function escapeHTML(str) {
         return str.replace(/&/g, "&amp;")
-                  .replace(/</g, "&lt;")
-                  .replace(/>/g, "&gt;")
-                  .replace(/"/g, "&quot;")
-                  .replace(/'/g, "&#039;");
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
     function clearTestSearch() {
