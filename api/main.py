@@ -43,6 +43,7 @@ from flask_caching import Cache
 import unicodedata
 import inflect
 import re
+import traceback
 
 from flask_caching import Cache
 
@@ -71,7 +72,7 @@ DISCIPLINE_GROUPS = {
         'pintura', 'escultura', 'cerámica', 'dibujo', 'instalación', 'fotografía',
         'artes visuales', 'visuales', 'grabado', 'arte plástica', 'muralismo',
         'arte urbano', 'arte público', 'nuevos medios', 'arte digital', 'ilustración', 
-        'artesanía', 'cerámica', 'orfebrería', 'talla en madera', 'técnicas tradicionales', 
+        'cerámica', 'orfebrería', 'talla en madera', 'técnicas tradicionales', 
         'digital', 'arte digital', 'nft', '3d', 'grabado', 'estampa', 'medios mixtos', 'digitales'
     },
     'música': {
@@ -821,8 +822,7 @@ def inject_total_nuevas():
     return dict(total_nuevas=total_nuevas)
 
 @app.route("/")
-def index():  # Changed from test_filters
-    """Main entry point with client-side filtering"""
+def index():
     try:
         cached_content = get_cached_database_content()
         if not cached_content:
@@ -834,6 +834,28 @@ def index():  # Changed from test_filters
 
         pages = cached_content.get('pages', [])
         destacar_pages = cached_content.get('destacar_pages', [])
+        
+        # Check for user preferences
+        user_prefs = set()
+        if 'user' in session:
+            preferences = get_existing_preferences(session["user"]["sub"])
+            user_prefs = preferences.get('disciplines', set())
+            app.logger.debug(f"Found user preferences: {user_prefs}")
+
+            # Apply preference-based sorting if user has preferences
+            if user_prefs:
+                scored_pages = []
+                for page in pages:
+                    pref_score = calculate_preference_score(page, user_prefs)  # Fixed this line
+                    scored_pages.append((pref_score, page))
+                
+                # Sort by preference score (descending) and then by closing date
+                pages = [
+                    page for _, page in sorted(
+                        scored_pages,
+                        key=lambda x: (-x[0], x[1].get('fecha_de_cierre', ''))
+                    )
+                ]
         
         # Pre-filter pages for each main discipline
         prefiltered_results = {}
@@ -859,7 +881,7 @@ def index():  # Changed from test_filters
         }
         
         return render_template(
-            "index.html",  # Changed from test_filters.html
+            "index.html",
             prefiltered_results=prefiltered_results,
             discipline_groups=DISCIPLINE_GROUPS,
             month_mapping=month_mapping,
@@ -1961,6 +1983,76 @@ def save_user_preferences(user_id, disciplines, email):
         app.logger.error(f"Response body: {response.text}")
         raise Exception(f"Notion API Error: {response.text}")
 
+import traceback  # Add this at the top with other imports
+
+def get_existing_preferences(user_id):
+    """Get preferences with normalized disciplines"""
+    try:
+        app.logger.debug(f"Querying preferences for user: {user_id}")
+        url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
+        
+        # Modified query to handle both ID formats
+        query = {
+            "filter": {
+                "and": [
+                    {
+                        "or": [
+                            {"property": "User ID", "title": {"equals": user_id}},
+                            {"property": "User ID", "title": {"equals": f"auth0|{user_id}"}}
+                        ]
+                    },
+                    {"property": "Opportunity ID", "rich_text": {"is_empty": True}}
+                ]
+            },
+            "page_size": 1
+        }
+        
+        app.logger.debug(f"Notion query: {json.dumps(query, indent=2)}")
+        
+        response = requests.post(url, headers=headers, json=query)
+        response.raise_for_status()
+        
+        result = response.json().get("results", [])
+        app.logger.debug(f"Raw API response: {json.dumps(result, indent=2)}")
+        
+        if not result:
+            app.logger.info(f"No preferences found for user {user_id}")
+            return {'disciplines': set(), 'email': ''}
+
+        properties = result[0].get('properties', {})
+        
+        # Extract preferences with detailed logging
+        preferences_prop = properties.get('Preferences', {})
+        app.logger.debug(f"Raw preferences property: {json.dumps(preferences_prop, indent=2)}")
+        
+        raw_disciplines = ""
+        if preferences_prop.get('rich_text'):
+            if len(preferences_prop['rich_text']) > 0:
+                raw_disciplines = preferences_prop['rich_text'][0].get('text', {}).get('content', '')
+        
+        email_prop = properties.get('Contact Email', {})
+        raw_email = email_prop.get('email', '')
+        
+        normalized_disciplines = set()
+        for d in raw_disciplines.split(','):
+            cleaned = d.strip()
+            if cleaned:
+                normalized = normalize_discipline(cleaned)
+                if normalized:
+                    normalized_disciplines.add(normalized)
+        
+        app.logger.debug(f"Normalized preferences: {normalized_disciplines}")
+        
+        return {
+            'disciplines': normalized_disciplines,
+            'email': raw_email,
+            'page_id': result[0]['id']
+        }
+
+    except Exception as e:
+        app.logger.error(f"Error in get_existing_preferences: {str(e)}")
+        app.logger.error(f"Traceback: {traceback.format_exc()}")
+        return {'disciplines': set(), 'email': ''}
 def get_existing_preferences_page_id(user_id):
     """Get existing preferences page ID with debug logging"""
     try:
@@ -1986,28 +2078,11 @@ def get_existing_preferences_page_id(user_id):
         app.logger.error(f"Error fetching preferences page: {str(e)}")
         return None
 
-def get_existing_preferences(user_id):
-    """Get preferences from OPORTUNIDADES_ID where Opportunity ID is empty"""
-    try:
-        page_id = get_existing_preferences_page_id(user_id)
-        if not page_id:
-            return {'disciplines': [], 'email': ''}
-        
-        url = f"https://api.notion.com/v1/pages/{page_id}"
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        page = response.json()
-        props = page.get("properties", {})
-        
-        # Maintain existing frontend structure
-        return {
-            'disciplines': [d.strip() for d in props.get("Preferences", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "").split(",") if d.strip()],
-            'email': props.get("Contact Email", {}).get("email", "")
-        }
-        
-    except Exception as e:
-        app.logger.error(f"Error getting prefs: {str(e)}")
-        return {'disciplines': [], 'email': ''}
+def calculate_preference_score(page, user_preferences):
+    """Calculate match score between opportunity and user preferences"""
+    opportunity_disciplines = set(page.get('disciplina', '').lower().split(', '))
+    preference_match = len(opportunity_disciplines & user_preferences)
+    return min(preference_match * 2, 10)  # Boost matches with 2x weight, cap at 10
 
 
 
