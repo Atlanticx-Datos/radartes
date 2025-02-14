@@ -1262,7 +1262,7 @@ def refresh_database_cache():
                         {
                             "or": [
                                 {"property": "Fecha de cierre", "date": {"is_empty": True}},
-                                {"property": "Fecha de cierre", "date": {"after": datetime.now().strftime('%Y-%m-%d')}}
+                                {"property": "Fecha de cierre", "date": {"on_or_after": datetime.now().strftime('%Y-%m-%d')}}
                             ]
                         }
                     ]
@@ -1434,8 +1434,9 @@ def refresh_database_cache():
 
         # Sort pages
         sorted_pages = sorted(pages, key=lambda page: (
-            page["fecha_de_cierre"] == placeholder_date,
-            datetime.strptime(page["fecha_de_cierre"], '%Y-%m-%d') if page["fecha_de_cierre"] != placeholder_date else datetime.max
+            page["fecha_de_cierre"] == placeholder_date,  # First sort by whether it's a placeholder date
+            datetime.strptime(page["fecha_de_cierre"], '%Y-%m-%d') if page["fecha_de_cierre"] != placeholder_date else datetime.max,  # Then by closing date
+            -datetime.fromisoformat(page["created_time"].replace('Z', '+00:00')).timestamp()  # Finally by creation time (newest first)
         ))
 
         # Store the processed data in Redis
