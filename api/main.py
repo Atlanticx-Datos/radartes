@@ -1434,9 +1434,9 @@ def refresh_database_cache():
 
         # Sort pages
         sorted_pages = sorted(pages, key=lambda page: (
-            not page["fecha_de_cierre"] == placeholder_date,
+            page["fecha_de_cierre"] == placeholder_date,
             datetime.strptime(page["fecha_de_cierre"], '%Y-%m-%d') if page["fecha_de_cierre"] != placeholder_date else datetime.max
-        ), reverse=True)
+        ))
 
         # Store the processed data in Redis
         cache_data = {
