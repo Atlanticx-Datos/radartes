@@ -833,6 +833,7 @@ def index():  # Changed from test_filters
                                 og_data=get_default_og_data())
 
         pages = cached_content.get('pages', [])
+        destacar_pages = cached_content.get('destacar_pages', [])
         
         # Pre-filter pages for each main discipline
         prefiltered_results = {}
@@ -863,6 +864,7 @@ def index():  # Changed from test_filters
             discipline_groups=DISCIPLINE_GROUPS,
             month_mapping=month_mapping,
             pages=pages,
+            destacar_pages=destacar_pages,
             total_opportunities=len(pages),
             DISCIPLINE_GROUPS=DISCIPLINE_GROUPS,
             og_data=get_default_og_data()

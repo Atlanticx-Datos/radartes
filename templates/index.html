@@ -46,14 +46,97 @@
         </div>
     </div>
 
-    <!-- Modify the search input div to include a clear button -->
+    <!-- Replace the current search input div with this -->
     <div class="mt-4 mb-6 relative">
-        <input type="text" id="open-search" placeholder="Buscar (ej: pintura, españa o beca, alemania)..."
-            class="w-full p-2 pr-10 border rounded-lg" oninput="performSearch()">
-        <button id="clear-search" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            onclick="clearTestSearch()" style="display: none;">
-            ✕
-        </button>
+        <div class="relative flex items-center">
+            <input 
+                type="text" 
+                id="open-search" 
+                placeholder="Buscar (ej: pintura, españa o beca, alemania)..." 
+                class="w-full p-2 pr-24 border rounded-lg" 
+                oninput="performSearch()">
+            
+            <!-- Filter trigger button -->
+            <button 
+                id="filter-dropdown-trigger"
+                class="absolute right-10 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600"
+                aria-label="Open filters">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            
+            <!-- Clear search button -->
+            <button 
+                id="clear-search" 
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                onclick="clearTestSearch()" 
+                style="display: none;">
+                ✕
+            </button>
+        </div>
+        
+        <!-- New structured filters dropdown -->
+        <div id="structured-filters" class="hidden absolute z-50 mt-1 w-80 right-0 bg-white rounded-lg shadow-lg border border-gray-200 p-3">
+            <!-- Categories Section -->
+            <div class="mb-4">
+                <h3 class="text-sm font-semibold mb-2">Categorías</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50" 
+                            data-category="beca">
+                        Beca
+                    </button>
+                    <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50" 
+                            data-category="residencia">
+                        Residencia
+                    </button>
+                    <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50" 
+                            data-category="premio">
+                        Premio
+                    </button>
+                    <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50" 
+                            data-category="convocatoria">
+                        Convocatoria
+                    </button>
+                    <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50" 
+                            data-category="oportunidad">
+                        Oportunidad
+                    </button>
+                    <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50" 
+                            data-category="fondos">
+                        Fondos
+                    </button>
+                    <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50" 
+                            data-category="apoyo">
+                        Apoyo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Country Dropdown -->
+            <div class="mb-4">
+                <h3 class="text-sm font-semibold mb-2">País</h3>
+                <select id="country-filter" class="w-full p-2 border rounded-lg bg-white">
+                    <option value="">Todos los países</option>
+                    <!-- Dynamically populated -->
+                </select>
+            </div>
+
+            <!-- Month Dropdown -->
+            <div class="mb-4">
+                <h3 class="text-sm font-semibold mb-2">Mes de cierre</h3>
+                <select id="month-filter" class="w-full p-2 border rounded-lg bg-white">
+                    <option value="">Todos los meses</option>
+                    <!-- Dynamically populated -->
+                </select>
+            </div>
+
+            <!-- Search Button -->
+            <button id="apply-filters" 
+                    class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                Buscar
+            </button>
+        </div>
     </div>
 
     <!-- Results -->

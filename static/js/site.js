@@ -14,6 +14,22 @@
  */
 import { initSearchEnhancements } from './search.js';
 
+// Add this near the top of the file with other constants
+const month_mapping = {
+    'enero': 1,
+    'febrero': 2,
+    'marzo': 3,
+    'abril': 4,
+    'mayo': 5,
+    'junio': 6,
+    'julio': 7,
+    'agosto': 8,
+    'septiembre': 9,
+    'octubre': 10,
+    'noviembre': 11,
+    'diciembre': 12
+};
+
 (function() {
   "use strict";
   
@@ -664,6 +680,36 @@ import { initSearchEnhancements } from './search.js';
         }
     }
 
+    let activeFilters = {
+        categories: new Set(),
+        country: null,
+        month: null
+    };
+
+    // Initialize dropdowns on load
+    function initializeStructuredFilters() {
+        // Country dropdown
+        const countryFilter = document.getElementById('country-filter');
+        const uniqueCountries = [...new Set(allPages.map(p => p.país).filter(Boolean))].sort();
+        uniqueCountries.forEach(country => {
+            const option = document.createElement('option');
+            option.value = country;
+            option.textContent = country;
+            countryFilter.appendChild(option);
+        });
+
+        // Month dropdown
+        const monthFilter = document.getElementById('month-filter');
+        if (monthFilter) {
+            Object.entries(month_mapping).forEach(([monthName, monthNumber]) => {
+                const option = document.createElement('option');
+                option.value = monthNumber;
+                option.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+                monthFilter.appendChild(option);
+            });
+        }
+    }
+
     // Initialize filters if we're on the test page
     const preFilteredData = document.getElementById('prefiltered-data');
     if (preFilteredData) {
@@ -697,6 +743,9 @@ import { initSearchEnhancements } from './search.js';
                 btn.classList.add('bg-blue-600', 'text-white');
             });
 
+            // Initialize the dropdowns
+            initializeStructuredFilters();
+
         } catch (e) {
             console.error('Filter initialization error:', e);
         }
@@ -715,6 +764,22 @@ import { initSearchEnhancements } from './search.js';
             e.preventDefault();
             handleMonthFilter(button);
         });
+    });
+
+    // Event listeners for dropdown changes
+    document.getElementById('country-filter')?.addEventListener('change', () => {
+        activeFilters.country = document.getElementById('country-filter').value || null;
+    });
+
+    document.getElementById('month-filter')?.addEventListener('change', () => {
+        activeFilters.month = document.getElementById('month-filter').value || null;
+    });
+
+    // Final search trigger
+    document.getElementById('apply-filters').addEventListener('click', (e) => {
+        e.preventDefault();
+        performSearch();
+        document.getElementById('structured-filters').classList.add('hidden');
     });
 
     // Add HTML escaping utility
@@ -856,6 +921,142 @@ import { initSearchEnhancements } from './search.js';
         showPreviewModal(url, name, country, summary);
       }
     });
+
+    // Modified category filter handler
+    document.querySelectorAll('.category-filter-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const category = button.dataset.category;
+            
+            button.classList.toggle('bg-blue-600');
+            button.classList.toggle('text-white');
+            button.classList.toggle('border-blue-600');
+            
+            if (activeFilters.categories.has(category)) {
+                activeFilters.categories.delete(category);
+            } else {
+                activeFilters.categories.add(category);
+            }
+        });
+    });
+
+    // Updated performSearch function
+    function performSearch() {
+        const searchInput = document.getElementById('open-search');
+        const searchValue = searchInput.value.trim();
+        const allPages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
+
+        let filteredPages = allPages.filter(page => {
+            // Category filter
+            if (activeFilters.categories.size > 0) {
+                const pageCategories = new Set(
+                    (page.categoria || '').toLowerCase().split(',').map(c => c.trim())
+                );
+                const hasMatch = [...activeFilters.categories].some(cat => 
+                    pageCategories.has(cat.toLowerCase())
+                );
+                if (!hasMatch) return false;
+            }
+
+            // Country filter
+            if (activeFilters.country) {
+                const pageCountry = (page.país || '').toLowerCase();
+                if (pageCountry !== activeFilters.country.toLowerCase()) return false;
+            }
+
+            // Month filter
+            if (activeFilters.month) {
+                const pageDate = page.fecha_de_cierre ? new Date(page.fecha_de_cierre) : null;
+                if (!pageDate) return false;
+                const pageMonth = pageDate.getMonth() + 1;
+                if (pageMonth !== parseInt(activeFilters.month)) return false;
+            }
+
+            return true;
+        });
+
+        // Existing text search logic
+        if (searchValue) {
+            const searchTerms = searchValue.split(',').map(term => term.trim().toLowerCase());
+            filteredPages = filteredPages.filter(page => {
+                return searchTerms.every(term => {
+                    const normalizedPage = {
+                        nombre: normalizeText(page.nombre || ''),
+                        og_resumida: normalizeText(page.og_resumida || ''),
+                        entidad: normalizeText(page.entidad || ''),
+                        categoria: normalizeText(page.categoria || ''),
+                        disciplina: normalizeText(page.disciplina || ''),
+                        pais: normalizeText(page.país || '')
+                    };
+                    
+                    const allFieldsText = Object.values(normalizedPage).join(' ');
+                    return allFieldsText.includes(normalizeText(term));
+                });
+            });
+        }
+
+        updateResults(filteredPages);
+    }
+
+    // Initialize dropdowns on load
+    function initializeStructuredFilters() {
+        // Country dropdown
+        const countryFilter = document.getElementById('country-filter');
+        const uniqueCountries = [...new Set(allPages.map(p => p.país).filter(Boolean))].sort();
+        uniqueCountries.forEach(country => {
+            const option = document.createElement('option');
+            option.value = country;
+            option.textContent = country;
+            countryFilter.appendChild(option);
+        });
+
+        // Month dropdown
+        const monthFilter = document.getElementById('month-filter');
+        if (monthFilter) {
+            Object.entries(month_mapping).forEach(([monthName, monthNumber]) => {
+                const option = document.createElement('option');
+                option.value = monthNumber;
+                option.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+                monthFilter.appendChild(option);
+            });
+        }
+    }
+
+    // Event listeners for dropdown changes
+    document.getElementById('country-filter').addEventListener('change', () => {
+        activeFilters.country = document.getElementById('country-filter').value || null;
+    });
+
+    document.getElementById('month-filter').addEventListener('change', () => {
+        activeFilters.month = document.getElementById('month-filter').value || null;
+    });
+
+    // Final search trigger
+    document.getElementById('apply-filters').addEventListener('click', (e) => {
+        e.preventDefault();
+        performSearch();
+        document.getElementById('structured-filters').classList.add('hidden');
+    });
+
+    // Setup filter dropdown trigger
+    const filterTrigger = document.getElementById('filter-dropdown-trigger');
+    const structuredFilters = document.getElementById('structured-filters');
+    
+    if (filterTrigger && structuredFilters) {
+        filterTrigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            structuredFilters.classList.toggle('hidden');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#structured-filters') && 
+                !e.target.closest('#filter-dropdown-trigger')) {
+                structuredFilters.classList.add('hidden');
+            }
+        });
+    }
   });
 
   // ============================================================================
