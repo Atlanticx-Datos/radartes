@@ -1505,7 +1505,10 @@ def home():
 def utility_processor():
     def versioned_static(filename):
         return url_for('static', filename=filename, v=1.0)  # Incrementa este número cuando hagas cambios
-    return dict(versioned_static=versioned_static)
+    def template_normalize_discipline(text):
+        """Template helper to normalize disciplines for comparison"""
+        return normalize_discipline(text)
+    return dict(versioned_static=versioned_static, normalize_discipline=template_normalize_discipline)
 
 @app.route('/proxy')
 def proxy():
@@ -1902,10 +1905,19 @@ def mi_espacio():
             email = request.form.get('email', '').strip()
             
             if not disciplines:
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return jsonify({"error": "Debes seleccionar al menos una disciplina"}), 400
                 flash("Debes seleccionar al menos una disciplina", "error")
                 return redirect(url_for('mi_espacio'))
             
             save_user_preferences(user_id, disciplines, email)
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({
+                    "success": True,
+                    "redirect": url_for('index')
+                })
+            
             flash("Preferencias guardadas correctamente", "success")
             return redirect(url_for('index'))
             
@@ -1913,20 +1925,21 @@ def mi_espacio():
         preferences = get_existing_preferences(user_id)
         app.logger.debug(f"Retrieved preferences for display: {preferences}")
         
-        # Fetch saved opportunities
         saved_opportunities = get_saved_opportunities(user_id)
         app.logger.debug(f"Retrieved saved opportunities: {saved_opportunities}")
         
         return render_template(
             "mi_espacio.html",
             disciplines=MAIN_DISCIPLINES,
-            selected_disciplines=preferences['disciplines'],
-            existing_email=preferences['email'],
-            saved_opportunities=saved_opportunities  # Add saved opportunities to template
+            selected_disciplines=list(preferences.get('disciplines', set())),
+            existing_email=preferences.get('email', ''),
+            saved_opportunities=saved_opportunities
         )
 
     except Exception as e:
         app.logger.error(f"mi_espacio error: {str(e)}")
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({"error": str(e)}), 500
         flash("Error al procesar tus preferencias", "error")
         return redirect(url_for('index'))
 

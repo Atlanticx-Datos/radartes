@@ -22,14 +22,14 @@
                 <!-- Disciplines Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {% for discipline in disciplines %}
-                    <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                        <input type="checkbox" 
-                               name="disciplines" 
-                               value="{{ discipline }}"
-                               class="form-checkbox h-5 w-5 text-blue-600"
-                               {% if discipline in selected_disciplines %}checked{% endif %}>
-                        <span class="text-gray-700 text-lg">{{ discipline|title }}</span>
-                    </label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="disciplines" 
+                               value="{{ discipline }}" id="{{ discipline }}"
+                               {% if normalize_discipline(discipline) in selected_disciplines %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ discipline }}">
+                            {{ discipline }}
+                        </label>
+                    </div>
                     {% endfor %}
                 </div>
 

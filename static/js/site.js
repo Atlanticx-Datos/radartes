@@ -264,18 +264,27 @@ const month_mapping = {
    *
    * @param {Event} event - The click event.
    */
-  window.layoutshowSpinner = function(event) {
+  window.layoutshowSpinner = function() {
+    console.log('layoutshowSpinner called');
     const spinner = document.getElementById('layout-spinner');
+    console.log('spinner element:', spinner);
     if (spinner) {
         spinner.style.display = 'block';
+        console.log('spinner display set to block');
+    } else {
+        console.warn('spinner element not found');
     }
   };
 
   // Hide spinner function
   window.hideSpinner = function() {
+    console.log('hideSpinner called');
     const spinner = document.getElementById('layout-spinner');
     if (spinner) {
         spinner.style.display = 'none';
+        console.log('spinner hidden');
+    } else {
+        console.warn('spinner element not found in hideSpinner');
     }
   };
 
@@ -753,70 +762,138 @@ const month_mapping = {
 
     // Add these event listeners in the DOMContentLoaded callback
     document.querySelectorAll('[data-discipline-filter]').forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            handleDisciplineFilter(button);
-        });
+        if (button) {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleDisciplineFilter(button);
+            });
+        }
     });
 
     document.querySelectorAll('[data-month-filter]').forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            handleMonthFilter(button);
-        });
+        if (button) {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleMonthFilter(button);
+            });
+        }
     });
 
     // Event listeners for dropdown changes
-    document.getElementById('country-filter')?.addEventListener('change', () => {
-        activeFilters.country = document.getElementById('country-filter').value || null;
+    const countryFilter = document.getElementById('country-filter');
+    if (countryFilter) {
+        countryFilter.addEventListener('change', () => {
+            activeFilters.country = countryFilter.value || null;
+        });
+    }
+
+    const monthFilter = document.getElementById('month-filter');
+    if (monthFilter) {
+        monthFilter.addEventListener('change', () => {
+            activeFilters.month = monthFilter.value || null;
+        });
+    }
+
+    // Category filter buttons
+    document.querySelectorAll('.category-filter-btn').forEach(button => {
+        if (button) {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const category = button.dataset.category;
+                
+                button.classList.toggle('bg-blue-600');
+                button.classList.toggle('text-white');
+                button.classList.toggle('border-blue-600');
+                
+                if (activeFilters.categories.has(category)) {
+                    activeFilters.categories.delete(category);
+                } else {
+                    activeFilters.categories.add(category);
+                }
+            });
+        }
     });
 
-    document.getElementById('month-filter')?.addEventListener('change', () => {
-        activeFilters.month = document.getElementById('month-filter').value || null;
-    });
-
-    // Final search trigger
-    document.getElementById('apply-filters').addEventListener('click', (e) => {
-        e.preventDefault();
-        performSearch();
-        document.getElementById('structured-filters').classList.add('hidden');
-    });
-
-    // Add HTML escaping utility
-    function escapeHTML(str) {
-        return str.replace(/&/g, "&amp;")
-                  .replace(/</g, "&lt;")
-                  .replace(/>/g, "&gt;")
-                  .replace(/"/g, "&quot;")
-                  .replace(/'/g, "&#039;");
+    // Apply filters button
+    const applyFiltersBtn = document.getElementById('apply-filters');
+    if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            performSearch();
+            const filtersElement = document.getElementById('structured-filters');
+            if (filtersElement) {
+                filtersElement.classList.add('hidden');
+            }
+        });
     }
 
     // --------------------------------------------------------------------------
-    // Preferences Form Handling
+    // Final corrected preferences form handling
     // --------------------------------------------------------------------------
-    document.querySelector('form[data-form-type="preferences"]')?.addEventListener('submit', function(e) {
-        // Client-side validation
-        if (!this.checkValidity()) {
-            return true; // Let browser handle native validation
-        }
-        
-        const submitBtn = this.querySelector('button[type="submit"]');
-        
-        // Show global spinner and disable button
-        window.layoutshowSpinner();
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Guardando...';
-        }
-        
-        // Fallback cleanup in case submission fails
-        window.addEventListener('unload', function() {
-            window.hideSpinner();
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Guardar Preferencias';
+    let preferencesForm = document.querySelector('form[data-form-type="preferences"]');
+    if (preferencesForm) {
+        console.log('Found preferences form, attaching submit handler');
+        preferencesForm.addEventListener('submit', function(e) {
+            console.log('Form submit event triggered');
+            
+            // Client-side validation
+            if (!this.checkValidity()) {
+                console.log('Form validation failed');
+                return true;
             }
+            
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const notification = document.getElementById('notification');
+            
+            console.log('Form elements:', {
+                submitBtn: submitBtn,
+                notification: notification,
+                formAction: this.action,
+                formMethod: this.method
+            });
+            
+            // Show global spinner and disable button
+            console.log('Attempting to show spinner');
+            window.layoutshowSpinner();
+            
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Guardando...';
+                console.log('Submit button disabled and text updated');
+            }
+
+            // Show redirecting notification
+            if (notification) {
+                notification.innerHTML = '<div class="alert alert-info">Redirigiendo...</div>';
+                notification.classList.remove('hidden');
+                console.log('Notification displayed');
+            }
+            
+            // Fallback cleanup in case submission fails
+            window.addEventListener('unload', function() {
+                console.log('Unload event triggered');
+                window.hideSpinner();
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Guardar Preferencias';
+                }
+                if (notification) {
+                    notification.classList.add('hidden');
+                }
+            });
+
+            console.log('Form submission proceeding normally');
+            return true;
         });
+    } else {
+        console.log('Preferences form not found in DOMContentLoaded');
+    }
+
+    // Log initial elements state
+    console.log('Initial elements state:', {
+        spinner: document.getElementById('layout-spinner'),
+        notification: document.getElementById('notification'),
+        preferencesForm: document.querySelector('form[data-form-type="preferences"]')
     });
 
     // Add to the top of the file with other constants
@@ -909,147 +986,30 @@ const month_mapping = {
         // ... rest of your existing DOMContentLoaded code ...
     });
 
-    // Add this near other event listeners in site.js
-    document.addEventListener('click', function(e) {
-      const previewBtn = e.target.closest('.preview-btn');
-      if (previewBtn) {
-        e.preventDefault();
-        const url = previewBtn.dataset.url;
-        const name = previewBtn.dataset.name;
-        const country = previewBtn.dataset.country;
-        const summary = previewBtn.dataset.summary;
-        showPreviewModal(url, name, country, summary);
-      }
-    });
-
-    // Modified category filter handler
-    document.querySelectorAll('.category-filter-btn').forEach(button => {
-        button.addEventListener('click', (e) => {
+    // Preview button handler (safe event delegation)
+    document.body.addEventListener('click', function(e) {
+        const previewBtn = e.target.closest('.preview-btn');
+        if (previewBtn) {
             e.preventDefault();
-            const category = button.dataset.category;
-            
-            button.classList.toggle('bg-blue-600');
-            button.classList.toggle('text-white');
-            button.classList.toggle('border-blue-600');
-            
-            if (activeFilters.categories.has(category)) {
-                activeFilters.categories.delete(category);
-            } else {
-                activeFilters.categories.add(category);
-            }
-        });
-    });
-
-    // Updated performSearch function
-    function performSearch() {
-        const searchInput = document.getElementById('open-search');
-        const searchValue = searchInput.value.trim();
-        const allPages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
-
-        let filteredPages = allPages.filter(page => {
-            // Category filter
-            if (activeFilters.categories.size > 0) {
-                const pageCategories = new Set(
-                    (page.categoria || '').toLowerCase().split(',').map(c => c.trim())
-                );
-                const hasMatch = [...activeFilters.categories].some(cat => 
-                    pageCategories.has(cat.toLowerCase())
-                );
-                if (!hasMatch) return false;
-            }
-
-            // Country filter
-            if (activeFilters.country) {
-                const pageCountry = (page.país || '').toLowerCase();
-                if (pageCountry !== activeFilters.country.toLowerCase()) return false;
-            }
-
-            // Month filter
-            if (activeFilters.month) {
-                const pageDate = page.fecha_de_cierre ? new Date(page.fecha_de_cierre) : null;
-                if (!pageDate) return false;
-                const pageMonth = pageDate.getMonth() + 1;
-                if (pageMonth !== parseInt(activeFilters.month)) return false;
-            }
-
-            return true;
-        });
-
-        // Existing text search logic
-        if (searchValue) {
-            const searchTerms = searchValue.split(',').map(term => term.trim().toLowerCase());
-            filteredPages = filteredPages.filter(page => {
-                return searchTerms.every(term => {
-                    const normalizedPage = {
-                        nombre: normalizeText(page.nombre || ''),
-                        og_resumida: normalizeText(page.og_resumida || ''),
-                        entidad: normalizeText(page.entidad || ''),
-                        categoria: normalizeText(page.categoria || ''),
-                        disciplina: normalizeText(page.disciplina || ''),
-                        pais: normalizeText(page.país || '')
-                    };
-                    
-                    const allFieldsText = Object.values(normalizedPage).join(' ');
-                    return allFieldsText.includes(normalizeText(term));
-                });
-            });
+            const url = previewBtn.dataset.url;
+            const name = previewBtn.dataset.name;
+            const country = previewBtn.dataset.country;
+            const summary = previewBtn.dataset.summary;
+            showPreviewModal(url, name, country, summary);
         }
-
-        updateResults(filteredPages);
-    }
-
-    // Initialize dropdowns on load
-    function initializeStructuredFilters() {
-        // Country dropdown
-        const countryFilter = document.getElementById('country-filter');
-        const uniqueCountries = [...new Set(allPages.map(p => p.país).filter(Boolean))].sort();
-        uniqueCountries.forEach(country => {
-            const option = document.createElement('option');
-            option.value = country;
-            option.textContent = country;
-            countryFilter.appendChild(option);
-        });
-
-        // Month dropdown
-        const monthFilter = document.getElementById('month-filter');
-        if (monthFilter) {
-            Object.entries(month_mapping).forEach(([monthName, monthNumber]) => {
-                const option = document.createElement('option');
-                option.value = monthNumber;
-                option.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
-                monthFilter.appendChild(option);
-            });
-        }
-    }
-
-    // Event listeners for dropdown changes
-    document.getElementById('country-filter').addEventListener('change', () => {
-        activeFilters.country = document.getElementById('country-filter').value || null;
     });
 
-    document.getElementById('month-filter').addEventListener('change', () => {
-        activeFilters.month = document.getElementById('month-filter').value || null;
-    });
-
-    // Final search trigger
-    document.getElementById('apply-filters').addEventListener('click', (e) => {
-        e.preventDefault();
-        performSearch();
-        document.getElementById('structured-filters').classList.add('hidden');
-    });
-
-    // Setup filter dropdown trigger
+    // Filter dropdown trigger (with existence check)
     const filterTrigger = document.getElementById('filter-dropdown-trigger');
     const structuredFilters = document.getElementById('structured-filters');
-    
     if (filterTrigger && structuredFilters) {
-        filterTrigger.addEventListener('click', (e) => {
+        filterTrigger.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             structuredFilters.classList.toggle('hidden');
         });
 
-        // Close dropdown when clicking outside
+        // Close dropdown click handler
         document.addEventListener('click', function(e) {
             if (!e.target.closest('#structured-filters') && 
                 !e.target.closest('#filter-dropdown-trigger')) {
@@ -1057,6 +1017,31 @@ const month_mapping = {
             }
         });
     }
+
+    // Add null check for ALL remaining elements
+    const ALL_EVENT_HANDLERS = [
+        { selector: '[data-discipline-filter]', event: 'click', handler: handleDisciplineFilter },
+        { selector: '[data-month-filter]', event: 'click', handler: handleMonthFilter },
+        { selector: '.category-filter-btn', event: 'click', handler: handleCategoryFilter },
+        { selector: '#apply-filters', event: 'click', handler: handleApplyFilters }
+    ];
+
+    ALL_EVENT_HANDLERS.forEach(({ selector, event, handler }) => {
+        document.querySelectorAll(selector).forEach(element => {
+            if (element) {
+                element.addEventListener(event, handler);
+            }
+        });
+    });
+
+    // Log the state of elements after DOMContentLoaded
+    console.log('DOMContentLoaded - Elements state:', {
+        spinner: document.getElementById('layout-spinner'),
+        notification: document.getElementById('notification'),
+        preferencesForm: document.querySelector('form[data-form-type="preferences"]'),
+        filterTrigger: document.getElementById('filter-dropdown-trigger'),
+        structuredFilters: document.getElementById('structured-filters')
+    });
   });
 
   // ============================================================================
@@ -1126,4 +1111,34 @@ const month_mapping = {
         alert.remove();
     }, 3000);
   };
+
+  // Define handleCategoryFilter function
+  function handleCategoryFilter(e) {
+    e.preventDefault();
+    const category = e.target.dataset.category;
+
+    // Toggle category filter logic
+    if (activeFilters.categories.has(category)) {
+        activeFilters.categories.delete(category);
+    } else {
+        activeFilters.categories.add(category);
+    }
+
+    // Update UI or perform other actions
+    console.log('Category filter updated:', Array.from(activeFilters.categories));
+  }
+
+  // Define the handleApplyFilters function
+  function handleApplyFilters(e) {
+    e.preventDefault();
+    // Assuming performSearch() is defined elsewhere and executes the search
+    performSearch();
+    
+    // Hide the structured filters
+    const filtersElement = document.getElementById('structured-filters');
+    if (filtersElement) {
+        filtersElement.classList.add('hidden');
+    }
+    console.log('Applied filters');
+  }
 })();
