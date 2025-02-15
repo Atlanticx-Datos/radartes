@@ -1042,6 +1042,16 @@ const month_mapping = {
         filterTrigger: document.getElementById('filter-dropdown-trigger'),
         structuredFilters: document.getElementById('structured-filters')
     });
+
+    // Append this near the global initialization code
+    window.addEventListener("pageshow", function(event) {
+        console.log("Pageshow event fired. Hiding the spinner if visible.");
+        // Access the spinner element and ensure it's hidden.
+        var spinner = document.getElementById("layout-spinner");
+        if (spinner) {
+            spinner.style.display = "none";
+        }
+    });
   });
 
   // ============================================================================
