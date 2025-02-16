@@ -138,8 +138,9 @@ const month_mapping = {
    * @param {string} name - Opportunity name.
    * @param {string} country - Country info.
    * @param {string} summary - Opportunity short summary.
+   * @param {string} id - Opportunity ID.
    */
-  window.showPreviewModal = function(url, name, country, summary) {
+  window.showPreviewModal = function(url, name, country, summary, id) {
     var modalId = "modal-" + Date.now();
 
     // Create an overlay element that covers the entire viewport and applies blur
@@ -207,6 +208,14 @@ const month_mapping = {
                           class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
                       Cerrar
                   </button>
+                  <button hx-post="/save_from_modal"
+                          hx-vals='{"page_id": "${encodeURIComponent(id)}"}'
+                          hx-target="#notification"
+                          hx-swap="innerHTML"
+                          hx-trigger="click"
+                          class="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md">
+                      Guardar
+                  </button>
                   <a href="${url}" target="_blank" 
                      class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">
                       Ir al sitio web
@@ -252,6 +261,9 @@ const month_mapping = {
         }
     }
     document.addEventListener("keydown", escListener);
+
+    // After adding modal to DOM, initialize HTMX
+    setTimeout(() => htmx.process(modalContent), 50);
   };
 
   // ============================================================================
@@ -568,7 +580,9 @@ const month_mapping = {
 
     // Add HTMX delete handler with confirmation
     document.body.addEventListener('htmx:beforeRequest', function(evt) {
-        if (evt.detail.pathInfo?.requestPath.startsWith('/delete_opportunity/')) {
+        const requestPath = evt.detail.requestConfig?.path || '';
+        
+        if (requestPath.startsWith('/delete_opportunity/')) {
             const spinner = document.getElementById('layout-spinner');
             if (spinner) spinner.style.display = 'block';
             
@@ -580,13 +594,30 @@ const month_mapping = {
     });
 
     document.body.addEventListener('htmx:afterRequest', function(evt) {
-        if (evt.detail.pathInfo?.requestPath.startsWith('/delete_opportunity/')) {
+        const requestPath = evt.detail.requestConfig?.path || '';
+        const pathInfo = evt.detail.pathInfo?.requestPath || '';
+        
+        console.log('HTMX afterRequest event:', {
+            successful: evt.detail.successful,
+            failed: evt.detail.failed,
+            target: evt.detail.target?.id,
+            path: requestPath || pathInfo
+        });
+
+        // Check if this was a successful save request
+        if (evt.detail.successful && 
+            (requestPath === '/save_user_opportunity' || requestPath === '/save_from_modal')) {
+            console.log('Save was successful, showing alert');
+            window.showAlert(MESSAGES.SAVED, 'success');
+        }
+
+        // Check if this was a delete operation
+        if (requestPath.startsWith('/delete_opportunity/')) {
             const spinner = document.getElementById('layout-spinner');
             if (spinner) spinner.style.display = 'none';
             
             if (evt.detail.successful) {
                 showAlert("Oportunidad eliminada correctamente", "success");
-                // HTMX will automatically update the list through the response
             } else if (evt.detail.failed) {
                 showAlert("Error al eliminar oportunidad", "error");
             }
@@ -678,7 +709,7 @@ const month_mapping = {
                         <div class="flex justify-between items-center">
                             <span class="text-sm text-gray-500">${pais}</span>
                             <button 
-                                onclick="showPreviewModal('${url}', '${nombre}', '${pais}', '${resumida}')"
+                                onclick="showPreviewModal('${url}', '${nombre}', '${pais}', '${resumida}', '${escapeHTML(page.id || '')}')"
                                 class="text-blue-600 hover:underline text-sm">
                                 Ver más
                             </button>
@@ -995,7 +1026,8 @@ const month_mapping = {
             const name = previewBtn.dataset.name;
             const country = previewBtn.dataset.country;
             const summary = previewBtn.dataset.summary;
-            showPreviewModal(url, name, country, summary);
+            const id = previewBtn.dataset.id;
+            showPreviewModal(url, name, country, summary, id);
         }
     });
 
@@ -1051,6 +1083,17 @@ const month_mapping = {
         if (spinner) {
             spinner.style.display = "none";
         }
+    });
+
+    // Add this to your HTMX configuration
+    document.body.addEventListener('htmx:responseError', function(evt) {
+        console.error('HTMX Error:', evt.detail);
+        showAlert("Error al guardar la oportunidad", "error");
+    });
+
+    document.body.addEventListener('htmx:sendError', function(evt) {
+        console.error('HTMX Send Error:', evt.detail);
+        showAlert("Error de conexión", "error");
     });
   });
 

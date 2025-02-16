@@ -2097,7 +2097,40 @@ def calculate_preference_score(page, user_preferences):
     preference_match = len(opportunity_disciplines & user_preferences)
     return min(preference_match * 2, 10)  # Boost matches with 2x weight, cap at 10
 
+@app.route("/save_from_modal", methods=["POST"])
+@login_required
+def save_from_modal():
+    try:
+        app.logger.debug(f"Request headers: {dict(request.headers)}")
+        app.logger.debug(f"Request form data: {request.form}")
+        app.logger.debug(f"Session data: {dict(session)}")
+        
+        user_id = session["user"]["sub"]
+        page_id = request.form.get("page_id")
+        app.logger.info(f"Attempting save - User: {user_id}, Page: {page_id}")
 
+        if not page_id:
+            app.logger.warning("No page ID provided")
+            return jsonify({"error": "Missing opportunity ID"}), 400
+
+        if not is_opportunity_already_saved(user_id, page_id):
+            save_to_notion(user_id, page_id)
+            app.logger.info(f"Saved opportunity {page_id} from modal")
+            success_message = """
+            <div role="alert" class="flex items-center justify-center alert alert-success p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            """
+            return success_message, 200
+        else:
+            app.logger.info(f"Opportunity {page_id} already saved")
+            return jsonify({"info": "Opportunity already saved"}), 200
+
+    except Exception as e:
+        app.logger.error(f"Error in save_from_modal: {str(e)}")
+        return jsonify({"error": str(e)}), 400
 
 if __name__ == "__main__":
     # Ensure session directory exists
