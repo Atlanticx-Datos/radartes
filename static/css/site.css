@@ -199,3 +199,23 @@ nav .dropdown-content,
 .suggestion-item span.font-semibold {
     color: #0891b2; /* cyan-600 */
 }
+
+/* ====================================
+   DROPDOWN ON MODAL
+   Used in: index.html
+   Purpose: Style the dropdown on modal
+   Why custom: maybe because it is delivered from js
+==================================== */
+.share-dropdown {
+    z-index: 10000; /* Higher than modal's z-index */
+}
+.share-option {
+    transition: background-color 0.2s ease;
+    color: #374151;
+    font-size: 0.875rem;
+}
+.share-toggle-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}

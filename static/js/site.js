@@ -143,100 +143,106 @@ const month_mapping = {
   window.showPreviewModal = function(url, name, country, summary, id) {
     var modalId = "modal-" + Date.now();
 
-    // Create an overlay element that covers the entire viewport and applies blur
+    // Create an overlay element to darken the background and capture clicks
     var overlay = document.createElement("div");
     overlay.id = modalId + "-overlay";
-    overlay.style.position = "fixed";
-    overlay.style.top = "0";
-    overlay.style.left = "0";
-    overlay.style.width = "100%";
-    overlay.style.height = "100%";
-    overlay.style.background = "rgba(0, 0, 0, 0.3)";
-    overlay.style.backdropFilter = "blur(4px)";
-    overlay.style.WebkitBackdropFilter = "blur(4px)";
-    overlay.style.zIndex = "50";
-    overlay.style.opacity = "0";
-    overlay.style.transition = "opacity 300ms ease-out";
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      opacity: 0;
+      transition: opacity 300ms ease-out;
+    `;
 
-    // Create the modal content container
+    // Create the modal container with responsive styling
     var modalContent = document.createElement("div");
     modalContent.id = modalId;
-    // Removed the earlier modal-animate class in favor of inline transition styles.
-    modalContent.className = "bg-white rounded-lg w-full max-w-lg overflow-hidden border border-neutral";
-    modalContent.style.position = "fixed";
-    modalContent.style.top = "50%";
-    modalContent.style.left = "50%";
-    // Start slightly above the final position (for a gentle slide effect)
-    modalContent.style.transform = "translate(-50%, -45%)";
-    modalContent.style.zIndex = "51";
-    modalContent.style.opacity = "0";
-    modalContent.style.transition = "opacity 300ms ease-out, transform 300ms ease-out";
+    modalContent.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -45%);
+      z-index: 51;
+      opacity: 0;
+      transition: opacity 300ms ease-out, transform 300ms ease-out;
+      width: 90%;
+      max-width: 500px;
+    `;
 
+    // Updated modal structure:
+    // - The header uses two columns: one for the title (2/3 width) and one for the share button (1/3).
+    // - The share dropdown is positioned absolutely relative to its container,
+    //   aligning its right edge with the button and showing directly below it.
     modalContent.innerHTML = `
-      <div class="flex items-center justify-between p-3 border-b border-neutral bg-gray-50">
-          <h3 class="text-lg font-medium text-gray-900">Vista previa de la oportunidad</h3>
-          <button class="text-neutral-700 hover:text-neutral-900 px-3 py-1 transition-colors" 
-                  onclick="document.getElementById('${modalId}-overlay').remove(); document.getElementById('${modalId}').remove(); document.body.classList.remove('modal-open');">
-              ✕
-          </button>
-      </div>
-      <div class="p-6">
-          <div class="space-y-4">
-              <div>
-                  <p class="text-sm text-gray-500">Nombre</p>
-                  <p class="mt-1 text-sm text-gray-900">${name || "No disponible"}</p>
-              </div>
-              <div>
-                  <p class="text-sm text-gray-500">País</p>
-                  <p class="mt-1 text-sm text-gray-900">${country || "No disponible"}</p>
-              </div>
-              ${ summary ? `
-              <div>
-                  <p class="text-sm text-gray-500">Resumen</p>
-                  <div class="mt-2 p-4 bg-gray-50 rounded-lg">
-                      <p class="text-sm text-gray-700 whitespace-pre-line">${summary}</p>
-                  </div>
-              </div>` : "" }
-              <div>
-                  <p class="text-sm text-gray-500">URL</p>
-                  <a href="${url}" class="mt-1 text-sm text-blue-600 hover:text-blue-800 break-all" target="_blank">
-                      ${url}
-                  </a>
-              </div>
-              <div class="mt-6 flex justify-end space-x-3">
-                  <button onclick="document.getElementById('${modalId}-overlay').remove(); document.getElementById('${modalId}').remove(); document.body.classList.remove('modal-open');" 
-                          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
-                      Cerrar
-                  </button>
-                  <button hx-post="/save_from_modal"
-                          hx-vals='{"page_id": "${encodeURIComponent(id)}"}'
-                          hx-target="#notification"
-                          hx-swap="innerHTML"
-                          hx-trigger="click"
-                          class="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md">
-                      Guardar
-                  </button>
-                  <a href="${url}" target="_blank" 
-                     class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">
-                      Ir al sitio web
-                  </a>
-              </div>
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <!-- Header: Title & Share Button -->
+        <div class="p-4 border-b flex items-start">
+          <div class="w-2/3">
+            <h3 class="text-xl font-semibold text-gray-800 break-words">
+              ${escapeHTML(name)}
+            </h3>
           </div>
-      </div>`;
+          <div class="w-1/3 relative flex justify-end">
+            <button type="button" class="share-toggle-btn inline-flex items-center px-3 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
+                <span>Compartir</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+            <div class="share-dropdown hidden absolute right-0 top-full mt-1 w-40 bg-white border rounded-md shadow-lg z-50">
+                <button class="share-option w-full text-left px-4 py-2 hover:bg-gray-100" data-action="copy-url">
+                  Copiar URL
+                </button>
+                <a href="#" class="share-option block px-4 py-2 hover:bg-gray-100" data-action="whatsapp">
+                  WhatsApp
+                </a>
+                <a href="#" class="share-option block px-4 py-2 hover:bg-gray-100" data-action="linkedin">
+                  LinkedIn
+                </a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Body: Opportunity Description -->
+        <div class="p-4">
+          <p class="text-gray-700">
+            ${escapeHTML(summary) || 'Descripción no disponible'}
+          </p>
+        </div>
+        
+        <!-- Footer: Action Buttons -->
+        <div class="p-4 border-t flex flex-col sm:flex-row justify-end gap-2">
+          <button hx-post="/save_from_modal" 
+                  hx-vals='{"page_id": "${id}"}'
+                  hx-target="#notification"
+                  class="bg-green-600 hover:bg-green-700 text-white rounded px-4 py-2">
+            Guardar
+          </button>
+          <a href="${url}" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white text-center rounded px-4 py-2">
+            Sitio web
+          </a>
+        </div>
+      </div>
+    `;
 
-    // Append to the document
+    // Append overlay and modalContent to document body
     document.body.appendChild(overlay);
     document.body.appendChild(modalContent);
     document.body.classList.add("modal-open");
 
-    // Trigger animations after mounting (using requestAnimationFrame to ensure CSS changes take effect)
+    // Animate the appearance
     requestAnimationFrame(() => {
         overlay.style.opacity = "1";
         modalContent.style.opacity = "1";
         modalContent.style.transform = "translate(-50%, -50%)";
     });
 
-    // Animate close on clicking the overlay
+    // Close modal when clicking the overlay
     overlay.addEventListener("click", function() {
         overlay.style.opacity = "0";
         modalContent.style.opacity = "0";
@@ -247,7 +253,7 @@ const month_mapping = {
         }, 300);
     });
 
-    // Animate close on pressing the Escape key
+    // Close modal with Escape key
     function escListener(event) {
         if (event.key === "Escape") {
             overlay.style.opacity = "0";
@@ -262,8 +268,50 @@ const month_mapping = {
     }
     document.addEventListener("keydown", escListener);
 
-    // After adding modal to DOM, initialize HTMX
+    // Process any HTMX bindings if needed
     setTimeout(() => htmx.process(modalContent), 50);
+
+    // Set up share dropdown toggle and actions
+    const shareToggle = modalContent.querySelector('.share-toggle-btn');
+    const shareDropdown = modalContent.querySelector('.share-dropdown');
+
+    if (shareToggle && shareDropdown) {
+      shareToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        shareDropdown.classList.toggle('hidden');
+      });
+    }
+
+    modalContent.querySelectorAll('.share-option').forEach(option => {
+      option.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const action = option.dataset.action;
+        const encodedUrl = encodeURIComponent(url);
+        switch(action) {
+          case 'copy-url':
+            navigator.clipboard.writeText(url)
+              .then(() => showAlert('URL copiada', 'success'))
+              .catch(() => showAlert('Error al copiar URL', 'error'));
+            break;
+          case 'whatsapp':
+            window.open(`https://api.whatsapp.com/send?text=${encodedUrl}`, '_blank');
+            break;
+          case 'linkedin':
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`, '_blank', 'width=550,height=400');
+            break;
+        }
+        shareDropdown.classList.add('hidden');
+      });
+    });
+
+    // Close share dropdown if clicking outside
+    document.addEventListener('click', function(e) {
+      if (!shareToggle.contains(e.target) && !shareDropdown.contains(e.target)) {
+        shareDropdown.classList.add('hidden');
+      }
+    });
   };
 
   // ============================================================================
