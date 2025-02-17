@@ -1,11 +1,79 @@
 {% extends "layout.html" %}
 
 {% block body %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold">OPORTUNIDADES GRATIS [EN CONSTRUCCIÓN]!!!
-        <h2 class="text-xl mb-6">Toda la info sobre nuestro proyecto <a href="https://github.com/Atlanticx-Datos/100_Oportunidades"
-                class="underline">está en GitHub</a></h2>
-    </h1>
+<div class="container max-w-[1292px] mx-auto px-8">
+    <!-- Header Section -->
+    <header class="py-16 flex flex-col items-center text-center">
+        <h1 class="text-5xl font-bold mb-4">Descubrí tu próxima oportunidad</h1>
+        <p class="text-xl text-gray-600 mb-8 max-w-2xl">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        
+        <!-- Search Section -->
+        <div class="relative w-full max-w-2xl">
+            <input type="text" 
+                   id="open-search" 
+                   placeholder="Buscar (ej: pintura, españa o beca, alemania)..." 
+                   class="w-full p-4 pr-24 border rounded-lg shadow-sm"
+                   oninput="performSearch()">
+
+            <!-- Filter trigger button -->
+            <button id="filter-dropdown-trigger"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+                </svg>
+            </button>
+
+            <!-- Structured filters dropdown -->
+            <div id="structured-filters"
+                class="hidden absolute z-50 mt-1 w-80 right-0 bg-white rounded-lg shadow-lg border border-gray-200 p-3 text-left"
+                style="top: 100%; /* Ensure dropdown appears below search bar */">
+                <!-- Categories Section -->
+                <div class="mb-4">
+                    <h3 class="text-sm font-semibold mb-2">Categorías</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                            data-category="beca">Beca</button>
+                        <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                            data-category="residencia">Residencia</button>
+                        <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                            data-category="premio">Premio</button>
+                        <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                            data-category="convocatoria">Convocatoria</button>
+                        <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                            data-category="oportunidad">Oportunidad</button>
+                        <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                            data-category="fondos">Fondos</button>
+                        <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                            data-category="apoyo">Apoyo</button>
+                    </div>
+                </div>
+
+                <!-- Country Dropdown -->
+                <div class="mb-4">
+                    <h3 class="text-sm font-semibold mb-2">País</h3>
+                    <select id="country-filter" class="w-full p-2 border rounded-lg bg-white">
+                        <option value="">Todos los países</option>
+                        <!-- Dynamically populated -->
+                    </select>
+                </div>
+
+                <!-- Month Dropdown -->
+                <div class="mb-4">
+                    <h3 class="text-sm font-semibold mb-2">Mes de cierre</h3>
+                    <select id="month-filter" class="w-full p-2 border rounded-lg bg-white">
+                        <option value="">Todos los meses</option>
+                        <!-- Dynamically populated -->
+                    </select>
+                </div>
+
+                <!-- Search Button -->
+                <button id="apply-filters"
+                    class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    Buscar
+                </button>
+            </div>
+        </div>
+    </header>
 
     <!-- Data container with proper escaping -->
     <div id="prefiltered-data" data-results="{{ prefiltered_results|tojson|forceescape }}"
@@ -29,111 +97,28 @@
         </div>
     </div>
 
-    <!-- Replace the current search input div with this -->
-    <div class="mt-4 mb-6 relative">
-        <div class="relative flex items-center">
-            <input type="text" id="open-search" placeholder="Buscar (ej: pintura, españa o beca, alemania)..."
-                class="w-full p-2 pr-24 border rounded-lg" oninput="performSearch()">
+    <!-- Results Section -->
+    <div class="mt-4 mb-6">
+        <!-- Results Counter -->
+        <div class="text-sm text-gray-600 my-4" id="results-counter"></div>
 
-            <!-- Filter trigger button -->
-            <button id="filter-dropdown-trigger"
-                class="absolute right-10 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600"
-                aria-label="Open filters">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd"
-                        d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
-                        clip-rule="evenodd" />
-                </svg>
-            </button>
-
-            <!-- Clear search button -->
-            <button id="clear-search"
-                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                onclick="clearTestSearch()" style="display: none;">
-                ✕
-            </button>
-        </div>
-
-        <!-- New structured filters dropdown -->
-        <div id="structured-filters"
-            class="hidden absolute z-50 mt-1 w-80 right-0 bg-white rounded-lg shadow-lg border border-gray-200 p-3">
-            <!-- Categories Section -->
-            <div class="mb-4">
-                <h3 class="text-sm font-semibold mb-2">Categorías</h3>
-                <div class="grid grid-cols-2 gap-2">
-                    <button
-                        class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                        data-category="beca">
-                        Beca
-                    </button>
-                    <button
-                        class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                        data-category="residencia">
-                        Residencia
-                    </button>
-                    <button
-                        class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                        data-category="premio">
-                        Premio
-                    </button>
-                    <button
-                        class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                        data-category="convocatoria">
-                        Convocatoria
-                    </button>
-                    <button
-                        class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                        data-category="oportunidad">
-                        Oportunidad
-                    </button>
-                    <button
-                        class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                        data-category="fondos">
-                        Fondos
-                    </button>
-                    <button
-                        class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                        data-category="apoyo">
-                        Apoyo
-                    </button>
-                </div>
-            </div>
-
-            <!-- Country Dropdown -->
-            <div class="mb-4">
-                <h3 class="text-sm font-semibold mb-2">País</h3>
-                <select id="country-filter" class="w-full p-2 border rounded-lg bg-white">
-                    <option value="">Todos los países</option>
-                    <!-- Dynamically populated -->
-                </select>
-            </div>
-
-            <!-- Month Dropdown -->
-            <div class="mb-4">
-                <h3 class="text-sm font-semibold mb-2">Mes de cierre</h3>
-                <select id="month-filter" class="w-full p-2 border rounded-lg bg-white">
-                    <option value="">Todos los meses</option>
-                    <!-- Dynamically populated -->
-                </select>
-            </div>
-
-            <!-- Search Button -->
-            <button id="apply-filters"
-                class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                Buscar
-            </button>
-        </div>
+        <!-- Results Grid -->
+        <div id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </div>
-
-    <!-- Results -->
-    <div class="text-sm text-gray-600 my-4" id="results-counter"></div>
-    <div id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 </div>
 
 <!-- Update the script section -->
 <script>
-    // Add HTML escaping utility at the top of the script
+    // Global variables needed by site.js
+    let activeFilters = {
+        categories: new Set(),
+        country: '',
+        month: '',
+        discipline: 'todos'
+    };
+
     function escapeHTML(str) {
+        if (!str) return '';
         return str.replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
@@ -141,66 +126,175 @@
             .replace(/'/g, "&#039;");
     }
 
-    function clearTestSearch() {
-        const searchInput = document.getElementById('open-search');
-        const clearButton = document.getElementById('clear-search');
-        searchInput.value = '';
-        clearButton.style.display = 'none';
-        performSearch();
+    function performSearch() {
+        const searchInput = document.getElementById('open-search').value;
+        applyFilters(searchInput);
     }
 
-    function performSearch() {
-        const searchInput = document.getElementById('open-search');
-        const clearButton = document.getElementById('clear-search');
-        const searchValue = searchInput.value.trim();
-
-        // Show/hide clear button based on whether there's text
-        clearButton.style.display = searchValue ? 'block' : 'none';
-
+    document.addEventListener('DOMContentLoaded', function() {
         const allPages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
-
-        if (!searchValue) {
-            updateResults(allPages);
-            return;
-        }
-
-        // Split search terms by comma and trim each term
-        const searchTerms = searchValue.split(',').map(term => term.trim().toLowerCase());
-
-        const filtered = allPages.filter(page => {
-            // If we have multiple search terms, all must match
-            return searchTerms.every(term => {
-                // Normalize all relevant fields for searching
-                const normalizedPage = {
-                    nombre: normalizeText(page.nombre || ''),
-                    og_resumida: normalizeText(page.og_resumida || ''),
-                    entidad: normalizeText(page.entidad || ''),
-                    categoria: normalizeText(page.categoria || ''),
-                    disciplina: normalizeText(page.disciplina || ''),
-                    pais: normalizeText(page.pais || '')
-                };
-
-                // Check if the term matches any field
-                const allFieldsText = Object.values(normalizedPage).join(' ');
-
-                // Special handling for common categories
-                if (term === 'beca' && normalizedPage.categoria.includes('beca')) return true;
-                if (term === 'premio' && normalizedPage.categoria.includes('premio')) return true;
-                if (term === 'residencia' && normalizedPage.categoria.includes('residencia')) return true;
-
-                // Check if the term exactly matches país or disciplina
-                if (term === normalizedPage.pais) return true;
-                if (term === normalizedPage.disciplina) return true;
-
-                // If no special match, look for the term in all fields
-                return allFieldsText.includes(normalizeText(term));
+        initializeDropdowns(allPages);
+        
+        // Setup event listeners
+        document.getElementById('open-search').addEventListener('input', performSearch);
+        
+        // Setup category filter buttons
+        document.querySelectorAll('.category-filter-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();  // Prevent event bubbling
+                const category = this.dataset.category;
+                console.log('Category clicked:', category);
+                
+                // Toggle category in activeFilters
+                if (activeFilters.categories.has(category)) {
+                    activeFilters.categories.delete(category);
+                    this.classList.remove('border-blue-500', 'bg-blue-50');
+                } else {
+                    activeFilters.categories.add(category);
+                    this.classList.add('border-blue-500', 'bg-blue-50');
+                }
+                
+                // Store categories in a way that persists
+                window.selectedCategories = Array.from(activeFilters.categories);
+                console.log('Selected categories:', window.selectedCategories);
             });
         });
 
+        // Setup discipline filter buttons
+        document.querySelectorAll('[data-discipline-filter]').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('[data-discipline-filter]').forEach(btn => {
+                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.add('border-gray-300', 'text-gray-700');
+                });
+                
+                this.classList.remove('border-gray-300', 'text-gray-700');
+                this.classList.add('bg-blue-600', 'text-white');
+                activeFilters.discipline = this.dataset.disciplineFilter;
+                applyFilters();
+            });
+        });
+
+        // Setup apply filters button
+        const applyFiltersBtn = document.getElementById('apply-filters');
+        if (applyFiltersBtn) {
+            applyFiltersBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Get current filter values
+                activeFilters.country = document.getElementById('country-filter').value;
+                activeFilters.month = document.getElementById('month-filter').value;
+                
+                // Ensure we're using the stored categories
+                if (window.selectedCategories) {
+                    activeFilters.categories = new Set(window.selectedCategories);
+                }
+                
+                console.log('Applying combined filters:', {
+                    categories: Array.from(activeFilters.categories),
+                    country: activeFilters.country,
+                    month: activeFilters.month
+                });
+                
+                applyFilters();
+                document.getElementById('structured-filters').classList.add('hidden');
+            });
+        }
+
+        // Initial results load
+        updateResults(allPages);
+    });
+
+    function applyFilters(searchInput = document.getElementById('open-search').value) {
+        // Restore categories from our stored selection
+        if (window.selectedCategories) {
+            activeFilters.categories = new Set(window.selectedCategories);
+        }
+
+        const allPages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
+        
+        const filtered = allPages.filter(page => {
+            // For debugging
+            let filterResults = {
+                searchMatch: true,
+                disciplineMatch: true,
+                countryMatch: true,
+                monthMatch: true,
+                categoryMatch: true
+            };
+
+            // Apply text search filter
+            if (searchInput) {
+                filterResults.searchMatch = matchesSearchTerms(page, searchInput);
+                if (!filterResults.searchMatch) return false;
+            }
+
+            // Apply discipline filter
+            if (activeFilters.discipline !== 'todos') {
+                filterResults.disciplineMatch = normalizeText(page.disciplina) === normalizeText(activeFilters.discipline);
+                if (!filterResults.disciplineMatch) return false;
+            }
+
+            // Apply country filter
+            if (activeFilters.country) {
+                filterResults.countryMatch = normalizeText(page.país) === normalizeText(activeFilters.country);
+                if (!filterResults.countryMatch) return false;
+            }
+
+            // Apply month filter
+            if (activeFilters.month) {
+                const monthToFind = String(activeFilters.month).padStart(2, '0');
+                const pageMonth = page.fecha_de_cierre ? page.fecha_de_cierre.split('-')[1] : '';
+                
+                console.log('Month matching:', {
+                    page: page.nombre,
+                    monthToFind,
+                    fecha_de_cierre: page.fecha_de_cierre,
+                    pageMonth,
+                    matches: pageMonth === monthToFind
+                });
+                
+                filterResults.monthMatch = pageMonth === monthToFind;
+                if (!filterResults.monthMatch) return false;
+            }
+
+            // Apply category filters
+            if (activeFilters.categories.size > 0) {
+                const pageCategory = normalizeText(page.categoria);
+                filterResults.categoryMatch = Array.from(activeFilters.categories).some(category => {
+                    const normalizedCategory = normalizeText(category);
+                    return pageCategory.startsWith(normalizedCategory) || 
+                           pageCategory.startsWith(normalizedCategory + 's');
+                });
+                if (!filterResults.categoryMatch) return false;
+            }
+
+            return true;
+        });
+
+        console.log('Filtered results:', filtered.length);
         updateResults(filtered);
     }
 
+    function matchesSearchTerms(page, searchInput) {
+        const searchTerms = searchInput.split(',').map(term => normalizeText(term.trim()));
+        return searchTerms.every(term => {
+            const pageText = normalizeText([
+                page.nombre,
+                page.og_resumida,
+                page.entidad,
+                page.categoria,
+                page.disciplina,
+                page.pais
+            ].join(' '));
+            return pageText.includes(term);
+        });
+    }
+
     function normalizeText(text) {
+        if (!text) return '';
         return text.normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "")
             .toLowerCase()
@@ -211,39 +305,70 @@
         const container = document.getElementById('results-container');
         const counter = document.getElementById('results-counter');
 
-        if (results.length === 0) {
+        if (!results.length) {
             container.innerHTML = '<p>No se encontraron resultados.</p>';
             counter.textContent = '0 resultados encontrados';
             return;
         }
 
         container.innerHTML = results.map(page => `
-        <div class="opportunity-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
-            <h3 class="font-bold text-lg mb-2">${escapeHTML(page.nombre || 'Sin nombre')}</h3>
-            <p class="text-sm text-gray-600 mb-2">${escapeHTML(page.og_resumida || '')}</p>
-            <div class="flex justify-between items-center">
-                <span class="text-sm text-gray-500">${escapeHTML(page.disciplina || '')}</span>
-                <button 
-                    class="preview-btn text-blue-600 hover:underline text-sm"
-                    data-url="${escapeHTML(page.url || '')}"
-                    data-name="${escapeHTML(page.nombre || '')}"
-                    data-country="${escapeHTML(page.pais || '')}"
-                    data-summary="${escapeHTML(page.og_resumida || '')}"
-                    data-id="${escapeHTML(page.id || '')}"
-                >
-                    Ver más
-                </button>
+            <div class="opportunity-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+                <h3 class="font-bold text-lg mb-2">${escapeHTML(page.nombre || 'Sin nombre')}</h3>
+                <p class="text-sm text-gray-600 mb-2">${escapeHTML(page.og_resumida || '')}</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-500">${escapeHTML(page.disciplina || '')}</span>
+                    <button 
+                        class="preview-btn text-blue-600 hover:underline text-sm"
+                        data-url="${escapeHTML(page.url || '')}"
+                        data-name="${escapeHTML(page.nombre || '')}"
+                        data-country="${escapeHTML(page.pais || '')}"
+                        data-summary="${escapeHTML(page.og_resumida || '')}"
+                        data-id="${escapeHTML(page.id || '')}"
+                    >
+                        Ver más
+                    </button>
+                </div>
             </div>
-        </div>
         `).join('');
 
         counter.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''}`;
     }
 
-    // Initialize with all results on load
-    document.addEventListener('DOMContentLoaded', function () {
-        const initialPages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
-        updateResults(initialPages);
-    });
+    function initializeDropdowns(pages) {
+        // Initialize country dropdown
+        const countryFilter = document.getElementById('country-filter');
+        const countries = [...new Set(pages.map(page => page.pais).filter(Boolean))].sort();
+        
+        countries.forEach(country => {
+            const option = document.createElement('option');
+            option.value = country;
+            option.textContent = country;
+            countryFilter.appendChild(option);
+        });
+
+        // Initialize month dropdown
+        const monthFilter = document.getElementById('month-filter');
+        const months = [
+            { value: '1', label: 'Enero' },
+            { value: '2', label: 'Febrero' },
+            { value: '3', label: 'Marzo' },
+            { value: '4', label: 'Abril' },
+            { value: '5', label: 'Mayo' },
+            { value: '6', label: 'Junio' },
+            { value: '7', label: 'Julio' },
+            { value: '8', label: 'Agosto' },
+            { value: '9', label: 'Septiembre' },
+            { value: '10', label: 'Octubre' },
+            { value: '11', label: 'Noviembre' },
+            { value: '12', label: 'Diciembre' }
+        ];
+
+        months.forEach(month => {
+            const option = document.createElement('option');
+            option.value = month.value;
+            option.textContent = month.label;
+            monthFilter.appendChild(option);
+        });
+    }
 </script>
 {% endblock %}

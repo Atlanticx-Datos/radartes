@@ -1,41 +1,58 @@
-<nav class="flex {% if request.endpoint == 'index' %}justify-end{% else %}justify-between{% endif %} items-center h-[34px] md:h-16 pt-6 md:pt-8 z-50 md:px-8">
-    <!-- Logo Section - only show on non-index routes -->
-    {% if request.endpoint != 'index' %}
-        <div class="flex items-center md:ml-2">
-            <span class="text-2xl md:text-3xl font-bold tracking-tight text-neutral-700 flex items-center gap-[2px]">
-                <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-neutral-700"></span>
-                <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-neutral-400"></span>
-                <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-red-500"></span>
-                <span class="font-black ml-1">OPORTUNIDADES</span>
-            </span>
+<nav class="flex justify-between items-center h-16 max-w-[1292px] mx-auto px-8">
+    <!-- Logo Section -->
+    <div class="flex items-center">
+        <span class="text-2xl font-bold tracking-tight text-neutral-700 flex items-center gap-[2px]">
+            <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-neutral-700"></span>
+            <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-neutral-400"></span>
+            <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-red-500"></span>
+            <span class="font-black ml-1">OPORTUNIDADES</span>
+        </span>
+    </div>
+
+    <!-- Right Section: Avatar Dropdown + CTA -->
+    <div class="flex items-center gap-4">
+        <!-- Avatar Dropdown (Always visible) -->
+        <div class="relative">
+            <button id="user-menu-button" class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+
+            <!-- Dropdown Panel -->
+            <div id="user-menu" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg">
+                {% if session.get('user') %}
+                    <div class="p-4 border-b">
+                        <p class="font-semibold">{{ session.user.name }}</p>
+                        <p class="text-sm text-gray-600">{{ session.user.email }}</p>
+                        <p class="text-xs text-gray-500 mt-1">{{ session.user.user_type }}</p>
+                    </div>
+                    <div class="p-2">
+                        <a href="{{ url_for('mi_espacio') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg">
+                            Mi cuenta
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="p-4 text-center text-gray-500">
+                        <p>Inicia sesión para acceder a tu cuenta</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
-    {% endif %}
 
-    {# Determine if a user is logged in #}
-    {% if session %}
-        {% set logged_in = session.get('user') is not none %}
-    {% else %}
-        {% set logged_in = false %}
-    {% endif %}
-
-    <!-- Navigation Buttons -->
-    <div class="flex items-center space-x-4">
-        <a href="{{ url_for('mi_espacio') }}"
-           onclick="layoutshowSpinner(event)"
-           class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded">
-            Mi Espacio
-        </a>
-        {% if logged_in %}
-            <a href="{{ url_for('logout') }}"
-               onclick="layoutshowSpinner(event)"
-               class="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded">
-                Cerrar Sesión
+        <!-- Auth Button -->
+        {% if session.get('user') %}
+            <a href="{{ url_for('logout') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                Cerrar sesión
             </a>
         {% else %}
-            <a href="{{ url_for('login') }}"
-               onclick="layoutshowSpinner(event)"
-               class="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded">
-                Entrar/Registrarse
+            <a href="{{ url_for('login') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                Iniciar sesión
             </a>
         {% endif %}
     </div>
