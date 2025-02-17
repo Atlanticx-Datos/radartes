@@ -9,19 +9,30 @@
         
         <!-- Search Section -->
         <div class="relative w-full max-w-2xl">
-            <input type="text" 
-                   id="open-search" 
-                   placeholder="Buscar (ej: pintura, españa o beca, alemania)..." 
-                   class="w-full p-4 pr-24 border rounded-lg shadow-sm"
-                   oninput="performSearch()">
+            <div class="relative flex items-center">
+                <input type="text" 
+                       id="open-search" 
+                       placeholder="Buscar (ej: pintura, españa o beca, alemania)..." 
+                       class="w-full p-4 pr-28 border rounded-lg shadow-sm">
 
-            <!-- Filter trigger button -->
-            <button id="filter-dropdown-trigger"
-                    class="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
-                </svg>
-            </button>
+                <!-- Filter trigger button (now first) -->
+                <button id="filter-dropdown-trigger"
+                        class="absolute right-16 p-2 text-gray-400 hover:text-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+
+                <!-- Clear all filters button (now second) -->
+                <button type="button"
+                        id="clear-search"
+                        class="absolute right-4 p-2 text-gray-400 hover:text-gray-600"
+                        onclick="clearAllFilters();">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+            </div>
 
             <!-- Structured filters dropdown -->
             <div id="structured-filters"
@@ -117,6 +128,69 @@
         discipline: 'todos'
     };
 
+    // Ensure these functions are globally available
+    window.performSearch = function() {
+        const searchInput = document.getElementById('open-search');
+        const clearButton = document.getElementById('clear-search');
+        
+        // Debug
+        console.log('performSearch called', {
+            inputValue: searchInput.value,
+            clearButtonExists: !!clearButton
+        });
+        
+        // Show/hide clear button based on input content
+        if (searchInput.value.length > 0) {
+            clearButton.style.display = 'block';
+        } else {
+            clearButton.style.display = 'none';
+        }
+
+        const searchInputValue = searchInput.value;
+        applyFilters(searchInputValue);
+    };
+
+    window.clearSearch = function() {
+        const searchInput = document.getElementById('open-search');
+        const clearButton = document.getElementById('clear-search');
+        
+        // Debug
+        console.log('clearSearch called');
+        
+        searchInput.value = '';
+        clearButton.style.display = 'none';
+        performSearch(); // Trigger search to reset results
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Debug: Initial check
+        console.log('DOM Content Loaded');
+        
+        const searchInput = document.getElementById('open-search');
+        const clearButton = document.getElementById('clear-search');
+        
+        // Debug: Element check
+        console.log('Elements found:', {
+            searchInput: !!searchInput,
+            clearButton: !!clearButton
+        });
+        
+        // Remove any existing listeners to prevent conflicts
+        const newSearchInput = searchInput.cloneNode(true);
+        searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+        
+        // Add our listeners
+        newSearchInput.addEventListener('input', window.performSearch);
+        
+        // Initial check for existing input
+        if (newSearchInput.value.length > 0) {
+            clearButton.style.display = 'block';
+        }
+        
+        // Debug: Setup complete
+        console.log('Search setup complete');
+    });
+
     function escapeHTML(str) {
         if (!str) return '';
         return str.replace(/&/g, "&amp;")
@@ -127,8 +201,26 @@
     }
 
     function performSearch() {
-        const searchInput = document.getElementById('open-search').value;
-        applyFilters(searchInput);
+        const searchInput = document.getElementById('open-search');
+        const clearButton = document.getElementById('clear-search');
+        
+        // Show/hide clear button based on input content
+        if (searchInput.value.length > 0) {
+            clearButton.style.display = 'block';
+        } else {
+            clearButton.style.display = 'none';
+        }
+
+        const searchInputValue = searchInput.value;
+        applyFilters(searchInputValue);
+    }
+
+    function clearSearch() {
+        const searchInput = document.getElementById('open-search');
+        const clearButton = document.getElementById('clear-search');
+        searchInput.value = '';
+        clearButton.style.display = 'none';
+        performSearch(); // Trigger search to reset results
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -137,6 +229,17 @@
         
         // Setup event listeners
         document.getElementById('open-search').addEventListener('input', performSearch);
+        
+        // Debug: Check if elements exist
+        console.log('Search input exists:', !!document.getElementById('open-search'));
+        console.log('Clear button exists:', !!document.getElementById('clear-search'));
+        
+        // Debug: Check initial state
+        const searchInput = document.getElementById('open-search');
+        console.log('Initial search value:', searchInput.value);
+        
+        // Force initial check of search input
+        performSearch();
         
         // Setup category filter buttons
         document.querySelectorAll('.category-filter-btn').forEach(button => {
@@ -202,9 +305,6 @@
                 document.getElementById('structured-filters').classList.add('hidden');
             });
         }
-
-        // Initial results load
-        updateResults(allPages);
     });
 
     function applyFilters(searchInput = document.getElementById('open-search').value) {
@@ -370,5 +470,56 @@
             monthFilter.appendChild(option);
         });
     }
+
+    // Function to clear all filters
+    function clearAllFilters() {
+        // Clear search input
+        document.getElementById('open-search').value = '';
+        
+        // Clear category filters
+        activeFilters.categories.clear();
+        window.selectedCategories = [];
+        document.querySelectorAll('.category-filter-btn').forEach(btn => {
+            btn.classList.remove('border-blue-500', 'bg-blue-50');
+        });
+        
+        // Clear country filter
+        document.getElementById('country-filter').value = '';
+        activeFilters.country = '';
+        
+        // Clear month filter
+        document.getElementById('month-filter').value = '';
+        activeFilters.month = '';
+        
+        // Reset discipline to 'todos'
+        activeFilters.discipline = 'todos';
+        document.querySelectorAll('[data-discipline-filter]').forEach(btn => {
+            btn.classList.remove('bg-blue-600', 'text-white');
+            btn.classList.add('border-gray-300', 'text-gray-700');
+            if (btn.dataset.disciplineFilter === 'todos') {
+                btn.classList.remove('border-gray-300', 'text-gray-700');
+                btn.classList.add('bg-blue-600', 'text-white');
+            }
+        });
+        
+        // Trigger search to update results
+        performSearch();
+        
+        // Close the filters dropdown if it's open
+        document.getElementById('structured-filters').classList.add('hidden');
+    }
+
+    // Ensure the clear button stays visible
+    function ensureClearButtonVisible() {
+        const clearButton = document.getElementById('clear-search');
+        if (clearButton) {
+            clearButton.style.display = 'block';
+            setTimeout(ensureClearButtonVisible, 100);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        ensureClearButtonVisible();
+    });
 </script>
 {% endblock %}
