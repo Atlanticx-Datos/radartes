@@ -1737,66 +1737,7 @@ def normalize_discipline(text):
     # Remove special characters and extra spaces
     return re.sub(r'[^a-z0-9\s]', '', text.lower()).strip()
 
-@app.route("/test-filters")
-def test_filters():
-    """Test page for client-side discipline filtering"""
-    try:
-        cached_content = get_cached_database_content()
-        if not cached_content:
-            return render_template("error.html", 
-                                message="No cached content available",
-                                total_opportunities=0,
-                                DISCIPLINE_GROUPS=DISCIPLINE_GROUPS,
-                                og_data=get_default_og_data())
 
-        pages = cached_content.get('pages', [])
-        
-        # Pre-filter pages for each main discipline
-        prefiltered_results = {}
-        for main_discipline in DISCIPLINE_GROUPS.keys():
-            scored_pages = []
-            for page in pages:
-                score = calculate_relevance_score(page, [main_discipline], DISCIPLINE_GROUPS)
-                if score > 0:
-                    scored_pages.append((score, page))
-            
-            prefiltered_results[main_discipline] = [
-                page for score, page in sorted(
-                    scored_pages,
-                    key=lambda x: x[0],
-                    reverse=True
-                )
-            ]
-
-        month_mapping = {
-            "enero": 1, "febrero": 2, "marzo": 3, "abril": 4,
-            "mayo": 5, "junio": 6, "julio": 7, "agosto": 8,
-            "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
-        }
-        
-        # Debug logging
-        app.logger.info(f"Prefiltered results keys: {list(prefiltered_results.keys())}")
-        app.logger.info(f"Sample discipline data: {list(prefiltered_results.values())[0][0] if prefiltered_results else 'None'}")
-        app.logger.info(f"Total pages passed to template: {len(pages)}")
-        
-        return render_template(
-            "test_filters.html",
-            prefiltered_results=prefiltered_results,
-            discipline_groups=DISCIPLINE_GROUPS,
-            month_mapping=month_mapping,
-            pages=pages,
-            total_opportunities=len(pages),
-            DISCIPLINE_GROUPS=DISCIPLINE_GROUPS,
-            og_data=get_default_og_data()
-        )
-        
-    except Exception as e:
-        app.logger.error(f"Error in test-filters: {str(e)}")
-        return render_template("error.html", 
-                             message=str(e),
-                             total_opportunities=0,
-                             DISCIPLINE_GROUPS=DISCIPLINE_GROUPS,
-                             og_data=get_default_og_data())
 
 def get_saved_opportunities(user_id):
     """Get saved opportunities with specific fields for display"""

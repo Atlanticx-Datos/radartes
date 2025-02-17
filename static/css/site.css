@@ -219,3 +219,10 @@ nav .dropdown-content,
     top: 1rem;
     right: 1rem;
 }
+
+html {
+    /* Always show the vertical scrollbar, even if it's disabled */
+    overflow-y: scroll;
+}
+
+

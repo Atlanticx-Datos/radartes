@@ -2030,17 +2030,11 @@ details.collapse summary::-webkit-details-marker {
 .flex-wrap {
   flex-wrap: wrap;
 }
-.\!items-start {
-  align-items: flex-start !important;
-}
 .items-start {
   align-items: flex-start;
 }
 .items-center {
   align-items: center;
-}
-.\!justify-start {
-  justify-content: flex-start !important;
 }
 .justify-start {
   justify-content: flex-start;
@@ -2758,9 +2752,6 @@ details.collapse summary::-webkit-details-marker {
 @media (min-width: 640px) {
   .sm\:h-screen {
     height: 100vh;
-  }
-  .sm\:items-start {
-    align-items: flex-start;
   }
 }
 @media (min-width: 768px) {

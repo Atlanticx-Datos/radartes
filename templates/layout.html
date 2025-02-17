@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
         {% if request.path == '/database' %}
-            Oportunidades: {{ total_opportunities }} en total
+        Oportunidades: {{ total_opportunities }} en total
         {% elif request.path == '/saved_opportunities' %}
-            Oportunidades Guardadas
+        Oportunidades Guardadas
         {% else %}
-            {{ og_data.title if og_data else "100 + Oportunidades" }}
+        {{ og_data.title if og_data else "100 + Oportunidades" }}
         {% endif %}
     </title>
     <meta property="og:title" content="
@@ -85,7 +85,9 @@
     <style>
         /* Keep only animation since it's JS-dependent */
         @keyframes fadeIn {
-            to { opacity: 1; }
+            to {
+                opacity: 1;
+            }
         }
     </style>
 
@@ -99,122 +101,41 @@
     <link rel="shortcut icon" href="/static/public/favicon.ico" />
 </head>
 
-<body class="flex justify-center max-sm:items-start bg-zinc-100 min-h-screen
-             {% if request.endpoint == 'list_saved_opportunities' %}!items-start{% endif %}"
-      data-route="{{ request.endpoint }}">
+<body class="flex justify-center max-sm:items-start bg-zinc-100 min-h-screen data-route=" {{ request.endpoint }}">
+
     <!-- Alert container -->
     <div id="alert-container" hx-preserve="true"></div>
 
     <!-- Server notification target (hidden) -->
-    <div 
-        id="notification" 
+    <div id="notification"
         class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999] bg-white p-4 rounded shadow-lg"
         hx-preserve="true">
     </div>
 
     <!-- Global spinner -->
-    <div id="layout-spinner" 
-         class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] h-8 w-8 hidden"
-         hx-preserve="true">
-        <img src="{{ url_for('static', filename='public/spinner.gif') }}?v=1.0" 
-             alt="Loading..." 
-             class="h-full w-full object-contain">
+    <div id="layout-spinner" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] h-8 w-8 hidden"
+        hx-preserve="true">
+        <img src="{{ url_for('static', filename='public/spinner.gif') }}?v=1.0" alt="Loading..."
+            class="h-full w-full object-contain">
     </div>
 
-    <!-- New dedicated spinner for saved opportunities -->
-    {% if request.endpoint == 'list_saved_opportunities' %}
-    <div id="saved-spinner" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] h-8 w-8 hidden">
-        <img src="{{ url_for('static', filename='public/spinner.gif') }}?v=1.0" 
-             alt="Loading..." 
-             class="h-full w-full object-contain">
-    </div>
-    {% endif %}
-    <main class="w-full bg-zinc-100 flex flex-col
-                 px-4
-                 max-sm:rounded-lg
-                 {% if request.endpoint == 'list_saved_opportunities' %}!justify-start{% endif %}">
-        <!-- Navigation - show on all pages -->
+    <main class="w-full bg-zinc-100 flex flex-col max-sm:rounded-lg">
+        <!-- Navigation - included as a partial -->
         <div class="w-full flex-shrink-0">
             <div class="mx-auto">
-                <nav class="flex {% if request.endpoint == 'index' %}justify-end{% else %}justify-between{% endif %} items-center h-[34px] md:h-16 pt-6 md:pt-8 z-50 md:px-8">
-                    <!-- Logo Section - only show on non-index routes -->
-                    {% if request.endpoint != 'index' %}
-                    <div class="flex items-center md:ml-2">
-                        <span class="text-2xl md:text-3xl font-bold tracking-tight text-neutral-700 flex items-center gap-[2px]">
-                            <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-neutral-700"></span>
-                            <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-neutral-400"></span>
-                            <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-red-500"></span>
-                            <span class="font-black ml-1">OPORTUNIDADES</span>
-                        </span>
-                    </div>
-                    {% endif %}
-
-                    {# Determine logged_in based on session #}
-                    {% if session %}
-                        {% set logged_in = session.get('user') is not none %}
-                    {% else %}
-                        {% set logged_in = false %}
-                    {% endif %}
-
-                    <!-- New Navigation Buttons replacing the dropdown -->
-                    <div class="flex items-center space-x-4">
-                        <a href="{{ url_for('mi_espacio') }}"
-                           onclick="layoutshowSpinner(event)"
-                           class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded">
-                            Mi Espacio
-                        </a>
-                        {% if logged_in %}
-                        <a href="{{ url_for('logout') }}"
-                           onclick="layoutshowSpinner(event)"
-                           class="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded">
-                            Cerrar Sesión
-                        </a>
-                        {% else %}
-                        <a href="{{ url_for('login') }}"
-                           onclick="layoutshowSpinner(event)"
-                           class="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded">
-                            Entrar/Registrarse
-                        </a>
-                        {% endif %}
-                    </div>
-                </nav>
+                {% include '_nav.html' %}
             </div>
         </div>
 
         <!-- Content wrapper -->
-        <div class="flex-grow flex 
-                    max-sm:items-start 
-                    sm:items-start 
-                    justify-start 
-                    pt-4
-                    md:pt-8">
+        <div>
             {% block body %}{% endblock %}
         </div>
     </main>
-
-    {% if request.endpoint == 'index' %}
-    <style>
-        /* Remove centering overrides since index is now main view */
-        body {
-            justify-content: normal !important;
-            align-items: normal !important;
-        }
-
-        main {
-            justify-content: normal !important;
-            align-items: normal !important;
-        }
-
-        .flex-grow {
-            justify-content: normal !important;
-            align-items: normal !important;
-        }
-    </style>
-    {% endif %}
     <script type="module" src="{{ url_for('static', filename='js/site.js') }}"></script>
     <style>
         /* Add smooth transitions for alerts */
-        #alert-container > div {
+        #alert-container>div {
             opacity: 1;
             transition: all 0.3s ease-in-out;
         }
