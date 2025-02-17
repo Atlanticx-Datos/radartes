@@ -1847,6 +1847,9 @@ details.collapse summary::-webkit-details-marker {
 .left-1\/2 {
   left: 50%;
 }
+.left-3 {
+  left: 0.75rem;
+}
 .right-0 {
   right: 0px;
 }
@@ -1867,6 +1870,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .top-1\/2 {
   top: 50%;
+}
+.top-3 {
+  top: 0.75rem;
 }
 .top-4 {
   top: 1rem;
@@ -1963,6 +1969,9 @@ details.collapse summary::-webkit-details-marker {
 .mt-1 {
   margin-top: 0.25rem;
 }
+.mt-12 {
+  margin-top: 3rem;
+}
 .mt-2 {
   margin-top: 0.5rem;
 }
@@ -2016,6 +2025,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .h-4 {
   height: 1rem;
+}
+.h-48 {
+  height: 12rem;
 }
 .h-5 {
   height: 1.25rem;
@@ -2233,6 +2245,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .gap-4 {
   gap: 1rem;
+}
+.gap-6 {
+  gap: 1.5rem;
 }
 .gap-\[2px\] {
   gap: 2px;
@@ -2562,8 +2577,8 @@ details.collapse summary::-webkit-details-marker {
 .pr-12 {
   padding-right: 3rem;
 }
-.pr-24 {
-  padding-right: 6rem;
+.pr-28 {
+  padding-right: 7rem;
 }
 .pt-4 {
   padding-top: 1rem;
@@ -2744,6 +2759,11 @@ details.collapse summary::-webkit-details-marker {
   --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
+.shadow-md {
+  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
 .shadow-sm {
   --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
@@ -2922,6 +2942,9 @@ details.collapse summary::-webkit-details-marker {
   .sm\:h-screen {
     height: 100vh;
   }
+  .sm\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 @media (min-width: 768px) {
   .md\:right-2 {
@@ -3069,6 +3092,11 @@ details.collapse summary::-webkit-details-marker {
   }
   .lg\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1287px) {
+  .xl\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 @media (min-width: 1336px) {
