@@ -2942,9 +2942,6 @@ details.collapse summary::-webkit-details-marker {
   .sm\:h-screen {
     height: 100vh;
   }
-  .sm\:grid-cols-2 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 @media (min-width: 768px) {
   .md\:right-2 {
@@ -3092,11 +3089,6 @@ details.collapse summary::-webkit-details-marker {
   }
   .lg\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-@media (min-width: 1287px) {
-  .xl\:grid-cols-4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 @media (min-width: 1336px) {

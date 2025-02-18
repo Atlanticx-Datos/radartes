@@ -109,14 +109,14 @@
     </div>
 
     <!-- Featured Opportunities Section -->
-    <div class="mt-12 mb-8">
+    <div class="featured-opportunities mt-12 mb-8">
         <h2 class="text-xl font-semibold mb-4">Destacados de la semana 🔥</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for page in destacar_pages[:3] %}
             <div class="bg-white rounded-lg shadow-md overflow-hidden relative">
-                <!-- Placeholder Image -->
+                <!-- Updated Image -->
                 <div class="relative h-48 bg-gray-200">
-                    <img src="/static/placeholder.jpg" alt="Placeholder" class="w-full h-full object-cover">
+                    <img src="/static/public/IsoAtx.png" alt="Atlantic x Logo" class="w-full h-full object-contain p-4">
                     <!-- Category Badge -->
                     <span class="absolute top-3 left-3 bg-gray-100 text-sm px-2 py-1 rounded-md">
                         {{ page.categoria }}
@@ -372,6 +372,20 @@
     });
 
     function applyFilters(searchInput = document.getElementById('open-search').value) {
+        // Add featured section toggle at the start
+        const featuredSection = document.querySelector('.featured-opportunities');
+        
+        // Hide featured section if there's any active filtering
+        if (searchInput || 
+            activeFilters.categories.size > 0 || 
+            activeFilters.country || 
+            activeFilters.month || 
+            activeFilters.discipline !== 'todos') {
+            featuredSection?.classList.add('hidden');
+        } else {
+            featuredSection?.classList.remove('hidden');
+        }
+
         // Restore categories from our stored selection
         if (window.selectedCategories) {
             activeFilters.categories = new Set(window.selectedCategories);
@@ -571,6 +585,10 @@
         
         // Close the filters dropdown if it's open
         document.getElementById('structured-filters').classList.add('hidden');
+        
+        // Show featured section when clearing all filters
+        const featuredSection = document.querySelector('.featured-opportunities');
+        featuredSection?.classList.remove('hidden');
     }
 
     // Ensure the clear button stays visible
