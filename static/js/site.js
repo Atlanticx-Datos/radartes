@@ -30,6 +30,44 @@ const month_mapping = {
     'diciembre': 12
 };
 
+// Define discipline groups for client-side filtering
+const DISCIPLINE_GROUPS = {
+    'Visuales': new Set([
+        'pintura', 'dibujo', 'grabado', 'escultura', 'fotografía', 'arte digital',
+        'instalación', 'performance', 'visuales', 'artes visuales', 'arte contemporáneo',
+        'arte urbano', 'street art', 'litografía', 'serigrafía', 'textiles',
+        'video', 'cine', 'audiovisual', 'documental', 'animación',
+        'videojuegos', 'nuevos medios', 'multimedia', 'transmedia'
+    ]),
+    'Música': new Set([
+        'música', 'composición', 'interpretación musical', 'dirección musical',
+        'canto', 'ópera', 'jazz', 'música clásica', 'música contemporánea',
+        'música experimental', 'sonido', 'arte sonoro'
+    ]),
+    'Escénicas': new Set([
+        'teatro', 'danza', 'circo', 'performance', 'artes vivas',
+        'artes escénicas', 'dramaturgia', 'coreografía', 'dirección escénica'
+    ]),
+    'Literatura': new Set([
+        'literatura', 'poesía', 'narrativa', 'ensayo', 'escritura creativa',
+        'novela', 'cuento', 'traducción', 'edición'
+    ]),
+    'Diseño': new Set([
+        'diseño', 'diseño gráfico', 'diseño industrial', 'diseño de producto',
+        'diseño web', 'diseño digital', 'diseño editorial', 'diseño de moda',
+        'diseño textil', 'ilustración', 'tipografía', 'arquitectura', 'urbanismo', 
+        'paisajismo', 'diseño de interiores', 'arquitectura efímera', 'diseño espacial'
+    ]),
+    'Más': new Set([
+        'multidisciplinar', 'investigación', 'beca', 'creación', 'curaduría', 
+        'gestión cultural', 'comisariado', 'comisario', 'teoría', 'historia', 
+        'mediación cultural', 'mediación', 'patrimonio', 'conservación', 
+        'investigación-creación', 'restauración', 'restaurador', 'archivo', 
+        'crítica', 'ecología', 'feminismo', 'cultura', 'documentación', 
+        'comunidad', 'público', 'audiencia', 'pensamiento', 'medioambiente'
+    ])
+};
+
 (function() {
   "use strict";
   
@@ -685,25 +723,107 @@ const month_mapping = {
     let prefilteredResults = null;
     let allPages = null;
 
-    function handleDisciplineFilter(button) {
-        const disciplineButtons = document.querySelectorAll('[data-discipline-filter]');
+    function normalizeText(text) {
+        if (!text) return '';
+        return text.normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .trim();
+    }
+
+    // Enhanced belongsToMainDiscipline with better logging and case handling
+    function belongsToMainDiscipline(discipline, mainDiscipline, disciplineGroups) {
+        const normalizedDiscipline = normalizeText(discipline);
+        const normalizedMain = normalizeText(mainDiscipline);
+
+        // 1. Direct name match (case and accent insensitive)
+        if (normalizedDiscipline === normalizedMain) {
+            console.log(`Direct name match: ${discipline} ≡ ${mainDiscipline}`);
+            return true;
+        }
+
+        // 2. Group membership check (using original case group key)
+        if (disciplineGroups[mainDiscipline]?.has(normalizedDiscipline)) {
+            console.log(`Group match: ${discipline} ∈ ${mainDiscipline} group`);
+            return true;
+        }
+
+        // 3. Special case for "Más" category
+        if (mainDiscipline === 'Más') {
+            const isGeneric = Array.from(disciplineGroups['Más']).some(d => 
+                normalizeText(d) === normalizedDiscipline
+            );
+            if (isGeneric) {
+                console.log(`Más category match: ${discipline}`);
+                return true;
+            }
+        }
+
+        console.log(`No match for ${discipline} in ${mainDiscipline}`);
+        return false;
+    }
+
+    // Enhanced filterByDiscipline that preserves existing behavior
+    function filterByDiscipline(pages, selectedDiscipline) {
+        if (selectedDiscipline === 'todos') {
+            return pages;
+        }
+
+        return pages.filter(page => {
+            if (!page.disciplina) return false;
+            
+            const pageDisciplines = page.disciplina
+                .split(',')
+                .map(d => d.trim());
+            
+            // Debug log to see raw disciplines
+            console.log(`Checking ${page.nombre} with disciplines:`, pageDisciplines);
+
+            return pageDisciplines.some(discipline => {
+                // Keep original case for group lookup, but normalize for comparison
+                const isMatch = belongsToMainDiscipline(
+                    discipline, 
+                    selectedDiscipline,  // Pass original case for group lookup
+                    DISCIPLINE_GROUPS
+                );
+                
+                // Detailed debug logging
+                console.log(`- "${discipline}" → "${normalizeText(discipline)}" vs "${selectedDiscipline}" → "${normalizeText(selectedDiscipline)}": ${isMatch ? 'MATCH' : 'NO MATCH'}`);
+                return isMatch;
+            });
+        });
+    }
+
+    // Define handleDisciplineFilter as a global function to maintain backwards compatibility.
+    window.handleDisciplineFilter = function(event) {
+        const button = event.target.closest('[data-discipline-filter]');
+        if (!button) return;
         
-        // Update active state
-        disciplineButtons.forEach(btn => {
+        const discipline = button.dataset.disciplineFilter;
+        console.log(`Filtering by discipline: ${discipline}`);
+        
+        // Update UI: mark the clicked button as active.
+        document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.classList.remove('bg-blue-600', 'text-white');
             btn.classList.add('border-gray-300', 'text-gray-700');
         });
-        button.classList.add('bg-blue-600', 'text-white');
-        button.classList.remove('border-gray-300', 'text-gray-700');
         
-        // Show filtered results
-        const discipline = button.dataset.disciplineFilter;
-        if (discipline === 'todos') {
-            showResults(allPages);
-        } else {
-            showFilteredResults(discipline);
-        }
-    }
+        button.classList.remove('border-gray-300', 'text-gray-700');
+        button.classList.add('bg-blue-600', 'text-white');
+        
+        // Apply the enhanced filtering logic.
+        const filteredPages = filterByDiscipline(allPages, discipline);
+        console.log(`Found ${filteredPages.length} matches for ${discipline}`);
+        
+        updateResults(filteredPages);
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Attach the global handler to discipline filter buttons.
+        document.querySelectorAll('[data-discipline-filter]').forEach(button => {
+            button.addEventListener('click', window.handleDisciplineFilter);
+        });
+    });
 
     function handleMonthFilter(button) {
         const monthButtons = document.querySelectorAll('[data-month-filter]');
@@ -838,60 +958,6 @@ const month_mapping = {
             console.error('Filter initialization error:', e);
         }
     }
-
-    // Add these event listeners in the DOMContentLoaded callback
-    document.querySelectorAll('[data-discipline-filter]').forEach(button => {
-        if (button) {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                handleDisciplineFilter(button);
-            });
-        }
-    });
-
-    document.querySelectorAll('[data-month-filter]').forEach(button => {
-        if (button) {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                handleMonthFilter(button);
-            });
-        }
-    });
-
-    // Event listeners for dropdown changes
-    const countryFilter = document.getElementById('country-filter');
-    if (countryFilter) {
-        countryFilter.addEventListener('change', () => {
-            activeFilters.country = countryFilter.value || null;
-        });
-    }
-
-    const monthFilter = document.getElementById('month-filter');
-    if (monthFilter) {
-        monthFilter.addEventListener('change', () => {
-            activeFilters.month = monthFilter.value || null;
-        });
-    }
-
-    // Category filter buttons
-    document.querySelectorAll('.category-filter-btn').forEach(button => {
-        if (button) {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                const category = button.dataset.category;
-                
-                button.classList.toggle('bg-blue-600');
-                button.classList.toggle('text-white');
-                button.classList.toggle('border-blue-600');
-                
-                if (activeFilters.categories.has(category)) {
-                    activeFilters.categories.delete(category);
-                } else {
-                    activeFilters.categories.add(category);
-                }
-            });
-        }
-    });
 
     // Apply filters button
     const applyFiltersBtn = document.getElementById('apply-filters');
@@ -1100,7 +1166,7 @@ const month_mapping = {
 
     // Add null check for ALL remaining elements
     const ALL_EVENT_HANDLERS = [
-        { selector: '[data-discipline-filter]', event: 'click', handler: handleDisciplineFilter },
+        { selector: '[data-discipline-filter]', event: 'click', handler: window.handleDisciplineFilter },
         { selector: '[data-month-filter]', event: 'click', handler: handleMonthFilter },
         { selector: '.category-filter-btn', event: 'click', handler: handleCategoryFilter },
         { selector: '#apply-filters', event: 'click', handler: handleApplyFilters }

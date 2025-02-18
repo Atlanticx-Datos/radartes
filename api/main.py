@@ -68,57 +68,53 @@ load_dotenv()
 AUTH0_CALLBACK_URL = os.environ.get('AUTH0_CALLBACK_URL')
 
 DISCIPLINE_GROUPS = {
-    'visuales': {
-        'pintura', 'escultura', 'cerámica', 'dibujo', 'instalación', 'fotografía',
-        'artes visuales', 'visuales', 'grabado', 'arte plástica', 'muralismo',
-        'arte urbano', 'arte público', 'nuevos medios', 'arte digital', 'ilustración', 
-        'cerámica', 'orfebrería', 'talla en madera', 'técnicas tradicionales', 
-        'digital', 'arte digital', 'nft', '3d', 'grabado', 'estampa', 'medios mixtos', 'digitales'
+    'Visuales': {
+        'pintura', 'dibujo', 'grabado', 'escultura', 'fotografía', 'arte digital',
+        'instalación', 'performance', 'visuales', 'artes visuales', 'arte contemporáneo',
+        'arte urbano', 'street art', 'litografía', 'serigrafía', 'textiles',
+        # Former Video subdisciplines
+        'video', 'cine', 'audiovisual', 'documental', 'animación',
+        'videojuegos', 'nuevos medios', 'multimedia', 'transmedia'
     },
-    'música': {
-        'música', 'composición', 'piano', 'guitarra', 'vientos', 'electrónica', 'ópera'
-        'coral', 'arte sonoro', 'instrumentos', 'multidisciplinar', 'experimental', 'canto', 'contemporánea'
+    'Música': {
+        'música', 'composición', 'interpretación musical', 'dirección musical',
+        'canto', 'ópera', 'jazz', 'música clásica', 'música contemporánea',
+        'música experimental', 'sonido', 'arte sonoro'
     },
-    'video': {
-        'videoarte', 'cine', 'documental', 'cortos', 'animación', 'cortometrajes', 'mapping'
-        'artes audiovisuales', 'multidisciplinar', 'largometraje', 'corto', 'televisión',
+    'Escénicas': {
+        'teatro', 'danza', 'circo', 'performance', 'artes vivas',
+        'artes escénicas', 'dramaturgia', 'coreografía', 'dirección escénica'
     },
-    'escénicas': {
-        'teatro', 'danza', 'performance', 'circo', 'coreografía', 'artes escénicas',
-        'teatro físico', 'danza contemporánea', 'multidisciplinar', 'performance',
-        'happening', 'intervención', 'inmersiva',
+    'Literatura': {
+        'literatura', 'poesía', 'narrativa', 'ensayo', 'escritura creativa',
+        'novela', 'cuento', 'traducción', 'edición'
     },
-    'literatura': {
-        'literatura', 'poesía', 'narrativa', 'ensayo', 'escritura', 'edición', 'publicaciones',
-        'traducción', 'guion', 'multidisciplinar', 'libretto', 'libreto', 'cuento', 'cuentos'
+    'Diseño': {
+        'diseño', 'diseño gráfico', 'diseño industrial', 'diseño de producto',
+        'diseño web', 'diseño digital', 'diseño editorial', 'diseño de moda',
+        'diseño textil', 'ilustración', 'tipografía',
+        # Former Arquitectura subdisciplines
+        'arquitectura', 'urbanismo', 'paisajismo', 'diseño de interiores',
+        'arquitectura efímera', 'diseño espacial'
     },
-    'diseño': {
-        'diseño', 'gráfico', 'industrial', 'textil',
-        'editorial', 'gráfica', 'multidisciplinar', 'ilustración',
-        'moda', 'interiores', 'tipografía',
-    },
-    'investigación': {
-        'investigación', 'creación', 'curaduría', 'gestión cultural', 'comisariado', 'comisario'
-        'teoría artística', 'historia del arte', 'mediación cultural', 'mediación', 'patrimonio',
-        'conservación patrimonial', 'investigación-creación', 'multidisciplinar', 'restauración', 
-        'restaurador', 'conservación', 'archivo', 'creación', 'crítica', 'ecología', 'feminismo',
-        'cultura', 'curaduría', 'documentación', 'comunidad', 'público', 'audiencia'
-    },
-    'arquitectura': {
-        'arquitectura', 'urbanismo', 'paisajismo', 'intervención urbana',
-        'arte ambiental', 'diseño de espacios', 'multidisciplinar'
+    'Más': {
+        'multidisciplinar', 'investigación', 'beca', 'creación', 'curaduría', 
+        'gestión cultural', 'comisariado', 'comisario', 'teoría', 'historia', 
+        'mediación cultural', 'mediación', 'patrimonio', 'conservación', 
+        'investigación-creación', 'restauración', 'restaurador', 'archivo', 
+        'crítica', 'ecología', 'feminismo', 'cultura', 'documentación', 
+        'comunidad', 'público', 'audiencia', 'pensamiento', 'medioambiente'
     }
 }
+
 
 MAIN_DISCIPLINES = [
     'visuales',
     'música',
-    'video',
     'escénicas',
     'literatura',
     'diseño',
-    'investigación',
-    'arquitectura'
+    'más'
 ]
 
 class RedisWrapper:
