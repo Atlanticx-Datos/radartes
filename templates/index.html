@@ -91,9 +91,9 @@
 
     <!-- Filter buttons section -->
     <div class="mb-8">
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap justify-between w-full gap-2">
             {% for discipline in discipline_groups.keys() %}
-            <button class="filter-btn px-4 py-2 rounded-full border border-gray-300 text-gray-700"
+            <button class="filter-btn px-12 py-12 rounded-med border border-gray-300 text-gray-700"
                 data-discipline-filter="{{ discipline }}"
                 onclick="toggleDisciplineFilter(this, '{{ discipline }}')">
                 {{ discipline|title }}
