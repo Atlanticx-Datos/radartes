@@ -13,8 +13,26 @@ export const SearchModule = {
     },
 
     init() {
+        // Initialize with data from the page
+        const preFilteredData = document.getElementById('prefiltered-data');
+        if (preFilteredData) {
+            try {
+                const tempParser = new DOMParser();
+                const pagesString = tempParser.parseFromString(preFilteredData.dataset.pages, 'text/html').body.textContent;
+                const pages = JSON.parse(pagesString);
+                
+                console.log('Initializing search module with:', { 
+                    pageCount: pages.length,
+                    firstPage: pages[0]
+                });
+
+                this.initializeStructuredFilters(pages);
+            } catch (e) {
+                console.error('Search module initialization error:', e);
+            }
+        }
+
         this.attachSearchListeners();
-        this.initializeStructuredFilters();
         this.updateFilterUI();
     },
 
@@ -38,13 +56,22 @@ export const SearchModule = {
         }
     },
 
-    initializeStructuredFilters() {
-        const pages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
-        
-        // Initialize country dropdown
+    initializeStructuredFilters(pages) {
+        // Country dropdown
         const countryFilter = document.getElementById('country-filter');
         if (countryFilter) {
-            const uniqueCountries = [...new Set(pages.map(p => p.pais).filter(Boolean))].sort();
+            // Clear existing options except the first one (if it's a placeholder)
+            while (countryFilter.options.length > 1) {
+                countryFilter.remove(1);
+            }
+
+            // Get unique countries and sort them
+            const uniqueCountries = [...new Set(pages
+                .map(p => p.país)
+                .filter(Boolean))]
+                .sort((a, b) => a.localeCompare(b, 'es'));
+
+            // Add new options
             uniqueCountries.forEach(country => {
                 const option = document.createElement('option');
                 option.value = country;
@@ -53,9 +80,15 @@ export const SearchModule = {
             });
         }
 
-        // Initialize month dropdown
+        // Month dropdown
         const monthFilter = document.getElementById('month-filter');
         if (monthFilter) {
+            // Clear existing options except the first one
+            while (monthFilter.options.length > 1) {
+                monthFilter.remove(1);
+            }
+
+            // Add month options
             Object.entries(CONSTANTS.MONTH_MAPPING).forEach(([monthName, monthNumber]) => {
                 const option = document.createElement('option');
                 option.value = monthNumber;
