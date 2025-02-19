@@ -14,6 +14,8 @@ export const FilterModule = {
 
     init() {
         this.initializeDropdowns();
+        this.removeExistingHandlers();
+        this.addNewHandlers();
     },
 
     initializeDropdowns() {
@@ -73,45 +75,17 @@ export const FilterModule = {
         this.applyFilters();
     },
 
-    handleDisciplineFilter(button) {
-        const discipline = button.dataset.disciplineFilter;
-        
-        // Update active discipline filter
-        this.activeFilters.discipline = discipline;
-        
-        // Update button styles
-        document.querySelectorAll('[data-discipline-filter]').forEach(btn => {
-            btn.classList.remove('bg-blue-600', 'text-white');
-            btn.classList.add('border-gray-300', 'text-gray-700');
-        });
-        
-        button.classList.remove('border-gray-300', 'text-gray-700');
-        button.classList.add('bg-blue-600', 'text-white');
-        
-        // Apply only discipline filter
-        const pages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
-        const filtered = this.filterByDiscipline(pages, discipline);
-        this.updateResults(filtered);
-        
-        // Handle featured section visibility
-        const featuredSection = document.querySelector('.featured-opportunities');
-        const prevControl = document.querySelector('.destacar-prev');
-        const nextControl = document.querySelector('.destacar-next');
-        
-        if (discipline !== 'todos') {
-            featuredSection?.classList.add('hidden');
-            prevControl?.classList.add('hidden');
-            nextControl?.classList.add('hidden');
-        } else {
-            featuredSection?.classList.remove('hidden');
-            prevControl?.classList.remove('hidden');
-            nextControl?.classList.remove('hidden');
-        }
+    normalizeText(text) {
+        if (!text) return '';
+        return text.normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .trim();
     },
 
     belongsToMainDiscipline(discipline, mainDiscipline) {
-        const normalizedDiscipline = Utils.normalizeText(discipline);
-        const normalizedMain = Utils.normalizeText(mainDiscipline);
+        const normalizedDiscipline = this.normalizeText(discipline);
+        const normalizedMain = this.normalizeText(mainDiscipline);
 
         // 1. Direct name match (case and accent insensitive)
         if (normalizedDiscipline === normalizedMain) {
@@ -119,16 +93,17 @@ export const FilterModule = {
             return true;
         }
 
-        // 2. Group membership check (using original case group key)
-        if (CONSTANTS.DISCIPLINE_GROUPS[mainDiscipline]?.has(normalizedDiscipline)) {
+        // 2. Group membership check
+        const disciplineGroups = CONSTANTS.DISCIPLINE_GROUPS;
+        if (disciplineGroups[mainDiscipline]?.has(normalizedDiscipline)) {
             console.log(`Group match: ${discipline} ∈ ${mainDiscipline} group`);
             return true;
         }
 
         // 3. Special case for "Más" category
         if (mainDiscipline === 'Más') {
-            const isGeneric = Array.from(CONSTANTS.DISCIPLINE_GROUPS['Más']).some(d => 
-                Utils.normalizeText(d) === normalizedDiscipline
+            const isGeneric = Array.from(disciplineGroups['Más']).some(d => 
+                this.normalizeText(d) === normalizedDiscipline
             );
             if (isGeneric) {
                 console.log(`Más category match: ${discipline}`);
@@ -140,31 +115,91 @@ export const FilterModule = {
         return false;
     },
 
-    filterByDiscipline(pages, selectedDiscipline) {
-        if (selectedDiscipline === 'todos') {
-            return pages;
+    handleDisciplineFilter(button) {
+        console.log('=== Discipline Filter Start ===');
+        const discipline = button.dataset.disciplineFilter;
+        console.log('Current discipline:', this.activeFilters.discipline);
+        console.log('Clicked discipline:', discipline);
+        
+        // Simple toggle: if same discipline is clicked, switch to 'todos'
+        if (discipline === this.activeFilters.discipline) {
+            this.activeFilters.discipline = 'todos';
+        } else {
+            this.activeFilters.discipline = discipline;
+        }
+        
+        console.log('New discipline state:', this.activeFilters.discipline);
+
+        // Get fresh data and apply filter
+        const pages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
+        let filtered = [...pages];
+        
+        if (this.activeFilters.discipline !== 'todos') {
+            filtered = filtered.filter(page => {
+                if (!page.disciplina) return false;
+                
+                const pageDisciplines = page.disciplina
+                    .split(',')
+                    .map(d => d.trim());
+                
+                console.log(`Checking ${page.nombre} with disciplines:`, pageDisciplines);
+
+                return pageDisciplines.some(d => {
+                    const isMatch = this.belongsToMainDiscipline(d, this.activeFilters.discipline);
+                    console.log(`- "${d}" → "${this.normalizeText(d)}" vs "${this.activeFilters.discipline}" → "${this.normalizeText(this.activeFilters.discipline)}": ${isMatch ? 'MATCH' : 'NO MATCH'}`);
+                    return isMatch;
+                });
+            });
         }
 
-        return pages.filter(page => {
-            if (!page.disciplina) return false;
-            
-            const pageDisciplines = page.disciplina
-                .split(',')
-                .map(d => d.trim());
-            
-            // Debug log to see raw disciplines
-            console.log(`Checking ${page.nombre} with disciplines:`, pageDisciplines);
+        // Update visibility of featured section
+        const featuredSection = document.querySelector('.featured-opportunities');
+        const prevControl = document.querySelector('.destacar-prev');
+        const nextControl = document.querySelector('.destacar-next');
+        
+        if (this.activeFilters.discipline !== 'todos') {
+            featuredSection?.classList.add('hidden');
+            prevControl?.classList.add('hidden');
+            nextControl?.classList.add('hidden');
+        } else {
+            featuredSection?.classList.remove('hidden');
+            prevControl?.classList.remove('hidden');
+            nextControl?.classList.remove('hidden');
+        }
 
-            return pageDisciplines.some(discipline => {
-                const isMatch = this.belongsToMainDiscipline(
-                    discipline, 
-                    selectedDiscipline
-                );
-                
-                // Detailed debug logging
-                console.log(`- "${discipline}" → "${Utils.normalizeText(discipline)}" vs "${selectedDiscipline}" → "${Utils.normalizeText(selectedDiscipline)}": ${isMatch ? 'MATCH' : 'NO MATCH'}`);
-                return isMatch;
-            });
+        console.log('Filtered results count:', filtered.length);
+        this.updateResults(filtered);
+        console.log('=== Discipline Filter End ===');
+    },
+
+    updateDisciplineButtons() {
+        // Reset all buttons to default state
+        document.querySelectorAll('[data-discipline-filter]').forEach(btn => {
+            btn.classList.remove('bg-blue-600', 'text-white');
+            btn.classList.add('border-gray-300', 'text-gray-700');
+        });
+
+        // If we're in 'todos' state, highlight the todos button
+        if (this.activeFilters.discipline === 'todos') {
+            const todosButton = document.querySelector('[data-discipline-filter="todos"]');
+            if (todosButton) {
+                todosButton.classList.remove('border-gray-300', 'text-gray-700');
+                todosButton.classList.add('bg-blue-600', 'text-white');
+            }
+        } else {
+            // Highlight the active discipline button
+            const activeButton = document.querySelector(`[data-discipline-filter="${this.activeFilters.discipline}"]`);
+            if (activeButton) {
+                activeButton.classList.remove('border-gray-300', 'text-gray-700');
+                activeButton.classList.add('bg-blue-600', 'text-white');
+            }
+        }
+    },
+
+    filterByDiscipline(pages, discipline) {
+        return pages.filter(page => {
+            const pageDisciplines = page.disciplinas || [];
+            return pageDisciplines.some(d => this.belongsToMainDiscipline(d, discipline));
         });
     },
 
@@ -319,5 +354,25 @@ export const FilterModule = {
         featuredSection?.classList.remove('hidden');
         prevControl?.classList.remove('hidden');
         nextControl?.classList.remove('hidden');
+    },
+
+    removeExistingHandlers() {
+        document.querySelectorAll('[data-discipline-filter]').forEach(button => {
+            button.replaceWith(button.cloneNode(true));
+        });
+    },
+
+    addNewHandlers() {
+        document.querySelectorAll('[data-discipline-filter]').forEach(button => {
+            button.addEventListener('click', (e) => this.handleDisciplineFilter(button));
+        });
     }
-}; 
+};
+
+// Remove the global handler
+window.handleDisciplineFilter = undefined;
+
+// Initialize the module
+document.addEventListener('DOMContentLoaded', () => {
+    FilterModule.init();
+}); 

@@ -36,7 +36,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Attach discipline filter handlers
     document.querySelectorAll('[data-discipline-filter]').forEach(button => {
-        button.addEventListener('click', () => FilterModule.handleDisciplineFilter(button));
+        button.removeEventListener('click', () => FilterModule.handleDisciplineFilter(button));
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            FilterModule.handleDisciplineFilter(button);
+        });
     });
 });
 

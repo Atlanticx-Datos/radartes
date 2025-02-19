@@ -114,8 +114,12 @@ export const SearchModule = {
     handleSearchFilters(e) {
         e.preventDefault();
         
+        // Clear any active discipline filter first
+        FilterModule.activeFilters.discipline = 'todos';
+        FilterModule.updateDisciplineButtons();
+        
         // Transfer active filters to the FilterModule
-        FilterModule.activeFilters.categories.clear(); // Clear existing first
+        FilterModule.activeFilters.categories.clear();
         if (this.activeFilters.categories.size > 0) {
             this.activeFilters.categories.forEach(category => {
                 FilterModule.activeFilters.categories.add(category.toLowerCase());
@@ -123,19 +127,19 @@ export const SearchModule = {
         }
 
         // Transfer month filter
-        FilterModule.activeFilters.month = '';  // Clear existing first
+        FilterModule.activeFilters.month = '';
         if (this.activeFilters.months.size > 0) {
             const month = Array.from(this.activeFilters.months)[0];
             FilterModule.activeFilters.month = month;
         }
 
-        // Transfer country filter if we have one
+        // Transfer country filter
         const countryFilter = document.getElementById('country-filter');
         if (countryFilter && countryFilter.value) {
             FilterModule.activeFilters.country = countryFilter.value;
         }
 
-        console.log('Applying combined filters:', {
+        console.log('Applying structured filters:', {
             categories: Array.from(this.activeFilters.categories),
             country: FilterModule.activeFilters.country,
             month: FilterModule.activeFilters.month
