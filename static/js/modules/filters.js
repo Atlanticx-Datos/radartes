@@ -1,0 +1,323 @@
+import { Utils } from '../utils.js';
+import { CONSTANTS } from '../constants.js';
+
+// Handles all filter-related functionality
+export const FilterModule = {
+    activeFilters: {
+        categories: new Set(),
+        country: '',
+        month: '',
+        discipline: 'todos'
+    },
+
+    selectedCategories: [],
+
+    init() {
+        this.initializeDropdowns();
+    },
+
+    initializeDropdowns() {
+        const pages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
+        
+        // Initialize country dropdown
+        const countryFilter = document.getElementById('country-filter');
+        const countries = [...new Set(pages.map(page => page.pais).filter(Boolean))].sort();
+        
+        countries.forEach(country => {
+            const option = document.createElement('option');
+            option.value = country;
+            option.textContent = country;
+            countryFilter.appendChild(option);
+        });
+
+        // Initialize month dropdown
+        const monthFilter = document.getElementById('month-filter');
+        const months = [
+            { value: '1', label: 'Enero' },
+            { value: '2', label: 'Febrero' },
+            { value: '3', label: 'Marzo' },
+            { value: '4', label: 'Abril' },
+            { value: '5', label: 'Mayo' },
+            { value: '6', label: 'Junio' },
+            { value: '7', label: 'Julio' },
+            { value: '8', label: 'Agosto' },
+            { value: '9', label: 'Septiembre' },
+            { value: '10', label: 'Octubre' },
+            { value: '11', label: 'Noviembre' },
+            { value: '12', label: 'Diciembre' }
+        ];
+
+        months.forEach(month => {
+            const option = document.createElement('option');
+            option.value = month.value;
+            option.textContent = month.label;
+            monthFilter.appendChild(option);
+        });
+    },
+
+    handleCategoryFilter(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const category = e.target.dataset.category;
+        
+        // Toggle category in activeFilters
+        if (this.activeFilters.categories.has(category)) {
+            this.activeFilters.categories.delete(category);
+            e.target.classList.remove('border-blue-500', 'bg-blue-50');
+        } else {
+            this.activeFilters.categories.add(category);
+            e.target.classList.add('border-blue-500', 'bg-blue-50');
+        }
+        
+        this.selectedCategories = Array.from(this.activeFilters.categories);
+        this.applyFilters();
+    },
+
+    handleDisciplineFilter(button) {
+        const discipline = button.dataset.disciplineFilter;
+        
+        // Update active discipline filter
+        this.activeFilters.discipline = discipline;
+        
+        // Update button styles
+        document.querySelectorAll('[data-discipline-filter]').forEach(btn => {
+            btn.classList.remove('bg-blue-600', 'text-white');
+            btn.classList.add('border-gray-300', 'text-gray-700');
+        });
+        
+        button.classList.remove('border-gray-300', 'text-gray-700');
+        button.classList.add('bg-blue-600', 'text-white');
+        
+        // Apply only discipline filter
+        const pages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
+        const filtered = this.filterByDiscipline(pages, discipline);
+        this.updateResults(filtered);
+        
+        // Handle featured section visibility
+        const featuredSection = document.querySelector('.featured-opportunities');
+        const prevControl = document.querySelector('.destacar-prev');
+        const nextControl = document.querySelector('.destacar-next');
+        
+        if (discipline !== 'todos') {
+            featuredSection?.classList.add('hidden');
+            prevControl?.classList.add('hidden');
+            nextControl?.classList.add('hidden');
+        } else {
+            featuredSection?.classList.remove('hidden');
+            prevControl?.classList.remove('hidden');
+            nextControl?.classList.remove('hidden');
+        }
+    },
+
+    belongsToMainDiscipline(discipline, mainDiscipline) {
+        const normalizedDiscipline = Utils.normalizeText(discipline);
+        const normalizedMain = Utils.normalizeText(mainDiscipline);
+
+        // 1. Direct name match (case and accent insensitive)
+        if (normalizedDiscipline === normalizedMain) {
+            console.log(`Direct name match: ${discipline} ≡ ${mainDiscipline}`);
+            return true;
+        }
+
+        // 2. Group membership check (using original case group key)
+        if (CONSTANTS.DISCIPLINE_GROUPS[mainDiscipline]?.has(normalizedDiscipline)) {
+            console.log(`Group match: ${discipline} ∈ ${mainDiscipline} group`);
+            return true;
+        }
+
+        // 3. Special case for "Más" category
+        if (mainDiscipline === 'Más') {
+            const isGeneric = Array.from(CONSTANTS.DISCIPLINE_GROUPS['Más']).some(d => 
+                Utils.normalizeText(d) === normalizedDiscipline
+            );
+            if (isGeneric) {
+                console.log(`Más category match: ${discipline}`);
+                return true;
+            }
+        }
+
+        console.log(`No match for ${discipline} in ${mainDiscipline}`);
+        return false;
+    },
+
+    filterByDiscipline(pages, selectedDiscipline) {
+        if (selectedDiscipline === 'todos') {
+            return pages;
+        }
+
+        return pages.filter(page => {
+            if (!page.disciplina) return false;
+            
+            const pageDisciplines = page.disciplina
+                .split(',')
+                .map(d => d.trim());
+            
+            // Debug log to see raw disciplines
+            console.log(`Checking ${page.nombre} with disciplines:`, pageDisciplines);
+
+            return pageDisciplines.some(discipline => {
+                const isMatch = this.belongsToMainDiscipline(
+                    discipline, 
+                    selectedDiscipline
+                );
+                
+                // Detailed debug logging
+                console.log(`- "${discipline}" → "${Utils.normalizeText(discipline)}" vs "${selectedDiscipline}" → "${Utils.normalizeText(selectedDiscipline)}": ${isMatch ? 'MATCH' : 'NO MATCH'}`);
+                return isMatch;
+            });
+        });
+    },
+
+    applyFilters(searchInput = '') {
+        const pages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
+        const featuredSection = document.querySelector('.featured-opportunities');
+        const prevControl = document.querySelector('.destacar-prev');
+        const nextControl = document.querySelector('.destacar-next');
+        
+        // Hide featured section and controls when filtering
+        if (searchInput || this.activeFilters.categories.size > 0 || 
+            this.activeFilters.country || this.activeFilters.month || 
+            this.activeFilters.discipline !== 'todos') {
+            featuredSection?.classList.add('hidden');
+            prevControl?.classList.add('hidden');
+            nextControl?.classList.add('hidden');
+        } else {
+            featuredSection?.classList.remove('hidden');
+            prevControl?.classList.remove('hidden');
+            nextControl?.classList.remove('hidden');
+        }
+
+        let filtered = pages;
+
+        // Apply search filter
+        if (searchInput) {
+            filtered = filtered.filter(page => this.matchesSearchTerms(page, searchInput));
+        }
+
+        // Apply category filters
+        if (this.activeFilters.categories.size > 0) {
+            filtered = filtered.filter(page => {
+                if (!page.categoria) return false;
+                const pageCategories = page.categoria.toLowerCase().split(',').map(c => c.trim());
+                return pageCategories.some(cat => this.activeFilters.categories.has(cat));
+            });
+        }
+
+        // Apply country filter
+        if (this.activeFilters.country) {
+            filtered = filtered.filter(page => page.pais === this.activeFilters.country);
+        }
+
+        // Apply month filter
+        if (this.activeFilters.month) {
+            filtered = filtered.filter(page => {
+                const pageMonth = new Date(page.fecha_de_cierre).getMonth() + 1;
+                return parseInt(this.activeFilters.month) === pageMonth;
+            });
+        }
+
+        // Apply discipline filter
+        if (this.activeFilters.discipline !== 'todos') {
+            filtered = this.filterByDiscipline(filtered, this.activeFilters.discipline);
+        }
+
+        console.log('Filtered results:', filtered.length);
+        this.updateResults(filtered);
+    },
+
+    matchesSearchTerms(page, searchInput) {
+        const searchTerms = searchInput.split(',').map(term => Utils.normalizeText(term.trim()));
+        return searchTerms.every(term => {
+            const pageText = Utils.normalizeText([
+                page.nombre,
+                page.og_resumida,
+                page.entidad,
+                page.categoria,
+                page.disciplina,
+                page.pais
+            ].join(' '));
+            return pageText.includes(term);
+        });
+    },
+
+    updateResults(results) {
+        const container = document.getElementById('results-container');
+        const counter = document.getElementById('results-counter');
+
+        if (!container || !counter) return;
+
+        if (!results.length) {
+            container.innerHTML = '<p class="text-center text-gray-500 my-8">No se encontraron resultados.</p>';
+            counter.textContent = '0 resultados encontrados';
+            return;
+        }
+
+        container.innerHTML = results.map(page => `
+            <div class="opportunity-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+                <h3 class="font-bold text-lg mb-2">${Utils.escapeHTML(page.nombre || 'Sin nombre')}</h3>
+                <p class="text-sm text-gray-600 mb-2">${Utils.escapeHTML(page.og_resumida || '')}</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-500">${Utils.escapeHTML(page.disciplina || '')}</span>
+                    <button 
+                        class="preview-btn text-blue-600 hover:underline text-sm"
+                        data-url="${Utils.escapeHTML(page.url || '')}"
+                        data-name="${Utils.escapeHTML(page.nombre || '')}"
+                        data-country="${Utils.escapeHTML(page.pais || '')}"
+                        data-summary="${Utils.escapeHTML(page.og_resumida || '')}"
+                        data-id="${Utils.escapeHTML(page.id || '')}"
+                    >
+                        Ver más
+                    </button>
+                </div>
+            </div>
+        `).join('');
+
+        counter.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''}`;
+    },
+
+    clearAllFilters() {
+        // Clear search input
+        document.getElementById('open-search').value = '';
+        
+        // Clear category filters
+        this.activeFilters.categories.clear();
+        this.selectedCategories = [];
+        document.querySelectorAll('.category-filter-btn').forEach(btn => {
+            btn.classList.remove('border-blue-500', 'bg-blue-50');
+        });
+        
+        // Clear country filter
+        document.getElementById('country-filter').value = '';
+        this.activeFilters.country = '';
+        
+        // Clear month filter
+        document.getElementById('month-filter').value = '';
+        this.activeFilters.month = '';
+        
+        // Reset discipline to 'todos'
+        this.activeFilters.discipline = 'todos';
+        document.querySelectorAll('[data-discipline-filter]').forEach(btn => {
+            btn.classList.remove('bg-blue-600', 'text-white');
+            btn.classList.add('border-gray-300', 'text-gray-700');
+            if (btn.dataset.disciplineFilter === 'todos') {
+                btn.classList.remove('border-gray-300', 'text-gray-700');
+                btn.classList.add('bg-blue-600', 'text-white');
+            }
+        });
+        
+        // Trigger search to update results
+        this.applyFilters();
+        
+        // Close the filters dropdown if it's open
+        document.getElementById('structured-filters').classList.add('hidden');
+        
+        // Show featured section and controls when clearing all filters
+        const featuredSection = document.querySelector('.featured-opportunities');
+        const prevControl = document.querySelector('.destacar-prev');
+        const nextControl = document.querySelector('.destacar-next');
+        
+        featuredSection?.classList.remove('hidden');
+        prevControl?.classList.remove('hidden');
+        nextControl?.classList.remove('hidden');
+    }
+}; 
