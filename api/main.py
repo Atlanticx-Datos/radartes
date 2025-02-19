@@ -876,13 +876,17 @@ def index():
             "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
         }
         
+        # Add debug logging
+        app.logger.debug(f"Destacar pages count: {len(destacar_pages)}")
+        app.logger.debug(f"First destacar page: {destacar_pages[0] if destacar_pages else 'None'}")
+        
         return render_template(
             "index.html",
             prefiltered_results=prefiltered_results,
             discipline_groups=DISCIPLINE_GROUPS,
             month_mapping=month_mapping,
             pages=pages,
-            destacar_pages=destacar_pages,
+            destacar_pages=destacar_pages,  # This is being passed correctly
             total_opportunities=len(pages),
             DISCIPLINE_GROUPS=DISCIPLINE_GROUPS,
             og_data=get_default_og_data()

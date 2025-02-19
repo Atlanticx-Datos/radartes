@@ -132,7 +132,13 @@
             {% block body %}{% endblock %}
         </div>
     </main>
+    
+    <!-- First: Initialize any data needed by site.js -->
+    {% block page_scripts %}{% endblock %}
+    
+    <!-- Then: Load site.js -->
     <script type="module" src="{{ url_for('static', filename='js/site.js') }}"></script>
+    
     <style>
         /* Add smooth transitions for alerts */
         #alert-container>div {

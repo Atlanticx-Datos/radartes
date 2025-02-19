@@ -91,85 +91,48 @@
         data-pages="{{ pages|tojson|forceescape }}" class="hidden">
     </div>
 
-    <!-- Filter Buttons Section (Discipline) -->
-    <div class="space-y-6">
-        <h2 class="text-lg font-semibold mb-3">Obtener resultados por disciplina</h2>
+    <!-- Filter buttons section -->
+    <div class="mb-8">
         <div class="flex flex-wrap gap-2">
-            <button class="filter-btn px-4 py-2 rounded-full border bg-blue-600 text-white"
-                data-discipline-filter="todos">
-                Todos
-            </button>
             {% for discipline in discipline_groups.keys() %}
             <button class="filter-btn px-4 py-2 rounded-full border border-gray-300 text-gray-700"
-                data-discipline-filter="{{ discipline }}">
+                data-discipline-filter="{{ discipline }}"
+                onclick="toggleDisciplineFilter(this, '{{ discipline }}')">
                 {{ discipline|title }}
             </button>
             {% endfor %}
         </div>
     </div>
 
-    <!-- Featured Opportunities Section -->
-    <div class="featured-opportunities mt-12 mb-8">
-        <h2 class="text-xl font-semibold mb-4">Destacados de la semana 🔥</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {% for page in destacar_pages[:3] %}
-            <div class="bg-white rounded-lg shadow-md overflow-hidden relative">
-                <!-- Updated Image -->
-                <div class="relative h-48 bg-gray-200">
-                    <img src="/static/public/IsoAtx.png" alt="Atlantic x Logo" class="w-full h-full object-contain p-4">
-                    <!-- Category Badge -->
-                    <span class="absolute top-3 left-3 bg-gray-100 text-sm px-2 py-1 rounded-md">
-                        {{ page.categoria }}
-                    </span>
-                    <!-- Favorite Button -->
-                    <button class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                        </svg>
-                    </button>
-                </div>
-                
-                <!-- Card Content -->
-                <div class="p-4">
-                    <h3 class="font-medium text-lg mb-2">{{ page.nombre }}</h3>
-                    
-                    <!-- Meta Information -->
-                    <div class="flex flex-wrap gap-4 text-sm text-gray-600 mt-3">
-                        <!-- Country -->
-                        <div class="flex items-center gap-1">
-                            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>{{ page.país }}</span>
-                        </div>
-                        
-                        <!-- Price -->
-                        <div class="flex items-center gap-1">
-                            <span class="font-medium">$$$</span>
-                        </div>
-                        
-                        <!-- Subdisciplines -->
-                        <div class="flex items-center gap-1">
-                            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
-                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
-                            </svg>
-                            {% set disciplines = page.disciplina.split(',')[:2] %}
-                            <span>{{ disciplines|join(', ') }}</span>
-                        </div>
-                        
-                        <!-- Date -->
-                        <div class="flex items-center gap-1">
-                            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>{{ page.fecha_de_cierre }}</span>
-                        </div>
-                    </div>
-                </div>
+    <!-- Destacados section with proper spacing and full width -->
+    <div class="relative max-w-7xl mx-auto">
+        <!-- Previous button - adjusted to -ml-14 -->
+        <button 
+            onclick="prevDestacarPage()"
+            class="destacar-prev absolute left-0 top-1/2 -translate-y-1/2 -ml-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200"
+            aria-disabled="true"
+        >
+            <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+
+        <!-- Featured opportunities grid - full width -->
+        <div class="featured-opportunities w-full">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Content will be populated by JavaScript -->
             </div>
-            {% endfor %}
         </div>
+
+        <!-- Next button - adjusted to -mr-14 -->
+        <button 
+            onclick="nextDestacarPage()"
+            class="destacar-next absolute right-0 top-1/2 -translate-y-1/2 -mr-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200"
+        >
+            <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+        </button>
     </div>
 
     <!-- Results Section -->
@@ -603,5 +566,17 @@
     document.addEventListener('DOMContentLoaded', function() {
         ensureClearButtonVisible();
     });
+</script>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+    // Process data and store in a dedicated window property
+    const rawData = {{ destacar_pages|tojson|safe }};
+    window.processedDestacarData = rawData.map(item => ({
+        ...item,
+        url_base: item.url_base || new URL(item.url).hostname.replace('www.', '')
+    }));
+    console.log('Processed data:', window.processedDestacarData);
 </script>
 {% endblock %}
