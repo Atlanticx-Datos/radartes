@@ -15,6 +15,27 @@ export const SearchModule = {
     init() {
         this.attachSearchListeners();
         this.initializeStructuredFilters();
+        this.updateFilterUI();
+    },
+
+    updateFilterUI() {
+        // Update checkboxes to match state
+        document.querySelectorAll('.category-filter').forEach(checkbox => {
+            checkbox.checked = this.activeFilters.categories.has(checkbox.value);
+        });
+
+        // Update the filter summary display
+        const filterSummary = document.querySelector('#filter-summary');
+        if (filterSummary) {
+            const categories = Array.from(this.activeFilters.categories);
+            if (categories.length > 0) {
+                filterSummary.textContent = `Categorías seleccionadas: ${categories.join(', ')}`;
+                filterSummary.classList.remove('hidden');
+            } else {
+                filterSummary.textContent = '';
+                filterSummary.classList.add('hidden');
+            }
+        }
     },
 
     initializeStructuredFilters() {
@@ -290,5 +311,54 @@ export const SearchModule = {
             clearButton.style.display = 'block';
             setTimeout(this.ensureClearButtonVisible.bind(this), 100);
         }
+    },
+
+    clearFilters() {
+        // Clear internal state
+        this.activeFilters.categories.clear();
+        this.activeFilters.months.clear();
+        this.activeFilters.countries.clear();
+
+        // Update UI to reflect cleared state
+        this.updateFilterUI();
+
+        // Hide the structured filters dropdown
+        const filtersElement = document.getElementById('structured-filters');
+        if (filtersElement) {
+            filtersElement.classList.add('hidden');
+        }
+    },
+
+    handleStructuredSearch() {
+        const filters = {
+            categories: Array.from(this.activeFilters.categories),
+            country: FilterModule.activeFilters.country,
+            month: FilterModule.activeFilters.month
+        };
+
+        console.log('Applying structured search with filters:', filters);
+
+        // Perform the search
+        FilterModule.applyFilters();
+        
+        // Clear filters and update UI after search
+        this.clearFilters();
+        
+        // Hide dropdown after search
+        const filtersElement = document.getElementById('structured-filters');
+        if (filtersElement) {
+            filtersElement.classList.add('hidden');
+        }
+    },
+
+    handleCategoryClick(category, element) {
+        if (element.checked) {
+            this.activeFilters.categories.add(category);
+        } else {
+            this.activeFilters.categories.delete(category);
+        }
+
+        this.updateFilterUI();
+        console.log('Updated categories:', Array.from(this.activeFilters.categories));
     }
 }; 
