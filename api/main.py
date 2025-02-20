@@ -61,6 +61,8 @@ from html import escape
 
 from werkzeug.urls import url_parse  # Add to existing imports
 
+from flask_wtf.csrf import CSRFProtect
+
 
 load_dotenv()
 
@@ -189,6 +191,14 @@ else:
     )
     app.logger.info("Development environment configured.")
 
+# Add to app configuration
+app.config.update(
+    WTF_CSRF_ENABLED=True,
+    WTF_CSRF_CHECK_DEFAULT=True,
+    WTF_CSRF_HEADERS=['X-CSRFToken'],
+    WTF_CSRF_TIME_LIMIT=3600
+)
+
 # Get the current domain from the request
 def get_current_domain():
     if not is_production:
@@ -236,6 +246,9 @@ def before_request():
 # Initialize the Session extension
 Session(app)
 
+# Initialize after app creation
+csrf = CSRFProtect(app)
+
 # Role-Base Access Mgmt
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "daleboquita")
 jwt = JWTManager(app)
@@ -256,17 +269,15 @@ def is_today_filter(date_str):
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        try:
-            if "user" not in session:
-                # Store the full URL of the current request
-                current_url = request.url
-                app.logger.info(f"Protected route accessed: {current_url}")
-                app.logger.info(f"Redirecting to login with next={current_url}")
-                return redirect(url_for("login", next=current_url))
-            return f(*args, **kwargs)
-        except RuntimeError as e:
-            app.logger.error(f"Session error: {str(e)}")
-            return redirect(url_for("login"))
+        if "user" not in session:
+            if request.headers.get('HX-Request'):
+                return """
+                <script>
+                    window.location.href = '/login?next=' + encodeURIComponent(window.location.href);
+                </script>
+                """, 401
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
     return decorated_function
 
 
@@ -539,41 +550,40 @@ def save_to_notion(user_id, page_id):
 @app.route("/save_user_opportunity", methods=["POST"])
 @login_required
 def save_user_opportunity():
-    user_id = session["user"]["sub"]
-    app.logger.info(f"Saving opportunities for user {user_id}")
-
     try:
-        selected_pages = request.form.getlist("selected_pages")
-        app.logger.info(f"Selected pages to save: {selected_pages}")
-
-        if not selected_pages:
-            app.logger.warning("No pages selected")
-            return jsonify({"error": "No pages selected"}), 400
-
-        saved_count = 0
+        selected_pages = request.form.getlist('selected_pages')
+        # Get user ID from Auth0 session structure
+        user_id = session['user']['sub']  # Direct access without 'profile' key
+        
+        # Get existing saves using your existing pattern
+        existing_ids = get_saved_opportunity_ids(user_id)
+        
+        # Save new opportunities
+        new_saves = 0
         for page_id in selected_pages:
-            try:
-                if not is_opportunity_already_saved(user_id, page_id):
-                    save_to_notion(user_id, page_id)
-                    saved_count += 1
-                    app.logger.info(f"Saved opportunity {page_id}")
-                else:
-                    app.logger.info(f"Opportunity {page_id} already saved")
-            except Exception as e:
-                app.logger.error(f"Error saving opportunity {page_id}: {str(e)}")
+            if page_id not in existing_ids:
+                save_to_notion(user_id, page_id)
+                new_saves += 1
 
-        success_message = f"""
-        <div role="alert" class="flex items-center justify-center alert alert-success p-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+        if new_saves == 0:
+            return """
+            <div class="flex items-center text-yellow-500">
+                Already saved
+            </div>
+            """
+
+        return """
+        <div class="flex items-center text-green-500">
+            Saved successfully
         </div>
         """
-        return success_message, 200
-
     except Exception as e:
-        app.logger.error(f"Error in save_user_opportunity: {str(e)}")
-        return jsonify({"error": str(e)}), 400
+        app.logger.error(f"Save error: {str(e)}", exc_info=True)
+        return f"""
+        <div class="text-red-500">
+            Error: {str(e)}
+        </div>
+        """, 500
 
 def fetch_opportunity_details(opportunity_id):
     return get_opportunity_by_id(opportunity_id)
@@ -626,19 +636,13 @@ def is_opportunity_already_saved(user_id, page_id):
     return bool(data["results"])
 
 def get_saved_opportunity_ids(user_id):
-    app.logger.info(f"Fetching saved opportunities for user {user_id}")
-    
+    """Your existing implementation"""
     url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
-    headers = {
-        "Authorization": "Bearer " + NOTION_TOKEN,
-        "Content-Type": "application/json",
-        "Notion-Version": "2022-06-28",
-    }
     json_body = {
         "filter": {
             "and": [
                 {"property": "User ID", "title": {"equals": user_id}},
-                {"property": "Opportunity ID", "rich_text": {"contains": ""}}
+                {"property": "Opportunity ID", "rich_text": {"is_not_empty": True}}
             ]
         }
     }
@@ -652,19 +656,15 @@ def get_saved_opportunity_ids(user_id):
         for result in data.get("results", []):
             try:
                 opp_id = result["properties"]["Opportunity ID"]["rich_text"][0]["text"]["content"]
-                if len(opp_id) == 36:  # Only add valid UUIDs
-                    app.logger.info(f"Found valid opportunity ID: {opp_id}")
+                if len(opp_id) == 36:  # UUID validation
                     opportunity_ids.append(opp_id)
-                else:
-                    app.logger.warning(f"Skipping invalid opportunity ID: {opp_id}")
-            except (KeyError, IndexError) as e:
-                app.logger.error(f"Error extracting opportunity ID from result: {e}")
+            except (KeyError, IndexError):
                 continue
 
-        return opportunity_ids
+        return set(opportunity_ids)
     except Exception as e:
         app.logger.error(f"Error fetching saved opportunities: {str(e)}")
-        return []
+        return set()
 
 def get_opportunity_by_id(opportunity_id):
     if not opportunity_id or not isinstance(opportunity_id, str) or len(opportunity_id) < 2:
@@ -2084,4 +2084,12 @@ if __name__ == "__main__":
         # Development server
         port = int(os.environ.get("PORT", 5001))
         app.run(host="0.0.0.0", port=port, debug=True)
+
+if not is_production:
+    @app.after_request
+    def add_cors_headers(response):
+        response.headers['Access-Control-Allow-Origin'] = 'http://localhost:5001'
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        response.headers['Access-Control-Allow-Headers'] = 'HX-Request, Content-Type'
+        return response
 

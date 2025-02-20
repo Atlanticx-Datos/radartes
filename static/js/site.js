@@ -25,6 +25,16 @@ exposeModules();
 
 // Initialize all modules when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
+    // Safely initialize HTMX configuration
+    if (typeof htmx !== 'undefined') {
+        htmx.config = htmx.config || {};
+        htmx.config.headers = htmx.config.headers || {};
+        htmx.config.headers['X-CSRFToken'] = document.querySelector('input[name="csrf_token"]')?.value || '';
+    }
+    
+    // Process dynamic content
+    htmx.process(document.body);
+    
     exposeModules();  // Ensure modules are exposed
     
     // Initialize core modules
@@ -100,15 +110,17 @@ function setupFilterDropdown() {
 // Setup preview button listeners
 function setupPreviewButtons() {
     document.addEventListener('click', function(e) {
-        if (e.target.closest('.preview-btn')) {
-            const button = e.target.closest('.preview-btn');
+        const previewBtn = e.target.closest('.preview-btn');
+        if (previewBtn) {
+            e.preventDefault();
+            const dataset = previewBtn.dataset;
             ModalModule.showPreviewModal(
-                button.dataset.url,
-                button.dataset.name,
-                button.dataset.pais,
-                button.dataset.og_resumida,
-                button.dataset.id,
-                button.dataset.categoria
+                dataset.url,
+                dataset.name,
+                dataset.pais || dataset.country,
+                dataset.og_resumida || dataset.summary,
+                dataset.id,
+                dataset.categoria || dataset.category
             );
         }
     });
@@ -121,3 +133,50 @@ window.performSearch = SearchModule.performSearch.bind(SearchModule);
 window.showAlert = Utils.showAlert.bind(Utils);
 window.clearAllFilters = FilterModule.clearAllFilters.bind(FilterModule);
 window.toggleDisciplineFilter = FilterModule.handleDisciplineFilter.bind(FilterModule);
+
+// Add to site.js
+document.body.addEventListener('htmx:afterRequest', function(evt) {
+    const notification = document.getElementById('notification');
+    if (!notification) return;
+
+    if (evt.detail.successful) {
+        notification.classList.remove('hidden', 'alert-error');
+        notification.classList.add('alert-success');
+        notification.innerHTML = 'Saved successfully';
+    } else {
+        notification.classList.remove('hidden', 'alert-success');
+        notification.classList.add('alert-error');
+        notification.innerHTML = 'Error saving';
+    }
+    
+    setTimeout(() => {
+        notification.classList.add('hidden');
+        notification.innerHTML = '';
+    }, 3000);
+});
+
+// Add this to site.js
+document.body.addEventListener('htmx:configRequest', function(evt) {
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+    if (csrfToken) {
+        evt.detail.headers['X-CSRFToken'] = csrfToken;
+    }
+});
+
+document.body.addEventListener('htmx:beforeRequest', function(evt) {
+    htmx.config.withCredentials = true;
+});
+
+document.body.addEventListener('htmx:responseError', function(evt) {
+    if (evt.detail.xhr.status === 401) {
+        window.location.href = '/login?next=' + encodeURIComponent(window.location.href);
+    }
+});
+
+document.body.addEventListener('htmx:afterProcessNode', function(evt) {
+    try {
+        htmx.process(evt.target);
+    } catch (e) {
+        console.error('HTMX processing error:', e);
+    }
+});

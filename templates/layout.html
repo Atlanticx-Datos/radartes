@@ -146,6 +146,11 @@
             transition: all 0.3s ease-in-out;
         }
     </style>
+
+    <!-- Add this inside the <body> tag -->
+    <div id="csrf-container" class="hidden">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    </div>
 </body>
 
 </html>

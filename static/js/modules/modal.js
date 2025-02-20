@@ -37,6 +37,10 @@ export const ModalModule = {
             max-width: 500px;
         `;
 
+        // Get CSRF token safely
+        const csrfInput = document.querySelector('input[name="csrf_token"]');
+        const csrfToken = csrfInput ? Utils.escapeHTML(csrfInput.value) : '';
+        
         modalContent.innerHTML = `
             <div class="bg-white rounded-lg shadow-lg overflow-hidden">
                 <!-- Header: Title & Share Button -->
@@ -85,20 +89,36 @@ export const ModalModule = {
                 </div>
 
                 <!-- Footer -->
-                <div class="p-4 bg-gray-50 border-t">
+                <div class="p-4 bg-gray-50 border-t flex gap-3">
+                    <button 
+                        hx-post="/save_user_opportunity"
+                        hx-target="#notification"
+                        hx-include="[name='selected_pages'], [name='csrf_token']"
+                        class="w-1/2 text-center bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors"
+                    >
+                        Guardar
+                    </button>
                     <a href="${Utils.escapeHTML(url)}" 
                        target="_blank" 
-                       rel="noopener noreferrer" 
-                       class="block w-full text-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                        Ver oportunidad completa
+                       class="w-1/2 text-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                        Ver oportunidad
                     </a>
                 </div>
+                <input type="hidden" name="selected_pages" value="${id}">
+                <input type="hidden" name="csrf_token" value="${csrfToken}">
             </div>
         `;
 
         // Add to DOM
         document.body.appendChild(overlay);
         document.body.appendChild(modalContent);
+
+        // Initialize HTMX on new content
+        if (window.htmx) {
+            htmx.process(modalContent);
+        } else {
+            console.error('HTMX not loaded');
+        }
 
         // Force reflow to enable transitions
         overlay.offsetHeight;
@@ -173,5 +193,11 @@ export const ModalModule = {
                 window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`, '_blank');
                 break;
         }
+    },
+
+    // After successful save
+    refreshSavedOpportunities() {
+        const refreshEvent = new CustomEvent('refresh-saved-opportunities');
+        document.dispatchEvent(refreshEvent);
     }
 }; 
