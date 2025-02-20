@@ -90,12 +90,21 @@
     </div>
 
     <style>
-        /* Estilos base del botón */
+        /* Estilos base del botón y contenedor */
+        .filter-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            width: 100%;
+        }
+
         .filter-btn {
             transition: all 0.3s ease;
             position: relative;
             background-color: white;
             border: 1px solid #e5e7eb;
+            width: 100%; /* Asegura que el botón ocupe todo el espacio de su celda */
+            min-height: 120px; /* Altura mínima consistente */
         }
 
         /* Estado normal del SVG */
@@ -166,13 +175,26 @@
                 opacity: 0.8;
             }
         }
+
+        /* Media queries para responsive */
+        @media (min-width: 640px) {
+            .filter-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .filter-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
     </style>
 
     <!-- Filter buttons section -->
     <div class="mb-8">
-        <div class="filter-container flex flex-wrap justify-between w-full gap-2">
+        <div class="filter-container">
             {% for discipline in discipline_groups.keys() %}
-            <button class="filter-btn flex flex-col items-center justify-center px-12 py-8 rounded-med border text-gray-700 transition-all"
+            <button class="filter-btn flex flex-col items-center justify-center rounded-med border text-gray-700 transition-all"
                 data-discipline-filter="{{ discipline }}"
                 data-active="false"
                 onclick="this.dataset.active = this.dataset.active === 'true' ? 'false' : 'true'; toggleDisciplineFilter(this, '{{ discipline }}')">
