@@ -298,23 +298,29 @@ export const SearchModule = {
     handleKeyPress(event) {
         if (event.key === "Enter" && !this.searchInProgress) {
             event.preventDefault();
-            const searchValue = document.getElementById("search-input").value.trim();
+            const searchInput = document.getElementById("open-search");
+            if (!searchInput) {
+                console.error("Search input element not found!");
+                return;
+            }
+            const searchValue = searchInput.value.trim();
             if (searchValue.length >= 3) {
                 this.searchInProgress = true;
                 this.trackSearch(searchValue);
-                htmx.ajax("GET", "/database?search=" + encodeURIComponent(searchValue), {
-                    target: "#search-results",
-                    swap: "innerHTML",
-                    headers: { "HX-Request": "true" },
-                    onAfterSwap: () => {
-                        this.searchInProgress = false;
-                    },
-                    onError: (error) => {
-                        console.error("Search error:", error);
-                        this.trackSearchError(searchValue, "fetch_error");
-                        this.searchInProgress = false;
-                    },
-                });
+                
+                // Perform local filtering (no server-side HTMX call)
+                FilterModule.applyFilters();
+                
+                this.searchInProgress = false;
+                
+                // Smooth scroll to the results container
+                const resultsContainer = document.getElementById('results-container');
+                if (resultsContainer) {
+                    resultsContainer.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
             }
         }
     },
