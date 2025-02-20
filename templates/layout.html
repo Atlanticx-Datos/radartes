@@ -101,7 +101,7 @@
     <link rel="shortcut icon" href="/static/public/favicon.ico" />
 </head>
 
-<body class="flex justify-center max-sm:items-start bg-zinc-100 min-h-screen data-route=" {{ request.endpoint }}">
+<body class="flex justify-center max-sm:items-start bg-gray-800 min-h-screen" data-route="{{ request.endpoint }}">
 
     <!-- Alert container -->
     <div id="alert-container" hx-preserve="true"></div>
@@ -119,16 +119,16 @@
             class="h-full w-full object-contain">
     </div>
 
-    <main class="w-full bg-zinc-100 flex flex-col max-sm:rounded-lg">
-        <!-- Navigation - included as a partial -->
-        <div class="w-full flex-shrink-0">
+    <main class="w-full flex flex-col max-sm:rounded-lg">
+        <!-- Navigation with light background -->
+        <div class="w-full bg-white flex-shrink-0">
             <div class="mx-auto">
                 {% include '_nav.html' %}
             </div>
         </div>
 
-        <!-- Content wrapper -->
-        <div>
+        <!-- Content blocks will inherit dark background -->
+        <div class="flex-1">
             {% block body %}{% endblock %}
         </div>
     </main>

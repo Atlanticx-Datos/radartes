@@ -1921,6 +1921,9 @@ details.collapse summary::-webkit-details-marker {
 .right-0 {
   right: 0px;
 }
+.right-1\/2 {
+  right: 50%;
+}
 .right-16 {
   right: 4rem;
 }
@@ -1966,6 +1969,10 @@ details.collapse summary::-webkit-details-marker {
 .col-span-1 {
   grid-column: span 1 / span 1;
 }
+.mx-\[-50vw\] {
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -1994,6 +2001,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .-mr-6 {
   margin-right: -1.5rem;
+}
+.-mt-10 {
+  margin-top: -2.5rem;
 }
 .mb-1 {
   margin-bottom: 0.25rem;
@@ -2406,6 +2416,10 @@ details.collapse summary::-webkit-details-marker {
 .rounded-xl {
   border-radius: 0.75rem;
 }
+.rounded-t-\[40px\] {
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+}
 .border {
   border-width: 1px;
 }
@@ -2496,6 +2510,10 @@ details.collapse summary::-webkit-details-marker {
   --tw-bg-opacity: 1;
   background-color: rgb(209 213 219 / var(--tw-bg-opacity));
 }
+.bg-gray-50 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(249 250 251 / var(--tw-bg-opacity));
+}
 .bg-gray-800 {
   --tw-bg-opacity: 1;
   background-color: rgb(31 41 55 / var(--tw-bg-opacity));
@@ -2570,10 +2588,6 @@ details.collapse summary::-webkit-details-marker {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
 }
-.px-12 {
-  padding-left: 3rem;
-  padding-right: 3rem;
-}
 .px-2 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
@@ -2597,6 +2611,10 @@ details.collapse summary::-webkit-details-marker {
 .px-8 {
   padding-left: 2rem;
   padding-right: 2rem;
+}
+.px-\[50vw\] {
+  padding-left: 50vw;
+  padding-right: 50vw;
 }
 .py-0 {
   padding-top: 0px;
@@ -2651,6 +2669,9 @@ details.collapse summary::-webkit-details-marker {
 }
 .pr-28 {
   padding-right: 7rem;
+}
+.pt-16 {
+  padding-top: 4rem;
 }
 .pt-4 {
   padding-top: 1rem;

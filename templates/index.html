@@ -1,35 +1,141 @@
 {% extends "layout.html" %}
 
 {% block body %}
+<style>
+    /* Estilos base del botón y contenedor */
+    .filter-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .filter-btn {
+        transition: all 0.3s ease;
+        position: relative;
+        background-color: white;
+        border: 1px solid #e5e7eb;
+        width: 100%;
+        /* Asegura que el botón ocupe todo el espacio de su celda */
+        min-height: 120px;
+        /* Altura mínima consistente */
+    }
+
+    /* Estado normal del SVG */
+    .filter-btn svg {
+        transition: stroke 0.3s ease;
+        stroke: #4b5563;
+    }
+
+    /* Estado hover */
+    .filter-btn:hover {
+        border-color: #3b82f6;
+        background-color: #eff6ff;
+    }
+
+    .filter-btn:hover svg {
+        stroke: #3b82f6;
+    }
+
+    /* Estado activo usando atributos personalizados */
+    .filter-btn[data-active="true"] {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        color: white;
+        transform: scale(1.02);
+    }
+
+    .filter-btn[data-active="true"] svg {
+        stroke: white;
+    }
+
+    /* Efecto de presión al hacer click */
+    .filter-btn:active {
+        transform: scale(0.98);
+    }
+
+    /* Animación del estado activo */
+    .filter-btn::after {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: inherit;
+        border: 2px solid transparent;
+        transition: border-color 0.3s ease;
+    }
+
+    .filter-btn[data-active="true"]::after {
+        border-color: #3b82f6;
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    /* Estilos para el contenedor de filtros */
+    .filter-container:has(.filter-btn[data-active="true"]) .filter-btn:not([data-active="true"]) {
+        opacity: 0.5;
+    }
+
+    /* Media query para hover solo en dispositivos que lo soportan */
+    @media (hover: hover) {
+        .filter-container:has(.filter-btn[data-active="true"]) .filter-btn:not([data-active="true"]):hover {
+            opacity: 0.8;
+        }
+    }
+
+    /* Media queries para responsive */
+    @media (min-width: 640px) {
+        .filter-container {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .filter-container {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+</style>
+
 <div class="container max-w-[1292px] mx-auto px-8">
     <!-- Header Section -->
     <header class="py-16 flex flex-col items-center text-center">
         <h1 class="text-5xl font-bold mb-4">Descubrí tu próxima oportunidad</h1>
-        <p class="text-xl text-gray-600 mb-8 max-w-2xl">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-        
+        <p class="text-xl text-gray-600 mb-8 max-w-2xl">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+
         <!-- Search Section -->
         <div class="relative w-full max-w-2xl">
             <div class="relative flex items-center">
-                <input type="text" 
-                       id="open-search" 
-                       placeholder="Buscar (ej: pintura, españa o beca, alemania)..." 
-                       class="w-full p-4 pr-28 border rounded-lg shadow-sm">
+                <input type="text" id="open-search" placeholder="Buscar (ej: pintura, españa o beca, alemania)..."
+                    class="w-full p-4 pr-28 border rounded-lg shadow-sm">
 
                 <!-- Filter trigger button (now first) -->
-                <button id="filter-dropdown-trigger"
-                        class="absolute right-16 p-2 text-gray-400 hover:text-gray-600">
+                <button id="filter-dropdown-trigger" class="absolute right-16 p-2 text-gray-400 hover:text-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd"
+                            d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
+                            clip-rule="evenodd" />
                     </svg>
                 </button>
 
                 <!-- Clear all filters button (now second) -->
-                <button type="button"
-                        id="clear-search"
-                        class="absolute right-4 p-2 text-gray-400 hover:text-gray-600"
-                        onclick="clearAllFilters();">
+                <button type="button" id="clear-search" class="absolute right-4 p-2 text-gray-400 hover:text-gray-600"
+                    onclick="clearAllFilters();">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        <path fill-rule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clip-rule="evenodd" />
                     </svg>
                 </button>
             </div>
@@ -42,19 +148,26 @@
                 <div class="mb-4">
                     <h3 class="text-sm font-semibold mb-2">Categorías</h3>
                     <div class="grid grid-cols-2 gap-2">
-                        <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                        <button
+                            class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
                             data-category="beca">Beca</button>
-                        <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                        <button
+                            class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
                             data-category="residencia">Residencia</button>
-                        <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                        <button
+                            class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
                             data-category="premio">Premio</button>
-                        <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                        <button
+                            class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
                             data-category="convocatoria">Convocatoria</button>
-                        <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                        <button
+                            class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
                             data-category="oportunidad">Oportunidad</button>
-                        <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                        <button
+                            class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
                             data-category="fondos">Fondos</button>
-                        <button class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                        <button
+                            class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
                             data-category="apoyo">Apoyo</button>
                     </div>
                 </div>
@@ -88,190 +201,100 @@
     <div id="prefiltered-data" data-results="{{ prefiltered_results|tojson|forceescape }}"
         data-pages="{{ pages|tojson|forceescape }}" class="hidden">
     </div>
+</div>
 
-    <style>
-        /* Estilos base del botón y contenedor */
-        .filter-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            width: 100%;
-        }
+<!-- Full width background container with rounded top corners -->
+<div class="w-full bg-gray-50 rounded-t-[40px] overflow-hidden">
+    <!-- Re-open container for content alignment -->
+    <div class="container max-w-[1292px] mx-auto px-8">
+        <div class="pt-16 -mt-10 relative z-20">
+            <!-- Filter buttons section -->
+            <div class="mb-8">
+                <div class="filter-container">
+                    {% for discipline in discipline_groups.keys() %}
+                    <button
+                        class="filter-btn flex flex-col items-center justify-center rounded-med border text-gray-700 transition-all"
+                        data-discipline-filter="{{ discipline }}" data-active="false"
+                        onclick="this.dataset.active = this.dataset.active === 'true' ? 'false' : 'true'; toggleDisciplineFilter(this, '{{ discipline }}')">
+                        <!-- Icons for each discipline -->
+                        {% if discipline == 'Visuales' %}
+                        <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        {% elif discipline == 'Música' %}
+                        <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                        </svg>
+                        {% elif discipline == 'Escénicas' %}
+                        <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        {% elif discipline == 'Literatura' %}
+                        <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                        {% elif discipline == 'Diseño' %}
+                        <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                        </svg>
+                        {% elif discipline == 'Cine' %}
+                        <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                        </svg>
+                        {% else %}
+                        <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        {% endif %}
+                        {{ discipline|title }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
 
-        .filter-btn {
-            transition: all 0.3s ease;
-            position: relative;
-            background-color: white;
-            border: 1px solid #e5e7eb;
-            width: 100%; /* Asegura que el botón ocupe todo el espacio de su celda */
-            min-height: 120px; /* Altura mínima consistente */
-        }
+            <!-- Destacados section with proper spacing and full width -->
+            <div class="relative max-w-7xl mx-auto">
+                <!-- Previous button - adjusted to -ml-14 -->
+                <button onclick="prevDestacarPage()"
+                    class="destacar-prev absolute left-0 top-1/2 -translate-y-1/2 -ml-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200"
+                    aria-disabled="true">
+                    <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
 
-        /* Estado normal del SVG */
-        .filter-btn svg {
-            transition: stroke 0.3s ease;
-            stroke: #4b5563;
-        }
+                <!-- Featured opportunities grid - full width -->
+                <div class="featured-opportunities w-full">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Content will be populated by JavaScript -->
+                    </div>
+                </div>
 
-        /* Estado hover */
-        .filter-btn:hover {
-            border-color: #3b82f6;
-            background-color: #eff6ff;
-        }
+                <!-- Next button - adjusted to -mr-14 -->
+                <button onclick="nextDestacarPage()"
+                    class="destacar-next absolute right-0 top-1/2 -translate-y-1/2 -mr-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200">
+                    <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
 
-        .filter-btn:hover svg {
-            stroke: #3b82f6;
-        }
+            <!-- Results Section -->
+            <div class="mt-4 mb-6">
+                <!-- Results Counter -->
+                <div class="text-sm text-gray-600 my-4" id="results-counter"></div>
 
-        /* Estado activo usando atributos personalizados */
-        .filter-btn[data-active="true"] {
-            background-color: #2563eb;
-            border-color: #2563eb;
-            color: white;
-            transform: scale(1.02);
-        }
-
-        .filter-btn[data-active="true"] svg {
-            stroke: white;
-        }
-
-        /* Efecto de presión al hacer click */
-        .filter-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* Animación del estado activo */
-        .filter-btn::after {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: inherit;
-            border: 2px solid transparent;
-            transition: border-color 0.3s ease;
-        }
-
-        .filter-btn[data-active="true"]::after {
-            border-color: #3b82f6;
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.5;
-            }
-        }
-
-        /* Estilos para el contenedor de filtros */
-        .filter-container:has(.filter-btn[data-active="true"]) .filter-btn:not([data-active="true"]) {
-            opacity: 0.5;
-        }
-
-        /* Media query para hover solo en dispositivos que lo soportan */
-        @media (hover: hover) {
-            .filter-container:has(.filter-btn[data-active="true"]) .filter-btn:not([data-active="true"]):hover {
-                opacity: 0.8;
-            }
-        }
-
-        /* Media queries para responsive */
-        @media (min-width: 640px) {
-            .filter-container {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .filter-container {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-    </style>
-
-    <!-- Filter buttons section -->
-    <div class="mb-8">
-        <div class="filter-container">
-            {% for discipline in discipline_groups.keys() %}
-            <button class="filter-btn flex flex-col items-center justify-center rounded-med border text-gray-700 transition-all"
-                data-discipline-filter="{{ discipline }}"
-                data-active="false"
-                onclick="this.dataset.active = this.dataset.active === 'true' ? 'false' : 'true'; toggleDisciplineFilter(this, '{{ discipline }}')">
-                <!-- Icons for each discipline -->
-                {% if discipline == 'Visuales' %}
-                <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
-                {% elif discipline == 'Música' %}
-                <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
-                </svg>
-                {% elif discipline == 'Escénicas' %}
-                <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                </svg>
-                {% elif discipline == 'Literatura' %}
-                <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                </svg>
-                {% elif discipline == 'Diseño' %}
-                <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
-                </svg>
-                {% elif discipline == 'Cine' %}
-                <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
-                </svg>
-                {% else %}
-                <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                </svg>
-                {% endif %}
-                {{ discipline|title }}
-            </button>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- Destacados section with proper spacing and full width -->
-    <div class="relative max-w-7xl mx-auto">
-        <!-- Previous button - adjusted to -ml-14 -->
-        <button 
-            onclick="prevDestacarPage()"
-            class="destacar-prev absolute left-0 top-1/2 -translate-y-1/2 -ml-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200"
-            aria-disabled="true"
-        >
-            <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-        </button>
-
-        <!-- Featured opportunities grid - full width -->
-        <div class="featured-opportunities w-full">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Content will be populated by JavaScript -->
+                <!-- Results Grid -->
+                <div id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             </div>
         </div>
-
-        <!-- Next button - adjusted to -mr-14 -->
-        <button 
-            onclick="nextDestacarPage()"
-            class="destacar-next absolute right-0 top-1/2 -translate-y-1/2 -mr-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200"
-        >
-            <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-        </button>
-    </div>
-
-    <!-- Results Section -->
-    <div class="mt-4 mb-6">
-        <!-- Results Counter -->
-        <div class="text-sm text-gray-600 my-4" id="results-counter"></div>
-
-        <!-- Results Grid -->
-        <div id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </div>
 </div>
 
@@ -286,16 +309,16 @@
     };
 
     // Ensure these functions are globally available
-    window.performSearch = function() {
+    window.performSearch = function () {
         const searchInput = document.getElementById('open-search');
         const clearButton = document.getElementById('clear-search');
-        
+
         // Debug
         console.log('performSearch called', {
             inputValue: searchInput.value,
             clearButtonExists: !!clearButton
         });
-        
+
         // Show/hide clear button based on input content
         if (searchInput.value.length > 0) {
             clearButton.style.display = 'block';
@@ -307,43 +330,43 @@
         applyFilters(searchInputValue);
     };
 
-    window.clearSearch = function() {
+    window.clearSearch = function () {
         const searchInput = document.getElementById('open-search');
         const clearButton = document.getElementById('clear-search');
-        
+
         // Debug
         console.log('clearSearch called');
-        
+
         searchInput.value = '';
         clearButton.style.display = 'none';
         performSearch(); // Trigger search to reset results
     };
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // Debug: Initial check
         console.log('DOM Content Loaded');
-        
+
         const searchInput = document.getElementById('open-search');
         const clearButton = document.getElementById('clear-search');
-        
+
         // Debug: Element check
         console.log('Elements found:', {
             searchInput: !!searchInput,
             clearButton: !!clearButton
         });
-        
+
         // Remove any existing listeners to prevent conflicts
         const newSearchInput = searchInput.cloneNode(true);
         searchInput.parentNode.replaceChild(newSearchInput, searchInput);
-        
+
         // Add our listeners
         newSearchInput.addEventListener('input', window.performSearch);
-        
+
         // Initial check for existing input
         if (newSearchInput.value.length > 0) {
             clearButton.style.display = 'block';
         }
-        
+
         // Debug: Setup complete
         console.log('Search setup complete');
     });
@@ -360,7 +383,7 @@
     function performSearch() {
         const searchInput = document.getElementById('open-search');
         const clearButton = document.getElementById('clear-search');
-        
+
         // Show/hide clear button based on input content
         if (searchInput.value.length > 0) {
             clearButton.style.display = 'block';
@@ -380,32 +403,32 @@
         performSearch(); // Trigger search to reset results
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const allPages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
         initializeDropdowns(allPages);
-        
+
         // Setup event listeners
         document.getElementById('open-search').addEventListener('input', performSearch);
-        
+
         // Debug: Check if elements exist
         console.log('Search input exists:', !!document.getElementById('open-search'));
         console.log('Clear button exists:', !!document.getElementById('clear-search'));
-        
+
         // Debug: Check initial state
         const searchInput = document.getElementById('open-search');
         console.log('Initial search value:', searchInput.value);
-        
+
         // Force initial check of search input
         performSearch();
-        
+
         // Setup category filter buttons
         document.querySelectorAll('.category-filter-btn').forEach(button => {
-            button.addEventListener('click', function(e) {
+            button.addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();  // Prevent event bubbling
                 const category = this.dataset.category;
                 console.log('Category clicked:', category);
-                
+
                 // Toggle category in activeFilters
                 if (activeFilters.categories.has(category)) {
                     activeFilters.categories.delete(category);
@@ -414,7 +437,7 @@
                     activeFilters.categories.add(category);
                     this.classList.add('border-blue-500', 'bg-blue-50');
                 }
-                
+
                 // Store categories in a way that persists
                 window.selectedCategories = Array.from(activeFilters.categories);
                 console.log('Selected categories:', window.selectedCategories);
@@ -423,12 +446,12 @@
 
         // Setup discipline filter buttons
         document.querySelectorAll('[data-discipline-filter]').forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 document.querySelectorAll('[data-discipline-filter]').forEach(btn => {
                     btn.classList.remove('bg-blue-600', 'text-white');
                     btn.classList.add('border-gray-300', 'text-gray-700');
                 });
-                
+
                 this.classList.remove('border-gray-300', 'text-gray-700');
                 this.classList.add('bg-blue-600', 'text-white');
                 activeFilters.discipline = this.dataset.disciplineFilter;
@@ -439,25 +462,25 @@
         // Setup apply filters button
         const applyFiltersBtn = document.getElementById('apply-filters');
         if (applyFiltersBtn) {
-            applyFiltersBtn.addEventListener('click', function(e) {
+            applyFiltersBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 // Get current filter values
                 activeFilters.country = document.getElementById('country-filter').value;
                 activeFilters.month = document.getElementById('month-filter').value;
-                
+
                 // Ensure we're using the stored categories
                 if (window.selectedCategories) {
                     activeFilters.categories = new Set(window.selectedCategories);
                 }
-                
+
                 console.log('Applying combined filters:', {
                     categories: Array.from(activeFilters.categories),
                     country: activeFilters.country,
                     month: activeFilters.month
                 });
-                
+
                 applyFilters();
                 document.getElementById('structured-filters').classList.add('hidden');
             });
@@ -467,12 +490,12 @@
     function applyFilters(searchInput = document.getElementById('open-search').value) {
         // Add featured section toggle at the start
         const featuredSection = document.querySelector('.featured-opportunities');
-        
+
         // Hide featured section if there's any active filtering
-        if (searchInput || 
-            activeFilters.categories.size > 0 || 
-            activeFilters.country || 
-            activeFilters.month || 
+        if (searchInput ||
+            activeFilters.categories.size > 0 ||
+            activeFilters.country ||
+            activeFilters.month ||
             activeFilters.discipline !== 'todos') {
             featuredSection?.classList.add('hidden');
         } else {
@@ -485,7 +508,7 @@
         }
 
         const allPages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
-        
+
         const filtered = allPages.filter(page => {
             // For debugging
             let filterResults = {
@@ -518,7 +541,7 @@
             if (activeFilters.month) {
                 const monthToFind = String(activeFilters.month).padStart(2, '0');
                 const pageMonth = page.fecha_de_cierre ? page.fecha_de_cierre.split('-')[1] : '';
-                
+
                 console.log('Month matching:', {
                     page: page.nombre,
                     monthToFind,
@@ -526,7 +549,7 @@
                     pageMonth,
                     matches: pageMonth === monthToFind
                 });
-                
+
                 filterResults.monthMatch = pageMonth === monthToFind;
                 if (!filterResults.monthMatch) return false;
             }
@@ -536,8 +559,8 @@
                 const pageCategory = normalizeText(page.categoria);
                 filterResults.categoryMatch = Array.from(activeFilters.categories).some(category => {
                     const normalizedCategory = normalizeText(category);
-                    return pageCategory.startsWith(normalizedCategory) || 
-                           pageCategory.startsWith(normalizedCategory + 's');
+                    return pageCategory.startsWith(normalizedCategory) ||
+                        pageCategory.startsWith(normalizedCategory + 's');
                 });
                 if (!filterResults.categoryMatch) return false;
             }
@@ -609,7 +632,7 @@
         // Initialize country dropdown
         const countryFilter = document.getElementById('country-filter');
         const countries = [...new Set(pages.map(page => page.pais).filter(Boolean))].sort();
-        
+
         countries.forEach(country => {
             const option = document.createElement('option');
             option.value = country;
@@ -646,22 +669,22 @@
     function clearAllFilters() {
         // Clear search input
         document.getElementById('open-search').value = '';
-        
+
         // Clear category filters
         activeFilters.categories.clear();
         window.selectedCategories = [];
         document.querySelectorAll('.category-filter-btn').forEach(btn => {
             btn.classList.remove('border-blue-500', 'bg-blue-50');
         });
-        
+
         // Clear country filter
         document.getElementById('country-filter').value = '';
         activeFilters.country = '';
-        
+
         // Clear month filter
         document.getElementById('month-filter').value = '';
         activeFilters.month = '';
-        
+
         // Reset discipline to 'todos'
         activeFilters.discipline = 'todos';
         document.querySelectorAll('[data-discipline-filter]').forEach(btn => {
@@ -672,13 +695,13 @@
                 btn.classList.add('bg-blue-600', 'text-white');
             }
         });
-        
+
         // Trigger search to update results
         performSearch();
-        
+
         // Close the filters dropdown if it's open
         document.getElementById('structured-filters').classList.add('hidden');
-        
+
         // Show featured section when clearing all filters
         const featuredSection = document.querySelector('.featured-opportunities');
         featuredSection?.classList.remove('hidden');
@@ -693,7 +716,7 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         ensureClearButtonVisible();
     });
 </script>
@@ -702,7 +725,7 @@
 {% block page_scripts %}
 <script>
     // Process data and store in a dedicated window property
-    const rawData = {{ destacar_pages|tojson|safe }};
+    const rawData = {{ destacar_pages| tojson | safe }};
     window.processedDestacarData = rawData.map(item => ({
         ...item,
         url_base: item.url_base || new URL(item.url).hostname.replace('www.', '')
