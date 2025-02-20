@@ -304,23 +304,25 @@ export const SearchModule = {
                 return;
             }
             const searchValue = searchInput.value.trim();
+
             if (searchValue.length >= 3) {
                 this.searchInProgress = true;
                 this.trackSearch(searchValue);
                 
-                // Perform local filtering (no server-side HTMX call)
-                FilterModule.applyFilters();
+                // Trigger the existing client-side filtering
+                window.performSearch();  // Use global function
                 
-                this.searchInProgress = false;
-                
-                // Smooth scroll to the results container
-                const resultsContainer = document.getElementById('results-container');
-                if (resultsContainer) {
-                    resultsContainer.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
+                // Smooth scroll after DOM update
+                setTimeout(() => {
+                    const resultsContainer = document.getElementById('results-container');
+                    if (resultsContainer) {
+                        resultsContainer.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                    this.searchInProgress = false;
+                }, 50);  // Brief delay to allow DOM update
             }
         }
     },

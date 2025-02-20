@@ -378,6 +378,17 @@
 
                 applyFilters();
                 document.getElementById('structured-filters').classList.add('hidden');
+
+                // Smooth scroll to results
+                setTimeout(() => {
+                    const resultsContainer = document.getElementById('results-container');
+                    if (resultsContainer) {
+                        resultsContainer.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }, 50);
             });
         }
     });
