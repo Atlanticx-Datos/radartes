@@ -98,7 +98,7 @@ DISCIPLINE_GROUPS = {
         'video', 'cine', 'audiovisual', 'documental', 'animación',
         'videojuegos', 'nuevos medios', 'multimedia', 'transmedia'
     },
-    'Más': {
+    'Otras': {
         'multidisciplinar', 'investigación', 'beca', 'creación', 'curaduría', 
         'gestión cultural', 'comisariado', 'comisario', 'teoría', 'historia', 
         'mediación cultural', 'mediación', 'patrimonio', 'conservación', 
