@@ -2562,6 +2562,10 @@ details.collapse summary::-webkit-details-marker {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
 }
+.px-12 {
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
 .px-2 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
@@ -2597,6 +2601,10 @@ details.collapse summary::-webkit-details-marker {
 .py-1 {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
+}
+.py-12 {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
 }
 .py-16 {
   padding-top: 4rem;

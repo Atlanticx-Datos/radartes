@@ -71,10 +71,7 @@ DISCIPLINE_GROUPS = {
     'Visuales': {
         'pintura', 'dibujo', 'grabado', 'escultura', 'fotografía', 'arte digital',
         'instalación', 'performance', 'visuales', 'artes visuales', 'arte contemporáneo',
-        'arte urbano', 'street art', 'litografía', 'serigrafía', 'textiles',
-        # Former Video subdisciplines
-        'video', 'cine', 'audiovisual', 'documental', 'animación',
-        'videojuegos', 'nuevos medios', 'multimedia', 'transmedia'
+        'arte urbano', 'street art', 'litografía', 'serigrafía', 'textiles'
     },
     'Música': {
         'música', 'composición', 'interpretación musical', 'dirección musical',
@@ -97,6 +94,10 @@ DISCIPLINE_GROUPS = {
         'arquitectura', 'urbanismo', 'paisajismo', 'diseño de interiores',
         'arquitectura efímera', 'diseño espacial'
     },
+    'Cine': {
+        'video', 'cine', 'audiovisual', 'documental', 'animación',
+        'videojuegos', 'nuevos medios', 'multimedia', 'transmedia'
+    },
     'Más': {
         'multidisciplinar', 'investigación', 'beca', 'creación', 'curaduría', 
         'gestión cultural', 'comisariado', 'comisario', 'teoría', 'historia', 
@@ -112,9 +113,10 @@ MAIN_DISCIPLINES = [
     'visuales',
     'música',
     'escénicas',
+    'cine',
     'literatura',
     'diseño',
-    'más'
+    'otras'
 ]
 
 class RedisWrapper:
