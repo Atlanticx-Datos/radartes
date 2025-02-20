@@ -401,5 +401,62 @@ export const SearchModule = {
 
         this.updateFilterUI();
         console.log('Updated categories:', Array.from(this.activeFilters.categories));
+    },
+
+    updateResults(results) {
+        const container = document.getElementById('results-container');
+        const counter = document.getElementById('results-counter');
+
+        if (!container || !counter) return;
+
+        // Remove any existing grid classes
+        container.className = '';
+
+        if (!results.length) {
+            container.innerHTML = '<p class="text-center text-gray-500 my-8">No se encontraron resultados.</p>';
+            counter.textContent = '0 resultados encontrados';
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
+                <table class="results-table w-full table-fixed border-collapse">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">Oportunidad</th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">Disciplina</th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">País</th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">$</th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">Cierre</th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        ${results.map(page => `
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-4 py-3 text-sm text-gray-900">${Utils.escapeHTML(page.nombre || '')}</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        ${Utils.escapeHTML(page.disciplina ? page.disciplina.split(',')[0].trim() : '')}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">${Utils.escapeHTML(page.pais || '')}</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">${page.tipo_de_pago || '-'}</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">${Utils.escapeHTML(page.fecha_de_cierre || '')}</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">
+                                    <button 
+                                        class="preview-btn px-3 py-1 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100"
+                                    >
+                                        Ver
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        counter.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''}`;
     }
 }; 

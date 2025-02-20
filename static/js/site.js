@@ -11,8 +11,22 @@ import { ModalModule } from './modules/modal.js';
 import { DestacarModule } from './modules/destacar.js';
 import { Utils } from './utils.js';
 
+// Expose modules to window object using a more reliable approach
+function exposeModules() {
+    window.SearchModule = SearchModule;
+    console.log('SearchModule exposed to window:', {
+        moduleExists: !!window.SearchModule,
+        updateResultsExists: !!(window.SearchModule && window.SearchModule.updateResults)
+    });
+}
+
+// Call expose immediately
+exposeModules();
+
 // Initialize all modules when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
+    exposeModules();  // Ensure modules are exposed
+    
     // Initialize core modules
     FilterModule.init();
     SearchModule.init();

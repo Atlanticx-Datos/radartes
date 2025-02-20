@@ -1,5 +1,9 @@
 {% extends "layout.html" %}
 
+{% block head %}
+<script type="module" src="{{ url_for('static', filename='js/site.js') }}"></script>
+{% endblock %}
+
 {% block body %}
 
 <div class="container max-w-[1292px] mx-auto px-8">
@@ -194,7 +198,12 @@
 </div>
 
 <!-- Update the script section -->
-<script>
+<script type="module">
+    console.log('SearchModule availability check:', {
+        searchModuleExists: !!window.SearchModule,
+        updateResultsExists: !!(window.SearchModule && window.SearchModule.updateResults)
+    });
+
     // Global variables needed by site.js
     let activeFilters = {
         categories: new Set(),
@@ -203,201 +212,88 @@
         discipline: 'todos'
     };
 
-    // Ensure these functions are globally available
-    window.performSearch = function () {
-        const searchInput = document.getElementById('open-search');
-        const clearButton = document.getElementById('clear-search');
+    // Define functions first
+    function initializeDropdowns(pages) {
+        console.log('Initializing dropdowns');
+        // Initialize country dropdown
+        const countryFilter = document.getElementById('country-filter');
+        const countries = [...new Set(pages.map(page => page.pais).filter(Boolean))].sort();
 
-        // Debug
-        console.log('performSearch called', {
-            inputValue: searchInput.value,
-            clearButtonExists: !!clearButton
+        countries.forEach(country => {
+            const option = document.createElement('option');
+            option.value = country;
+            option.textContent = country;
+            countryFilter.appendChild(option);
         });
 
-        // Show/hide clear button based on input content
-        if (searchInput.value.length > 0) {
-            clearButton.style.display = 'block';
+        // Initialize month dropdown
+        const monthFilter = document.getElementById('month-filter');
+        const months = [
+            { value: '1', label: 'Enero' },
+            { value: '2', label: 'Febrero' },
+            { value: '3', label: 'Marzo' },
+            { value: '4', label: 'Abril' },
+            { value: '5', label: 'Mayo' },
+            { value: '6', label: 'Junio' },
+            { value: '7', label: 'Julio' },
+            { value: '8', label: 'Agosto' },
+            { value: '9', label: 'Septiembre' },
+            { value: '10', label: 'Octubre' },
+            { value: '11', label: 'Noviembre' },
+            { value: '12', label: 'Diciembre' }
+        ];
+
+        months.forEach(month => {
+            const option = document.createElement('option');
+            option.value = month.value;
+            option.textContent = month.label;
+            monthFilter.appendChild(option);
+        });
+    }
+
+    function updateResults(results) {
+        if (window.SearchModule && window.SearchModule.updateResults) {
+            window.SearchModule.updateResults(results);
         } else {
-            clearButton.style.display = 'none';
+            // Your existing fallback card-based display logic
+            const container = document.getElementById('results-container');
+            const counter = document.getElementById('results-counter');
+
+            if (!results.length) {
+                container.innerHTML = '<p>No se encontraron resultados.</p>';
+                counter.textContent = '0 resultados encontrados';
+                return;
+            }
+
+            container.innerHTML = results.map(page => `
+                <div class="opportunity-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <h3 class="font-bold text-lg mb-2">${escapeHTML(page.nombre || 'Sin nombre')}</h3>
+                    <p class="text-sm text-gray-600 mb-2">${escapeHTML(page.og_resumida || '')}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">${escapeHTML(page.disciplina || '')}</span>
+                        <button 
+                            class="preview-btn text-blue-600 hover:underline text-sm"
+                            data-url="${escapeHTML(page.url || '')}"
+                            data-name="${escapeHTML(page.nombre || '')}"
+                            data-country="${escapeHTML(page.pais || '')}"
+                            data-summary="${escapeHTML(page.og_resumida || '')}"
+                            data-id="${escapeHTML(page.id || '')}"
+                        >
+                            Ver más
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            counter.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''}`;
         }
-
-        const searchInputValue = searchInput.value;
-        applyFilters(searchInputValue);
-    };
-
-    window.clearSearch = function () {
-        const searchInput = document.getElementById('open-search');
-        const clearButton = document.getElementById('clear-search');
-
-        // Debug
-        console.log('clearSearch called');
-
-        searchInput.value = '';
-        clearButton.style.display = 'none';
-        performSearch(); // Trigger search to reset results
-    };
-
-    document.addEventListener('DOMContentLoaded', function () {
-        // Debug: Initial check
-        console.log('DOM Content Loaded');
-
-        const searchInput = document.getElementById('open-search');
-        const clearButton = document.getElementById('clear-search');
-
-        // Debug: Element check
-        console.log('Elements found:', {
-            searchInput: !!searchInput,
-            clearButton: !!clearButton
-        });
-
-        // Remove any existing listeners to prevent conflicts
-        const newSearchInput = searchInput.cloneNode(true);
-        searchInput.parentNode.replaceChild(newSearchInput, searchInput);
-
-        // Add our listeners
-        newSearchInput.addEventListener('input', window.performSearch);
-
-        // Initial check for existing input
-        if (newSearchInput.value.length > 0) {
-            clearButton.style.display = 'block';
-        }
-
-        // Debug: Setup complete
-        console.log('Search setup complete');
-    });
-
-    function escapeHTML(str) {
-        if (!str) return '';
-        return str.replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
     }
-
-    function performSearch() {
-        const searchInput = document.getElementById('open-search');
-        const clearButton = document.getElementById('clear-search');
-
-        // Show/hide clear button based on input content
-        if (searchInput.value.length > 0) {
-            clearButton.style.display = 'block';
-        } else {
-            clearButton.style.display = 'none';
-        }
-
-        const searchInputValue = searchInput.value;
-        applyFilters(searchInputValue);
-    }
-
-    function clearSearch() {
-        const searchInput = document.getElementById('open-search');
-        const clearButton = document.getElementById('clear-search');
-        searchInput.value = '';
-        clearButton.style.display = 'none';
-        performSearch(); // Trigger search to reset results
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const allPages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
-        initializeDropdowns(allPages);
-
-        // Setup event listeners
-        document.getElementById('open-search').addEventListener('input', performSearch);
-
-        // Debug: Check if elements exist
-        console.log('Search input exists:', !!document.getElementById('open-search'));
-        console.log('Clear button exists:', !!document.getElementById('clear-search'));
-
-        // Debug: Check initial state
-        const searchInput = document.getElementById('open-search');
-        console.log('Initial search value:', searchInput.value);
-
-        // Force initial check of search input
-        performSearch();
-
-        // Setup category filter buttons
-        document.querySelectorAll('.category-filter-btn').forEach(button => {
-            button.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();  // Prevent event bubbling
-                const category = this.dataset.category;
-                console.log('Category clicked:', category);
-
-                // Toggle category in activeFilters
-                if (activeFilters.categories.has(category)) {
-                    activeFilters.categories.delete(category);
-                    this.classList.remove('border-blue-500', 'bg-blue-50');
-                } else {
-                    activeFilters.categories.add(category);
-                    this.classList.add('border-blue-500', 'bg-blue-50');
-                }
-
-                // Store categories in a way that persists
-                window.selectedCategories = Array.from(activeFilters.categories);
-                console.log('Selected categories:', window.selectedCategories);
-            });
-        });
-
-        // Setup discipline filter buttons
-        document.querySelectorAll('[data-discipline-filter]').forEach(button => {
-            button.addEventListener('click', function () {
-                document.querySelectorAll('[data-discipline-filter]').forEach(btn => {
-                    btn.classList.remove('bg-blue-600', 'text-white');
-                    btn.classList.add('border-gray-300', 'text-gray-700');
-                });
-
-                this.classList.remove('border-gray-300', 'text-gray-700');
-                this.classList.add('bg-blue-600', 'text-white');
-                activeFilters.discipline = this.dataset.disciplineFilter;
-                applyFilters();
-            });
-        });
-
-        // Setup apply filters button
-        const applyFiltersBtn = document.getElementById('apply-filters');
-        if (applyFiltersBtn) {
-            applyFiltersBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                // Get current filter values
-                activeFilters.country = document.getElementById('country-filter').value;
-                activeFilters.month = document.getElementById('month-filter').value;
-
-                // Ensure we're using the stored categories
-                if (window.selectedCategories) {
-                    activeFilters.categories = new Set(window.selectedCategories);
-                }
-
-                console.log('Applying combined filters:', {
-                    categories: Array.from(activeFilters.categories),
-                    country: activeFilters.country,
-                    month: activeFilters.month
-                });
-
-                applyFilters();
-                document.getElementById('structured-filters').classList.add('hidden');
-
-                // Smooth scroll to results
-                setTimeout(() => {
-                    const resultsContainer = document.getElementById('results-container');
-                    if (resultsContainer) {
-                        resultsContainer.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                }, 50);
-            });
-        }
-    });
 
     function applyFilters(searchInput = document.getElementById('open-search').value) {
-        // Add featured section toggle at the start
+        console.log('applyFilters called with:', { searchInput, activeFilters });
+        
         const featuredSection = document.querySelector('.featured-opportunities');
 
-        // Hide featured section if there's any active filtering
         if (searchInput ||
             activeFilters.categories.size > 0 ||
             activeFilters.country ||
@@ -408,13 +304,8 @@
             featuredSection?.classList.remove('hidden');
         }
 
-        // Restore categories from our stored selection
-        if (window.selectedCategories) {
-            activeFilters.categories = new Set(window.selectedCategories);
-        }
-
         const allPages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
-
+        
         const filtered = allPages.filter(page => {
             // For debugging
             let filterResults = {
@@ -439,7 +330,7 @@
 
             // Apply country filter
             if (activeFilters.country) {
-                filterResults.countryMatch = normalizeText(page.país) === normalizeText(activeFilters.country);
+                filterResults.countryMatch = normalizeText(page.pais) === normalizeText(activeFilters.country);
                 if (!filterResults.countryMatch) return false;
             }
 
@@ -447,15 +338,6 @@
             if (activeFilters.month) {
                 const monthToFind = String(activeFilters.month).padStart(2, '0');
                 const pageMonth = page.fecha_de_cierre ? page.fecha_de_cierre.split('-')[1] : '';
-
-                console.log('Month matching:', {
-                    page: page.nombre,
-                    monthToFind,
-                    fecha_de_cierre: page.fecha_de_cierre,
-                    pageMonth,
-                    matches: pageMonth === monthToFind
-                });
-
                 filterResults.monthMatch = pageMonth === monthToFind;
                 if (!filterResults.monthMatch) return false;
             }
@@ -501,129 +383,63 @@
             .trim();
     }
 
-    function updateResults(results) {
-        const container = document.getElementById('results-container');
-        const counter = document.getElementById('results-counter');
-
-        if (!results.length) {
-            container.innerHTML = '<p>No se encontraron resultados.</p>';
-            counter.textContent = '0 resultados encontrados';
-            return;
-        }
-
-        container.innerHTML = results.map(page => `
-            <div class="opportunity-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
-                <h3 class="font-bold text-lg mb-2">${escapeHTML(page.nombre || 'Sin nombre')}</h3>
-                <p class="text-sm text-gray-600 mb-2">${escapeHTML(page.og_resumida || '')}</p>
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-500">${escapeHTML(page.disciplina || '')}</span>
-                    <button 
-                        class="preview-btn text-blue-600 hover:underline text-sm"
-                        data-url="${escapeHTML(page.url || '')}"
-                        data-name="${escapeHTML(page.nombre || '')}"
-                        data-country="${escapeHTML(page.pais || '')}"
-                        data-summary="${escapeHTML(page.og_resumida || '')}"
-                        data-id="${escapeHTML(page.id || '')}"
-                    >
-                        Ver más
-                    </button>
-                </div>
-            </div>
-        `).join('');
-
-        counter.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''}`;
-    }
-
-    function initializeDropdowns(pages) {
-        // Initialize country dropdown
-        const countryFilter = document.getElementById('country-filter');
-        const countries = [...new Set(pages.map(page => page.pais).filter(Boolean))].sort();
-
-        countries.forEach(country => {
-            const option = document.createElement('option');
-            option.value = country;
-            option.textContent = country;
-            countryFilter.appendChild(option);
-        });
-
-        // Initialize month dropdown
-        const monthFilter = document.getElementById('month-filter');
-        const months = [
-            { value: '1', label: 'Enero' },
-            { value: '2', label: 'Febrero' },
-            { value: '3', label: 'Marzo' },
-            { value: '4', label: 'Abril' },
-            { value: '5', label: 'Mayo' },
-            { value: '6', label: 'Junio' },
-            { value: '7', label: 'Julio' },
-            { value: '8', label: 'Agosto' },
-            { value: '9', label: 'Septiembre' },
-            { value: '10', label: 'Octubre' },
-            { value: '11', label: 'Noviembre' },
-            { value: '12', label: 'Diciembre' }
-        ];
-
-        months.forEach(month => {
-            const option = document.createElement('option');
-            option.value = month.value;
-            option.textContent = month.label;
-            monthFilter.appendChild(option);
-        });
-    }
-
-    // Function to clear all filters
-    function clearAllFilters() {
-        // Clear search input
-        document.getElementById('open-search').value = '';
-
-        // Clear category filters
-        activeFilters.categories.clear();
-        window.selectedCategories = [];
-        document.querySelectorAll('.category-filter-btn').forEach(btn => {
-            btn.classList.remove('border-blue-500', 'bg-blue-50');
-        });
-
-        // Clear country filter
-        document.getElementById('country-filter').value = '';
-        activeFilters.country = '';
-
-        // Clear month filter
-        document.getElementById('month-filter').value = '';
-        activeFilters.month = '';
-
-        // Reset discipline to 'todos'
-        activeFilters.discipline = 'todos';
-        document.querySelectorAll('[data-discipline-filter]').forEach(btn => {
-            btn.classList.remove('bg-blue-600', 'text-white');
-            btn.classList.add('border-gray-300', 'text-gray-700');
-            if (btn.dataset.disciplineFilter === 'todos') {
-                btn.classList.remove('border-gray-300', 'text-gray-700');
-                btn.classList.add('bg-blue-600', 'text-white');
-            }
-        });
-
-        // Trigger search to update results
-        performSearch();
-
-        // Close the filters dropdown if it's open
-        document.getElementById('structured-filters').classList.add('hidden');
-
-        // Show featured section when clearing all filters
-        const featuredSection = document.querySelector('.featured-opportunities');
-        featuredSection?.classList.remove('hidden');
-    }
-
-    // Ensure the clear button stays visible
-    function ensureClearButtonVisible() {
-        const clearButton = document.getElementById('clear-search');
-        if (clearButton) {
-            clearButton.style.display = 'block';
-            setTimeout(ensureClearButtonVisible, 100);
-        }
-    }
-
+    // Then add event listeners
     document.addEventListener('DOMContentLoaded', function () {
-        ensureClearButtonVisible();
+        console.log('DOM Content Loaded - Setting up event listeners');
+        
+        const allPages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
+        initializeDropdowns(allPages);
+
+        // Setup category filter buttons
+        document.querySelectorAll('.category-filter-btn').forEach(button => {
+            console.log('Setting up category button:', button.dataset.category);
+            button.addEventListener('click', function (e) {
+                console.log('Category clicked:', this.dataset.category);
+                e.preventDefault();
+                e.stopPropagation();
+                const category = this.dataset.category;
+
+                if (activeFilters.categories.has(category)) {
+                    activeFilters.categories.delete(category);
+                    this.classList.remove('border-blue-500', 'bg-blue-50');
+                } else {
+                    activeFilters.categories.add(category);
+                    this.classList.add('border-blue-500', 'bg-blue-50');
+                }
+
+                window.selectedCategories = Array.from(activeFilters.categories);
+                console.log('Selected categories:', window.selectedCategories);
+            });
+        });
+
+        // Setup apply filters button
+        const applyFiltersBtn = document.getElementById('apply-filters');
+        if (applyFiltersBtn) {
+            console.log('Setting up apply filters button');
+            applyFiltersBtn.addEventListener('click', function (e) {
+                console.log('Apply filters clicked');
+                e.preventDefault();
+                e.stopPropagation();
+
+                activeFilters.country = document.getElementById('country-filter').value;
+                activeFilters.month = document.getElementById('month-filter').value;
+
+                if (window.selectedCategories) {
+                    activeFilters.categories = new Set(window.selectedCategories);
+                }
+
+                console.log('Applying filters with:', {
+                    categories: Array.from(activeFilters.categories),
+                    country: activeFilters.country,
+                    month: activeFilters.month
+                });
+
+                applyFilters();
+                document.getElementById('structured-filters').classList.add('hidden');
+            });
+        } else {
+            console.warn('Apply filters button not found!');
+        }
     });
 </script>
 {% endblock %}
