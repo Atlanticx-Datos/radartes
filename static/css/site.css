@@ -225,4 +225,98 @@ html {
     overflow-y: scroll;
 }
 
+/* ====================================
+   FILTER BUTTON COMPONENTS
+   Used in: index.html filter buttons
+   Purpose: Custom interactive filter UI
+   Why custom: Complex state management and animations
+==================================== */
+.filter-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    width: 100%;
+}
+
+.filter-btn {
+    transition: all 0.3s ease;
+    position: relative;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    width: 100%;
+    min-height: 120px;
+}
+
+.filter-btn svg {
+    transition: stroke 0.3s ease;
+    stroke: #4b5563;
+}
+
+.filter-btn:hover {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+}
+
+.filter-btn:hover svg {
+    stroke: #3b82f6;
+}
+
+.filter-btn[data-active="true"] {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    color: white;
+    transform: scale(1.02);
+}
+
+.filter-btn[data-active="true"] svg {
+    stroke: white;
+}
+
+.filter-btn:active {
+    transform: scale(0.98);
+}
+
+.filter-btn::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.filter-btn[data-active="true"]::after {
+    border-color: #3b82f6;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Contextual styles */
+.filter-container:has(.filter-btn[data-active="true"]) .filter-btn:not([data-active="true"]) {
+    opacity: 0.5;
+}
+
+@media (hover: hover) {
+    .filter-container:has(.filter-btn[data-active="true"]) .filter-btn:not([data-active="true"]):hover {
+        opacity: 0.8;
+    }
+}
+
+/* Responsive grid adjustments */
+@media (min-width: 640px) {
+    .filter-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .filter-container {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
 

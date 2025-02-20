@@ -1921,9 +1921,6 @@ details.collapse summary::-webkit-details-marker {
 .right-0 {
   right: 0px;
 }
-.right-1\/2 {
-  right: 50%;
-}
 .right-16 {
   right: 4rem;
 }
@@ -1968,10 +1965,6 @@ details.collapse summary::-webkit-details-marker {
 }
 .col-span-1 {
   grid-column: span 1 / span 1;
-}
-.mx-\[-50vw\] {
-  margin-left: -50vw;
-  margin-right: -50vw;
 }
 .mx-auto {
   margin-left: auto;
@@ -2611,10 +2604,6 @@ details.collapse summary::-webkit-details-marker {
 .px-8 {
   padding-left: 2rem;
   padding-right: 2rem;
-}
-.px-\[50vw\] {
-  padding-left: 50vw;
-  padding-right: 50vw;
 }
 .py-0 {
   padding-top: 0px;
