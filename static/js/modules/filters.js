@@ -87,7 +87,7 @@ export const FilterModule = {
         const normalizedDiscipline = this.normalizeText(discipline);
         const normalizedMain = this.normalizeText(mainDiscipline);
 
-        // 1. Direct name match (case and accent insensitive)
+        // 1. Direct name match
         if (normalizedDiscipline === normalizedMain) {
             console.log(`Direct name match: ${discipline} ≡ ${mainDiscipline}`);
             return true;
@@ -100,13 +100,13 @@ export const FilterModule = {
             return true;
         }
 
-        // 3. Special case for "Más" category
-        if (mainDiscipline === 'Más') {
-            const isGeneric = Array.from(disciplineGroups['Más']).some(d => 
+        // 3. Special case for "Otras" category (previously "Más")
+        if (mainDiscipline === 'Otras') {
+            const isGeneric = Array.from(disciplineGroups['Otras']).some(d => 
                 this.normalizeText(d) === normalizedDiscipline
             );
             if (isGeneric) {
-                console.log(`Más category match: ${discipline}`);
+                console.log(`Otras category match: ${discipline}`);
                 return true;
             }
         }

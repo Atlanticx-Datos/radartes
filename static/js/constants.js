@@ -33,7 +33,7 @@ export const CONSTANTS = {
             'diseño textil', 'ilustración', 'tipografía', 'arquitectura', 'urbanismo', 
             'paisajismo', 'diseño de interiores', 'arquitectura efímera', 'diseño espacial'
         ]),
-        'Más': new Set([
+        'Otras': new Set([
             'multidisciplinar', 'investigación', 'beca', 'creación', 'curaduría', 
             'gestión cultural', 'comisariado', 'comisario', 'teoría', 'historia', 
             'mediación cultural', 'mediación', 'patrimonio', 'conservación', 
