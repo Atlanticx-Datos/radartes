@@ -277,6 +277,7 @@
                             data-name="${escapeHTML(page.nombre || '')}"
                             data-country="${escapeHTML(page.pais || '')}"
                             data-summary="${escapeHTML(page.og_resumida || '')}"
+                            data-category="${escapeHTML(page.categoria || '')}"
                             data-id="${escapeHTML(page.id || '')}"
                         >
                             Ver más
@@ -389,6 +390,9 @@
         
         const allPages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
         initializeDropdowns(allPages);
+
+        // Initialize the view with all results
+        applyFilters();
 
         // Setup category filter buttons
         document.querySelectorAll('.category-filter-btn').forEach(button => {

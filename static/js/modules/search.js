@@ -20,8 +20,8 @@ export const SearchModule = {
                 const tempParser = new DOMParser();
                 const pagesString = tempParser.parseFromString(preFilteredData.dataset.pages, 'text/html').body.textContent;
                 const pages = JSON.parse(pagesString);
-                
-                console.log('Initializing search module with:', { 
+
+                console.log('Initializing search module with:', {
                     pageCount: pages.length,
                     firstPage: pages[0]
                 });
@@ -147,12 +147,12 @@ export const SearchModule = {
     handleMonthFilter(button) {
         const month = button.dataset.monthFilter;
         const monthButtons = document.querySelectorAll('[data-month-filter]');
-        
+
         monthButtons.forEach(btn => {
             btn.classList.remove('bg-blue-600', 'text-white');
             btn.classList.add('border-gray-300', 'text-gray-700');
         });
-        
+
         button.classList.add('bg-blue-600', 'text-white');
         button.classList.remove('border-gray-300', 'text-gray-700');
 
@@ -167,11 +167,11 @@ export const SearchModule = {
 
     handleSearchFilters(e) {
         e.preventDefault();
-        
+
         // Clear any active discipline filter first
         FilterModule.activeFilters.discipline = 'todos';
         FilterModule.updateDisciplineButtons();
-        
+
         // Transfer active filters to the FilterModule
         FilterModule.activeFilters.categories.clear();
         if (this.activeFilters.categories.size > 0) {
@@ -201,7 +201,7 @@ export const SearchModule = {
 
         // Now perform the search
         FilterModule.applyFilters();
-        
+
         // Hide the structured filters dropdown
         const filtersElement = document.getElementById('structured-filters');
         if (filtersElement) {
@@ -238,23 +238,23 @@ export const SearchModule = {
     attachSearchListeners() {
         const searchInput = document.getElementById('open-search');
         const clearButton = document.getElementById('clear-search');
-        
+
         // Debug: Element check
         console.log('Search elements found:', {
             searchInput: !!searchInput,
             clearButton: !!clearButton
         });
-        
+
         // Remove any existing listeners to prevent conflicts
         if (searchInput) {
             const newSearchInput = searchInput.cloneNode(true);
             searchInput.parentNode.replaceChild(newSearchInput, searchInput);
-            
+
             // Add our listeners
             newSearchInput.addEventListener('input', () => this.performSearch());
             newSearchInput.addEventListener('keypress', this.handleKeyPress.bind(this));
         }
-        
+
         // Initial check for existing input
         if (searchInput?.value.length > 0) {
             clearButton.style.display = 'block';
@@ -264,7 +264,7 @@ export const SearchModule = {
     performSearch() {
         const searchInput = document.getElementById('open-search');
         const clearButton = document.getElementById('clear-search');
-        
+
         // Show/hide clear button based on input content
         if (searchInput.value.length > 0) {
             clearButton.style.display = 'block';
@@ -284,13 +284,13 @@ export const SearchModule = {
     clearSearch() {
         const searchInput = document.getElementById('open-search');
         const clearButton = document.getElementById('clear-search');
-        
+
         console.log('clearSearch called');
-        
+
         searchInput.value = '';
         clearButton.style.display = 'none';
         this.performSearch(); // Trigger search to reset results
-        
+
         // Replace current URL without query parameters
         history.replaceState(null, null, window.location.pathname);
     },
@@ -308,10 +308,10 @@ export const SearchModule = {
             if (searchValue.length >= 3) {
                 this.searchInProgress = true;
                 this.trackSearch(searchValue);
-                
+
                 // Trigger the existing client-side filtering
                 window.performSearch();  // Use global function
-                
+
                 // Smooth scroll after DOM update
                 setTimeout(() => {
                     const resultsContainer = document.getElementById('results-container');
@@ -381,10 +381,10 @@ export const SearchModule = {
 
         // Perform the search
         FilterModule.applyFilters();
-        
+
         // Clear filters and update UI after search
         this.clearFilters();
-        
+
         // Hide dropdown after search
         const filtersElement = document.getElementById('structured-filters');
         if (filtersElement) {
@@ -423,29 +423,54 @@ export const SearchModule = {
                 <table class="results-table w-full table-fixed border-collapse">
                     <thead>
                         <tr>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">Oportunidad</th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">Disciplina</th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">País</th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">$</th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">Cierre</th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50"></th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                                Oportunidad
+                            </th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                                Disciplina
+                            </th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                                País
+                            </th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                                $
+                            </th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                                Cierre
+                            </th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         ${results.map(page => `
                             <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="px-4 py-3 text-sm text-gray-900">${Utils.escapeHTML(page.nombre || '')}</td>
+                                <td class="px-4 py-3 text-sm text-gray-900">
+                                    ${Utils.escapeHTML(page.nombre || '')}
+                                </td>
                                 <td class="px-4 py-3 text-sm text-gray-600">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                         ${Utils.escapeHTML(page.disciplina ? page.disciplina.split(',')[0].trim() : '')}
                                     </span>
                                 </td>
-                                <td class="px-4 py-3 text-sm text-gray-600">${Utils.escapeHTML(page.pais || '')}</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">${page.tipo_de_pago || '-'}</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">${Utils.escapeHTML(page.fecha_de_cierre || '')}</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">
+                                    ${Utils.escapeHTML(page.pais || page.país || '')}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">
+                                    ${page.tipo_de_pago || '-'}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">
+                                    ${Utils.escapeHTML(page.fecha_de_cierre || '')}
+                                </td>
                                 <td class="px-4 py-3 text-sm text-gray-600">
                                     <button 
                                         class="preview-btn px-3 py-1 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100"
+                                        data-url="${Utils.escapeHTML(page.url || '')}"
+                                        data-name="${Utils.escapeHTML(page.nombre || '')}"
+                                        data-pais="${Utils.escapeHTML(page.pais || page.país || '')}"
+                                        data-og_resumida="${Utils.escapeHTML(page.og_resumida || '')}"
+                                        data-id="${Utils.escapeHTML(page.id || '')}"
+                                        data-categoria="${Utils.escapeHTML(page.categoria || '')}"
                                     >
                                         Ver
                                     </button>

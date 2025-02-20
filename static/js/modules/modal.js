@@ -3,7 +3,7 @@ import { CONSTANTS } from '../constants.js';
 
 // Handles modal functionality
 export const ModalModule = {
-    showPreviewModal(url, name, country, summary, id) {
+    showPreviewModal(url, name, pais, og_resumida, id, categoria) {
         const modalId = "modal-" + Date.now();
 
         // Create an overlay element to darken the background and capture clicks
@@ -73,9 +73,15 @@ export const ModalModule = {
                         <svg class="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                         </svg>
-                        ${Utils.escapeHTML(country)}
+                        ${Utils.escapeHTML(pais)}
                     </div>
-                    <p class="text-gray-600">${Utils.escapeHTML(summary)}</p>
+                    <div class="flex items-center text-sm text-gray-600 mb-2">
+                        <svg class="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"/>
+                        </svg>
+                        ${Utils.escapeHTML(categoria)}
+                    </div>
+                    <p class="text-gray-600">${Utils.escapeHTML(og_resumida)}</p>
                 </div>
 
                 <!-- Footer -->

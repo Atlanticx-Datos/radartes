@@ -105,9 +105,10 @@ function setupPreviewButtons() {
             ModalModule.showPreviewModal(
                 button.dataset.url,
                 button.dataset.name,
-                button.dataset.country,
-                button.dataset.summary,
-                button.dataset.id
+                button.dataset.pais,
+                button.dataset.og_resumida,
+                button.dataset.id,
+                button.dataset.categoria
             );
         }
     });
