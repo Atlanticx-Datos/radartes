@@ -319,4 +319,52 @@ html {
     }
 }
 
+/* Add table-specific styles */
+.results-table {
+    @apply min-w-full divide-y divide-gray-200;
+}
+
+.results-table thead {
+    @apply bg-gray-50;
+}
+
+.results-table th {
+    @apply px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+    min-width: 120px;  /* Prevent column collapse */
+}
+
+.results-table td {
+    @apply px-4 py-3 text-sm text-gray-900;
+    min-width: 120px;  /* Prevent column collapse */
+}
+
+.results-table td:first-child {
+    min-width: 200px;  /* Wider first column */
+}
+
+.results-table tr {
+    @apply transition-colors hover:bg-gray-50;
+}
+
+/* Mobile optimization */
+@media (max-width: 640px) {
+    .results-table-container {
+        @apply overflow-x-auto;
+    }
+    
+    .results-table {
+        @apply text-sm;
+    }
+    
+    .results-table th,
+    .results-table td {
+        @apply px-2 py-2;
+        min-width: 100px;
+    }
+    
+    .results-table td:first-child {
+        min-width: 150px;
+    }
+}
+
 
