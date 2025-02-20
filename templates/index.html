@@ -89,13 +89,93 @@
         data-pages="{{ pages|tojson|forceescape }}" class="hidden">
     </div>
 
+    <style>
+        /* Estilos base del botón */
+        .filter-btn {
+            transition: all 0.3s ease;
+            position: relative;
+            background-color: white;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* Estado normal del SVG */
+        .filter-btn svg {
+            transition: stroke 0.3s ease;
+            stroke: #4b5563;
+        }
+
+        /* Estado hover */
+        .filter-btn:hover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+
+        .filter-btn:hover svg {
+            stroke: #3b82f6;
+        }
+
+        /* Estado activo usando atributos personalizados */
+        .filter-btn[data-active="true"] {
+            background-color: #2563eb;
+            border-color: #2563eb;
+            color: white;
+            transform: scale(1.02);
+        }
+
+        .filter-btn[data-active="true"] svg {
+            stroke: white;
+        }
+
+        /* Efecto de presión al hacer click */
+        .filter-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Animación del estado activo */
+        .filter-btn::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-btn[data-active="true"]::after {
+            border-color: #3b82f6;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Estilos para el contenedor de filtros */
+        .filter-container:has(.filter-btn[data-active="true"]) .filter-btn:not([data-active="true"]) {
+            opacity: 0.5;
+        }
+
+        /* Media query para hover solo en dispositivos que lo soportan */
+        @media (hover: hover) {
+            .filter-container:has(.filter-btn[data-active="true"]) .filter-btn:not([data-active="true"]):hover {
+                opacity: 0.8;
+            }
+        }
+    </style>
+
     <!-- Filter buttons section -->
     <div class="mb-8">
-        <div class="flex flex-wrap justify-between w-full gap-2">
+        <div class="filter-container flex flex-wrap justify-between w-full gap-2">
             {% for discipline in discipline_groups.keys() %}
-            <button class="filter-btn flex flex-col items-center justify-center px-12 py-8 rounded-med border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50 transition-all"
+            <button class="filter-btn flex flex-col items-center justify-center px-12 py-8 rounded-med border text-gray-700 transition-all"
                 data-discipline-filter="{{ discipline }}"
-                onclick="toggleDisciplineFilter(this, '{{ discipline }}')">
+                data-active="false"
+                onclick="this.dataset.active = this.dataset.active === 'true' ? 'false' : 'true'; toggleDisciplineFilter(this, '{{ discipline }}')">
                 <!-- Icons for each discipline -->
                 {% if discipline == 'Visuales' %}
                 <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
