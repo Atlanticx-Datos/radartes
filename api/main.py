@@ -730,6 +730,16 @@ def get_opportunity_by_id(opportunity_id):
                 if data["properties"]["Fecha de cierre"]["date"]
                 else ""
             ),
+            "top": (
+                data["properties"]["Top"]["checkbox"]
+                if data["properties"].get("Top")
+                else False
+            ),
+            "inscripcion": (
+                data["properties"]["Inscripcion"]["select"]["name"]
+                if data["properties"].get("Inscripcion", {}).get("select")
+                else ""
+            )
         }
         return opportunity
     except requests.exceptions.HTTPError as e:
@@ -1434,6 +1444,22 @@ def refresh_database_cache():
                         )
                         app.logger.info(f"Disciplina encontrada para {page_data.get('nombre', 'Unknown')}: {page_data['disciplina']}")
 
+                    # Add Top checkbox field
+                    if "Top" in page["properties"]:
+                        page_data["top"] = (
+                            page["properties"]["Top"]["checkbox"]
+                            if page["properties"]["Top"]
+                            else False
+                        )
+
+                    # Add Inscripcion select field
+                    if "Inscripcion" in page["properties"]:
+                        page_data["inscripcion"] = (
+                            page["properties"]["Inscripcion"]["select"]["name"]
+                            if page["properties"]["Inscripcion"]["select"]
+                            else ""
+                        )
+
                     # Handle fecha_de_cierre
                     fecha_de_cierre_prop = page["properties"].get("Fecha de cierre", None)
                     fecha_de_cierre = None
@@ -1836,7 +1862,9 @@ def parse_opportunity(page):
         "ai_keywords": get_prop_value(props.get("AI keywords", {})),
         "fecha_de_cierre": get_date_value(props.get("Fecha de cierre", {})),
         "url": props.get("URL", {}).get("url", ""),
-        "entidad": get_prop_value(props.get("Entidad", {}))
+        "entidad": get_prop_value(props.get("Entidad", {})),
+        "top": props.get("Top", {}).get("checkbox", False),
+        "inscripcion": props.get("Inscripcion", {}).get("select", {}).get("name", "")
     }
 
 def get_prop_value(prop):

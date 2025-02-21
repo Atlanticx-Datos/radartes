@@ -162,16 +162,16 @@ export const FilterModule = {
         }
 
         // Update visibility of featured section
-        const featuredSection = document.querySelector('.featured-opportunities');
+        const destacadosContainer = document.querySelector('.destacados-container');
         const prevControl = document.querySelector('.destacar-prev');
         const nextControl = document.querySelector('.destacar-next');
         
         if (this.activeFilters.discipline !== 'todos') {
-            featuredSection?.classList.add('hidden');
+            destacadosContainer?.classList.add('hidden');
             prevControl?.classList.add('hidden');
             nextControl?.classList.add('hidden');
         } else {
-            featuredSection?.classList.remove('hidden');
+            destacadosContainer?.classList.remove('hidden');
             prevControl?.classList.remove('hidden');
             nextControl?.classList.remove('hidden');
         }
@@ -212,23 +212,40 @@ export const FilterModule = {
         });
     },
 
-    applyFilters(searchInput = '') {
+    applyFilters(searchInput = '', fromStructuredSearch = false) {
         const pages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
-        const featuredSection = document.querySelector('.featured-opportunities');
+        const destacadosContainer = document.querySelector('.destacados-container');
         const prevControl = document.querySelector('.destacar-prev');
         const nextControl = document.querySelector('.destacar-next');
         
-        // Hide featured section and controls when filtering
-        if (searchInput || this.activeFilters.categories.size > 0 || 
-            this.activeFilters.country || this.activeFilters.month || 
-            this.activeFilters.discipline !== 'todos') {
-            featuredSection?.classList.add('hidden');
-            prevControl?.classList.add('hidden');
-            nextControl?.classList.add('hidden');
-        } else {
-            featuredSection?.classList.remove('hidden');
-            prevControl?.classList.remove('hidden');
-            nextControl?.classList.remove('hidden');
+        // Check if any filter is active
+        const hasActiveFilters = searchInput || 
+            this.activeFilters.categories.size > 0 || 
+            this.activeFilters.country || 
+            this.activeFilters.month || 
+            this.activeFilters.discipline !== 'todos';
+
+        console.log('Filter state:', {
+            searchInput,
+            categories: this.activeFilters.categories.size,
+            country: this.activeFilters.country,
+            month: this.activeFilters.month,
+            discipline: this.activeFilters.discipline,
+            hasActiveFilters,
+            fromStructuredSearch
+        });
+        
+        // Only manage visibility if not coming from structured search
+        if (!fromStructuredSearch) {
+            if (hasActiveFilters) {
+                destacadosContainer?.classList.add('hidden');
+                prevControl?.classList.add('hidden');
+                nextControl?.classList.add('hidden');
+            } else {
+                destacadosContainer?.classList.remove('hidden');
+                prevControl?.classList.remove('hidden');
+                nextControl?.classList.remove('hidden');
+            }
         }
 
         let filtered = pages;
@@ -243,7 +260,9 @@ export const FilterModule = {
             filtered = filtered.filter(page => {
                 if (!page.categoria) return false;
                 const pageCategories = page.categoria.toLowerCase().split(',').map(c => c.trim());
-                return pageCategories.some(cat => this.activeFilters.categories.has(cat));
+                return Array.from(this.activeFilters.categories).some(cat => 
+                    pageCategories.includes(cat.toLowerCase())
+                );
             });
         }
 
@@ -255,6 +274,7 @@ export const FilterModule = {
         // Apply month filter
         if (this.activeFilters.month) {
             filtered = filtered.filter(page => {
+                if (!page.fecha_de_cierre) return false;
                 const pageMonth = new Date(page.fecha_de_cierre).getMonth() + 1;
                 return parseInt(this.activeFilters.month) === pageMonth;
             });
@@ -262,7 +282,11 @@ export const FilterModule = {
 
         // Apply discipline filter
         if (this.activeFilters.discipline !== 'todos') {
-            filtered = this.filterByDiscipline(filtered, this.activeFilters.discipline);
+            filtered = filtered.filter(page => {
+                if (!page.disciplina) return false;
+                const pageDisciplines = page.disciplina.split(',').map(d => d.trim());
+                return pageDisciplines.some(d => this.belongsToMainDiscipline(d, this.activeFilters.discipline));
+            });
         }
 
         console.log('Filtered results:', filtered.length);
@@ -334,11 +358,11 @@ export const FilterModule = {
         document.getElementById('structured-filters').classList.add('hidden');
         
         // Show featured section and controls when clearing all filters
-        const featuredSection = document.querySelector('.featured-opportunities');
+        const destacadosContainer = document.querySelector('.destacados-container');
         const prevControl = document.querySelector('.destacar-prev');
         const nextControl = document.querySelector('.destacar-next');
         
-        featuredSection?.classList.remove('hidden');
+        destacadosContainer?.classList.remove('hidden');
         prevControl?.classList.remove('hidden');
         nextControl?.classList.remove('hidden');
     },

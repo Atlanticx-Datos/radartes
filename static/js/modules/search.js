@@ -187,39 +187,43 @@ export const SearchModule = {
         console.log('handleSearchFilters called');  // Debug log
         e.preventDefault();
 
+        // Get all relevant elements
+        const destacadosContainer = document.querySelector('.destacados-container');
+        const prevControl = document.querySelector('.destacar-prev');
+        const nextControl = document.querySelector('.destacar-next');
+
         // Clear any active discipline filter first
         FilterModule.activeFilters.discipline = 'todos';
         FilterModule.updateDisciplineButtons();
 
+        // Get current filter states
+        const countryFilter = document.getElementById('country-filter');
+        const monthFilter = document.getElementById('month-filter');
+        const hasActiveCategories = this.activeFilters.categories.size > 0;
+        const hasActiveCountry = countryFilter && countryFilter.value;
+        const hasActiveMonth = monthFilter && monthFilter.value;
+
+        // Always hide destacados section when structured search is used
+        destacadosContainer?.classList.add('hidden');
+        prevControl?.classList.add('hidden');
+        nextControl?.classList.add('hidden');
+
         // Transfer active filters to the FilterModule
         FilterModule.activeFilters.categories.clear();
-        if (this.activeFilters.categories.size > 0) {
+        if (hasActiveCategories) {
             this.activeFilters.categories.forEach(category => {
                 FilterModule.activeFilters.categories.add(category.toLowerCase());
             });
         }
 
         // Transfer month filter
-        FilterModule.activeFilters.month = '';
-        if (this.activeFilters.months.size > 0) {
-            const month = Array.from(this.activeFilters.months)[0];
-            FilterModule.activeFilters.month = month;
-        }
+        FilterModule.activeFilters.month = hasActiveMonth ? monthFilter.value : '';
 
         // Transfer country filter
-        const countryFilter = document.getElementById('country-filter');
-        if (countryFilter && countryFilter.value) {
-            FilterModule.activeFilters.country = countryFilter.value;
-        }
-
-        console.log('Applying structured filters:', {
-            categories: Array.from(this.activeFilters.categories),
-            country: FilterModule.activeFilters.country,
-            month: FilterModule.activeFilters.month
-        });
+        FilterModule.activeFilters.country = hasActiveCountry ? countryFilter.value : '';
 
         // Now perform the search
-        FilterModule.applyFilters();
+        FilterModule.applyFilters('', true);
 
         // Hide the structured filters dropdown
         const filtersElement = document.getElementById('structured-filters');
@@ -227,23 +231,16 @@ export const SearchModule = {
             filtersElement.classList.add('hidden');
         }
 
-        // Use a more robust approach to scrolling
-        console.log('Scheduling scroll to results');  // Debug log
+        // Scroll to results
         const scrollToResults = () => {
             const resultsContainer = document.getElementById('results-container');
-            console.log('Results container found:', !!resultsContainer);  // Debug log
-            
             if (resultsContainer) {
-                // First try with smooth scroll
                 try {
                     resultsContainer.scrollIntoView({
                         behavior: 'smooth',
                         block: 'start'
                     });
-                    console.log('Smooth scroll executed');
                 } catch (error) {
-                    // Fallback to window.scrollTo if scrollIntoView fails
-                    console.log('Falling back to window.scrollTo');
                     const rect = resultsContainer.getBoundingClientRect();
                     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
                     window.scrollTo({
@@ -254,10 +251,7 @@ export const SearchModule = {
             }
         };
 
-        // Try multiple times with increasing delays
         setTimeout(scrollToResults, 100);
-        setTimeout(scrollToResults, 300);
-        setTimeout(scrollToResults, 500);
     },
 
     clearStructuredFilters() {
@@ -315,12 +309,20 @@ export const SearchModule = {
     performSearch() {
         const searchInput = document.getElementById('open-search');
         const clearButton = document.getElementById('clear-search');
+        const destacadosContainer = document.querySelector('.destacados-container');
 
         // Show/hide clear button based on input content
         if (searchInput.value.length > 0) {
             clearButton.style.display = 'block';
+            destacadosContainer?.classList.add('hidden');
         } else {
             clearButton.style.display = 'none';
+            if (!FilterModule.activeFilters.categories.size && 
+                !FilterModule.activeFilters.country && 
+                !FilterModule.activeFilters.month && 
+                FilterModule.activeFilters.discipline === 'todos') {
+                destacadosContainer?.classList.remove('hidden');
+            }
         }
 
         const searchInputValue = searchInput.value;
@@ -335,11 +337,21 @@ export const SearchModule = {
     clearSearch() {
         const searchInput = document.getElementById('open-search');
         const clearButton = document.getElementById('clear-search');
+        const destacadosContainer = document.querySelector('.destacados-container');
 
         console.log('clearSearch called');
 
         searchInput.value = '';
         clearButton.style.display = 'none';
+        
+        // Show destacados section only if no other filters are active
+        if (!FilterModule.activeFilters.categories.size && 
+            !FilterModule.activeFilters.country && 
+            !FilterModule.activeFilters.month && 
+            FilterModule.activeFilters.discipline === 'todos') {
+            destacadosContainer?.classList.remove('hidden');
+        }
+        
         this.performSearch(); // Trigger search to reset results
 
         // Replace current URL without query parameters
@@ -563,7 +575,10 @@ export const SearchModule = {
                                     ${Utils.escapeHTML(page.pais || page.país || '')}
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-600">
-                                    ${page.tipo_de_pago || '-'}
+                                    ${page.inscripcion === 'Sin cargo' || !page.inscripcion ? 
+                                        '<span class="relative inline-block">$<span class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-600 transform -rotate-45"></span></span>' : 
+                                        '<span class="font-medium">$</span>'
+                                    }
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-600">
                                     ${formatDate(page.fecha_de_cierre)}

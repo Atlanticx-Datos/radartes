@@ -108,7 +108,10 @@ export const DestacarModule = {
                             </div>
                             
                             <div class="flex items-center gap-1">
-                                <span class="font-medium">$$$</span>
+                                ${page.inscripcion === 'Sin cargo' || !page.inscripcion ? 
+                                    '<span class="relative inline-block">$<span class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-600 transform -rotate-45"></span></span>' : 
+                                    '<span class="font-medium">$</span>'
+                                }
                             </div>
                             
                             <div class="flex items-center gap-1">

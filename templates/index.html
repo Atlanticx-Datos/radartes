@@ -159,34 +159,38 @@
             </div>
 
             <!-- Destacados section with proper spacing and full width -->
-            <div class="relative max-w-7xl mx-auto">
-                <!-- Previous button - adjusted to -ml-14 -->
-                <button onclick="prevDestacarPage()"
-                    class="destacar-prev absolute left-0 top-1/2 -translate-y-1/2 -ml-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200"
-                    aria-disabled="true">
-                    <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
+            <div class="relative max-w-7xl mx-auto destacados-container">
+                <h2 class="text-2xl font-bold mb-6 destacados-header">Destacados de la semana 🔥</h2>
+                <div class="relative">
+                    <!-- Previous button - adjusted to -ml-14 -->
+                    <button onclick="prevDestacarPage()"
+                        class="destacar-prev absolute left-0 top-1/2 -translate-y-1/2 -ml-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200"
+                        aria-disabled="true">
+                        <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
 
-                <!-- Featured opportunities grid - full width -->
-                <div class="featured-opportunities w-full">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Content will be populated by JavaScript -->
+                    <!-- Featured opportunities grid - full width -->
+                    <div class="featured-opportunities w-full">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Content will be populated by JavaScript -->
+                        </div>
                     </div>
-                </div>
 
-                <!-- Next button - adjusted to -mr-14 -->
-                <button onclick="nextDestacarPage()"
-                    class="destacar-next absolute right-0 top-1/2 -translate-y-1/2 -mr-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200">
-                    <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </button>
+                    <!-- Next button - adjusted to -mr-14 -->
+                    <button onclick="nextDestacarPage()"
+                        class="destacar-next absolute right-0 top-1/2 -translate-y-1/2 -mr-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200">
+                        <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <!-- Results Section -->
-            <div class="mt-4 mb-6">
+            <div class="mt-6 mb-6">
+                <h2 class="text-2xl font-bold mb-6">Radar de oportunidades 🌎</h2>
                 <!-- Results Counter -->
                 <div class="text-sm text-gray-600 my-4" id="results-counter"></div>
 
