@@ -11,6 +11,7 @@ import { ModalModule } from './modules/modal.js';
 import { DestacarModule } from './modules/destacar.js';
 import { Utils } from './utils.js';
 import { TopModule } from './modules/top.js';
+import { SubscribeModule } from './modules/subscribe.js';
 
 // Expose modules to window object using a more reliable approach
 function exposeModules() {
@@ -83,6 +84,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add navigation functions to window
     window.nextTopPage = TopModule.nextPage.bind(TopModule);
     window.prevTopPage = TopModule.prevPage.bind(TopModule);
+
+    // Initialize SubscribeModule
+    SubscribeModule.init();
 });
 
 // Setup user menu functionality

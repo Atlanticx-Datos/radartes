@@ -2153,6 +2153,138 @@ def save_from_modal():
         app.logger.error(f"Error in save_from_modal: {str(e)}")
         return jsonify({"error": str(e)}), 400
 
+@app.route("/subscribe", methods=["POST"])
+def subscribe():
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        
+        if not email:
+            return jsonify({"error": "Email is required"}), 400
+
+        # Check if email already exists in database
+        url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
+        query = {
+            "filter": {
+                "and": [
+                    {
+                        "property": "Contact Email",
+                        "email": {"equals": email}
+                    },
+                    {
+                        "property": "Preferences",
+                        "rich_text": {"contains": "newsletter_subscriber"}
+                    }
+                ]
+            }
+        }
+        
+        response = requests.post(url, headers=headers, json=query)
+        if response.status_code != 200:
+            app.logger.error(f"Notion API Error during email check: {response.text}")
+            return jsonify({"error": "Failed to check subscription status"}), 500
+
+        existing_subscription = response.json().get("results", [])
+        
+        if existing_subscription:
+            # Email already subscribed
+            app.logger.info(f"Email {email} already subscribed")
+            return jsonify({
+                "message": "Ya estás suscrito al newsletter",
+                "email": email,
+                "already_subscribed": True
+            }), 200
+
+        # If we get here, email is not subscribed yet
+        user_id = session.get('user', {}).get('sub')
+        
+        if user_id:
+            # Check if user already has preferences
+            existing_prefs = get_existing_preferences(user_id)
+            if existing_prefs.get('page_id'):
+                # Update existing preferences
+                url = f"https://api.notion.com/v1/pages/{existing_prefs['page_id']}"
+                payload = {
+                    "properties": {
+                        "Contact Email": {
+                            "email": email
+                        },
+                        "Preferences": {
+                            "rich_text": [{"text": {"content": "newsletter_subscriber"}}]
+                        }
+                    }
+                }
+                method = "PATCH"
+            else:
+                # Create new preferences
+                url = "https://api.notion.com/v1/pages"
+                payload = {
+                    "parent": {"database_id": OPORTUNIDADES_ID},
+                    "properties": {
+                        "User ID": {
+                            "title": [{"text": {"content": user_id}}]
+                        },
+                        "Contact Email": {
+                            "email": email
+                        },
+                        "Opportunity ID": {
+                            "rich_text": []
+                        },
+                        "Preferences": {
+                            "rich_text": [{"text": {"content": "newsletter_subscriber"}}]
+                        }
+                    }
+                }
+                method = "POST"
+        else:
+            # Handle anonymous subscription
+            anonymous_id = f"anon_{secrets.token_hex(8)}"
+            url = "https://api.notion.com/v1/pages"
+            payload = {
+                "parent": {"database_id": OPORTUNIDADES_ID},
+                "properties": {
+                    "User ID": {
+                        "title": [{"text": {"content": anonymous_id}}]
+                    },
+                    "Contact Email": {
+                        "email": email
+                    },
+                    "Opportunity ID": {
+                        "rich_text": []
+                    },
+                    "Preferences": {
+                        "rich_text": [{"text": {"content": "newsletter_subscriber"}}]
+                    }
+                }
+            }
+            method = "POST"
+
+        response = requests.request(
+            method,
+            url,
+            headers=headers,
+            json=payload
+        )
+        
+        if response.status_code not in [200, 201]:
+            app.logger.error(f"Notion API Error: {response.text}")
+            return jsonify({"error": "Failed to save subscription"}), 500
+
+        # Update session if user is logged in
+        if user_id:
+            session['user']['email'] = email
+            session.modified = True
+
+        return jsonify({
+            "message": "¡Gracias por suscribirte!",
+            "email": email,
+            "already_subscribed": False
+        }), 200
+
+    except Exception as e:
+        app.logger.error(f"Subscription error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == "__main__":
     # Ensure session directory exists
     os.makedirs(os.path.join(app.root_path, 'flask_session'), exist_ok=True)

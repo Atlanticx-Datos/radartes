@@ -227,6 +227,87 @@
                     </button>
                 </div>
             </div>
+
+            <!-- Newsletter Section -->
+            <div class="mt-16 mb-12 bg-[#8B8B9D] rounded-lg overflow-hidden">
+                <div class="container mx-auto px-8 py-12">
+                    <div class="text-center">
+                        {% if session.user %}
+                            {% if session.user.email %}
+                                <!-- User is logged in and has email -->
+                                <div id="newsletter-status" class="text-center">
+                                    {% if existing_email %}
+                                        <h2 class="text-2xl font-bold text-white mb-2">¡Ya estás suscrito!</h2>
+                                        <p class="text-gray-200">
+                                            Recibirás actualizaciones en {{ session.user.email }}
+                                        </p>
+                                    {% else %}
+                                        <h2 class="text-3xl font-bold text-white mb-2">Suscribite a nuestro newsletter</h2>
+                                        <p class="text-gray-200 mb-8">
+                                            ¿Querés recibir actualizaciones en {{ session.user.email }}?
+                                        </p>
+                                        <form id="subscribe-form" class="max-w-xl mx-auto flex gap-2">
+                                            <input type="hidden" id="subscribe-email" value="{{ session.user.email }}">
+                                            <button 
+                                                type="submit"
+                                                class="bg-[#00FF85] text-gray-900 px-6 py-3 rounded-lg font-medium hover:bg-[#00CC6A] transition-colors"
+                                            >
+                                                Suscribirse
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <!-- User is logged in but no email -->
+                                <h2 class="text-3xl font-bold text-white mb-2">Suscribite a nuestro newsletter</h2>
+                                <p class="text-gray-200 mb-8">
+                                    Recibí actualizaciones mensuales de fotografía, arte, literatura y mucho más.
+                                </p>
+                                <form id="subscribe-form" class="max-w-xl mx-auto flex gap-2">
+                                    <div class="flex-1 relative">
+                                        <input 
+                                            type="email" 
+                                            id="subscribe-email"
+                                            placeholder="Ingresa tu correo electrónico"
+                                            class="w-full px-6 py-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            required
+                                        >
+                                    </div>
+                                    <button 
+                                        type="submit"
+                                        class="bg-[#00FF85] text-gray-900 px-6 py-3 rounded-lg font-medium hover:bg-[#00CC6A] transition-colors"
+                                    >
+                                        Suscribirse
+                                    </button>
+                                </form>
+                            {% endif %}
+                        {% else %}
+                            <!-- User is not logged in -->
+                            <h2 class="text-3xl font-bold text-white mb-2">Suscribite a nuestro newsletter</h2>
+                            <p class="text-gray-200 mb-8">
+                                Recibí actualizaciones mensuales de fotografía, arte, literatura y mucho más.
+                            </p>
+                            <form id="subscribe-form" class="max-w-xl mx-auto flex gap-2">
+                                <div class="flex-1 relative">
+                                    <input 
+                                        type="email" 
+                                        id="subscribe-email"
+                                        placeholder="Ingresa tu correo electrónico"
+                                        class="w-full px-6 py-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required
+                                    >
+                                </div>
+                                <button 
+                                    type="submit"
+                                    class="bg-[#00FF85] text-gray-900 px-6 py-3 rounded-lg font-medium hover:bg-[#00CC6A] transition-colors"
+                                >
+                                    Suscribirse
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -483,13 +564,18 @@
 {% endblock %}
 
 {% block page_scripts %}
-<script>
+<script type="module">
     // Process data and store in a dedicated window property
-    const rawData = {{ destacar_pages| tojson | safe }};
-    window.processedDestacarData = rawData.map(item => ({
-        ...item,
-        url_base: item.url_base || new URL(item.url).hostname.replace('www.', '')
-    }));
-    console.log('Processed data:', window.processedDestacarData);
+    try {
+        const rawData = {{ destacar_pages| tojson | safe }};
+        window.processedDestacarData = rawData.map(item => ({
+            ...item,
+            url_base: item.url_base || new URL(item.url).hostname.replace('www.', '')
+        }));
+        console.log('Processed data:', window.processedDestacarData);
+    } catch (error) {
+        console.error('Error processing destacar data:', error);
+        window.processedDestacarData = [];
+    }
 </script>
 {% endblock %}
