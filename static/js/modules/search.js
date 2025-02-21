@@ -11,6 +11,12 @@ export const SearchModule = {
         months: new Set(),
         countries: new Set()
     },
+    pagination: {
+        currentPage: 1,
+        itemsPerPage: 15,
+        totalPages: 1,
+        allResults: []
+    },
 
     init() {
         // Initialize with data from the page
@@ -403,11 +409,20 @@ export const SearchModule = {
         console.log('Updated categories:', Array.from(this.activeFilters.categories));
     },
 
-    updateResults(results) {
+    updateResults(results, preservePage = false) {
         const container = document.getElementById('results-container');
         const counter = document.getElementById('results-counter');
 
         if (!container || !counter) return;
+
+        // Store all results for pagination
+        this.pagination.allResults = results;
+        this.pagination.totalPages = Math.ceil(results.length / this.pagination.itemsPerPage);
+        
+        // Only reset to first page when new results come in and preservePage is false
+        if (!preservePage) {
+            this.pagination.currentPage = 1;
+        }
 
         // Remove any existing grid classes
         container.className = '';
@@ -418,6 +433,12 @@ export const SearchModule = {
             return;
         }
 
+        // Calculate pagination slice
+        const startIndex = (this.pagination.currentPage - 1) * this.pagination.itemsPerPage;
+        const endIndex = startIndex + this.pagination.itemsPerPage;
+        const paginatedResults = results.slice(startIndex, endIndex);
+
+        // Create table with results
         container.innerHTML = `
             <div class="overflow-x-auto rounded-lg border border-gray-200">
                 <table class="results-table w-full table-fixed border-collapse">
@@ -443,7 +464,7 @@ export const SearchModule = {
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        ${results.map(page => `
+                        ${paginatedResults.map(page => `
                             <tr class="hover:bg-gray-50 transition-colors">
                                 <td class="px-4 py-3 text-sm text-gray-900">
                                     ${Utils.escapeHTML(page.nombre || '')}
@@ -480,8 +501,47 @@ export const SearchModule = {
                     </tbody>
                 </table>
             </div>
+            ${this.pagination.totalPages > 1 ? `
+                <div class="flex justify-center mt-6">
+                    <div class="flex items-center gap-2">
+                        ${Array.from({ length: this.pagination.totalPages }, (_, i) => i + 1).map(pageNum => `
+                            <button 
+                                class="pagination-number w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium ${
+                                    pageNum === this.pagination.currentPage 
+                                    ? 'bg-blue-600 text-white' 
+                                    : 'text-gray-700 hover:bg-gray-100'
+                                }"
+                                data-page="${pageNum}"
+                            >
+                                ${pageNum}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
         `;
 
+        // Attach event listeners to pagination buttons
+        if (this.pagination.totalPages > 1) {
+            container.querySelectorAll('.pagination-number').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const pageNum = parseInt(e.target.dataset.page);
+                    this.goToPage(pageNum);
+                });
+            });
+        }
+
         counter.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''}`;
-    }
+    },
+
+    goToPage(page) {
+        if (page < 1 || page > this.pagination.totalPages) return;
+        this.pagination.currentPage = page;
+        
+        // Update the results with the new page, preserving the current page
+        this.updateResults(this.pagination.allResults, true);
+        
+        // Scroll to top of results
+        document.getElementById('results-container')?.scrollIntoView({ behavior: 'smooth' });
+    },
 }; 

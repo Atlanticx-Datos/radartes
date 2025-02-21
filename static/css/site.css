@@ -367,4 +367,65 @@ html {
     }
 }
 
+/* ====================================
+   PAGINATION STYLES
+   Used in: All paginated results
+   Purpose: Style pagination controls
+   Why custom: Complex responsive behavior
+==================================== */
+.pagination-container {
+    @apply mt-4 flex items-center justify-between;
+}
+
+.pagination-nav {
+    @apply relative z-10 inline-flex rounded-md shadow-sm -space-x-px;
+}
+
+.pagination-button {
+    @apply relative inline-flex items-center px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors;
+}
+
+.pagination-button.active {
+    @apply bg-blue-50 text-blue-600 border-blue-500;
+}
+
+.pagination-button.disabled {
+    @apply opacity-50 cursor-not-allowed;
+}
+
+@media (max-width: 640px) {
+    .pagination-info {
+        @apply hidden;
+    }
+    
+    .pagination-nav {
+        @apply flex-wrap justify-center gap-1;
+    }
+    
+    .pagination-button {
+        @apply px-2 py-1 text-xs;
+    }
+}
+
+.pagination-number {
+    transition: all 0.2s ease-in-out;
+}
+
+.pagination-number:hover {
+    transform: scale(1.1);
+}
+
+.pagination-number.active {
+    background-color: #2563eb;
+    color: white;
+}
+
+@media (max-width: 640px) {
+    .pagination-number {
+        width: 2rem;
+        height: 2rem;
+        font-size: 0.875rem;
+    }
+}
+
 

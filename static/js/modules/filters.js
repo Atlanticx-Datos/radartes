@@ -277,7 +277,12 @@ export const FilterModule = {
     },
 
     updateResults(results) {
-        // Use SearchModule's updateResults instead of maintaining separate display logic
+        // Reset pagination in SearchModule when filter results change
+        SearchModule.pagination.currentPage = 1;
+        SearchModule.pagination.allResults = results;
+        SearchModule.pagination.totalPages = Math.ceil(results.length / SearchModule.pagination.itemsPerPage);
+        
+        // Use SearchModule's updateResults to maintain consistent pagination
         SearchModule.updateResults(results);
     },
 
@@ -310,6 +315,9 @@ export const FilterModule = {
                 btn.classList.add('bg-blue-600', 'text-white');
             }
         });
+        
+        // Reset pagination
+        SearchModule.pagination.currentPage = 1;
         
         // Trigger search to update results
         this.applyFilters();

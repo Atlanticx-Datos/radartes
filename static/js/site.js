@@ -14,9 +14,12 @@ import { Utils } from './utils.js';
 // Expose modules to window object using a more reliable approach
 function exposeModules() {
     window.SearchModule = SearchModule;
+    // Expose pagination functions
+    window.goToPage = SearchModule.goToPage.bind(SearchModule);
     console.log('SearchModule exposed to window:', {
         moduleExists: !!window.SearchModule,
-        updateResultsExists: !!(window.SearchModule && window.SearchModule.updateResults)
+        updateResultsExists: !!(window.SearchModule && window.SearchModule.updateResults),
+        paginationExists: !!(window.SearchModule && window.SearchModule.goToPage)
     });
 }
 
@@ -133,6 +136,7 @@ window.performSearch = SearchModule.performSearch.bind(SearchModule);
 window.showAlert = Utils.showAlert.bind(Utils);
 window.clearAllFilters = FilterModule.clearAllFilters.bind(FilterModule);
 window.toggleDisciplineFilter = FilterModule.handleDisciplineFilter.bind(FilterModule);
+window.goToPage = SearchModule.goToPage.bind(SearchModule);
 
 // Add CSRF token configuration
 document.body.addEventListener('htmx:configRequest', function(evt) {
