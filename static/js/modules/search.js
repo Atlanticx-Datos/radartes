@@ -118,10 +118,22 @@ export const SearchModule = {
             button.addEventListener('click', () => this.handleMonthFilter(button));
         });
 
-        // Search button (changed from 'apply-filters' to 'search-filters')
+        // Search button
         const searchButton = document.getElementById('search-filters');
+        console.log('Search button found:', !!searchButton);  // Debug log
+        
         if (searchButton) {
-            searchButton.addEventListener('click', (e) => this.handleSearchFilters(e));
+            // Remove any existing listeners
+            const newSearchButton = searchButton.cloneNode(true);
+            searchButton.parentNode.replaceChild(newSearchButton, searchButton);
+            
+            // Add new listener
+            newSearchButton.addEventListener('click', (e) => {
+                console.log('Search button clicked');  // Debug log
+                this.handleSearchFilters(e);
+            });
+        } else {
+            console.error('Search button not found!');  // Error log
         }
 
         // Clear filters button
@@ -172,6 +184,7 @@ export const SearchModule = {
     },
 
     handleSearchFilters(e) {
+        console.log('handleSearchFilters called');  // Debug log
         e.preventDefault();
 
         // Clear any active discipline filter first
@@ -213,6 +226,38 @@ export const SearchModule = {
         if (filtersElement) {
             filtersElement.classList.add('hidden');
         }
+
+        // Use a more robust approach to scrolling
+        console.log('Scheduling scroll to results');  // Debug log
+        const scrollToResults = () => {
+            const resultsContainer = document.getElementById('results-container');
+            console.log('Results container found:', !!resultsContainer);  // Debug log
+            
+            if (resultsContainer) {
+                // First try with smooth scroll
+                try {
+                    resultsContainer.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    console.log('Smooth scroll executed');
+                } catch (error) {
+                    // Fallback to window.scrollTo if scrollIntoView fails
+                    console.log('Falling back to window.scrollTo');
+                    const rect = resultsContainer.getBoundingClientRect();
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    window.scrollTo({
+                        top: rect.top + scrollTop,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        };
+
+        // Try multiple times with increasing delays
+        setTimeout(scrollToResults, 100);
+        setTimeout(scrollToResults, 300);
+        setTimeout(scrollToResults, 500);
     },
 
     clearStructuredFilters() {
@@ -316,7 +361,7 @@ export const SearchModule = {
                 this.trackSearch(searchValue);
 
                 // Trigger the existing client-side filtering
-                window.performSearch();  // Use global function
+                this.performSearch();
 
                 // Smooth scroll after DOM update
                 setTimeout(() => {
@@ -328,7 +373,7 @@ export const SearchModule = {
                         });
                     }
                     this.searchInProgress = false;
-                }, 50);  // Brief delay to allow DOM update
+                }, 100);  // Brief delay to allow DOM update
             }
         }
     },
@@ -396,6 +441,17 @@ export const SearchModule = {
         if (filtersElement) {
             filtersElement.classList.add('hidden');
         }
+
+        // Scroll to results after filters are applied and DOM is updated
+        setTimeout(() => {
+            const resultsContainer = document.getElementById('results-container');
+            if (resultsContainer) {
+                resultsContainer.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }, 100);
     },
 
     handleCategoryClick(category, element) {

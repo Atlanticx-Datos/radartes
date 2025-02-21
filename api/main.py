@@ -1270,6 +1270,7 @@ def get_cached_database_content():
     return None
 
 @app.route("/refresh_database_cache", methods=["POST"])
+@csrf.exempt
 def refresh_database_cache():
     if not redis:
         return jsonify({"status": "error", "message": "Redis not available"}), 500
