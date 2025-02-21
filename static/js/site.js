@@ -14,10 +14,12 @@ import { Utils } from './utils.js';
 // Expose modules to window object using a more reliable approach
 function exposeModules() {
     window.SearchModule = SearchModule;
+    window.ModalModule = ModalModule;  // Expose ModalModule
     // Expose pagination functions
     window.goToPage = SearchModule.goToPage.bind(SearchModule);
-    console.log('SearchModule exposed to window:', {
-        moduleExists: !!window.SearchModule,
+    console.log('Modules exposed to window:', {
+        searchModuleExists: !!window.SearchModule,
+        modalModuleExists: !!window.ModalModule,
         updateResultsExists: !!(window.SearchModule && window.SearchModule.updateResults),
         paginationExists: !!(window.SearchModule && window.SearchModule.goToPage)
     });

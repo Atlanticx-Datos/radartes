@@ -600,4 +600,28 @@ export const SearchModule = {
         // Scroll to top of results
         document.getElementById('results-container')?.scrollIntoView({ behavior: 'smooth' });
     },
+
+    attachPreviewHandlers(container) {
+        if (!container) return;
+        
+        container.querySelectorAll('.opportunity-preview').forEach(element => {
+            element.addEventListener('click', (e) => {
+                e.preventDefault();
+                const dataset = element.dataset;
+                
+                if (window.ModalModule && window.ModalModule.showPreviewModal) {
+                    window.ModalModule.showPreviewModal(
+                        dataset.url,
+                        dataset.name,
+                        dataset.country || dataset.pais,
+                        dataset.summary || dataset.ogResumida,
+                        dataset.id,
+                        dataset.category || dataset.categoria
+                    );
+                } else {
+                    console.error('ModalModule not found or showPreviewModal not available');
+                }
+            });
+        });
+    },
 }; 

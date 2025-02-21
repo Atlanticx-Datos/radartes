@@ -48,7 +48,13 @@ export const DestacarModule = {
         container.innerHTML = this.pages
             .slice(this.currentIndex, this.currentIndex + 3)
             .map(page => `
-                <div class="bg-white rounded-lg shadow-md overflow-hidden relative">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden relative cursor-pointer opportunity-preview"
+                     data-url="${Utils.escapeHTML(page.url)}"
+                     data-name="${Utils.escapeHTML(page.nombre)}"
+                     data-country="${Utils.escapeHTML(page.país)}"
+                     data-summary="${Utils.escapeHTML(page.og_resumida || '')}"
+                     data-id="${Utils.escapeHTML(page.id)}"
+                     data-category="${Utils.escapeHTML(page.categoria)}">
                     <div class="relative h-48 bg-gray-200">
                         <img src="/static/public/IsoAtx.png" alt="Atlantic x Logo" class="w-full h-full object-contain p-4">
                         <span class="absolute top-3 left-3 bg-gray-100 text-sm px-2 py-1 rounded-md">
@@ -94,6 +100,27 @@ export const DestacarModule = {
                     </div>
                 </div>
             `).join('');
+
+        // Attach click handlers to the newly created opportunity cards
+        container.querySelectorAll('.opportunity-preview').forEach(element => {
+            element.addEventListener('click', (e) => {
+                e.preventDefault();
+                const dataset = element.dataset;
+                
+                if (window.ModalModule && window.ModalModule.showPreviewModal) {
+                    window.ModalModule.showPreviewModal(
+                        dataset.url,
+                        dataset.name,
+                        dataset.country,
+                        dataset.summary,
+                        dataset.id,
+                        dataset.category
+                    );
+                } else {
+                    console.error('ModalModule not found or showPreviewModal not available');
+                }
+            });
+        });
     },
 
     attachNavigationListeners() {
