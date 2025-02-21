@@ -42,6 +42,10 @@ export const ModalModule = {
         const csrfInput = document.querySelector('input[name="csrf_token"]');
         const csrfToken = csrfInput ? Utils.escapeHTML(csrfInput.value) : '';
         
+        // Get inscripcion value from the clicked element
+        const clickedElement = document.querySelector(`[data-id="${id}"]`);
+        const inscripcion = clickedElement?.dataset?.inscripcion || '';
+        
         modalContent.innerHTML = `
             <div class="bg-white rounded-lg shadow-lg overflow-hidden">
                 <!-- Header: Title & Share Button -->
@@ -74,11 +78,19 @@ export const ModalModule = {
 
                 <!-- Content -->
                 <div class="p-4">
-                    <div class="flex items-center text-sm text-gray-600 mb-4">
-                        <svg class="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-                        </svg>
-                        ${Utils.escapeHTML(pais)}
+                    <div class="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                            </svg>
+                            ${Utils.escapeHTML(pais)}
+                        </div>
+                        <div class="flex items-center">
+                            ${inscripcion === 'Sin cargo' || !inscripcion ? 
+                                '<div class="relative inline-block"><svg class="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg><svg class="absolute top-0 left-0 w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="5" y1="5" x2="19" y2="19"/></svg></div>' : 
+                                '<svg class="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg>'
+                            }
+                        </div>
                     </div>
                     <div class="flex items-center text-sm text-gray-600 mb-2">
                         <svg class="w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor">

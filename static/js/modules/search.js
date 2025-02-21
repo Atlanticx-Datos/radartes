@@ -576,8 +576,8 @@ export const SearchModule = {
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-600">
                                     ${page.inscripcion === 'Sin cargo' || !page.inscripcion ? 
-                                        '<span class="relative inline-block">$<span class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-600 transform -rotate-45"></span></span>' : 
-                                        '<span class="font-medium">$</span>'
+                                        '<div class="relative inline-block"><svg class="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg><svg class="absolute top-0 left-0 w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="5" y1="5" x2="19" y2="19"/></svg></div>' : 
+                                        '<svg class="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg>'
                                     }
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-600">
@@ -592,6 +592,7 @@ export const SearchModule = {
                                         data-og_resumida="${Utils.escapeHTML(page.og_resumida || '')}"
                                         data-id="${Utils.escapeHTML(page.id || '')}"
                                         data-categoria="${Utils.escapeHTML(page.categoria || '')}"
+                                        data-inscripcion="${Utils.escapeHTML(page.inscripcion || '')}"
                                     >
                                         Ver
                                     </button>
