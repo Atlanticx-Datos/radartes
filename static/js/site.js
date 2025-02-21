@@ -134,15 +134,35 @@ window.showAlert = Utils.showAlert.bind(Utils);
 window.clearAllFilters = FilterModule.clearAllFilters.bind(FilterModule);
 window.toggleDisciplineFilter = FilterModule.handleDisciplineFilter.bind(FilterModule);
 
-// Add to site.js
+// Add CSRF token configuration
+document.body.addEventListener('htmx:configRequest', function(evt) {
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+    if (csrfToken) {
+        evt.detail.headers['X-CSRFToken'] = csrfToken;
+    }
+});
+
+document.body.addEventListener('htmx:beforeRequest', function(evt) {
+    htmx.config.withCredentials = true;
+    const spinner = document.getElementById('layout-spinner');
+    if (spinner) {
+        spinner.classList.remove('hidden');
+    }
+});
+
 document.body.addEventListener('htmx:afterRequest', function(evt) {
+    const spinner = document.getElementById('layout-spinner');
+    if (spinner) {
+        spinner.classList.add('hidden');
+    }
+
     const notification = document.getElementById('notification');
     if (!notification) return;
 
     if (evt.detail.successful) {
         notification.classList.remove('hidden', 'alert-error');
         notification.classList.add('alert-success');
-        notification.innerHTML = 'Saved successfully';
+        notification.innerHTML = 'Bien! Ya guardaste la oportunidad en tu espacio personal';
     } else {
         notification.classList.remove('hidden', 'alert-success');
         notification.classList.add('alert-error');
@@ -155,19 +175,19 @@ document.body.addEventListener('htmx:afterRequest', function(evt) {
     }, 3000);
 });
 
-// Add this to site.js
-document.body.addEventListener('htmx:configRequest', function(evt) {
-    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
-    if (csrfToken) {
-        evt.detail.headers['X-CSRFToken'] = csrfToken;
+document.body.addEventListener('htmx:afterResponse', function(evt) {
+    const spinner = document.getElementById('layout-spinner');
+    if (spinner) {
+        spinner.classList.add('hidden');
     }
 });
 
-document.body.addEventListener('htmx:beforeRequest', function(evt) {
-    htmx.config.withCredentials = true;
-});
-
 document.body.addEventListener('htmx:responseError', function(evt) {
+    const spinner = document.getElementById('layout-spinner');
+    if (spinner) {
+        spinner.classList.add('hidden');
+    }
+    
     if (evt.detail.xhr.status === 401) {
         window.location.href = '/login?next=' + encodeURIComponent(window.location.href);
     }

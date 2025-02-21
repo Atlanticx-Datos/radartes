@@ -94,7 +94,8 @@ export const ModalModule = {
                         hx-post="/save_user_opportunity"
                         hx-target="#notification"
                         hx-include="[name='selected_pages'], [name='csrf_token']"
-                        class="w-1/2 text-center bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors"
+                        hx-indicator="#layout-spinner"
+                        class="save-btn w-1/2 text-center bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors"
                     >
                         Guardar
                     </button>
@@ -104,6 +105,7 @@ export const ModalModule = {
                         Ver oportunidad
                     </a>
                 </div>
+                <div id="save-notification" class="hidden"></div>
                 <input type="hidden" name="selected_pages" value="${id}">
                 <input type="hidden" name="csrf_token" value="${csrfToken}">
             </div>
@@ -134,6 +136,11 @@ export const ModalModule = {
             overlay.style.opacity = "0";
             modalContent.style.opacity = "0";
             modalContent.style.transform = "translate(-50%, -45%)";
+            
+            // Ensure spinner is hidden when modal is closed
+            const spinner = document.getElementById('layout-spinner');
+            if (spinner) spinner.classList.add('hidden');
+            
             setTimeout(() => {
                 overlay.remove();
                 modalContent.remove();

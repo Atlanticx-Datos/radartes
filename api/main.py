@@ -565,6 +565,9 @@ def save_user_opportunity():
                 save_to_notion(user_id, page_id)
                 new_saves += 1
 
+        # Add a small delay to ensure spinner is visible
+        time.sleep(0.5)  # 500ms delay for better UX
+
         if new_saves == 0:
             return """
             <div class="flex items-center text-yellow-500">
