@@ -5,6 +5,7 @@ import { CONSTANTS } from '../constants.js';
 export const ModalModule = {
     showPreviewModal(url, name, pais, og_resumida, id, categoria) {
         const modalId = "modal-" + Date.now();
+        const isMiEspacio = window.location.pathname === '/mi_espacio';
 
         // Create an overlay element to darken the background and capture clicks
         const overlay = document.createElement("div");
@@ -90,18 +91,20 @@ export const ModalModule = {
 
                 <!-- Footer -->
                 <div class="p-4 bg-gray-50 border-t flex gap-3">
-                    <button 
-                        hx-post="/save_user_opportunity"
-                        hx-target="#notification"
-                        hx-include="[name='selected_pages'], [name='csrf_token']"
-                        hx-indicator="#layout-spinner"
-                        class="save-btn w-1/2 text-center bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors"
-                    >
-                        Guardar
-                    </button>
+                    ${!isMiEspacio ? `
+                        <button 
+                            hx-post="/save_user_opportunity"
+                            hx-target="#notification"
+                            hx-include="[name='selected_pages'], [name='csrf_token']"
+                            hx-indicator="#layout-spinner"
+                            class="save-btn w-1/2 text-center bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors"
+                        >
+                            Guardar
+                        </button>
+                    ` : ''}
                     <a href="${Utils.escapeHTML(url)}" 
                        target="_blank" 
-                       class="w-1/2 text-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                       class="${isMiEspacio ? 'w-full' : 'w-1/2'} text-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
                         Ver oportunidad
                     </a>
                 </div>

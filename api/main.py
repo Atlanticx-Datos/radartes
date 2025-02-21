@@ -747,17 +747,37 @@ def delete_opportunity(page_id):
     user_id = session["user"]["sub"]
     
     try:
-        # Archive the page directly since we have its ID
-        archive_url = f"https://api.notion.com/v1/pages/{page_id}"
+        # First find the saved opportunity record
+        url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
+        query = {
+            "filter": {
+                "and": [
+                    {"property": "User ID", "title": {"equals": user_id}},
+                    {"property": "Opportunity ID", "rich_text": {"equals": page_id}}
+                ]
+            }
+        }
+        
+        response = requests.post(url, headers=headers, json=query)
+        response.raise_for_status()
+        results = response.json().get("results", [])
+        
+        if not results:
+            app.logger.error(f"No saved opportunity found for user {user_id} and page {page_id}")
+            return "Record not found", 404
+            
+        # Get the ID of the saved opportunity record
+        saved_record_id = results[0]["id"]
+        
+        # Archive the saved opportunity record
+        archive_url = f"https://api.notion.com/v1/pages/{saved_record_id}"
         archive_data = {
             "archived": True
         }
         
-        app.logger.debug(f"Archiving record {page_id}")
+        app.logger.debug(f"Archiving saved opportunity record {saved_record_id}")
         archive_response = requests.patch(archive_url, headers=headers, json=archive_data)
         archive_response.raise_for_status()
-        
-        app.logger.debug(f"Archive response status: {archive_response.status_code}")
         
         # Return the updated list partial
         saved_opportunities = get_saved_opportunities(user_id)
@@ -1774,14 +1794,18 @@ def get_saved_opportunities(user_id):
                 opp_response.raise_for_status()
                 opp_data = opp_response.json()
                 
-                # Get only the specific fields we need
+                # Get all the fields we need to match the index display
                 props = opp_data.get("properties", {})
                 saved_items.append({
-                    "id": item["id"],  # Save ID for deletion
+                    "id": opp_id,  # Use the opportunity ID for consistency
+                    "nombre_original": get_prop_value(props.get("Nombre", {})),
                     "resumen_generado_por_la_ia": get_prop_value(props.get("Resumen generado por la IA", {})),
-                    "categoría": get_prop_value(props.get("Categoría", {})),
+                    "disciplina": get_prop_value(props.get("Disciplina", {})),
                     "país": get_prop_value(props.get("País", {})),
-                    "fecha_de_cierre": get_date_value(props.get("Fecha de cierre", {}))
+                    "categoría": get_prop_value(props.get("Categoría", {})),
+                    "fecha_de_cierre": get_date_value(props.get("Fecha de cierre", {})),
+                    "url": props.get("URL", {}).get("url", ""),
+                    "og_resumida": get_prop_value(props.get("Og_Resumida", {}))
                 })
                 
             except Exception as e:

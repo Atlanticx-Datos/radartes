@@ -19,6 +19,7 @@
             </p>
             
             <form method="POST" action="{{ url_for('mi_espacio') }}" class="space-y-6" data-form-type="mi-espacio">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <!-- Disciplines Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {% for discipline in disciplines %}
@@ -73,8 +74,30 @@
         <!-- Saved Opportunities Section -->
         <section class="bg-white shadow-lg rounded-lg p-6">
             <h2 class="text-xl font-semibold mb-4">Tus Oportunidades Guardadas</h2>
-            <div class="border-b border-t border-neutral overflow-auto">
-                <table class="table-fixed w-full">
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
+                <table class="results-table w-full table-fixed border-collapse">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                                Oportunidad
+                            </th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                                Disciplina
+                            </th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                                País
+                            </th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                                $
+                            </th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                                Cierre
+                            </th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                                Acciones
+                            </th>
+                        </tr>
+                    </thead>
                     <tbody id="saved-opportunities-list">
                         {% include "_saved_opportunities_list.html" %}
                     </tbody>

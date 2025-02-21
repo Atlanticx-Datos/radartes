@@ -14,12 +14,20 @@ export const FilterModule = {
     selectedCategories: [],
 
     init() {
+        // Only initialize if we're on a page with filters
+        const preFilteredData = document.getElementById('prefiltered-data');
+        if (!preFilteredData) {
+            return; // Skip initialization if we're not on a page with filters
+        }
         this.initializeDropdowns();
         this.removeExistingHandlers();
         this.addNewHandlers();
     },
 
     initializeDropdowns() {
+        const preFilteredData = document.getElementById('prefiltered-data');
+        if (!preFilteredData) return;  // Skip if element doesn't exist
+        
         const pages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
         
         // Initialize country dropdown
