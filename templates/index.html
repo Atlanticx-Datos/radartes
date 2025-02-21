@@ -197,6 +197,36 @@
                 <!-- Results Grid -->
                 <div id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             </div>
+
+            <!-- New Top Opportunities Section -->
+            <div class="mt-16 mb-12">
+                <h2 class="text-2xl font-bold mb-6">Top convocatorias 🎯</h2>
+                <div class="relative">
+                    <!-- Previous button -->
+                    <button onclick="prevTopPage()"
+                        class="top-prev absolute left-0 top-1/2 -translate-y-1/2 -ml-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200"
+                        aria-disabled="true">
+                        <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+
+                    <!-- Top opportunities grid -->
+                    <div class="top-opportunities-container">
+                        <div class="grid grid-cols-1 gap-6">
+                            <!-- Content will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Next button -->
+                    <button onclick="nextTopPage()"
+                        class="top-next absolute right-0 top-1/2 -translate-y-1/2 -mr-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200">
+                        <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
