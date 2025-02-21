@@ -494,6 +494,35 @@ export const SearchModule = {
         const endIndex = startIndex + this.pagination.itemsPerPage;
         const paginatedResults = results.slice(startIndex, endIndex);
 
+        // Function to format date
+        const formatDate = (dateStr) => {
+            if (!dateStr || dateStr === '1900-01-01') {
+                return 'Confirmar en bases';
+            }
+            try {
+                const date = new Date(dateStr);
+                const day = String(date.getDate()).padStart(2, '0');
+                const year = date.getFullYear();
+                const monthMap = {
+                    0: 'Ene',
+                    1: 'Feb',
+                    2: 'Mar',
+                    3: 'Abr',
+                    4: 'May',
+                    5: 'Jun',
+                    6: 'Jul',
+                    7: 'Ago',
+                    8: 'Sep',
+                    9: 'Oct',
+                    10: 'Nov',
+                    11: 'Dic'
+                };
+                return `${day}/${monthMap[date.getMonth()]}/${year}`;
+            } catch (e) {
+                return dateStr;
+            }
+        };
+
         // Create table with results
         container.innerHTML = `
             <div class="overflow-x-auto rounded-lg border border-gray-200">
@@ -537,7 +566,7 @@ export const SearchModule = {
                                     ${page.tipo_de_pago || '-'}
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-600">
-                                    ${Utils.escapeHTML(page.fecha_de_cierre || '')}
+                                    ${formatDate(page.fecha_de_cierre)}
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-600">
                                     <button 

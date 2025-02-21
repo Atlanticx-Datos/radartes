@@ -29,7 +29,36 @@ export const DestacarModule = {
 
     updateDisplay() {
         const container = document.querySelector('.featured-opportunities .grid');
-        if (!container || !this.pages.length) return;
+        if (!container || !this.pages || !this.pages.length) return;
+
+        // Function to format date
+        const formatDate = (dateStr) => {
+            if (!dateStr || dateStr === '1900-01-01') {
+                return 'Confirmar en bases';
+            }
+            try {
+                const date = new Date(dateStr);
+                const day = String(date.getDate()).padStart(2, '0');
+                const year = date.getFullYear();
+                const monthMap = {
+                    0: 'Ene',
+                    1: 'Feb',
+                    2: 'Mar',
+                    3: 'Abr',
+                    4: 'May',
+                    5: 'Jun',
+                    6: 'Jul',
+                    7: 'Ago',
+                    8: 'Sep',
+                    9: 'Oct',
+                    10: 'Nov',
+                    11: 'Dic'
+                };
+                return `${day}/${monthMap[date.getMonth()]}/${year}`;
+            } catch (e) {
+                return dateStr;
+            }
+        };
 
         // Update navigation buttons state (opacity) instead of visibility
         const prevButton = document.querySelector('.destacar-prev');
@@ -94,7 +123,7 @@ export const DestacarModule = {
                                 <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
                                 </svg>
-                                <span>${Utils.escapeHTML(page.fecha_de_cierre)}</span>
+                                <span>${formatDate(page.fecha_de_cierre)}</span>
                             </div>
                         </div>
                     </div>

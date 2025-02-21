@@ -166,18 +166,69 @@ document.body.addEventListener('htmx:afterRequest', function(evt) {
     if (!notification) return;
 
     if (evt.detail.successful) {
-        notification.classList.remove('hidden', 'alert-error');
-        notification.classList.add('alert-success');
-        notification.innerHTML = 'Bien! Ya guardaste la oportunidad en tu espacio personal';
+        // Check if it's a delete request
+        const isDelete = evt.detail.pathInfo.requestPath.includes('/delete_opportunity/');
+        const message = isDelete 
+            ? 'Ok! Borramos tu oportunidad'
+            : 'Bien! Ya guardaste la oportunidad en tu espacio personal';
+
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 4px;
+            background: #d1fae5;
+            color: #065f46;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 9999;
+        `;
+
+        notification.innerHTML = `
+            <svg style="flex-shrink:0; width:20px; height:20px;" viewBox="0 0 24 24" fill="none">
+                <path stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span style="font-size:14px; font-weight:500;">${message}</span>
+        `;
+        notification.classList.remove('hidden');
     } else {
-        notification.classList.remove('hidden', 'alert-success');
-        notification.classList.add('alert-error');
-        notification.innerHTML = 'Error saving';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 4px;
+            background: #fee2e2;
+            color: #991b1b;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 9999;
+        `;
+
+        notification.innerHTML = `
+            <svg style="flex-shrink:0; width:20px; height:20px;" viewBox="0 0 24 24" fill="none">
+                <path stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span style="font-size:14px; font-weight:500;">Error en la operación</span>
+        `;
+        notification.classList.remove('hidden');
     }
     
     setTimeout(() => {
-        notification.classList.add('hidden');
-        notification.innerHTML = '';
+        notification.style.opacity = '0';
+        notification.style.transition = 'opacity 150ms ease-out';
+        setTimeout(() => {
+            notification.classList.add('hidden');
+            notification.innerHTML = '';
+            notification.style = ''; // Reset styles
+        }, 150);
     }, 3000);
 });
 

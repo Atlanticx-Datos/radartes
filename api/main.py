@@ -867,16 +867,20 @@ def index():
             if user_prefs:
                 scored_pages = []
                 for page in pages:
-                    pref_score = calculate_preference_score(page, user_prefs)  # Fixed this line
+                    pref_score = calculate_preference_score(page, user_prefs)
                     scored_pages.append((pref_score, page))
                 
-                # Sort by preference score (descending) and then by closing date
-                pages = [
-                    page for _, page in sorted(
-                        scored_pages,
-                        key=lambda x: (-x[0], x[1].get('fecha_de_cierre', ''))
-                    )
-                ]
+                # Sort by: 1) preference score (descending), 
+                #         2) date (ascending, but 1900-01-01 at end)
+                def sort_key(item):
+                    score, page = item
+                    date = page.get('fecha_de_cierre', '')
+                    # Put 1900-01-01 dates at the end
+                    if date == '1900-01-01':
+                        date = '9999-12-31'  # Far future date to sort last
+                    return (-score, date or '9999-12-31')  # Handle empty dates too
+                
+                pages = [page for _, page in sorted(scored_pages, key=sort_key)]
         
         # Pre-filter pages for each main discipline
         prefiltered_results = {}
@@ -1118,7 +1122,7 @@ def all_pages():
 def format_date(value):
     placeholder_date = '1900-01-01'
     if not value or value == placeholder_date:
-        return 'Sin Cierre'
+        return 'Confirmar en bases'
     try:
         date_obj = datetime.strptime(value, '%Y-%m-%d')
         return date_obj.strftime('%d/%m')
@@ -2064,9 +2068,27 @@ def get_existing_preferences_page_id(user_id):
 
 def calculate_preference_score(page, user_preferences):
     """Calculate match score between opportunity and user preferences"""
-    opportunity_disciplines = set(page.get('disciplina', '').lower().split(', '))
-    preference_match = len(opportunity_disciplines & user_preferences)
-    return min(preference_match * 2, 10)  # Boost matches with 2x weight, cap at 10
+    score = 0
+    page_disciplines = set(d.strip() for d in page.get('disciplina', '').split(',') if d.strip())
+    
+    # Normalize page disciplines
+    normalized_page_disciplines = {normalize_discipline(d) for d in page_disciplines}
+    
+    # For each user preference, check both direct matches and group membership
+    for pref in user_preferences:
+        # Check if preference is a main discipline
+        if pref in DISCIPLINE_GROUPS:
+            # If it's a main discipline, check if any page discipline belongs to its group
+            group_keywords = {normalize_discipline(k) for k in DISCIPLINE_GROUPS[pref]}
+            matches = len(normalized_page_disciplines.intersection(group_keywords))
+            if matches > 0:
+                score += matches * 3  # Higher weight for group matches
+        
+        # Also check for direct matches
+        if pref in normalized_page_disciplines:
+            score += 2  # Direct match bonus
+    
+    return min(score, 10)  # Cap at 10 to avoid extreme scores
 
 @app.route("/save_from_modal", methods=["POST"])
 @login_required
