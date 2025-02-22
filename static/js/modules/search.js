@@ -13,7 +13,7 @@ export const SearchModule = {
     },
     pagination: {
         currentPage: 1,
-        itemsPerPage: 15,
+        itemsPerPage: 12,
         totalPages: 1,
         allResults: []
     },
@@ -487,7 +487,7 @@ export const SearchModule = {
         this.pagination.allResults = results;
         this.pagination.totalPages = Math.ceil(results.length / this.pagination.itemsPerPage);
         
-        // Only reset to first page when new results come in and preservePage is false
+        // Reset to first page when new results come in and not preserving page
         if (!preservePage) {
             this.pagination.currentPage = 1;
         }
@@ -605,32 +605,34 @@ export const SearchModule = {
             ${this.pagination.totalPages > 1 ? `
                 <div class="flex justify-center mt-6">
                     <div class="flex items-center gap-2">
+                        <button 
+                            class="pagination-nav w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 ${this.pagination.currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                            ${this.pagination.currentPage === 1 ? 'disabled' : 'onclick="SearchModule.goToPage(' + (this.pagination.currentPage - 1) + ')"'}
+                        >
+                            ←
+                        </button>
                         ${Array.from({ length: this.pagination.totalPages }, (_, i) => i + 1).map(pageNum => `
                             <button 
-                                class="pagination-number w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium ${
+                                class="pagination-number w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium ${
                                     pageNum === this.pagination.currentPage 
                                     ? 'bg-blue-600 text-white' 
                                     : 'text-gray-700 hover:bg-gray-100'
                                 }"
-                                data-page="${pageNum}"
+                                onclick="SearchModule.goToPage(${pageNum})"
                             >
                                 ${pageNum}
                             </button>
                         `).join('')}
+                        <button 
+                            class="pagination-nav w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 ${this.pagination.currentPage === this.pagination.totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
+                            ${this.pagination.currentPage === this.pagination.totalPages ? 'disabled' : 'onclick="SearchModule.goToPage(' + (this.pagination.currentPage + 1) + ')"'}
+                        >
+                            →
+                        </button>
                     </div>
                 </div>
             ` : ''}
         `;
-
-        // Attach event listeners to pagination buttons
-        if (this.pagination.totalPages > 1) {
-            container.querySelectorAll('.pagination-number').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const pageNum = parseInt(e.target.dataset.page);
-                    this.goToPage(pageNum);
-                });
-            });
-        }
 
         counter.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''}`;
     },
@@ -639,7 +641,7 @@ export const SearchModule = {
         if (page < 1 || page > this.pagination.totalPages) return;
         this.pagination.currentPage = page;
         
-        // Update the results with the new page, preserving the current page
+        // Update the results with the new page
         this.updateResults(this.pagination.allResults, true);
         
         // Scroll to top of results
