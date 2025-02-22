@@ -1572,13 +1572,12 @@ def get_saved_opportunities(user_id):
                 saved_items.append({
                     "id": opp_id,
                     "nombre_original": get_prop_value(props.get("Nombre", {})),
-                    "resumen_IA": get_prop_value(props.get("Resumen generado por la IA", {})),
+                    "og_resumida": get_prop_value(props.get("Og_Resumida", {})),
                     "disciplina": get_prop_value(props.get("Disciplina", {})),
                     "país": get_prop_value(props.get("País", {})),
                     "categoría": get_prop_value(props.get("Categoría", {})),
                     "fecha_de_cierre": get_date_value(props.get("Fecha de cierre", {})),
                     "url": props.get("URL", {}).get("url", ""),
-                    "og_resumida": get_prop_value(props.get("Og_Resumida", {})),
                     "inscripcion": inscripcion_value
                 })
                 
