@@ -978,29 +978,6 @@ def sitemap():
     response.headers["Content-Type"] = "application/xml"
     return response
 
-@app.route("/create", methods=["GET", "POST"])
-@login_required
-def handle_create():
-    if request.method == "POST":
-        # Handle form submission
-        data = request.form.to_dict()
-        required_fields = ["Nombre", "País", "URL", "Destinatarios"]
-        if not data or any(field not in data for field in required_fields):
-            return "Invalid data: all fields are required", 400
-
-        # Assuming create_page returns a response or redirect
-        response = create_page(data)
-        return response
-
-    # For GET request, just show the form
-    return render_template("form.html", properties={}, page_id=None)
-
-def create_page(data: dict):
-    create_url = "https://api.notion.com/v1/pages"
-    payload = {"parent": {"database_id": DATABASE_ID}, "properties": data}
-    res = requests.post(create_url, headers=headers, json=payload)
-    return res.text
-
 @app.route("/share/<opportunity_id>")
 def share_opportunity(opportunity_id):
     opportunity = get_opportunity_by_id(opportunity_id)
@@ -1008,124 +985,9 @@ def share_opportunity(opportunity_id):
         "title": opportunity["nombre"],
         "description": opportunity["resumen_IA"],
         "url": opportunity["url"],
-        "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
+        "image": "https://oportunidades.lat/static/public/dgpapng.png"
     }
     return render_template("share.html", opportunity=opportunity, og_data=og_data)
-
-
-
-@app.route("/database", methods=["GET", "POST"])
-def all_pages():
-    # Handle POST requests (for saving opportunities)
-    if request.method == "POST":
-        if not session.get('user'):
-            return redirect(url_for('login', next=request.url))
-        return redirect(url_for('all_pages'))
-
-    # Get cached content and pages
-    cached_content = get_cached_database_content()
-    pages = cached_content.get('pages', []) if cached_content else []
-    
-    # Define HTMX and scroll variables early
-    is_htmx = request.headers.get('HX-Request', 'false').lower() == 'true'
-    scroll_id = request.args.get('scroll_id')
-    
-    # Define month mapping (keep this for filtering)
-    month_mapping = {
-        "enero": 1, "febrero": 2, "marzo": 3, "abril": 4,
-        "mayo": 5, "junio": 6, "julio": 7, "agosto": 8,
-        "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
-    }
-    
-    # Get month filter from request
-    month_filter = request.args.get("month")
-    
-    # Original search implementation
-    search_query = request.args.get("search", "").strip().lower()
-    print(f"Search query: {search_query}")  # Debug print
-    
-    filtered_pages = []
-    if search_query:
-        # Normalize and split search terms
-        search_terms = [
-            normalize_discipline(term.strip())
-            for term in search_query.split(',')
-        ]
-        
-        # Score and filter pages
-        scored_pages = []
-        for page in pages:
-            score = calculate_relevance_score(page, search_terms, DISCIPLINE_GROUPS)
-            if score > 0:  # Only include pages with matches
-                scored_pages.append((score, page))
-        
-        # Sort by score (descending) and extract just the pages
-        filtered_pages = [
-            page for score, page in sorted(
-                scored_pages, 
-                key=lambda x: x[0], 
-                reverse=True
-            )
-        ]
-        
-        app.logger.debug(f"Found {len(filtered_pages)} relevant pages")
-        
-    else:
-        filtered_pages = pages
-
-    # Apply month filter if present (restore this functionality)
-    if month_filter:
-        try:
-            month_number = int(month_filter)
-            filtered_pages = [
-                page for page in filtered_pages
-                if page.get('fecha_de_cierre') 
-                and page['fecha_de_cierre'] != '1900-01-01'
-                and datetime.strptime(page['fecha_de_cierre'], '%Y-%m-%d').month == month_number
-            ]
-        except (ValueError, TypeError) as e:
-            app.logger.error(f"Error filtering by month: {str(e)}")
-
-    # Handle ALL HTMX requests first
-    if is_htmx:
-        print(f"HTMX: Returning {len(filtered_pages)} results")
-        return render_template("_search_results.html", 
-                            pages=filtered_pages,
-                            no_results=not filtered_pages)
-
-    # Optimized point: Cache discipline counts
-    discipline_counts = get_discipline_counts()  # Ensure this uses Redis
-    
-    # Get discipline counts for sidebar/facets
-    main_discipline_counts = {
-        main: sum(
-            count for disc, count in discipline_counts['main'].items()
-            if disc in subs or disc == main
-        )
-        for main, subs in DISCIPLINE_GROUPS.items()
-    }
-
-    total_opportunities = len(filtered_pages)
-
-    # Final return for full page requests
-    return render_template(
-        "database.html",
-        pages=filtered_pages,
-        closing_soon_pages=get_cached_database_content()['closing_soon_pages'][:7],
-        destacar_pages=get_cached_database_content()['destacar_pages'],
-        total_opportunities=total_opportunities,
-        search_meta={
-            'total_results': len(filtered_pages),
-            'main_discipline_counts': main_discipline_counts,
-            'original_search': search_query
-        },
-        og_data={
-            "title": "100 ︱ Oportunidades",
-            "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
-            "url": request.url,
-            "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
-        }
-    )
 
 # Custom Jinja2 filter for date
 @app.template_filter('format_date')
@@ -1138,107 +1000,6 @@ def format_date(value):
         return date_obj.strftime('%d/%m')
     except ValueError:
         return value  # Return the original value if it cannot be parsed
-
-@app.route("/update/<page_id>", methods=["GET", "POST"])
-@admin_required
-def update_page(page_id):
-    if request.method == "POST":
-        # Update the page with the form data
-        data = request.form.to_dict()
-
-        # Prepare properties for the Notion API
-        properties = {
-            "Nombre": {"title": [{"text": {"content": data.get("name", "")}}]},
-            "País": {"rich_text": [{"text": {"content": data.get("country", "")}}]},
-            "URL": {"url": data.get("url", "")},
-            "Destinatarios": {
-                "rich_text": [{"text": {"content": data.get("recipients", "")}}]
-            },
-        }
-
-        if "fecha_de_cierre" in data and data["fecha_de_cierre"]:
-            properties["Fecha de cierre"] = {
-                "date": {"start": data.get("fecha_de_cierre")}
-            }
-
-        update_url = f"https://api.notion.com/v1/pages/{page_id}"
-        res = requests.patch(
-            update_url, headers=headers, json={"properties": properties}
-        )
-
-        if res.status_code != 200:
-            return "Failed to update page", 400
-
-        # Fetch the updated data for the page
-        url = f"https://api.notion.com/v1/pages/{page_id}"
-        res = requests.get(url, headers=headers)
-        page = res.json()
-
-        # Extract the properties from the page
-        properties = page["properties"]
-
-        # Redirect to the form.html template with the updated properties
-        return render_template("form.html", properties=properties, page_id=page_id)
-
-    # Fetch the current data for the page
-    url = f"https://api.notion.com/v1/pages/{page_id}"
-    res = requests.get(url, headers=headers)
-    page = res.json()
-
-    # Extract the properties from the page
-    properties = page["properties"]
-
-    return render_template("form.html", properties=properties, page_id=page_id)
-
-@app.route("/save", methods=["POST"])
-@app.route("/save/<page_id>", methods=["POST"])
-@admin_required
-def save_page(page_id=None):
-    data = request.form.to_dict()
-
-    properties = {
-        "Nombre": {"title": [{"text": {"content": data.get("name", "")}}]},
-        "País": {"rich_text": [{"text": {"content": data.get("country", "")}}]},
-        "URL": {"url": data.get("url", "")},
-        "Destinatarios": {
-            "rich_text": [{"text": {"content": data.get("recipients", "")}}]
-        },
-    }
-
-    if "fecha_de_cierre" in data and data["fecha_de_cierre"]:
-        properties["Fecha de cierre"] = {"date": {"start": data.get("fecha_de_cierre")}}
-
-    headers = {
-        "Authorization": "Bearer " + NOTION_TOKEN,
-        "Content-Type": "application/json",
-        "Notion-Version": "2022-06-28",
-    }
-
-    if page_id:
-        update_url = f"https://api.notion.com/v1/pages/{page_id}"
-        response = requests.patch(
-            update_url, headers=headers, json={"properties": properties}
-        )
-    else:
-        create_url = "https://api.notion.com/v1/pages"
-        parent = {"database_id": DATABASE_ID}
-        response = requests.post(
-            create_url,
-            headers=headers,
-            json={"parent": parent, "properties": properties},
-        )
-
-    if response.status_code not in [
-        200,
-        201,
-    ]:  # 200 OK for update, 201 Created for create
-        print(
-            f"Failed to process page: {response.status_code}, {response.text}"
-        )  # Debugging
-        return "Failed to process page", 400
-
-    # Redirect to the /database route to display all pages
-    return redirect(url_for("all_pages"))
 
 @app.route("/update_total_nuevas", methods=["GET"])
 def update_total_nuevas():
@@ -1553,10 +1314,6 @@ def refresh_database_cache():
 def privacy_policy():
     return render_template("privacy_policy.html")
 
-@app.route('/home')
-def home():
-    return render_template('home.html')
-
 @app.context_processor
 def utility_processor():
     def versioned_static(filename):
@@ -1565,19 +1322,6 @@ def utility_processor():
         """Template helper to normalize disciplines for comparison"""
         return normalize_discipline(text)
     return dict(versioned_static=versioned_static, normalize_discipline=template_normalize_discipline)
-
-@app.route('/proxy')
-def proxy():
-    url = request.args.get('url')
-    if not url:
-        return 'No URL provided', 400
-    
-    try:
-        response = requests.get(url)
-        return response.text
-    except Exception as e:
-        return str(e), 500
-
 # Add this context processor to make function available in all templates
 @app.context_processor
 def inject_utilities():
@@ -1946,18 +1690,6 @@ def mi_espacio():
         flash("Error al procesar tus preferencias", "error")
         return redirect(url_for('index'))
 
-# Maintain existing preferences route
-@app.route("/preferences", methods=["GET", "POST"])
-@login_required
-def preferences():
-    return redirect(url_for("mi_espacio"))
-
-# Maintain existing saved_opportunities route 
-@app.route("/saved_opportunities")
-@login_required
-def saved_opportunities():
-    return redirect(url_for("mi_espacio"))
-
 def save_user_preferences(user_id, disciplines, email):
     """Save to OPORTUNIDADES_ID with proper Notion property formats"""
     try:
@@ -2069,6 +1801,7 @@ def get_existing_preferences(user_id):
         app.logger.error(f"Error in get_existing_preferences: {str(e)}")
         app.logger.error(f"Traceback: {traceback.format_exc()}")
         return {'disciplines': set(), 'email': ''}
+
 def get_existing_preferences_page_id(user_id):
     """Get existing preferences page ID with debug logging"""
     try:
