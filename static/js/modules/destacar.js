@@ -79,7 +79,7 @@ export const DestacarModule = {
             .map(page => `
                 <div class="bg-white rounded-lg shadow-md overflow-hidden relative cursor-pointer opportunity-preview"
                      data-url="${Utils.escapeHTML(page.url)}"
-                     data-name="${Utils.escapeHTML(page.nombre)}"
+                     data-nombre="${Utils.escapeHTML(page.nombre_original)}"
                      data-country="${Utils.escapeHTML(page.país)}"
                      data-summary="${Utils.escapeHTML(page.og_resumida || '')}"
                      data-id="${Utils.escapeHTML(page.id)}"
@@ -98,7 +98,7 @@ export const DestacarModule = {
                     </div>
                     
                     <div class="p-4">
-                        <h3 class="font-medium text-lg mb-2">${Utils.escapeHTML(page.nombre)}</h3>
+                        <h3 class="font-medium text-lg mb-2">${Utils.escapeHTML(page.nombre_original)}</h3>
                         
                         <div class="flex flex-wrap gap-4 text-sm text-gray-600 mt-3">
                             <div class="flex items-center gap-1">
@@ -143,7 +143,7 @@ export const DestacarModule = {
                 if (window.ModalModule && window.ModalModule.showPreviewModal) {
                     window.ModalModule.showPreviewModal(
                         dataset.url,
-                        dataset.name,
+                        dataset.nombre,
                         dataset.country,
                         dataset.summary,
                         dataset.id,

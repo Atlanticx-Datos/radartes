@@ -48,6 +48,9 @@ document.addEventListener('DOMContentLoaded', function() {
     FilterModule.init();
     SearchModule.init();
     
+    // Initialize modal handlers globally
+    setupModalHandlers();
+    
     // Initialize DestacarModule if featured content exists
     if (window.processedDestacarData) {
         DestacarModule.init(window.processedDestacarData);
@@ -58,9 +61,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup filter dropdown trigger
     setupFilterDropdown();
-    
-    // Setup preview button listeners
-    setupPreviewButtons();
     
     // Ensure the clear button stays visible
     SearchModule.ensureClearButtonVisible();
@@ -126,25 +126,6 @@ function setupFilterDropdown() {
             }
         });
     }
-}
-
-// Setup preview button listeners
-function setupPreviewButtons() {
-    document.addEventListener('click', function(e) {
-        const previewBtn = e.target.closest('.preview-btn');
-        if (previewBtn) {
-            e.preventDefault();
-            const dataset = previewBtn.dataset;
-            ModalModule.showPreviewModal(
-                dataset.url,
-                dataset.name,
-                dataset.pais || dataset.country,
-                dataset.og_resumida || dataset.summary,
-                dataset.id,
-                dataset.categoria || dataset.category
-            );
-        }
-    });
 }
 
 // Attach necessary functions to window object for backward compatibility
@@ -273,3 +254,29 @@ document.body.addEventListener('htmx:afterProcessNode', function(evt) {
         console.error('HTMX processing error:', e);
     }
 });
+
+// New global modal handler setup
+function setupModalHandlers() {
+    document.addEventListener('click', (e) => {
+        const previewButton = e.target.closest('.preview-btn');
+        if (!previewButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        handlePreviewClick(previewButton.dataset);
+    });
+}
+
+// Centralized preview click handler
+function handlePreviewClick(dataset) {
+    if (window.ModalModule?.showPreviewModal) {
+        ModalModule.showPreviewModal(
+            dataset.url,
+            dataset.nombre || dataset.name,
+            dataset.pais || dataset.country,
+            dataset.og_resumida || dataset.summary,
+            dataset.id,
+            dataset.categoria || dataset.category
+        );
+    }
+}

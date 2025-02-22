@@ -51,13 +51,13 @@ export const TopModule = {
                 <div class="grid grid-cols-2 gap-8">
                     <!-- Left side: Image placeholder -->
                     <div class="bg-gray-100 rounded-lg flex items-center justify-center">
-                        <img src="/static/public/IsoAtx.png" alt="Atlantic x Logo" class="w-full h-full object-contain p-8">
+                        <img src="/static/public/IsoAtx.png" alt="Atlantic x Logo" class="w-full h-48 object-contain p-8">
                     </div>
                     
                     <!-- Right side: Content -->
                     <div class="flex flex-col justify-between">
                         <div>
-                            <h3 class="text-xl font-semibold mb-4">${Utils.escapeHTML(currentPage.nombre)}</h3>
+                            <h3 class="text-xl font-semibold mb-4">${Utils.escapeHTML(currentPage.nombre_original)}</h3>
                             
                             <!-- Meta information -->
                             <div class="space-y-2 mb-4">
@@ -88,13 +88,14 @@ export const TopModule = {
                         </div>
 
                         <button 
+                            type="button"
                             class="preview-btn mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors w-fit"
                             data-url="${Utils.escapeHTML(currentPage.url)}"
-                            data-name="${Utils.escapeHTML(currentPage.nombre)}"
-                            data-country="${Utils.escapeHTML(currentPage.país)}"
-                            data-summary="${Utils.escapeHTML(currentPage.og_resumida)}"
+                            data-nombre="${Utils.escapeHTML(currentPage.nombre)}"
+                            data-pais="${Utils.escapeHTML(currentPage.país)}"
+                            data-og-resumida="${Utils.escapeHTML(currentPage.og_resumida)}"
                             data-id="${Utils.escapeHTML(currentPage.id)}"
-                            data-category="${Utils.escapeHTML(currentPage.categoria)}"
+                            data-categoria="${Utils.escapeHTML(currentPage.categoria)}"
                         >
                             Ver más
                         </button>
@@ -102,25 +103,6 @@ export const TopModule = {
                 </div>
             </div>
         `;
-
-        // Attach click handlers to the preview button
-        container.querySelectorAll('.preview-btn').forEach(element => {
-            element.addEventListener('click', (e) => {
-                e.preventDefault();
-                const dataset = element.dataset;
-                
-                if (window.ModalModule && window.ModalModule.showPreviewModal) {
-                    window.ModalModule.showPreviewModal(
-                        dataset.url,
-                        dataset.name,
-                        dataset.country,
-                        dataset.summary,
-                        dataset.id,
-                        dataset.category
-                    );
-                }
-            });
-        });
     },
 
     attachNavigationListeners() {

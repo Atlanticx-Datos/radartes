@@ -2,7 +2,7 @@
     {% for opportunity in saved_opportunities %}
     <tr class="hover:bg-gray-50 transition-colors">
         <td class="px-4 py-3 text-sm text-gray-900">
-            {{ opportunity.resumen_generado_por_la_ia }}
+            {{ opportunity.nombre_original }}
         </td>
         <td class="px-4 py-3 text-sm text-gray-600">
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
@@ -31,16 +31,16 @@
             {% endif %}
         </td>
         <td class="px-4 py-3 text-sm text-gray-600">
-            {{ opportunity.fecha_de_cierre | format_date }}
+            {{ opportunity.fecha_de_cierre | format_date('%d/%m/%Y') }}
         </td>
         <td class="px-4 py-3 text-sm text-gray-600">
             <div class="flex items-center justify-center gap-2">
                 <button 
                     class="preview-btn px-3 py-1 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100"
                     data-url="{{ opportunity.url }}"
-                    data-name="{{ opportunity.nombre_original }}"
-                    data-country="{{ opportunity.país }}"
-                    data-summary="{{ opportunity.og_resumida }}"
+                    data-nombre="{{ opportunity.nombre_original }}"
+                    data-pais="{{ opportunity.país }}"
+                    data-summary="{{ opportunity.resumen_IA }}"
                     data-id="{{ opportunity.id }}"
                     data-category="{{ opportunity.categoría }}"
                     data-inscripcion="{{ opportunity.inscripcion }}"

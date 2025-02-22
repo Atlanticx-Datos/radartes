@@ -3,7 +3,7 @@ import { CONSTANTS } from '../constants.js';
 
 // Handles modal functionality
 export const ModalModule = {
-    showPreviewModal(url, name, pais, og_resumida, id, categoria) {
+    showPreviewModal(url, nombre, pais, og_resumida, id, categoria) {
         const modalId = "modal-" + Date.now();
         const isMiEspacio = window.location.pathname === '/mi_espacio';
 
@@ -52,7 +52,7 @@ export const ModalModule = {
                 <div class="p-4 border-b flex items-start">
                     <div class="w-2/3">
                         <h3 class="text-xl font-semibold text-gray-800 break-words">
-                            ${Utils.escapeHTML(name)}
+                            ${Utils.escapeHTML(nombre)}
                         </h3>
                     </div>
                     <div class="w-1/3 relative flex justify-end">
@@ -189,7 +189,7 @@ export const ModalModule = {
                 option.addEventListener('click', (e) => {
                     e.preventDefault();
                     const action = option.dataset.action;
-                    this.handleShare(action, url, name);
+                    this.handleShare(action, url, nombre);
                     shareDropdown.classList.add('hidden');
                 });
             });

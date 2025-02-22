@@ -33,6 +33,31 @@ export const SearchModule = {
                 });
 
                 this.initializeStructuredFilters(pages);
+                
+                // Add single event listener for preview buttons using event delegation
+                document.addEventListener('click', (e) => {
+                    const previewButton = e.target.closest('.preview-btn');
+                    if (!previewButton) return;
+                    
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const dataset = previewButton.dataset;
+                    console.log('Preview button clicked, data:', dataset);
+                    
+                    if (window.ModalModule && window.ModalModule.showPreviewModal) {
+                        window.ModalModule.showPreviewModal(
+                            dataset.url,
+                            dataset.nombre || dataset.name,
+                            dataset.pais || dataset.country,
+                            dataset.og_resumida || dataset.summary,
+                            dataset.id,
+                            dataset.categoria || dataset.category
+                        );
+                    } else {
+                        console.error('ModalModule not found or showPreviewModal not available');
+                    }
+                });
             } catch (e) {
                 console.error('Search module initialization error:', e);
             }
@@ -564,7 +589,7 @@ export const SearchModule = {
                         ${paginatedResults.map(page => `
                             <tr class="hover:bg-gray-50 transition-colors">
                                 <td class="px-4 py-3 text-sm text-gray-900">
-                                    ${Utils.escapeHTML(page.nombre || '')}
+                                    ${Utils.escapeHTML(page.nombre_original || '')}
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-600">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
@@ -585,9 +610,10 @@ export const SearchModule = {
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-600">
                                     <button 
+                                        type="button"
                                         class="preview-btn px-3 py-1 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100"
                                         data-url="${Utils.escapeHTML(page.url || '')}"
-                                        data-name="${Utils.escapeHTML(page.nombre || '')}"
+                                        data-nombre="${Utils.escapeHTML(page.nombre_original || '')}"
                                         data-pais="${Utils.escapeHTML(page.pais || page.país || '')}"
                                         data-og_resumida="${Utils.escapeHTML(page.og_resumida || '')}"
                                         data-id="${Utils.escapeHTML(page.id || '')}"
@@ -646,29 +672,5 @@ export const SearchModule = {
         
         // Scroll to top of results
         document.getElementById('results-container')?.scrollIntoView({ behavior: 'smooth' });
-    },
-
-    attachPreviewHandlers(container) {
-        if (!container) return;
-        
-        container.querySelectorAll('.opportunity-preview').forEach(element => {
-            element.addEventListener('click', (e) => {
-                e.preventDefault();
-                const dataset = element.dataset;
-                
-                if (window.ModalModule && window.ModalModule.showPreviewModal) {
-                    window.ModalModule.showPreviewModal(
-                        dataset.url,
-                        dataset.name,
-                        dataset.country || dataset.pais,
-                        dataset.summary || dataset.ogResumida,
-                        dataset.id,
-                        dataset.category || dataset.categoria
-                    );
-                } else {
-                    console.error('ModalModule not found or showPreviewModal not available');
-                }
-            });
-        });
     },
 }; 

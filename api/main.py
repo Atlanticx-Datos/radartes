@@ -217,7 +217,7 @@ else:
     current_domain = get_current_domain()
     AUTH0_CALLBACK_URL = f"https://{current_domain}/callback"
     BASE_URL = f"https://{current_domain}"
-    SESSION_COOKIE_DOMAIN = current_domain
+    SESSION_COOKIE_DOMAIN = ".oportunidades.lat"  # Allow subdomains
     app.logger.info(f"Using production URLs with domain: {current_domain}")
 
 app.logger.info(f"Configured callback URL: {AUTH0_CALLBACK_URL}")
@@ -238,9 +238,8 @@ app.config.update(
 @app.before_request
 def before_request():
     session.permanent = True
-    # In production, always use the main domain for cookies
     if is_production:
-        session.cookie_domain = "oportunidades.lat"
+        session.cookie_domain = ".oportunidades.lat"  # Match the main domain config
         app.logger.info(f"Setting cookie domain to: {session.cookie_domain}")
 
 # Initialize the Session extension
@@ -270,12 +269,19 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if "user" not in session:
+            app.logger.info(f"No user in session, redirecting to login. Requested URL: {request.url}")
+            
             if request.headers.get('HX-Request'):
                 return """
                 <script>
-                    window.location.href = '/login?next=' + encodeURIComponent(window.location.href);
+                    window.location.href = '/login';
                 </script>
                 """, 401
+            
+            # Store the full path (not just the URL) in the session
+            session['next'] = request.path
+            session.modified = True
+            
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
@@ -338,35 +344,12 @@ oauth.register(
 
 @app.route("/login")
 def login():
-    app.logger.info(f"Auth0 Configuration:")
-    app.logger.info(f"Custom Domain: {AUTH0_CUSTOM_DOMAIN}")
-    app.logger.info(f"Callback URL configured: {AUTH0_CALLBACK_URL}")
-    
-    # Log all request args
-    app.logger.info(f"Login request args: {request.args}")
-    
-    # Store the next URL in session
-    next_url = request.args.get('next')
-    app.logger.info(f"Next URL from request: {next_url}")
-    
-    if next_url:
-        session['next_url'] = next_url
-        app.logger.info(f"Stored next_url in session: {next_url}")
+    app.logger.info(f"Login route accessed. Session contents: {session}")
     
     # Generate and store state in session
     state = secrets.token_urlsafe(32)
     session['state'] = state
     session.modified = True
-    
-    app.logger.info(f"Session before redirect: {session}")
-    
-    # Check if user is first time visitor by looking up their preferences
-    user_id = session.get('user', {}).get('sub')
-    if user_id:
-        has_preferences = check_user_preferences(user_id)
-        if not has_preferences:
-            session['needs_preferences'] = True
-            session.modified = True
     
     return oauth.auth0.authorize_redirect(
         redirect_uri=AUTH0_CALLBACK_URL,
@@ -427,67 +410,44 @@ def check_user_preferences(user_id):
 def callback():
     try:
         app.logger.info("Starting callback processing")
-        app.logger.info(f"Current environment: {'Production' if is_production else 'Development'}")
-        app.logger.info(f"Configured AUTH0_CALLBACK_URL: {AUTH0_CALLBACK_URL}")
-        app.logger.info(f"Request URL: {request.url}")
         app.logger.info(f"Session contents at callback start: {session}")
-        app.logger.info(f"Request args: {request.args}")
         
-        # Check for error in callback
+        # Basic error handling
         if 'error' in request.args:
-            error_desc = request.args.get('error_description', 'Unknown error')
-            app.logger.error(f"Auth0 callback error: {error_desc}")
-            session.clear()
+            app.logger.error(f"Auth0 callback error: {request.args.get('error_description', 'Unknown error')}")
             return redirect(url_for("login"))
         
-        # Verify state before proceeding
-        request_state = request.args.get('state')
-        session_state = session.get('state')
-        
-        if not session_state:
-            app.logger.error("No state in session")
-            return redirect(url_for("login"))
-            
-        if request_state != session_state:
-            app.logger.error(f"State mismatch: {request_state} != {session_state}")
+        # State verification
+        if request.args.get('state') != session.get('state'):
+            app.logger.error("State mismatch")
             return redirect(url_for("login"))
         
-        app.logger.info("Getting access token...")
+        # Get token and user info
         token = oauth.auth0.authorize_access_token()
+        user_info = oauth.auth0.get("userinfo").json()
+        
+        # Store in session
         session["jwt"] = token
-        app.logger.info("Token obtained successfully")
-        
-        app.logger.info("Getting user info...")
-        user_info_response = oauth.auth0.get("userinfo")
-        user_info = user_info_response.json()
         session["user"] = user_info
-        app.logger.info(f"User info stored in session: {user_info}")
+        session.modified = True
         
-        # Clear the state after successful verification
+        # Get next URL from session
+        next_url = session.pop('next', None)
+        app.logger.info(f"Next URL from session: {next_url}")
+        
+        # Clear state
         session.pop('state', None)
         
-        # Check if user has preferences
-        user_id = user_info['sub']
-        app.logger.info(f"Checking preferences for user: {user_id}")
-        
-        preferences = get_existing_preferences(user_id)
-        app.logger.debug(f"Retrieved preferences: {preferences}")
-        
-        # Determine redirect target
-        if not preferences.get('disciplines'):
-            app.logger.info(f"User {user_id} needs preferences setup")
-            target = url_for('mi_espacio', first_time=1)
+        # Determine where to redirect
+        if next_url:
+            app.logger.info(f"Redirecting to stored URL: {next_url}")
+            return redirect(next_url)
         else:
-            app.logger.info(f"User {user_id} has existing preferences")
-            target = url_for('index')
-        
-        # Final redirect with proper session commit
-        response = redirect(target)
-        session.modified = True  # Force session save
-        return response
-        
+            app.logger.info("No stored URL, redirecting to index")
+            return redirect(url_for('index'))
+            
     except Exception as e:
-        app.logger.error(f"Error during callback processing: {str(e)}")
+        app.logger.error(f"Callback error: {str(e)}")
         app.logger.exception("Full traceback:")
         session.clear()
         return redirect(url_for("login"))
@@ -690,7 +650,7 @@ def get_opportunity_by_id(opportunity_id):
         
         opportunity = {
             "id": data["id"],
-            "nombre": (
+            "nombre_original": (  # Changed from 'nombre' to 'nombre_original'
                 data["properties"]["Nombre"]["title"][0]["text"]["content"]
                 if data["properties"]["Nombre"]["title"]
                 else ""
@@ -738,6 +698,16 @@ def get_opportunity_by_id(opportunity_id):
             "inscripcion": (
                 data["properties"]["Inscripcion"]["select"]["name"]
                 if data["properties"].get("Inscripcion", {}).get("select")
+                else ""
+            ),
+            "disciplina": (  # Added missing disciplina field
+                data["properties"]["Disciplina"]["rich_text"][0]["text"]["content"]
+                if data["properties"]["Disciplina"]["rich_text"]
+                else ""
+            ),
+            "categoría": (  # Added missing categoría field
+                data["properties"]["Categoría"]["rich_text"][0]["text"]["content"]
+                if data["properties"]["Categoría"]["rich_text"]
                 else ""
             )
         }
@@ -982,7 +952,7 @@ def sitemap():
 def share_opportunity(opportunity_id):
     opportunity = get_opportunity_by_id(opportunity_id)
     og_data = {
-        "title": opportunity["nombre"],
+        "title": opportunity["nombre_original"],
         "description": opportunity["resumen_IA"],
         "url": opportunity["url"],
         "image": "https://oportunidades.lat/static/public/dgpapng.png"
@@ -991,15 +961,15 @@ def share_opportunity(opportunity_id):
 
 # Custom Jinja2 filter for date
 @app.template_filter('format_date')
-def format_date(value):
+def format_date(value, date_format='%d/%m/%Y'):
     placeholder_date = '1900-01-01'
     if not value or value == placeholder_date:
         return 'Confirmar en bases'
     try:
         date_obj = datetime.strptime(value, '%Y-%m-%d')
-        return date_obj.strftime('%d/%m')
+        return date_obj.strftime(date_format)  # Use the provided format
     except ValueError:
-        return value  # Return the original value if it cannot be parsed
+        return value
 
 @app.route("/update_total_nuevas", methods=["GET"])
 def update_total_nuevas():
@@ -1321,7 +1291,10 @@ def utility_processor():
     def template_normalize_discipline(text):
         """Template helper to normalize disciplines for comparison"""
         return normalize_discipline(text)
-    return dict(versioned_static=versioned_static, normalize_discipline=template_normalize_discipline)
+    return dict(
+        versioned_static=versioned_static,
+        normalize_discipline=template_normalize_discipline
+    )
 # Add this context processor to make function available in all templates
 @app.context_processor
 def inject_utilities():
@@ -1559,31 +1532,59 @@ def get_saved_opportunities(user_id):
         for item in response.json().get("results", []):
             try:
                 opp_id = item.get("properties", {}).get("Opportunity ID", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "")
-                if not opp_id:
+                if not opp_id or len(opp_id) != 36:  # Validate UUID length
+                    app.logger.warning(f"Invalid opportunity ID: {opp_id}")
                     continue
                 
                 # Fetch full opportunity details from main database
                 opp_url = f"https://api.notion.com/v1/pages/{opp_id}"
                 opp_response = requests.get(opp_url, headers=headers)
-                opp_response.raise_for_status()
+                
+                # Log response status and content for debugging
+                app.logger.debug(f"Opportunity {opp_id} response status: {opp_response.status_code}")
+                
+                if opp_response.status_code != 200:
+                    app.logger.warning(f"Could not fetch opportunity {opp_id}: {opp_response.status_code}")
+                    app.logger.warning(f"Response content: {opp_response.text}")
+                    continue
+                
                 opp_data = opp_response.json()
+                if not opp_data:
+                    app.logger.warning(f"Empty response data for opportunity {opp_id}")
+                    continue
+                    
+                if "properties" not in opp_data:
+                    app.logger.warning(f"No properties found in opportunity {opp_id}")
+                    app.logger.debug(f"Response data: {json.dumps(opp_data, indent=2)}")
+                    continue
                 
                 # Get all the fields we need to match the index display
                 props = opp_data.get("properties", {})
+                
+                # Handle inscripcion field safely
+                inscripcion_prop = props.get("Inscripcion", {})
+                inscripcion_value = ""
+                if inscripcion_prop and isinstance(inscripcion_prop, dict):
+                    select_data = inscripcion_prop.get("select")
+                    if select_data and isinstance(select_data, dict):
+                        inscripcion_value = select_data.get("name", "")
+                
                 saved_items.append({
-                    "id": opp_id,  # Use the opportunity ID for consistency
+                    "id": opp_id,
                     "nombre_original": get_prop_value(props.get("Nombre", {})),
-                    "resumen_generado_por_la_ia": get_prop_value(props.get("Resumen generado por la IA", {})),
+                    "resumen_IA": get_prop_value(props.get("Resumen generado por la IA", {})),
                     "disciplina": get_prop_value(props.get("Disciplina", {})),
                     "país": get_prop_value(props.get("País", {})),
                     "categoría": get_prop_value(props.get("Categoría", {})),
                     "fecha_de_cierre": get_date_value(props.get("Fecha de cierre", {})),
                     "url": props.get("URL", {}).get("url", ""),
-                    "og_resumida": get_prop_value(props.get("Og_Resumida", {}))
+                    "og_resumida": get_prop_value(props.get("Og_Resumida", {})),
+                    "inscripcion": inscripcion_value
                 })
                 
             except Exception as e:
-                app.logger.error(f"Error processing opportunity {opp_id}: {str(e)}")
+                app.logger.error(f"Error processing opportunity {opp_id if 'opp_id' in locals() else 'unknown'}: {str(e)}")
+                app.logger.error(f"Full error details: {traceback.format_exc()}")
                 continue
         
         app.logger.debug(f"Retrieved {len(saved_items)} saved opportunities")
@@ -1591,6 +1592,7 @@ def get_saved_opportunities(user_id):
         
     except Exception as e:
         app.logger.error(f"Error getting saved opportunities: {str(e)}")
+        app.logger.error(f"Full error details: {traceback.format_exc()}")
         return []
 
 def parse_opportunity(page):
@@ -1613,6 +1615,9 @@ def parse_opportunity(page):
 
 def get_prop_value(prop):
     """Helper function to extract values from different property types"""
+    if not prop:
+        return ""
+        
     prop_type = prop.get("type", "")
     
     if prop_type == "title":
@@ -1685,10 +1690,19 @@ def mi_espacio():
 
     except Exception as e:
         app.logger.error(f"mi_espacio error: {str(e)}")
+        app.logger.exception("Full traceback:")
+        
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify({"error": str(e)}), 500
-        flash("Error al procesar tus preferencias", "error")
-        return redirect(url_for('index'))
+            
+        flash("Error al cargar tu espacio personal. Por favor intenta nuevamente.", "error")
+        return render_template(
+            "mi_espacio.html",
+            disciplines=MAIN_DISCIPLINES,
+            selected_disciplines=[],
+            existing_email='',
+            saved_opportunities=[]
+        )
 
 def save_user_preferences(user_id, disciplines, email):
     """Save to OPORTUNIDADES_ID with proper Notion property formats"""
@@ -1739,7 +1753,7 @@ def get_existing_preferences(user_id):
         app.logger.debug(f"Querying preferences for user: {user_id}")
         url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
         
-        # Modified query to handle both ID formats
+        # Query for user preferences that are not newsletter subscriptions
         query = {
             "filter": {
                 "and": [
@@ -1749,7 +1763,13 @@ def get_existing_preferences(user_id):
                             {"property": "User ID", "title": {"equals": f"auth0|{user_id}"}}
                         ]
                     },
-                    {"property": "Opportunity ID", "rich_text": {"is_empty": True}}
+                    {"property": "Opportunity ID", "rich_text": {"is_empty": True}},
+                    {
+                        "or": [
+                            {"property": "Preferences", "rich_text": {"does_not_equal": "newsletter_subscriber"}},
+                            {"property": "Preferences", "rich_text": {"is_empty": True}}
+                        ]
+                    }
                 ]
             },
             "page_size": 1
@@ -1782,12 +1802,13 @@ def get_existing_preferences(user_id):
         raw_email = email_prop.get('email', '')
         
         normalized_disciplines = set()
-        for d in raw_disciplines.split(','):
-            cleaned = d.strip()
-            if cleaned:
-                normalized = normalize_discipline(cleaned)
-                if normalized:
-                    normalized_disciplines.add(normalized)
+        if raw_disciplines and raw_disciplines != "newsletter_subscriber":
+            for d in raw_disciplines.split(','):
+                cleaned = d.strip()
+                if cleaned:
+                    normalized = normalize_discipline(cleaned)
+                    if normalized:
+                        normalized_disciplines.add(normalized)
         
         app.logger.debug(f"Normalized preferences: {normalized_disciplines}")
         
@@ -2035,4 +2056,11 @@ if not is_production:
         response.headers['Access-Control-Allow-Credentials'] = 'true'
         response.headers['Access-Control-Allow-Headers'] = 'HX-Request, Content-Type'
         return response
+
+@app.after_request
+def add_cors_headers(response):
+    if is_production:
+        response.headers['Access-Control-Allow-Origin'] = 'https://oportunidades.lat'
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+    return response
 
