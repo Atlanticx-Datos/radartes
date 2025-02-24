@@ -260,25 +260,8 @@ export const SearchModule = {
             filtersElement.classList.add('hidden');
         }
 
-        // Scroll to results
-        const scrollToResults = () => {
-            const resultsContainer = document.getElementById('results-container');
-            if (resultsContainer) {
-                try {
-                    resultsContainer.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                } catch (error) {
-                    const rect = resultsContainer.getBoundingClientRect();
-                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                    window.scrollTo({
-                        top: rect.top + scrollTop,
-                        behavior: 'smooth'
-                    });
-                }
-            }
-        };
+        // Removed scrolling behavior: disabling scrollToResults function
+        const scrollToResults = () => {};
 
         setTimeout(scrollToResults, 100);
     },
@@ -388,34 +371,9 @@ export const SearchModule = {
     },
 
     handleKeyPress(event) {
-        if (event.key === "Enter" && !this.searchInProgress) {
+        if (event.key === 'Enter') {
             event.preventDefault();
-            const searchInput = document.getElementById("open-search");
-            if (!searchInput) {
-                console.error("Search input element not found!");
-                return;
-            }
-            const searchValue = searchInput.value.trim();
-
-            if (searchValue.length >= 3) {
-                this.searchInProgress = true;
-                this.trackSearch(searchValue);
-
-                // Trigger the existing client-side filtering
-                this.performSearch();
-
-                // Smooth scroll after DOM update
-                setTimeout(() => {
-                    const resultsContainer = document.getElementById('results-container');
-                    if (resultsContainer) {
-                        resultsContainer.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                    this.searchInProgress = false;
-                }, 100);  // Brief delay to allow DOM update
-            }
+            this.performSearch();
         }
     },
 
