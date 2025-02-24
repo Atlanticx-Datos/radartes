@@ -257,11 +257,8 @@ document.body.addEventListener('htmx:afterProcessNode', function(evt) {
 
 // New global modal handler setup
 function setupModalHandlers() {
-    // Remove any existing event listener
-    document.removeEventListener('click', handlePreviewClick);
-    
-    // Add event listener using event delegation
-    document.addEventListener('click', function(e) {
+    // Use a single event listener with event delegation
+    const modalHandler = function(e) {
         const previewButton = e.target.closest('.preview-btn');
         if (!previewButton) return;
         
@@ -283,5 +280,9 @@ function setupModalHandlers() {
                 dataset.categoria || dataset.category
             );
         }
-    });
+    };
+
+    // Remove any existing click handlers by using a unique namespace
+    document.removeEventListener('click', modalHandler);
+    document.addEventListener('click', modalHandler);
 }

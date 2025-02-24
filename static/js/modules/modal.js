@@ -163,6 +163,10 @@ export const ModalModule = {
             const spinner = document.getElementById('layout-spinner');
             if (spinner) spinner.classList.add('hidden');
             
+            // Remove event listeners before removing elements
+            overlay.removeEventListener('click', closeModal);
+            document.removeEventListener('click', closeDropdown);
+            
             setTimeout(() => {
                 overlay.remove();
                 modalContent.remove();
@@ -182,9 +186,8 @@ export const ModalModule = {
             });
 
             // Close dropdown when clicking outside
-            document.addEventListener('click', () => {
-                shareDropdown.classList.add('hidden');
-            });
+            const closeDropdown = () => shareDropdown.classList.add('hidden');
+            document.addEventListener('click', closeDropdown);
 
             // Prevent dropdown from closing when clicking inside it
             shareDropdown.addEventListener('click', (e) => {
