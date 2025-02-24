@@ -4,6 +4,13 @@ import { CONSTANTS } from '../constants.js';
 // Handles modal functionality
 export const ModalModule = {
     showPreviewModal(url, nombre, pais, og_resumida, id, categoria) {
+        // Clean up any existing modals first
+        const existingModals = document.querySelectorAll('[id^="modal-"]');
+        const existingOverlays = document.querySelectorAll('[id$="-overlay"]');
+        
+        existingModals.forEach(modal => modal.remove());
+        existingOverlays.forEach(overlay => overlay.remove());
+
         const modalId = "modal-" + Date.now();
         const isMiEspacio = window.location.pathname === '/mi_espacio';
 

@@ -257,26 +257,31 @@ document.body.addEventListener('htmx:afterProcessNode', function(evt) {
 
 // New global modal handler setup
 function setupModalHandlers() {
-    document.addEventListener('click', (e) => {
+    // Remove any existing event listener
+    document.removeEventListener('click', handlePreviewClick);
+    
+    // Add event listener using event delegation
+    document.addEventListener('click', function(e) {
         const previewButton = e.target.closest('.preview-btn');
         if (!previewButton) return;
         
         e.preventDefault();
         e.stopPropagation();
-        handlePreviewClick(previewButton.dataset);
-    });
-}
 
-// Centralized preview click handler
-function handlePreviewClick(dataset) {
-    if (window.ModalModule?.showPreviewModal) {
-        ModalModule.showPreviewModal(
-            dataset.url,
-            dataset.nombre || dataset.name,
-            dataset.pais || dataset.country,
-            dataset.og_resumida || dataset.summary,
-            dataset.id,
-            dataset.categoria || dataset.category
-        );
-    }
+        // Prevent multiple modals from being opened
+        const existingModal = document.querySelector('[id^="modal-"]');
+        if (existingModal) return;
+
+        if (window.ModalModule?.showPreviewModal) {
+            const dataset = previewButton.dataset;
+            ModalModule.showPreviewModal(
+                dataset.url,
+                dataset.nombre || dataset.name,
+                dataset.pais || dataset.country,
+                dataset.og_resumida || dataset.summary,
+                dataset.id,
+                dataset.categoria || dataset.category
+            );
+        }
+    });
 }
