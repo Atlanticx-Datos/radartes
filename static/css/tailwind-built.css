@@ -1917,6 +1917,9 @@ details.collapse summary::-webkit-details-marker {
 .h-\[400px\] {
   height: 400px;
 }
+.h-\[550px\] {
+  height: 550px;
+}
 .h-full {
   height: 100%;
 }

@@ -48,9 +48,6 @@ document.addEventListener('DOMContentLoaded', function() {
     FilterModule.init();
     SearchModule.init();
     
-    // Initialize modal handlers globally
-    setupModalHandlers();
-    
     // Initialize DestacarModule if featured content exists
     if (window.processedDestacarData) {
         DestacarModule.init(window.processedDestacarData);
@@ -255,34 +252,30 @@ document.body.addEventListener('htmx:afterProcessNode', function(evt) {
     }
 });
 
-// New global modal handler setup
-function setupModalHandlers() {
-    // Use a single event listener with event delegation
-    const modalHandler = function(e) {
-        const previewButton = e.target.closest('.preview-btn');
-        if (!previewButton) return;
-        
-        e.preventDefault();
-        e.stopPropagation();
+// Global modal click handler
+const handleModalClick = (e) => {
+    const previewButton = e.target.closest('.preview-btn');
+    if (!previewButton) return;
+    
+    e.preventDefault();
+    e.stopPropagation();
 
-        // Prevent multiple modals from being opened
-        const existingModal = document.querySelector('[id^="modal-"]');
-        if (existingModal) return;
+    // Prevent multiple modals from being opened
+    const existingModal = document.querySelector('[id^="modal-"]');
+    if (existingModal) return;
 
-        if (window.ModalModule?.showPreviewModal) {
-            const dataset = previewButton.dataset;
-            ModalModule.showPreviewModal(
-                dataset.url,
-                dataset.nombre || dataset.name,
-                dataset.pais || dataset.country,
-                dataset.og_resumida || dataset.summary,
-                dataset.id,
-                dataset.categoria || dataset.category
-            );
-        }
-    };
+    if (window.ModalModule?.showPreviewModal) {
+        const dataset = previewButton.dataset;
+        ModalModule.showPreviewModal(
+            dataset.url,
+            dataset.nombre || dataset.name,
+            dataset.pais || dataset.country,
+            dataset.og_resumida || dataset.summary,
+            dataset.id,
+            dataset.categoria || dataset.category
+        );
+    }
+};
 
-    // Remove any existing click handlers by using a unique namespace
-    document.removeEventListener('click', modalHandler);
-    document.addEventListener('click', modalHandler);
-}
+// Add the single event listener when the script loads
+document.addEventListener('click', handleModalClick);
