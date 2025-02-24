@@ -17,6 +17,10 @@ export const SearchModule = {
         totalPages: 1,
         allResults: []
     },
+    sorting: {
+        column: null,
+        active: false
+    },
 
     init() {
         // Initialize with data from the page
@@ -502,6 +506,56 @@ export const SearchModule = {
         console.log('Updated categories:', Array.from(this.activeFilters.categories));
     },
 
+    sortResults(results, column) {
+        if (!column || !this.sorting.active) return results;
+
+        const sortFunctions = {
+            nombre: (a, b) => {
+                const aName = (a.nombre_original || '').toLowerCase();
+                const bName = (b.nombre_original || '').toLowerCase();
+                return aName.localeCompare(bName);
+            },
+            disciplina: (a, b) => {
+                const aDisc = ((a.disciplina || '').split(',')[0] || '').toLowerCase().trim();
+                const bDisc = ((b.disciplina || '').split(',')[0] || '').toLowerCase().trim();
+                return aDisc.localeCompare(bDisc);
+            },
+            pais: (a, b) => {
+                const aPais = (a.pais || a.país || '').toLowerCase();
+                const bPais = (b.pais || b.país || '').toLowerCase();
+                return aPais.localeCompare(bPais);
+            },
+            fecha: (a, b) => {
+                const aDate = a.fecha_de_cierre === '1900-01-01' ? new Date(8640000000000000) : new Date(a.fecha_de_cierre);
+                const bDate = b.fecha_de_cierre === '1900-01-01' ? new Date(8640000000000000) : new Date(b.fecha_de_cierre);
+                return aDate - bDate;
+            }
+        };
+
+        return [...results].sort(sortFunctions[column]);
+    },
+
+    handleSort(column) {
+        if (this.sorting.column === column) {
+            // Toggle active state if clicking the same column
+            this.sorting.active = !this.sorting.active;
+        } else {
+            // New column, set to active
+            this.sorting.column = column;
+            this.sorting.active = true;
+        }
+
+        this.updateResults(this.pagination.allResults, true);
+    },
+
+    // Function to get sort icon
+    getSortIcon(column) {
+        const isActive = this.sorting.column === column && this.sorting.active;
+        return `<svg class="w-4 h-4 ml-1 ${isActive ? 'text-blue-600' : 'text-gray-400'}" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+        </svg>`;
+    },
+
     updateResults(results, preservePage = false) {
         const container = document.getElementById('results-container');
         const counter = document.getElementById('results-counter');
@@ -512,12 +566,10 @@ export const SearchModule = {
         this.pagination.allResults = results;
         this.pagination.totalPages = Math.ceil(results.length / this.pagination.itemsPerPage);
         
-        // Reset to first page when new results come in and not preserving page
         if (!preservePage) {
             this.pagination.currentPage = 1;
         }
 
-        // Remove any existing grid classes
         container.className = '';
 
         if (!results.length) {
@@ -526,10 +578,13 @@ export const SearchModule = {
             return;
         }
 
+        // Sort results if a sort column is selected and active
+        const sortedResults = this.sortResults(results, this.sorting.column);
+
         // Calculate pagination slice
         const startIndex = (this.pagination.currentPage - 1) * this.pagination.itemsPerPage;
         const endIndex = startIndex + this.pagination.itemsPerPage;
-        const paginatedResults = results.slice(startIndex, endIndex);
+        const paginatedResults = sortedResults.slice(startIndex, endIndex);
 
         // Function to format date
         const formatDate = (dateStr) => {
@@ -566,20 +621,32 @@ export const SearchModule = {
                 <table class="results-table w-full table-fixed border-collapse">
                     <thead>
                         <tr>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
-                                Oportunidad
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50 cursor-pointer hover:bg-gray-100" onclick="SearchModule.handleSort('nombre')">
+                                <div class="flex items-center">
+                                    Oportunidad
+                                    ${this.getSortIcon('nombre')}
+                                </div>
                             </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
-                                Disciplina
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50 cursor-pointer hover:bg-gray-100" onclick="SearchModule.handleSort('disciplina')">
+                                <div class="flex items-center">
+                                    Disciplina
+                                    ${this.getSortIcon('disciplina')}
+                                </div>
                             </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
-                                País
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50 cursor-pointer hover:bg-gray-100" onclick="SearchModule.handleSort('pais')">
+                                <div class="flex items-center">
+                                    País
+                                    ${this.getSortIcon('pais')}
+                                </div>
                             </th>
                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
                                 $
                             </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
-                                Cierre
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50 cursor-pointer hover:bg-gray-100" onclick="SearchModule.handleSort('fecha')">
+                                <div class="flex items-center">
+                                    Cierre
+                                    ${this.getSortIcon('fecha')}
+                                </div>
                             </th>
                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
                             </th>

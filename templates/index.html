@@ -6,100 +6,112 @@
 
 {% block body %}
 
-<div class="container max-w-[1292px] mx-auto px-8">
-    <!-- Header Section -->
-    <header class="py-16 flex flex-col items-center text-center justify-center h-[550px]">
-        <h1 class="text-5xl font-bold mb-4 text-white">Descubrí tu próxima oportunidad</h1>
-        <p class="text-xl text-gray-600 mb-8 max-w-2xl">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+<!-- Full width header section -->
+<header class="relative w-full h-[550px]">
+    <!-- Background image with overlay -->
+    <div class="absolute inset-0 z-0">
+        <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80" 
+             alt="Background" 
+             class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-black/70"></div>
+    </div>
+    
+    <!-- Content container -->
+    <div class="container max-w-[1292px] mx-auto px-8 h-full">
+        <div class="relative z-10 flex flex-col items-center text-center justify-center h-full">
+            <h1 class="text-5xl font-bold mb-4 text-white drop-shadow-lg">Descubrí tu próxima oportunidad</h1>
+            <p class="text-xl text-gray-100 mb-8 max-w-2xl drop-shadow">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
 
-        <!-- Search Section -->
-        <div class="relative w-full max-w-2xl">
-            <div class="relative flex items-center">
-                <input type="text" id="open-search" placeholder="Buscar (acepta combinaciones, por ej.: 'Visuales, España')"
-                    class="w-full p-4 pr-28 border rounded-lg shadow-sm">
+            <!-- Search Section -->
+            <div class="relative w-full max-w-2xl">
+                <!-- Search input and buttons -->
+                <div class="relative flex items-center">
+                    <input type="text" id="open-search" placeholder="Buscar (acepta combinaciones, por ej.: 'Visuales, España')"
+                        class="w-full p-4 pr-28 border rounded-lg shadow-xl bg-white/95 placeholder-gray-500">
 
-                <!-- Filter trigger button (now first) -->
-                <button id="filter-dropdown-trigger" class="absolute right-16 p-2 text-gray-400 hover:text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd"
-                            d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
-                            clip-rule="evenodd" />
-                    </svg>
-                </button>
+                    <!-- Filter trigger button (now first) -->
+                    <button id="filter-dropdown-trigger" class="absolute right-16 p-2 text-gray-400 hover:text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </button>
 
-                <!-- Clear all filters button (now second) -->
-                <button type="button" id="clear-search" class="absolute right-4 p-2 text-gray-400 hover:text-gray-600"
-                    onclick="clearAllFilters();">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd"
-                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                            clip-rule="evenodd" />
-                    </svg>
-                </button>
-            </div>
+                    <!-- Clear all filters button (now second) -->
+                    <button type="button" id="clear-search" class="absolute right-4 p-2 text-gray-400 hover:text-gray-600"
+                        onclick="clearAllFilters();">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </button>
 
-            <!-- Structured filters dropdown -->
-            <div id="structured-filters"
-                class="hidden absolute z-50 mt-1 w-80 right-0 bg-white rounded-lg shadow-lg border border-gray-200 p-3 text-left"
-                style="top: 100%; /* Ensure dropdown appears below search bar */">
-                <!-- Categories Section -->
-                <div class="mb-4">
-                    <h3 class="text-sm font-semibold mb-2">Categorías</h3>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button
-                            class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                            data-category="beca">Beca</button>
-                        <button
-                            class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                            data-category="residencia">Residencia</button>
-                        <button
-                            class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                            data-category="premio">Premio</button>
-                        <button
-                            class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                            data-category="convocatoria">Convocatoria</button>
-                        <button
-                            class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                            data-category="oportunidad">Oportunidad</button>
-                        <button
-                            class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                            data-category="fondos">Fondos</button>
-                        <button
-                            class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                            data-category="apoyo">Apoyo</button>
+                    <!-- Structured filters dropdown -->
+                    <div id="structured-filters"
+                        class="hidden absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 p-4"
+                        style="top: 100%; z-index: 999999;">
+                        <!-- Categories Section -->
+                        <div class="mb-4">
+                            <h3 class="text-sm font-semibold mb-2">Categorías</h3>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button
+                                    class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                                    data-category="beca">Beca</button>
+                                <button
+                                    class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                                    data-category="residencia">Residencia</button>
+                                <button
+                                    class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                                    data-category="premio">Premio</button>
+                                <button
+                                    class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                                    data-category="convocatoria">Convocatoria</button>
+                                <button
+                                    class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                                    data-category="oportunidad">Oportunidad</button>
+                                <button
+                                    class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                                    data-category="fondos">Fondos</button>
+                                <button
+                                    class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                                    data-category="apoyo">Apoyo</button>
+                            </div>
+                        </div>
+
+                        <!-- Country Dropdown -->
+                        <div class="mb-4">
+                            <h3 class="text-sm font-semibold mb-2">País</h3>
+                            <select id="country-filter" class="form-select">
+                                <option value="">Todos los países</option>
+                            </select>
+                        </div>
+
+                        <!-- Month Dropdown -->
+                        <div class="mb-4">
+                            <h3 class="text-sm font-semibold mb-2">Mes de cierre</h3>
+                            <select id="month-filter" class="form-select">
+                                <option value="">Todos los meses</option>
+                            </select>
+                        </div>
+
+                        <!-- Search Button -->
+                        <button id="search-filters"
+                            class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            Buscar
+                        </button>
                     </div>
                 </div>
-
-                <!-- Country Dropdown -->
-                <div class="mb-4">
-                    <h3 class="text-sm font-semibold mb-2">País</h3>
-                    <select id="country-filter" class="form-select">
-                        <option value="">Todos los países</option>
-                    </select>
-                </div>
-
-                <!-- Month Dropdown -->
-                <div class="mb-4">
-                    <h3 class="text-sm font-semibold mb-2">Mes de cierre</h3>
-                    <select id="month-filter" class="form-select">
-                        <option value="">Todos los meses</option>
-                    </select>
-                </div>
-
-                <!-- Search Button -->
-                <button id="search-filters"
-                    class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                    Buscar
-                </button>
             </div>
         </div>
-    </header>
-
-    <!-- Data container with proper escaping -->
-    <div id="prefiltered-data" data-results="{{ prefiltered_results|tojson|forceescape }}"
-        data-pages="{{ pages|tojson|forceescape }}" class="hidden">
     </div>
+</header>
+
+<!-- Data container with proper escaping -->
+<div id="prefiltered-data" data-results="{{ prefiltered_results|tojson|forceescape }}"
+    data-pages="{{ pages|tojson|forceescape }}" class="hidden">
 </div>
 
 <!-- Full width background container with rounded top corners -->
@@ -112,47 +124,47 @@
                 <div class="filter-container">
                     {% for discipline in discipline_groups.keys() %}
                     <button
-                        class="filter-btn flex flex-col items-center justify-center rounded-med border text-gray-700 transition-all"
+                        class="filter-btn flex items-center justify-center rounded-med border text-gray-700 transition-all"
                         data-discipline-filter="{{ discipline }}" data-active="false"
                         onclick="this.dataset.active = this.dataset.active === 'true' ? 'false' : 'true'; toggleDisciplineFilter(this, '{{ discipline }}')">
                         <!-- Icons for each discipline -->
                         {% if discipline == 'Visuales' %}
-                        <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                         {% elif discipline == 'Música' %}
-                        <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                         </svg>
                         {% elif discipline == 'Escénicas' %}
-                        <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                         </svg>
                         {% elif discipline == 'Literatura' %}
-                        <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                         </svg>
                         {% elif discipline == 'Diseño' %}
-                        <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                         </svg>
                         {% elif discipline == 'Cine' %}
-                        <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
                         </svg>
                         {% else %}
-                        <svg class="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
                         {% endif %}
-                        {{ discipline|title }}
+                        <span class="ml-2">{{ discipline|title }}</span>
                     </button>
                     {% endfor %}
                 </div>
@@ -190,7 +202,7 @@
 
             <!-- Results Section -->
             <div class="mt-8 mb-6">
-                <h2 class="text-2xl font-bold mb-6">Radar de oportunidades 🌎</h2>
+                <h2 id="radar-header" class="text-2xl font-bold mb-6">Radar de oportunidades 🌎</h2>
                 <!-- Results Counter -->
                 <div class="text-sm text-gray-600 my-4" id="results-counter"></div>
 
@@ -376,6 +388,7 @@
             activeFilters.month ||
             activeFilters.discipline !== 'todos') {
             featuredSection?.classList.add('hidden');
+            // Removed scroll logic as the featured section is now hidden
         } else {
             featuredSection?.classList.remove('hidden');
         }

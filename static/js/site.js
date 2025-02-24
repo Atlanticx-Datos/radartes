@@ -113,7 +113,21 @@ function setupFilterDropdown() {
     if (filterTrigger && filterDropdown) {
         filterTrigger.addEventListener('click', (e) => {
             e.stopPropagation();
-            filterDropdown.classList.toggle('hidden');
+            if (filterDropdown.classList.contains('hidden')) {
+                // Show dropdown: remove hidden and reposition it fixed relative to the trigger
+                filterDropdown.classList.remove('hidden');
+                const triggerRect = filterTrigger.getBoundingClientRect();
+                filterDropdown.style.position = 'fixed';
+                filterDropdown.style.top = (triggerRect.bottom + 5) + 'px';
+                filterDropdown.style.left = triggerRect.left + 'px';
+                
+                // Reparent the dropdown to document.body, if not already there
+                if (filterDropdown.parentElement !== document.body) {
+                    document.body.appendChild(filterDropdown);
+                }
+            } else {
+                filterDropdown.classList.add('hidden');
+            }
         });
 
         // Close dropdown when clicking outside
