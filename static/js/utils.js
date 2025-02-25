@@ -2,9 +2,22 @@
 export const Utils = {
     normalizeText(text) {
         if (!text) return '';
-        return text.normalize("NFD")
+        
+        // Convert to string if not already
+        const str = String(text);
+        
+        return str
+            // Normalize Unicode characters (decompose accented characters)
+            .normalize("NFD")
+            // Remove diacritical marks (accents)
             .replace(/[\u0300-\u036f]/g, "")
+            // Replace special characters with spaces
+            .replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, ' ')
+            // Replace multiple spaces with a single space
+            .replace(/\s+/g, ' ')
+            // Convert to lowercase
             .toLowerCase()
+            // Trim whitespace
             .trim();
     },
 

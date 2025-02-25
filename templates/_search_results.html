@@ -5,7 +5,7 @@
             <input type="checkbox" 
                    name="selected_pages" 
                    value="{{ page.id }}"
-                   class="checkbox rounded-none h-4 w-4">
+                   class="h-4 w-4 rounded-none border-gray-300 text-primary focus:ring-primary">
         </label>
     </th>
     <td class="w-[45%] md:w-[38%] pl-6">
@@ -129,13 +129,13 @@
                                 d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"></path>
                         </svg>
                     </button>
-                    <ul class="dropdown-content menu p-2 shadow-xl bg-zinc-100 rounded-none w-52 border border-black mt-3 absolute right-0 hidden">
-                        <li class="menu-item">
-                            <a href="#" onclick="copyUrl('{{ page.base_url if page.base_url else page.url }}'); return false;">Copiar URL</a>
+                    <ul class="hidden absolute right-0 mt-3 w-52 bg-zinc-100 shadow-xl border border-black p-2 z-50 dropdown-menu">
+                        <li class="hover:bg-gray-200">
+                            <a href="#" class="block px-4 py-2 text-sm" onclick="copyUrl('{{ page.base_url if page.base_url else page.url }}'); return false;">Copiar URL</a>
                         </li>
-                        <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'whatsapp')">WhatsApp</a></li>
-                        <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'linkedin')">LinkedIn</a></li>
-                        <li class="menu-item"><a href="#" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'gmail')">Email</a></li>
+                        <li class="hover:bg-gray-200"><a href="#" class="block px-4 py-2 text-sm" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'whatsapp')">WhatsApp</a></li>
+                        <li class="hover:bg-gray-200"><a href="#" class="block px-4 py-2 text-sm" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'linkedin')">LinkedIn</a></li>
+                        <li class="hover:bg-gray-200"><a href="#" class="block px-4 py-2 text-sm" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'gmail')">Email</a></li>
                     </ul>
                 </div>
             </div>

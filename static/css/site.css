@@ -22,7 +22,7 @@
 ==================================== */
 
 /* General dropdown positioning - least specific */
-.dropdown-content {
+.dropdown-menu {
     right: 0;
     transform-origin: top right;
     box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
@@ -31,7 +31,7 @@
 }
 
 /* Navigation dropdowns - more specific */
-nav .dropdown-content,
+nav .dropdown-menu,
 .nav-dropdown {
     position: fixed;
     z-index: 999999;
@@ -39,7 +39,7 @@ nav .dropdown-content,
 }
 
 /* Table share dropdowns - more specific */
-.table-fixed .dropdown-content {
+.table-fixed .dropdown-menu {
     position: absolute;
     z-index: 50;
     background-color: rgb(244, 244, 245) !important;

@@ -67,25 +67,14 @@ module.exports = {
         'categoria-oportunidades': 'rgba(247, 242, 255, 0.6)',
         'categoria-apoyos': 'rgba(255, 245, 242, 0.6)',
         'categoria-becas': 'rgba(242, 255, 251, 0.6)',
+        'primary': '#0CC7C7',
+        'secondary': '#FFA00F',
+        'green': '#10E07F',
+        'accent': '#F05A30',
       },
     },
   },
-  daisyui: {
-    themes: [
-      {
-        "mytheme": {
-          "primary": "#0CC7C7",
-          "secondary": "#FFA00F",
-          "green" : "#10E07F",
-          "accent": "#F05A30",
-          "neutral": "#000",
-          "base-100": "#ffffff",
-        },
-      },
-    ],
-  },
   plugins: [
-    require('daisyui'),
     require('tailwindcss-filters'),
     function({ addUtilities, theme }) {
       const newUtilities = {
@@ -100,18 +89,6 @@ module.exports = {
             lineHeight: '0.93 !important',
             fontWeight: '500 !important',
             letterSpacing: '0 !important',
-          }
-        },
-        '.dropdown-overlay': {
-          'position': 'relative',
-          'isolation': 'isolate',
-          '& .dropdown-content': {
-            'background-color': 'white',
-            'z-index': '9999',
-            'position': 'absolute',
-            'isolation': 'isolate',
-            '--tw-shadow': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-            'box-shadow': 'var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)'
           }
         }
       }

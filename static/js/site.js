@@ -169,6 +169,53 @@ function setupFilterDropdown() {
     }
 }
 
+// Toggle dropdown function for share buttons
+function toggleDropdown(button) {
+    const dropdown = button.nextElementSibling;
+    
+    // Close all other open dropdowns first
+    document.querySelectorAll('.dropdown-menu').forEach(content => {
+        if (content !== dropdown && !content.classList.contains('hidden')) {
+            content.classList.add('hidden');
+        }
+    });
+    
+    // Toggle the clicked dropdown
+    dropdown.classList.toggle('hidden');
+    
+    // Add click outside listener to close dropdown
+    const closeDropdown = (e) => {
+        if (!dropdown.contains(e.target) && e.target !== button) {
+            dropdown.classList.add('hidden');
+            document.removeEventListener('click', closeDropdown);
+        }
+    };
+    
+    // Only add the listener if we're opening the dropdown
+    if (!dropdown.classList.contains('hidden')) {
+        // Use setTimeout to avoid immediate trigger of the event
+        setTimeout(() => {
+            document.addEventListener('click', closeDropdown);
+        }, 0);
+    }
+}
+
+// Share opportunity function
+function shareOpportunity(url, title, platform) {
+    switch (platform) {
+        case 'whatsapp':
+            window.open(`https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`, '_blank');
+            break;
+        case 'linkedin':
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
+            break;
+        case 'gmail':
+            window.open(`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(url)}`, '_blank');
+            break;
+    }
+    return false;
+}
+
 // Attach necessary functions to window object for backward compatibility
 window.showPreviewModal = ModalModule.showPreviewModal.bind(ModalModule);
 window.clearSearch = SearchModule.clearSearch.bind(SearchModule);
@@ -177,6 +224,8 @@ window.showAlert = Utils.showAlert.bind(Utils);
 window.clearAllFilters = FilterModule.clearAllFilters.bind(FilterModule);
 window.toggleDisciplineFilter = FilterModule.handleDisciplineFilter.bind(FilterModule);
 window.goToPage = SearchModule.goToPage.bind(SearchModule);
+window.toggleDropdown = toggleDropdown;
+window.shareOpportunity = shareOpportunity;
 
 // Add CSRF token configuration
 document.body.addEventListener('htmx:configRequest', function(evt) {

@@ -6,6 +6,24 @@ export const CONSTANTS = {
         ERROR: "Ha ocurrido un error. Por favor, inténtalo de nuevo."
     },
 
+    // Country aliases to help with search matching
+    COUNTRY_ALIASES: {
+        'españa': ['spain', 'espana', 'spanish'],
+        'estados unidos': ['usa', 'united states', 'eeuu', 'us', 'america'],
+        'reino unido': ['uk', 'united kingdom', 'inglaterra', 'england'],
+        'francia': ['france', 'french'],
+        'alemania': ['germany', 'german'],
+        'italia': ['italy', 'italian'],
+        'méxico': ['mexico', 'mexican'],
+        'brasil': ['brazil', 'brazilian'],
+        'argentina': ['argentinian'],
+        'colombia': ['colombian'],
+        'chile': ['chilean'],
+        'perú': ['peru', 'peruvian'],
+        'portugal': ['portuguese'],
+        'canadá': ['canada', 'canadian']
+    },
+
     DISCIPLINE_GROUPS: {
         'Visuales': new Set([
             'pintura', 'dibujo', 'grabado', 'escultura', 'fotografía', 'arte digital',

@@ -282,9 +282,42 @@ export const FilterModule = {
                     console.log('Page has no country field:', page.nombre);
                     return false;
                 }
+                
+                // Use normalized comparison for more consistent matching
                 const normalizedPageCountry = Utils.normalizeText(pageCountry);
                 const normalizedFilterCountry = Utils.normalizeText(this.activeFilters.country);
-                const match = normalizedPageCountry === normalizedFilterCountry;
+                
+                // Check for exact match after normalization
+                let match = normalizedPageCountry === normalizedFilterCountry;
+                
+                // If no direct match, check country aliases
+                if (!match) {
+                    // Check if the filter country has aliases and if the page country matches any of them
+                    for (const [country, aliases] of Object.entries(CONSTANTS.COUNTRY_ALIASES)) {
+                        const normalizedCountryName = Utils.normalizeText(country);
+                        
+                        // If the filter country matches this country name
+                        if (normalizedFilterCountry === normalizedCountryName) {
+                            // Check if the page country matches any of the aliases
+                            if (aliases.some(alias => Utils.normalizeText(alias) === normalizedPageCountry)) {
+                                match = true;
+                                console.log(`Country alias match: Filter "${this.activeFilters.country}" matches page country "${pageCountry}" via alias`);
+                                break;
+                            }
+                        }
+                        
+                        // If the page country matches this country name
+                        if (normalizedPageCountry === normalizedCountryName) {
+                            // Check if the filter country matches any of the aliases
+                            if (aliases.some(alias => Utils.normalizeText(alias) === normalizedFilterCountry)) {
+                                match = true;
+                                console.log(`Country alias match: Page "${pageCountry}" matches filter "${this.activeFilters.country}" via alias`);
+                                break;
+                            }
+                        }
+                    }
+                }
+                
                 console.log(`Country check: "${pageCountry}" (${normalizedPageCountry}) vs "${this.activeFilters.country}" (${normalizedFilterCountry}) = ${match}`);
                 return match;
             });
@@ -370,14 +403,64 @@ export const FilterModule = {
     matchesSearchTerms(page, searchInput) {
         const searchTerms = searchInput.split(',').map(term => Utils.normalizeText(term.trim()));
         return searchTerms.every(term => {
+            // Handle both pais and país variations
+            const pageCountry = page.pais || page.país || '';
+            
+            // Special handling for country searches
+            // Check if the term might be a country name
+            if (term.length > 3) { // Only check for longer terms to avoid false positives
+                const normalizedCountry = Utils.normalizeText(pageCountry);
+                
+                // Direct country match
+                if (normalizedCountry === term) {
+                    console.log(`Direct country match: "${pageCountry}" (${normalizedCountry}) = "${term}"`);
+                    return true;
+                }
+                
+                // Check country aliases
+                for (const [country, aliases] of Object.entries(CONSTANTS.COUNTRY_ALIASES)) {
+                    const normalizedCountryName = Utils.normalizeText(country);
+                    
+                    // If the page's country matches this country name
+                    if (normalizedCountry === normalizedCountryName) {
+                        // Check if the search term matches any of the aliases
+                        if (term === normalizedCountryName || aliases.some(alias => Utils.normalizeText(alias) === term)) {
+                            console.log(`Country alias match: "${pageCountry}" matches alias "${term}"`);
+                            return true;
+                        }
+                    }
+                    
+                    // If the search term is a country name, check if the page's country matches any of its aliases
+                    if (term === normalizedCountryName) {
+                        if (aliases.some(alias => Utils.normalizeText(alias) === normalizedCountry)) {
+                            console.log(`Search term country match: "${term}" matches country alias "${pageCountry}"`);
+                            return true;
+                        }
+                    }
+                }
+                
+                // Check if country contains the term
+                if (normalizedCountry.includes(term)) {
+                    console.log(`Country contains term: "${pageCountry}" (${normalizedCountry}) contains "${term}"`);
+                    return true;
+                }
+                
+                // Check if term contains the country
+                if (term.includes(normalizedCountry) && normalizedCountry.length > 3) {
+                    console.log(`Term contains country: "${term}" contains "${pageCountry}" (${normalizedCountry})`);
+                    return true;
+                }
+            }
+            
             const pageText = Utils.normalizeText([
                 page.nombre,
                 page.og_resumida,
                 page.entidad,
                 page.categoria,
                 page.disciplina,
-                page.pais
+                pageCountry
             ].join(' '));
+            
             return pageText.includes(term);
         });
     },

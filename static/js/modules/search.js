@@ -101,10 +101,13 @@ export const SearchModule = {
             }
 
             // Get unique countries and sort them
+            // Handle both pais and país variations
             const uniqueCountries = [...new Set(pages
-                .map(p => p.país)
+                .map(p => p.pais || p.país || '')
                 .filter(Boolean))]
                 .sort((a, b) => a.localeCompare(b, 'es'));
+
+            console.log('Unique countries for dropdown:', uniqueCountries);
 
             // Add new options
             uniqueCountries.forEach(country => {
