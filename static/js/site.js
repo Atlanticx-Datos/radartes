@@ -136,6 +136,36 @@ function setupFilterDropdown() {
                 filterDropdown.classList.add('hidden');
             }
         });
+        
+        // Set up category filter buttons
+        document.querySelectorAll('.category-filter-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const category = button.dataset.category;
+                if (category) {
+                    button.classList.toggle('border-blue-500');
+                    button.classList.toggle('bg-blue-50');
+                    
+                    if (button.classList.contains('border-blue-500')) {
+                        // Add category to SearchModule's active filters
+                        SearchModule.activeFilters.categories.add(category);
+                    } else {
+                        // Remove category from SearchModule's active filters
+                        SearchModule.activeFilters.categories.delete(category);
+                    }
+                    
+                    console.log('Category filters updated:', Array.from(SearchModule.activeFilters.categories));
+                }
+            });
+        });
+        
+        // Set up search button
+        const searchButton = document.getElementById('search-filters');
+        if (searchButton) {
+            searchButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                SearchModule.handleStructuredSearch();
+            });
+        }
     }
 }
 

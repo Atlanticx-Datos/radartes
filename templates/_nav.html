@@ -1,32 +1,44 @@
 <nav class="flex justify-between items-center h-16 max-w-[1292px] mx-auto px-8">
     <!-- Logo Section -->
     <div class="flex items-center">
-        <span class="text-2xl font-bold tracking-tight text-neutral-700 flex items-center gap-[2px]">
+        <a href="{{ url_for('index') }}" class="text-2xl font-bold tracking-tight text-neutral-700 flex items-center gap-[2px] hover:opacity-80 transition-opacity">
             <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-neutral-700"></span>
             <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-neutral-400"></span>
             <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-red-500"></span>
-            <span class="font-black ml-1">OPORTUNIDADES</span>
-        </span>
+            <span class="font-black ml-1">RAD/AR/TES</span>
+        </a>
     </div>
 
-    <!-- Right Section: Avatar Dropdown + CTA -->
+    <!-- Right Section: Avatar Dropdown or CTA -->
     <div class="flex items-center gap-4">
-        <!-- Avatar Dropdown (Always visible) -->
-        <div class="relative">
-            <button id="user-menu-button" class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+        {% if session.get('user') %}
+            <!-- Avatar Dropdown (Only visible when logged in) -->
+            <div class="relative">
+                <button id="user-menu-button" class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
+                        {% if session.user.get('picture') and 'http' in session.user.picture %}
+                            <!-- Case 1: User has a valid picture URL -->
+                            <img src="{{ session.user.picture }}" alt="{{ session.user.name }}" class="w-full h-full object-cover"
+                                 onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\'w-full h-full bg-blue-600 text-white flex items-center justify-center font-medium\'>{{ session.user.email[:1].upper() }}</div>';">
+                        {% elif session.user.get('name') %}
+                            <!-- Case 2: User has a name but no picture -->
+                            <div class="w-full h-full bg-blue-600 text-white flex items-center justify-center font-medium">
+                                {{ session.user.name[:1].upper() }}{{ session.user.name.split(' ')[1][:1].upper() if ' ' in session.user.name else '' }}
+                            </div>
+                        {% else %}
+                            <!-- Case 3: User only has email -->
+                            <div class="w-full h-full bg-gray-600 text-white flex items-center justify-center">
+                                {{ session.user.email[:1].upper() }}
+                            </div>
+                        {% endif %}
+                    </div>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-            </button>
+                </button>
 
-            <!-- Dropdown Panel -->
-            <div id="user-menu" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg">
-                {% if session.get('user') %}
+                <!-- Dropdown Panel -->
+                <div id="user-menu" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg z-50">
                     <div class="p-4 border-b">
                         <p class="font-semibold">{{ session.user.name }}</p>
                         <p class="text-sm text-gray-600">{{ session.user.email }}</p>
@@ -34,24 +46,17 @@
                     </div>
                     <div class="p-2">
                         <a href="{{ url_for('mi_espacio') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg">
-                            Mi cuenta
+                            Mi espacio
+                        </a>
+                        <a href="{{ url_for('logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg">
+                            Cerrar sesión
                         </a>
                     </div>
-                {% else %}
-                    <div class="p-4 text-center text-gray-500">
-                        <p>Inicia sesión para acceder a tu cuenta</p>
-                    </div>
-                {% endif %}
+                </div>
             </div>
-        </div>
-
-        <!-- Auth Button -->
-        {% if session.get('user') %}
-            <a href="{{ url_for('logout') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                Cerrar sesión
-            </a>
         {% else %}
-            <a href="{{ url_for('login') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+            <!-- Login Button (Only visible when not logged in) -->
+            <a href="{{ url_for('login') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                 Iniciar sesión
             </a>
         {% endif %}

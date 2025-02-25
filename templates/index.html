@@ -19,10 +19,9 @@
     <!-- Content container -->
     <div class="container max-w-[1292px] mx-auto px-8 h-full">
         <div class="relative z-10 flex flex-col items-center text-center justify-center h-full">
-            <h1 class="text-5xl font-bold mb-4 text-white drop-shadow-lg">Descubrí tu próxima oportunidad</h1>
-            <p class="text-xl text-gray-100 mb-8 max-w-2xl drop-shadow">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-
+            <h1 class="text-5xl font-bold mb-4 text-white drop-shadow-lg">un radar global para tus</h1>
+            <h1 class="text-5xl text-gray-100 mb-8 max-w-2xl drop-shadow">oportunidades</h1>
+            <h1 class="text-3xl text-gray-100 mb-8 max-w-2xl drop-shadow -mt-6">DESCUBRI(lo/te)</h1>
             <!-- Search Section -->
             <div class="relative w-full max-w-2xl">
                 <!-- Search input and buttons -->
@@ -96,6 +95,12 @@
                                 <option value="">Todos los meses</option>
                             </select>
                         </div>
+
+                        <!-- New checkbox for 'Inscripcion' filter -->
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" id="inscripcion-checkbox" class="form-checkbox" />
+                            <span class="text-sm text-gray-700">Buscar solo oportunidades sin pago</span>
+                        </label>
 
                         <!-- Search Button -->
                         <button id="search-filters"
@@ -409,6 +414,15 @@
             if (searchInput) {
                 filterResults.searchMatch = matchesSearchTerms(page, searchInput);
                 if (!filterResults.searchMatch) return false;
+            }
+            
+            // If the "Buscar solo oportunidades sin pago" checkbox is checked, filter by inscripcion field
+            const inscripcionCheckbox = document.getElementById('inscripcion-checkbox');
+            if (inscripcionCheckbox && inscripcionCheckbox.checked) {
+                // Only include pages that are free ("Sin cargo") or have no value for inscripcion
+                if (page.inscripcion && page.inscripcion.trim().toLowerCase() !== 'sin cargo') {
+                    return false;
+                }
             }
 
             // Apply discipline filter

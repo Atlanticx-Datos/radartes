@@ -8,7 +8,8 @@ export const FilterModule = {
         categories: new Set(),
         country: '',
         month: '',
-        discipline: 'todos'
+        discipline: 'todos',
+        freeOnly: false  // New filter for "Sin cargo" opportunities
     },
 
     selectedCategories: [],
@@ -22,6 +23,9 @@ export const FilterModule = {
         this.initializeDropdowns();
         this.removeExistingHandlers();
         this.addNewHandlers();
+        
+        // Remove the change event listener from the inscripcion checkbox
+        // The checkbox state will be read when the user clicks the "Buscar" button
     },
 
     initializeDropdowns() {
@@ -223,7 +227,8 @@ export const FilterModule = {
             this.activeFilters.categories.size > 0 || 
             this.activeFilters.country || 
             this.activeFilters.month || 
-            this.activeFilters.discipline !== 'todos';
+            this.activeFilters.discipline !== 'todos' ||
+            this.activeFilters.freeOnly;  // Include the new filter in the check
 
         console.log('Filter state:', {
             searchInput,
@@ -231,6 +236,7 @@ export const FilterModule = {
             country: this.activeFilters.country,
             month: this.activeFilters.month,
             discipline: this.activeFilters.discipline,
+            freeOnly: this.activeFilters.freeOnly,  // Log the new filter state
             hasActiveFilters,
             fromStructuredSearch
         });
@@ -268,15 +274,75 @@ export const FilterModule = {
 
         // Apply country filter
         if (this.activeFilters.country) {
-            filtered = filtered.filter(page => page.pais === this.activeFilters.country);
+            console.log('Applying country filter:', this.activeFilters.country);
+            filtered = filtered.filter(page => {
+                // Handle both pais and país variations
+                const pageCountry = page.pais || page.país || '';
+                if (!pageCountry) {
+                    console.log('Page has no country field:', page.nombre);
+                    return false;
+                }
+                const normalizedPageCountry = Utils.normalizeText(pageCountry);
+                const normalizedFilterCountry = Utils.normalizeText(this.activeFilters.country);
+                const match = normalizedPageCountry === normalizedFilterCountry;
+                console.log(`Country check: "${pageCountry}" (${normalizedPageCountry}) vs "${this.activeFilters.country}" (${normalizedFilterCountry}) = ${match}`);
+                return match;
+            });
         }
 
         // Apply month filter
         if (this.activeFilters.month) {
+            console.log('Applying month filter:', this.activeFilters.month);
             filtered = filtered.filter(page => {
-                if (!page.fecha_de_cierre) return false;
-                const pageMonth = new Date(page.fecha_de_cierre).getMonth() + 1;
-                return parseInt(this.activeFilters.month) === pageMonth;
+                // Check for different possible date field names
+                const dateField = page.fecha_de_cierre || page.fecha_cierre || page.fecha || '';
+                if (!dateField) {
+                    console.log('Page has no date field:', page.nombre);
+                    return false;
+                }
+                
+                console.log(`Processing date for "${page.nombre}": ${dateField}`);
+                
+                let pageMonth;
+                try {
+                    // Try to parse the date
+                    const dateObj = new Date(dateField);
+                    if (isNaN(dateObj.getTime())) {
+                        // If date is invalid, try to extract month from string format
+                        // Try different date formats: DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD, etc.
+                        let dateParts;
+                        
+                        if (dateField.includes('/')) {
+                            dateParts = dateField.split('/');
+                            // Assume DD/MM/YYYY format
+                            pageMonth = parseInt(dateParts[1]);
+                        } else if (dateField.includes('-')) {
+                            dateParts = dateField.split('-');
+                            // Assume YYYY-MM-DD format
+                            pageMonth = parseInt(dateParts[1]);
+                        } else if (dateField.includes('.')) {
+                            dateParts = dateField.split('.');
+                            // Assume DD.MM.YYYY format
+                            pageMonth = parseInt(dateParts[1]);
+                        } else {
+                            console.log(`Unrecognized date format for "${page.nombre}": ${dateField}`);
+                            return false;
+                        }
+                        
+                        console.log(`Extracted month from string: ${pageMonth} from ${dateField}`);
+                    } else {
+                        pageMonth = dateObj.getMonth() + 1; // getMonth() is 0-indexed
+                        console.log(`Extracted month from Date object: ${pageMonth} from ${dateField}`);
+                    }
+                } catch (error) {
+                    console.error(`Error parsing date for "${page.nombre}":`, error);
+                    return false;
+                }
+                
+                const filterMonth = parseInt(this.activeFilters.month);
+                const match = filterMonth === pageMonth;
+                console.log(`Month check for "${page.nombre}": "${dateField}" → month ${pageMonth} vs filter ${filterMonth} = ${match}`);
+                return match;
             });
         }
 
@@ -286,6 +352,14 @@ export const FilterModule = {
                 if (!page.disciplina) return false;
                 const pageDisciplines = page.disciplina.split(',').map(d => d.trim());
                 return pageDisciplines.some(d => this.belongsToMainDiscipline(d, this.activeFilters.discipline));
+            });
+        }
+        
+        // Apply free-only filter (new)
+        if (this.activeFilters.freeOnly) {
+            filtered = filtered.filter(page => {
+                // Include pages that have no inscripcion value or have "Sin cargo"
+                return !page.inscripcion || page.inscripcion.trim().toLowerCase() === 'sin cargo';
             });
         }
 
@@ -347,6 +421,13 @@ export const FilterModule = {
                 btn.classList.add('bg-blue-600', 'text-white');
             }
         });
+        
+        // Clear inscripcion filter
+        const inscripcionCheckbox = document.getElementById('inscripcion-checkbox');
+        if (inscripcionCheckbox) {
+            inscripcionCheckbox.checked = false;
+        }
+        this.activeFilters.freeOnly = false;
         
         // Reset pagination
         SearchModule.pagination.currentPage = 1;

@@ -228,9 +228,11 @@ export const SearchModule = {
         // Get current filter states
         const countryFilter = document.getElementById('country-filter');
         const monthFilter = document.getElementById('month-filter');
+        const inscripcionCheckbox = document.getElementById('inscripcion-checkbox');
         const hasActiveCategories = this.activeFilters.categories.size > 0;
         const hasActiveCountry = countryFilter && countryFilter.value;
         const hasActiveMonth = monthFilter && monthFilter.value;
+        const hasFreeOnly = inscripcionCheckbox && inscripcionCheckbox.checked;
 
         // Always hide destacados section when structured search is used
         destacadosContainer?.classList.add('hidden');
@@ -247,9 +249,22 @@ export const SearchModule = {
 
         // Transfer month filter
         FilterModule.activeFilters.month = hasActiveMonth ? monthFilter.value : '';
+        console.log('Transferred month filter:', {
+            hasActiveMonth,
+            monthFilterValue: monthFilter?.value,
+            transferredValue: FilterModule.activeFilters.month
+        });
 
         // Transfer country filter
         FilterModule.activeFilters.country = hasActiveCountry ? countryFilter.value : '';
+        console.log('Transferred country filter:', {
+            hasActiveCountry,
+            countryFilterValue: countryFilter?.value,
+            transferredValue: FilterModule.activeFilters.country
+        });
+        
+        // Transfer inscripcion filter
+        FilterModule.activeFilters.freeOnly = hasFreeOnly;
 
         // Now perform the search
         FilterModule.applyFilters('', true);
@@ -285,8 +300,11 @@ export const SearchModule = {
         // Reset dropdowns
         const countryFilter = document.getElementById('country-filter');
         const monthFilter = document.getElementById('month-filter');
+        const inscripcionCheckbox = document.getElementById('inscripcion-checkbox');
+        
         if (countryFilter) countryFilter.value = '';
         if (monthFilter) monthFilter.value = '';
+        if (inscripcionCheckbox) inscripcionCheckbox.checked = false;
 
         // Clear FilterModule filters and update results
         FilterModule.clearAllFilters();
@@ -350,11 +368,18 @@ export const SearchModule = {
         const searchInput = document.getElementById('open-search');
         const clearButton = document.getElementById('clear-search');
         const destacadosContainer = document.querySelector('.destacados-container');
+        const inscripcionCheckbox = document.getElementById('inscripcion-checkbox');
 
         console.log('clearSearch called');
 
         searchInput.value = '';
         clearButton.style.display = 'none';
+        
+        // Reset inscripcion checkbox
+        if (inscripcionCheckbox) {
+            inscripcionCheckbox.checked = false;
+        }
+        FilterModule.activeFilters.freeOnly = false;
         
         // Show destacados section only if no other filters are active
         if (!FilterModule.activeFilters.categories.size && 
@@ -421,19 +446,45 @@ export const SearchModule = {
     },
 
     handleStructuredSearch() {
-        const filters = {
-            categories: Array.from(this.activeFilters.categories),
+        // Get the inscripcion checkbox state
+        const inscripcionCheckbox = document.getElementById('inscripcion-checkbox');
+        const freeOnly = inscripcionCheckbox && inscripcionCheckbox.checked;
+        
+        // Get current filter states
+        const countryFilter = document.getElementById('country-filter');
+        const monthFilter = document.getElementById('month-filter');
+        const hasActiveCategories = this.activeFilters.categories.size > 0;
+        const hasActiveCountry = countryFilter && countryFilter.value;
+        const hasActiveMonth = monthFilter && monthFilter.value;
+        
+        console.log('Structured search with categories:', Array.from(this.activeFilters.categories));
+        
+        // Transfer active filters to the FilterModule
+        FilterModule.activeFilters.categories.clear();
+        if (hasActiveCategories) {
+            this.activeFilters.categories.forEach(category => {
+                FilterModule.activeFilters.categories.add(category.toLowerCase());
+            });
+        }
+
+        // Transfer month filter
+        FilterModule.activeFilters.month = hasActiveMonth ? monthFilter.value : '';
+
+        // Transfer country filter
+        FilterModule.activeFilters.country = hasActiveCountry ? countryFilter.value : '';
+        
+        // Transfer inscripcion filter
+        FilterModule.activeFilters.freeOnly = freeOnly;
+
+        console.log('Applying structured search with filters:', {
+            categories: Array.from(FilterModule.activeFilters.categories),
             country: FilterModule.activeFilters.country,
-            month: FilterModule.activeFilters.month
-        };
-
-        console.log('Applying structured search with filters:', filters);
-
+            month: FilterModule.activeFilters.month,
+            freeOnly: FilterModule.activeFilters.freeOnly
+        });
+        
         // Perform the search
-        FilterModule.applyFilters();
-
-        // Clear filters and update UI after search
-        this.clearFilters();
+        FilterModule.applyFilters('', true);
 
         // Hide dropdown after search
         const filtersElement = document.getElementById('structured-filters');
