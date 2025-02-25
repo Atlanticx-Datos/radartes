@@ -576,11 +576,8 @@ video {
 .-mr-6 {
   margin-right: -1.5rem;
 }
-.-mt-10 {
-  margin-top: -2.5rem;
-}
-.-mt-6 {
-  margin-top: -1.5rem;
+.-mt-8 {
+  margin-top: -2rem;
 }
 .mb-1 {
   margin-bottom: 0.25rem;
@@ -972,6 +969,9 @@ video {
 }
 .overflow-hidden {
   overflow: hidden;
+}
+.overflow-visible {
+  overflow: visible;
 }
 .overflow-x-auto {
   overflow-x: auto;

@@ -216,7 +216,7 @@ export const FilterModule = {
         });
     },
 
-    applyFilters(searchInput = '', fromStructuredSearch = false) {
+    applyFilters(searchInput = '', fromStructuredSearch = false, shouldScroll = false) {
         const pages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
         const destacadosContainer = document.querySelector('.destacados-container');
         const prevControl = document.querySelector('.destacar-prev');
@@ -238,7 +238,8 @@ export const FilterModule = {
             discipline: this.activeFilters.discipline,
             freeOnly: this.activeFilters.freeOnly,  // Log the new filter state
             hasActiveFilters,
-            fromStructuredSearch
+            fromStructuredSearch,
+            shouldScroll
         });
         
         // Only manage visibility if not coming from structured search
@@ -397,7 +398,7 @@ export const FilterModule = {
         }
 
         console.log('Filtered results:', filtered.length);
-        this.updateResults(filtered);
+        this.updateResults(filtered, shouldScroll);
     },
 
     matchesSearchTerms(page, searchInput) {
@@ -465,7 +466,7 @@ export const FilterModule = {
         });
     },
 
-    updateResults(results) {
+    updateResults(results, shouldScroll = false) {
         // Reset pagination in SearchModule when filter results change
         SearchModule.pagination.currentPage = 1;
         SearchModule.pagination.allResults = results;
@@ -473,6 +474,21 @@ export const FilterModule = {
         
         // Use SearchModule's updateResults to maintain consistent pagination
         SearchModule.updateResults(results);
+        
+        // Only trigger scrolling if explicitly requested (Enter key or button click)
+        if (shouldScroll && results.length > 0 && (
+            this.activeFilters.categories.size > 0 || 
+            this.activeFilters.country || 
+            this.activeFilters.month || 
+            this.activeFilters.discipline !== 'todos' ||
+            this.activeFilters.freeOnly ||
+            document.getElementById('open-search')?.value
+        )) {
+            // Use SearchModule's scrollToResults function if available
+            if (SearchModule.scrollToResults) {
+                SearchModule.scrollToResults();
+            }
+        }
     },
 
     clearAllFilters() {

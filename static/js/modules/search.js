@@ -339,7 +339,7 @@ export const SearchModule = {
         }
     },
 
-    performSearch() {
+    performSearch(shouldScroll = false) {
         const searchInput = document.getElementById('open-search');
         const clearButton = document.getElementById('clear-search');
         const destacadosContainer = document.querySelector('.destacados-container');
@@ -359,7 +359,7 @@ export const SearchModule = {
         }
 
         const searchInputValue = searchInput.value;
-        FilterModule.applyFilters(searchInputValue);
+        FilterModule.applyFilters(searchInputValue, false, shouldScroll);
 
         // Track search if value is not empty
         if (searchInputValue.trim()) {
@@ -401,7 +401,8 @@ export const SearchModule = {
     handleKeyPress(event) {
         if (event.key === 'Enter') {
             event.preventDefault();
-            this.performSearch();
+            // Pass true to performSearch to indicate scrolling should happen
+            this.performSearch(true);
         }
     },
 
@@ -486,25 +487,14 @@ export const SearchModule = {
             freeOnly: FilterModule.activeFilters.freeOnly
         });
         
-        // Perform the search
-        FilterModule.applyFilters('', true);
+        // Perform the search with scrolling enabled
+        FilterModule.applyFilters('', true, true);
 
         // Hide dropdown after search
         const filtersElement = document.getElementById('structured-filters');
         if (filtersElement) {
             filtersElement.classList.add('hidden');
         }
-
-        // Scroll to results after filters are applied and DOM is updated
-        setTimeout(() => {
-            const resultsContainer = document.getElementById('results-container');
-            if (resultsContainer) {
-                resultsContainer.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        }, 100);
     },
 
     handleCategoryClick(category, element) {
@@ -751,5 +741,27 @@ export const SearchModule = {
         
         // Scroll to top of results
         document.getElementById('results-container')?.scrollIntoView({ behavior: 'smooth' });
+    },
+
+    // Function to scroll to results with some white space above the radar header
+    scrollToResults() {
+        setTimeout(() => {
+            const radarHeader = document.getElementById('radar-header');
+            if (radarHeader) {
+                // Get the position of the radar header
+                const headerRect = radarHeader.getBoundingClientRect();
+                const scrollPosition = window.pageYOffset + headerRect.top - 100; // 100px of white space above
+                
+                // Scroll to the position
+                window.scrollTo({
+                    top: scrollPosition,
+                    behavior: 'smooth'
+                });
+                
+                console.log('Scrolled to radar header with offset');
+            } else {
+                console.log('Radar header not found');
+            }
+        }, 100); // Small delay to ensure DOM is updated
     },
 }; 
