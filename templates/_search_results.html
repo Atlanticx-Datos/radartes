@@ -133,9 +133,51 @@
                         <li class="hover:bg-gray-200">
                             <a href="#" class="block px-4 py-2 text-sm" onclick="copyUrl('{{ page.base_url if page.base_url else page.url }}'); return false;">Copiar URL</a>
                         </li>
-                        <li class="hover:bg-gray-200"><a href="#" class="block px-4 py-2 text-sm" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'whatsapp')">WhatsApp</a></li>
-                        <li class="hover:bg-gray-200"><a href="#" class="block px-4 py-2 text-sm" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'linkedin')">LinkedIn</a></li>
-                        <li class="hover:bg-gray-200"><a href="#" class="block px-4 py-2 text-sm" onclick="shareOpportunity('{{ page.url }}', '{{ page.nombre }}', 'gmail')">Email</a></li>
+                        <li class="hover:bg-gray-200">
+                            <a href="#" class="block px-4 py-2 text-sm" onclick="shareOpportunity(
+                                '{{ page.url }}', 
+                                '{{ page.nombre }}', 
+                                'whatsapp',
+                                {
+                                    id: '{{ page.id }}',
+                                    country: '{{ page.país }}',
+                                    disciplina: '{{ page.disciplina }}',
+                                    fecha_de_cierre: '{{ page.fecha_de_cierre }}',
+                                    inscripcion: '{{ page.inscripcion }}',
+                                    base_url: '{{ page.base_url if page.base_url else "" }}'
+                                }
+                            ); return false;">WhatsApp</a>
+                        </li>
+                        <li class="hover:bg-gray-200">
+                            <a href="#" class="block px-4 py-2 text-sm" onclick="shareOpportunity(
+                                '{{ page.url }}', 
+                                '{{ page.nombre }}', 
+                                'linkedin',
+                                {
+                                    id: '{{ page.id }}',
+                                    country: '{{ page.país }}',
+                                    disciplina: '{{ page.disciplina }}',
+                                    fecha_de_cierre: '{{ page.fecha_de_cierre }}',
+                                    inscripcion: '{{ page.inscripcion }}',
+                                    base_url: '{{ page.base_url if page.base_url else "" }}'
+                                }
+                            ); return false;">LinkedIn</a>
+                        </li>
+                        <li class="hover:bg-gray-200">
+                            <a href="#" class="block px-4 py-2 text-sm" onclick="shareOpportunity(
+                                '{{ page.url }}', 
+                                '{{ page.nombre }}', 
+                                'email',
+                                {
+                                    id: '{{ page.id }}',
+                                    country: '{{ page.país }}',
+                                    disciplina: '{{ page.disciplina }}',
+                                    fecha_de_cierre: '{{ page.fecha_de_cierre }}',
+                                    inscripcion: '{{ page.inscripcion }}',
+                                    base_url: '{{ page.base_url if page.base_url else "" }}'
+                                }
+                            ); return false;">Email</a>
+                        </li>
                     </ul>
                 </div>
             </div>

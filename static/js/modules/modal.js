@@ -3,7 +3,7 @@ import { CONSTANTS } from '../constants.js';
 
 // Handles modal functionality
 export const ModalModule = {
-    showPreviewModal(url, nombre, pais, og_resumida, id, categoria) {
+    showPreviewModal(url, nombre, pais, og_resumida, id, categoria, base_url) {
         // Clean up any existing modals first
         const existingModals = document.querySelectorAll('[id^="modal-"]');
         const existingOverlays = document.querySelectorAll('[id$="-overlay"]');
@@ -33,6 +33,7 @@ export const ModalModule = {
         // Create the modal container with responsive styling
         const modalContent = document.createElement("div");
         modalContent.id = modalId;
+        modalContent.dataset.baseUrl = base_url || '';
         modalContent.style.cssText = `
             position: fixed;
             top: 50%;
@@ -70,14 +71,17 @@ export const ModalModule = {
                             </svg>
                         </button>
                         <div class="share-dropdown hidden absolute right-0 top-full mt-1 w-40 bg-white border rounded-md shadow-lg z-50">
-                            <button class="share-option w-full text-left px-4 py-2 hover:bg-gray-100" data-action="copy-url">
+                            <button class="share-option w-full text-left px-4 py-2 hover:bg-gray-100" data-action="copy">
                                 Copiar URL
                             </button>
                             <a href="#" class="share-option block px-4 py-2 hover:bg-gray-100" data-action="whatsapp">
                                 WhatsApp
                             </a>
-                            <a href="#" class="share-option block px-4 py-2 hover:bg-gray-100" data-action="twitter">
-                                Twitter
+                            <a href="#" class="share-option block px-4 py-2 hover:bg-gray-100" data-action="linkedin">
+                                LinkedIn
+                            </a>
+                            <a href="#" class="share-option block px-4 py-2 hover:bg-gray-100" data-action="email">
+                                Email
                             </a>
                         </div>
                     </div>
@@ -200,23 +204,68 @@ export const ModalModule = {
     },
 
     handleShare(platform, url, title) {
-        switch (platform) {
-            case 'copy-url':
-                navigator.clipboard.writeText(url).then(() => {
-                    Utils.showAlert('URL copiada al portapapeles');
-                }).catch(err => {
-                    console.error('Error copying URL:', err);
-                    Utils.showAlert('Error al copiar URL', 'error');
-                });
-                break;
+        // Create opportunity object with available data from the modal
+        const modalElement = document.querySelector('[id^="modal-"]');
+        if (!modalElement) {
+            console.error('Modal element not found for sharing');
+            return;
+        }
+        
+        // Try to extract data from the modal content
+        const countryElement = modalElement.querySelector('.flex.items-center svg[viewBox="0 0 20 20"] + *');
+        const disciplinaElement = modalElement.querySelector('.flex.items-center svg[viewBox="0 0 20 20"] ~ .text-gray-600');
+        
+        // Check if we have a base_url from the modal element or from the clicked element
+        const baseUrl = modalElement.dataset.baseUrl || '';
+        
+        // Use base_url if present, otherwise use the provided url
+        const shareUrl = baseUrl || url;
+        
+        // Create opportunity object with available data
+        const opportunity = {
+            id: modalElement.querySelector('input[name="selected_pages"]')?.value || 'unknown',
+            nombre: title,
+            url: shareUrl,
+            país: countryElement ? countryElement.textContent.trim() : '',
+            disciplina: disciplinaElement ? disciplinaElement.textContent.trim() : '',
+            fecha_de_cierre: '', // Not available in modal
+            inscripcion: modalElement.querySelector('.flex.items-center svg.w-5.h-5') ? 
+                (modalElement.querySelector('.flex.items-center svg.w-5.h-5 + svg.absolute') ? 'Sin cargo' : 'Con cargo') : ''
+        };
+        
+        console.log('Sharing opportunity:', opportunity, 'via platform:', platform);
+        
+        // Use the SharingModule if available, otherwise fall back to basic sharing
+        if (window.SharingModule) {
+            window.SharingModule.shareOpportunity(opportunity, platform);
+        } else {
+            // Legacy fallback
+            switch (platform) {
+                case 'copy':
+                    navigator.clipboard.writeText(shareUrl).then(() => {
+                        Utils.showAlert('URL copiada al portapapeles');
+                    }).catch(err => {
+                        console.error('Error copying URL:', err);
+                        Utils.showAlert('Error al copiar URL', 'error');
+                    });
+                    break;
 
-            case 'whatsapp':
-                window.open(`https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`, '_blank');
-                break;
+                case 'whatsapp':
+                    window.open(`https://wa.me/?text=${encodeURIComponent(title + ' ' + shareUrl)}`, '_blank');
+                    break;
 
-            case 'twitter':
-                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`, '_blank');
-                break;
+                case 'linkedin':
+                    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank');
+                    break;
+
+                case 'email':
+                    window.open(`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(title + '\n\n' + shareUrl)}`, '_blank');
+                    break;
+                    
+                default:
+                    console.error(`Unsupported sharing platform: ${platform}`);
+                    break;
+            }
         }
     },
 

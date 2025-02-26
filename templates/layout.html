@@ -13,6 +13,14 @@
         {{ og_data.title if og_data else "100 + Oportunidades" }}
         {% endif %}
     </title>
+    
+    <!-- App Metadata for Sharing Module -->
+    <meta name="app-name" content="{{ og_data.title if og_data else '100 ︱ Oportunidades' }}">
+    <meta name="description" content="{{ og_data.description if og_data else 'Convocatorias, Becas y Recursos Globales para Artistas.' }}">
+    <meta name="app-url" content="{{ og_data.url if og_data else 'http://oportunidades.lat' }}">
+    <meta name="app-image" content="{{ og_data.image if og_data else 'http://oportunidades.lat/static/public/LogoCienOpps.png' }}">
+    
+    <!-- Open Graph Tags -->
     <meta property="og:title" content="
         {% if request.path == '/database' %}
             Oportunidades: {{ total_opportunities }} en total

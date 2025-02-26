@@ -12,11 +12,40 @@ import { DestacarModule } from './modules/destacar.js';
 import { Utils } from './utils.js';
 import { TopModule } from './modules/top.js';
 import { SubscribeModule } from './modules/subscribe.js';
+import { SharingModule } from './modules/sharing.js';
+import { SharingTestModule } from './modules/sharing-test.js';
 
 // Expose modules to window object using a more reliable approach
 function exposeModules() {
+    // Make modules available globally
     window.SearchModule = SearchModule;
-    window.ModalModule = ModalModule;  // Expose ModalModule
+    window.FilterModule = FilterModule;
+    window.ModalModule = ModalModule;
+    window.DestacarModule = DestacarModule;
+    window.TopModule = TopModule;
+    window.SharingModule = SharingModule;
+    
+    // Initialize modules
+    SearchModule.init();
+    FilterModule.init();
+    
+    // Initialize sharing module
+    SharingModule.init({
+        brandInfo: {
+            name: document.querySelector('meta[name="app-name"]')?.content || "100 ︱ Oportunidades",
+            tagline: document.querySelector('meta[name="description"]')?.content || "Convocatorias, Becas y Recursos Globales para Artistas",
+            url: window.location.origin,
+            imageUrl: `${window.location.origin}/static/public/Logo_100_mediano.png`
+        }
+    });
+    
+    // Initialize sharing test module in development environments
+    if (window.location.hostname === 'localhost' || 
+        window.location.hostname === '127.0.0.1' || 
+        window.location.search.includes('test=true')) {
+        SharingTestModule.init();
+    }
+    
     // Expose pagination functions
     window.goToPage = SearchModule.goToPage.bind(SearchModule);
     console.log('Modules exposed to window:', {
@@ -200,20 +229,24 @@ function toggleDropdown(button) {
     }
 }
 
-// Share opportunity function
-function shareOpportunity(url, title, platform) {
-    switch (platform) {
-        case 'whatsapp':
-            window.open(`https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`, '_blank');
-            break;
-        case 'linkedin':
-            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
-            break;
-        case 'gmail':
-            window.open(`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(url)}`, '_blank');
-            break;
-    }
-    return false;
+// Enhanced share opportunity function that uses the new SharingModule
+function shareOpportunity(url, title, platform, extraData = {}) {
+    // Use base_url if provided, otherwise use the regular url
+    const shareUrl = extraData.base_url || url;
+    
+    // Create opportunity object with available data
+    const opportunity = {
+        id: extraData.id || 'unknown',
+        nombre: title,
+        url: shareUrl,
+        país: extraData.country || '',
+        disciplina: extraData.disciplina || '',
+        fecha_de_cierre: extraData.fecha_de_cierre || '',
+        inscripcion: extraData.inscripcion || ''
+    };
+    
+    // Use the SharingModule to handle sharing
+    return SharingModule.shareOpportunity(opportunity, platform);
 }
 
 // Attach necessary functions to window object for backward compatibility
@@ -365,7 +398,8 @@ const handleModalClick = (e) => {
             dataset.pais || dataset.country,
             dataset.og_resumida || dataset.summary,
             dataset.id,
-            dataset.categoria || dataset.category
+            dataset.categoria || dataset.category,
+            dataset.baseUrl || dataset.base_url
         );
     }
 };
