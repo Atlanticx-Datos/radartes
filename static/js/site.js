@@ -91,14 +91,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ensure the clear button stays visible
     SearchModule.ensureClearButtonVisible();
 
-    // Attach discipline filter handlers
-    document.querySelectorAll('[data-discipline-filter]').forEach(button => {
-        button.removeEventListener('click', () => FilterModule.handleDisciplineFilter(button));
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            FilterModule.handleDisciplineFilter(button);
-        });
-    });
+    // Remove the direct event listeners for discipline filter buttons
+    // since we're now using the onclick attribute in HTML with toggleDisciplineFilter
+    // document.querySelectorAll('[data-discipline-filter]').forEach(button => {
+    //     button.removeEventListener('click', () => FilterModule.handleDisciplineFilter(button));
+    //     button.addEventListener('click', (e) => {
+    //         e.preventDefault();
+    //         FilterModule.handleDisciplineFilter(button);
+    //     });
+    // });
 
     // Initialize TopModule if we have pages data
     const preFilteredData = document.getElementById('prefiltered-data');
@@ -609,7 +610,32 @@ window.clearSearch = SearchModule.clearSearch.bind(SearchModule);
 window.performSearch = SearchModule.performSearch.bind(SearchModule);
 window.showAlert = Utils.showAlert.bind(Utils);
 window.clearAllFilters = FilterModule.clearAllFilters.bind(FilterModule);
-window.toggleDisciplineFilter = FilterModule.handleDisciplineFilter.bind(FilterModule);
+window.toggleDisciplineFilter = function(button, discipline) {
+    // Ensure the button has the correct discipline value in its dataset
+    button.dataset.disciplineFilter = discipline;
+    
+    // Update the active state visually
+    const allButtons = document.querySelectorAll('[data-discipline-filter]');
+    allButtons.forEach(btn => {
+        if (btn !== button) {
+            btn.dataset.active = 'false';
+            btn.classList.remove('active-filter');
+        }
+    });
+    
+    // Toggle the active state of the clicked button
+    const isActive = button.dataset.active === 'true';
+    button.dataset.active = isActive ? 'false' : 'true';
+    
+    if (button.dataset.active === 'true') {
+        button.classList.add('active-filter');
+    } else {
+        button.classList.remove('active-filter');
+    }
+    
+    // Call the FilterModule's handleDisciplineFilter method
+    FilterModule.handleDisciplineFilter(button);
+};
 window.goToPage = SearchModule.goToPage.bind(SearchModule);
 window.toggleDropdown = toggleDropdown;
 window.shareOpportunity = shareOpportunity;

@@ -242,6 +242,9 @@ export const FilterModule = {
             nextControl?.classList.remove('hidden');
         }
 
+        // Update the visual state of discipline buttons
+        this.updateDisciplineButtons();
+
         console.log('Filtered results count:', filtered.length);
         this.updateResults(filtered);
         console.log('=== Discipline Filter End ===');
@@ -250,23 +253,23 @@ export const FilterModule = {
     updateDisciplineButtons() {
         // Reset all buttons to default state
         document.querySelectorAll('[data-discipline-filter]').forEach(btn => {
-            btn.classList.remove('bg-blue-600', 'text-white');
-            btn.classList.add('border-gray-300', 'text-gray-700');
+            btn.classList.remove('active-filter', 'bg-blue-600', 'text-white');
+            btn.dataset.active = 'false';
         });
 
         // If we're in 'todos' state, highlight the todos button
         if (this.activeFilters.discipline === 'todos') {
             const todosButton = document.querySelector('[data-discipline-filter="todos"]');
             if (todosButton) {
-                todosButton.classList.remove('border-gray-300', 'text-gray-700');
-                todosButton.classList.add('bg-blue-600', 'text-white');
+                todosButton.classList.add('active-filter');
+                todosButton.dataset.active = 'true';
             }
         } else {
             // Highlight the active discipline button
             const activeButton = document.querySelector(`[data-discipline-filter="${this.activeFilters.discipline}"]`);
             if (activeButton) {
-                activeButton.classList.remove('border-gray-300', 'text-gray-700');
-                activeButton.classList.add('bg-blue-600', 'text-white');
+                activeButton.classList.add('active-filter');
+                activeButton.dataset.active = 'true';
             }
         }
     },
