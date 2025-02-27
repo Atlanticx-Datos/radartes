@@ -14,6 +14,7 @@ export const FilterModule = {
     },
 
     selectedCategories: [],
+    lastFilteredResults: [], // Store the last filtered results
 
     init() {
         console.log('FilterModule initialized');
@@ -350,6 +351,9 @@ export const FilterModule = {
             return true;
         });
 
+        // Store the filtered results
+        this.lastFilteredResults = filtered;
+        
         this.updateResults(filtered, shouldScroll);
     },
 
@@ -378,14 +382,7 @@ export const FilterModule = {
         SearchModule.updateResults(results);
         
         // Only trigger scrolling if explicitly requested (Enter key or button click)
-        if (shouldScroll && results.length > 0 && (
-            this.activeFilters.categories.size > 0 || 
-            this.activeFilters.country || 
-            this.activeFilters.month || 
-            this.activeFilters.discipline !== 'todos' ||
-            this.activeFilters.freeOnly ||
-            document.getElementById('open-search')?.value
-        )) {
+        if (shouldScroll && results.length > 0) {
             // Use SearchModule's scrollToResults function if available
             if (SearchModule.scrollToResults) {
                 SearchModule.scrollToResults();

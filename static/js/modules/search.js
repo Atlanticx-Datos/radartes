@@ -287,7 +287,7 @@ export const SearchModule = {
         // Transfer inscripcion filter
         FilterModule.activeFilters.freeOnly = hasFreeOnly;
 
-        // Now perform the search
+        // Now perform the search with scrolling enabled
         FilterModule.applyFilters('', true);
 
         // Hide the structured filters dropdown
@@ -295,11 +295,6 @@ export const SearchModule = {
         if (filtersElement) {
             filtersElement.classList.add('hidden');
         }
-
-        // Removed scrolling behavior: disabling scrollToResults function
-        const scrollToResults = () => {};
-
-        setTimeout(scrollToResults, 100);
     },
 
     clearStructuredFilters() {
@@ -377,7 +372,12 @@ export const SearchModule = {
         }
 
         const searchInputValue = searchInput.value;
-        FilterModule.applyFilters(searchInputValue, false, shouldScroll);
+        FilterModule.applyFilters(searchInputValue, false);
+
+        // Directly handle scrolling here if requested
+        if (shouldScroll && FilterModule.lastFilteredResults && FilterModule.lastFilteredResults.length > 0) {
+            this.scrollToResults();
+        }
 
         // Track search if value is not empty
         if (searchInputValue.trim()) {
@@ -390,9 +390,12 @@ export const SearchModule = {
         const clearButton = document.getElementById('clear-search');
         const destacadosContainer = document.querySelector('.destacados-container');
         const inscripcionCheckbox = document.getElementById('inscripcion-checkbox');
+        const prevControl = document.querySelector('.destacar-prev');
+        const nextControl = document.querySelector('.destacar-next');
 
         console.log('clearSearch called');
 
+        // Clear search input
         searchInput.value = '';
         clearButton.style.display = 'none';
         
@@ -400,18 +403,44 @@ export const SearchModule = {
         if (inscripcionCheckbox) {
             inscripcionCheckbox.checked = false;
         }
-        FilterModule.activeFilters.freeOnly = false;
         
-        // Show destacados section only if no other filters are active
-        if (!FilterModule.activeFilters.categories.size && 
-            !FilterModule.activeFilters.country && 
-            !FilterModule.activeFilters.month && 
-            FilterModule.activeFilters.discipline === 'todos') {
-            destacadosContainer?.classList.remove('hidden');
-        }
+        // Reset all filters in FilterModule
+        FilterModule.activeFilters = {
+            categories: new Set(),
+            subdisciplinas: new Set(),
+            country: '',
+            month: '',
+            discipline: 'todos',
+            freeOnly: false
+        };
         
-        this.performSearch(); // Trigger search to reset results
-
+        // Reset UI elements
+        FilterModule.updateDisciplineButtons();
+        
+        // Reset dropdowns
+        const countryFilter = document.getElementById('country-filter');
+        const monthFilter = document.getElementById('month-filter');
+        if (countryFilter) countryFilter.value = '';
+        if (monthFilter) monthFilter.value = '';
+        
+        // Reset checkboxes in structured filters
+        document.querySelectorAll('#structured-filters input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        
+        // Reset selected values display in structured filters
+        document.querySelectorAll('.selected-values').forEach(span => {
+            span.textContent = '';
+        });
+        
+        // Show destacados section and controls
+        destacadosContainer?.classList.remove('hidden');
+        prevControl?.classList.remove('hidden');
+        nextControl?.classList.remove('hidden');
+        
+        // Trigger search to reset results
+        this.performSearch(false); // Pass false to avoid scrolling
+        
         // Replace current URL without query parameters
         history.replaceState(null, null, window.location.pathname);
     },
@@ -444,10 +473,16 @@ export const SearchModule = {
     },
 
     ensureClearButtonVisible() {
+        const searchInput = document.getElementById('open-search');
         const clearButton = document.getElementById('clear-search');
-        if (clearButton) {
-            clearButton.style.display = 'block';
-            setTimeout(this.ensureClearButtonVisible.bind(this), 100);
+        
+        if (searchInput && clearButton) {
+            // Show clear button if there's text in the search input
+            if (searchInput.value.length > 0) {
+                clearButton.style.display = 'block';
+            } else {
+                clearButton.style.display = 'none';
+            }
         }
     },
 
@@ -830,8 +865,16 @@ export const SearchModule = {
         const resultsHeader = document.getElementById('radar-header');
         if (resultsHeader) {
             // Use smooth scrolling for better UX
-            resultsHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            console.log('Scrolled to results header');
+            // Use 'start' alignment with a negative margin to add white space above
+            const headerRect = resultsHeader.getBoundingClientRect();
+            const scrollPosition = window.scrollY + headerRect.top - 100; // 100px of white space
+            
+            window.scrollTo({
+                top: scrollPosition,
+                behavior: 'smooth'
+            });
+            
+            console.log('Scrolled to results header with white space');
         } else {
             console.warn('Results header not found for scrolling');
         }

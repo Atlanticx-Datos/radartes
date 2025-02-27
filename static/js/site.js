@@ -233,8 +233,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup filter dropdown trigger
     setupFilterDropdown();
     
-    // Ensure the clear button stays visible
-    SearchModule.ensureClearButtonVisible();
+    // Ensure the clear button visibility is correct based on search input
+    if (window.SearchModule && typeof window.SearchModule.ensureClearButtonVisible === 'function') {
+        window.SearchModule.ensureClearButtonVisible();
+    }
 
     // Remove the direct event listeners for discipline filter buttons
     // since we're now using the onclick attribute in HTML with toggleDisciplineFilter
