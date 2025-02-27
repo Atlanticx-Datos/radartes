@@ -6,68 +6,130 @@ import { SearchModule } from './search.js';
 export const FilterModule = {
     activeFilters: {
         categories: new Set(),
+        subdisciplinas: new Set(),
         country: '',
         month: '',
         discipline: 'todos',
-        freeOnly: false  // New filter for "Sin cargo" opportunities
+        freeOnly: false
     },
 
     selectedCategories: [],
 
     init() {
-        // Only initialize if we're on a page with filters
         const preFilteredData = document.getElementById('prefiltered-data');
-        if (!preFilteredData) {
-            return; // Skip initialization if we're not on a page with filters
-        }
+        if (!preFilteredData) return;
+
         this.initializeDropdowns();
-        this.removeExistingHandlers();
-        this.addNewHandlers();
-        
-        // Remove the change event listener from the inscripcion checkbox
-        // The checkbox state will be read when the user clicks the "Buscar" button
+        this.setupEventListeners();
+        this.populateSubdisciplinas();
     },
 
     initializeDropdowns() {
-        const preFilteredData = document.getElementById('prefiltered-data');
-        if (!preFilteredData) return;  // Skip if element doesn't exist
-        
-        const pages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
+        const pages = JSON.parse(document.getElementById('prefiltered-data')?.dataset.pages || '[]');
         
         // Initialize country dropdown
         const countryFilter = document.getElementById('country-filter');
-        const countries = [...new Set(pages.map(page => page.pais).filter(Boolean))].sort();
-        
-        countries.forEach(country => {
-            const option = document.createElement('option');
-            option.value = country;
-            option.textContent = country;
-            countryFilter.appendChild(option);
-        });
+        if (countryFilter) {
+            const countries = [...new Set(pages.map(page => page.pais).filter(Boolean))].sort();
+            countries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = country;
+                countryFilter.appendChild(option);
+            });
+        }
 
         // Initialize month dropdown
         const monthFilter = document.getElementById('month-filter');
-        const months = [
-            { value: '1', label: 'Enero' },
-            { value: '2', label: 'Febrero' },
-            { value: '3', label: 'Marzo' },
-            { value: '4', label: 'Abril' },
-            { value: '5', label: 'Mayo' },
-            { value: '6', label: 'Junio' },
-            { value: '7', label: 'Julio' },
-            { value: '8', label: 'Agosto' },
-            { value: '9', label: 'Septiembre' },
-            { value: '10', label: 'Octubre' },
-            { value: '11', label: 'Noviembre' },
-            { value: '12', label: 'Diciembre' }
-        ];
+        if (monthFilter) {
+            const months = [
+                { value: '1', label: 'Enero' },
+                { value: '2', label: 'Febrero' },
+                { value: '3', label: 'Marzo' },
+                { value: '4', label: 'Abril' },
+                { value: '5', label: 'Mayo' },
+                { value: '6', label: 'Junio' },
+                { value: '7', label: 'Julio' },
+                { value: '8', label: 'Agosto' },
+                { value: '9', label: 'Septiembre' },
+                { value: '10', label: 'Octubre' },
+                { value: '11', label: 'Noviembre' },
+                { value: '12', label: 'Diciembre' }
+            ];
+            months.forEach(month => {
+                const option = document.createElement('option');
+                option.value = month.value;
+                option.textContent = month.label;
+                monthFilter.appendChild(option);
+            });
+        }
+    },
 
-        months.forEach(month => {
-            const option = document.createElement('option');
-            option.value = month.value;
-            option.textContent = month.label;
-            monthFilter.appendChild(option);
+    populateSubdisciplinas() {
+        const pages = JSON.parse(document.getElementById('prefiltered-data')?.dataset.pages || '[]');
+        const subdisciplinasSet = new Set();
+        
+        // Extract subdisciplinas from the disciplina field (words after the first comma)
+        pages.forEach(page => {
+            if (page.disciplina) {
+                const parts = page.disciplina.split(',');
+                if (parts.length > 1) {
+                    parts.slice(1).forEach(sub => {
+                        const trimmed = sub.trim();
+                        if (trimmed) subdisciplinasSet.add(trimmed);
+                    });
+                }
+            }
         });
+
+        // Populate subdisciplinas dropdown
+        const subdisciplinasFilter = document.getElementById('subdisciplinas-filter');
+        if (subdisciplinasFilter) {
+            [...subdisciplinasSet].sort().forEach(sub => {
+                const option = document.createElement('option');
+                option.value = sub;
+                option.textContent = sub;
+                subdisciplinasFilter.appendChild(option);
+            });
+        }
+    },
+
+    setupEventListeners() {
+        // Categories filter
+        const categoriesFilter = document.getElementById('categories-filter');
+        if (categoriesFilter) {
+            categoriesFilter.addEventListener('change', () => {
+                this.activeFilters.categories = new Set(
+                    Array.from(categoriesFilter.selectedOptions).map(option => option.value)
+                );
+            });
+        }
+
+        // Subdisciplinas filter
+        const subdisciplinasFilter = document.getElementById('subdisciplinas-filter');
+        if (subdisciplinasFilter) {
+            subdisciplinasFilter.addEventListener('change', () => {
+                this.activeFilters.subdisciplinas = new Set(
+                    Array.from(subdisciplinasFilter.selectedOptions).map(option => option.value)
+                );
+            });
+        }
+
+        // Clear filters button
+        const clearFiltersBtn = document.getElementById('clear-filters');
+        if (clearFiltersBtn) {
+            clearFiltersBtn.addEventListener('click', () => this.clearAllFilters());
+        }
+
+        // Search button
+        const searchButton = document.getElementById('search-filters');
+        if (searchButton) {
+            searchButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.applyFilters();
+                document.getElementById('structured-filters').classList.add('hidden');
+            });
+        }
     },
 
     handleCategoryFilter(e) {
@@ -216,252 +278,70 @@ export const FilterModule = {
         });
     },
 
-    applyFilters(searchInput = '', fromStructuredSearch = false, shouldScroll = false) {
-        const pages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
-        const destacadosContainer = document.querySelector('.destacados-container');
-        const prevControl = document.querySelector('.destacar-prev');
-        const nextControl = document.querySelector('.destacar-next');
+    applyFilters(searchInput = '', shouldScroll = false) {
+        const pages = JSON.parse(document.getElementById('prefiltered-data')?.dataset.pages || '[]');
         
-        // Check if any filter is active
-        const hasActiveFilters = searchInput || 
-            this.activeFilters.categories.size > 0 || 
-            this.activeFilters.country || 
-            this.activeFilters.month || 
-            this.activeFilters.discipline !== 'todos' ||
-            this.activeFilters.freeOnly;  // Include the new filter in the check
+        const filtered = pages.filter(page => {
+            // Text search filter
+            if (searchInput && !this.matchesSearchTerms(page, searchInput)) return false;
 
-        console.log('Filter state:', {
-            searchInput,
-            categories: this.activeFilters.categories.size,
-            country: this.activeFilters.country,
-            month: this.activeFilters.month,
-            discipline: this.activeFilters.discipline,
-            freeOnly: this.activeFilters.freeOnly,  // Log the new filter state
-            hasActiveFilters,
-            fromStructuredSearch,
-            shouldScroll
-        });
-        
-        // Only manage visibility if not coming from structured search
-        if (!fromStructuredSearch) {
-            if (hasActiveFilters) {
-                destacadosContainer?.classList.add('hidden');
-                prevControl?.classList.add('hidden');
-                nextControl?.classList.add('hidden');
-            } else {
-                destacadosContainer?.classList.remove('hidden');
-                prevControl?.classList.remove('hidden');
-                nextControl?.classList.remove('hidden');
+            // Categories filter
+            if (this.activeFilters.categories.size > 0) {
+                const pageCategory = this.normalizeText(page.categoria);
+                const categoryMatch = Array.from(this.activeFilters.categories).some(category => {
+                    const normalizedCategory = this.normalizeText(category);
+                    return pageCategory.startsWith(normalizedCategory);
+                });
+                if (!categoryMatch) return false;
             }
-        }
 
-        let filtered = pages;
-
-        // Apply search filter
-        if (searchInput) {
-            filtered = filtered.filter(page => this.matchesSearchTerms(page, searchInput));
-        }
-
-        // Apply category filters
-        if (this.activeFilters.categories.size > 0) {
-            filtered = filtered.filter(page => {
-                if (!page.categoria) return false;
-                const pageCategories = page.categoria.toLowerCase().split(',').map(c => c.trim());
-                return Array.from(this.activeFilters.categories).some(cat => 
-                    pageCategories.includes(cat.toLowerCase())
+            // Subdisciplinas filter
+            if (this.activeFilters.subdisciplinas.size > 0) {
+                const disciplinaParts = (page.disciplina || '').split(',').map(p => p.trim());
+                const subdisciplinasMatch = Array.from(this.activeFilters.subdisciplinas).some(sub =>
+                    disciplinaParts.slice(1).some(pageSub => 
+                        this.normalizeText(pageSub) === this.normalizeText(sub)
+                    )
                 );
-            });
-        }
+                if (!subdisciplinasMatch) return false;
+            }
 
-        // Apply country filter
-        if (this.activeFilters.country) {
-            console.log('Applying country filter:', this.activeFilters.country);
-            filtered = filtered.filter(page => {
-                // Handle both pais and país variations
-                const pageCountry = page.pais || page.país || '';
-                if (!pageCountry) {
-                    console.log('Page has no country field:', page.nombre);
-                    return false;
-                }
-                
-                // Use normalized comparison for more consistent matching
-                const normalizedPageCountry = Utils.normalizeText(pageCountry);
-                const normalizedFilterCountry = Utils.normalizeText(this.activeFilters.country);
-                
-                // Check for exact match after normalization
-                let match = normalizedPageCountry === normalizedFilterCountry;
-                
-                // If no direct match, check country aliases
-                if (!match) {
-                    // Check if the filter country has aliases and if the page country matches any of them
-                    for (const [country, aliases] of Object.entries(CONSTANTS.COUNTRY_ALIASES)) {
-                        const normalizedCountryName = Utils.normalizeText(country);
-                        
-                        // If the filter country matches this country name
-                        if (normalizedFilterCountry === normalizedCountryName) {
-                            // Check if the page country matches any of the aliases
-                            if (aliases.some(alias => Utils.normalizeText(alias) === normalizedPageCountry)) {
-                                match = true;
-                                console.log(`Country alias match: Filter "${this.activeFilters.country}" matches page country "${pageCountry}" via alias`);
-                                break;
-                            }
-                        }
-                        
-                        // If the page country matches this country name
-                        if (normalizedPageCountry === normalizedCountryName) {
-                            // Check if the filter country matches any of the aliases
-                            if (aliases.some(alias => Utils.normalizeText(alias) === normalizedFilterCountry)) {
-                                match = true;
-                                console.log(`Country alias match: Page "${pageCountry}" matches filter "${this.activeFilters.country}" via alias`);
-                                break;
-                            }
-                        }
-                    }
-                }
-                
-                console.log(`Country check: "${pageCountry}" (${normalizedPageCountry}) vs "${this.activeFilters.country}" (${normalizedFilterCountry}) = ${match}`);
-                return match;
-            });
-        }
+            // Country filter
+            if (this.activeFilters.country && 
+                this.normalizeText(page.pais) !== this.normalizeText(this.activeFilters.country)) {
+                return false;
+            }
 
-        // Apply month filter
-        if (this.activeFilters.month) {
-            console.log('Applying month filter:', this.activeFilters.month);
-            filtered = filtered.filter(page => {
-                // Check for different possible date field names
-                const dateField = page.fecha_de_cierre || page.fecha_cierre || page.fecha || '';
-                if (!dateField) {
-                    console.log('Page has no date field:', page.nombre);
-                    return false;
-                }
-                
-                console.log(`Processing date for "${page.nombre}": ${dateField}`);
-                
-                let pageMonth;
-                try {
-                    // Try to parse the date
-                    const dateObj = new Date(dateField);
-                    if (isNaN(dateObj.getTime())) {
-                        // If date is invalid, try to extract month from string format
-                        // Try different date formats: DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD, etc.
-                        let dateParts;
-                        
-                        if (dateField.includes('/')) {
-                            dateParts = dateField.split('/');
-                            // Assume DD/MM/YYYY format
-                            pageMonth = parseInt(dateParts[1]);
-                        } else if (dateField.includes('-')) {
-                            dateParts = dateField.split('-');
-                            // Assume YYYY-MM-DD format
-                            pageMonth = parseInt(dateParts[1]);
-                        } else if (dateField.includes('.')) {
-                            dateParts = dateField.split('.');
-                            // Assume DD.MM.YYYY format
-                            pageMonth = parseInt(dateParts[1]);
-                        } else {
-                            console.log(`Unrecognized date format for "${page.nombre}": ${dateField}`);
-                            return false;
-                        }
-                        
-                        console.log(`Extracted month from string: ${pageMonth} from ${dateField}`);
-                    } else {
-                        pageMonth = dateObj.getMonth() + 1; // getMonth() is 0-indexed
-                        console.log(`Extracted month from Date object: ${pageMonth} from ${dateField}`);
-                    }
-                } catch (error) {
-                    console.error(`Error parsing date for "${page.nombre}":`, error);
-                    return false;
-                }
-                
-                const filterMonth = parseInt(this.activeFilters.month);
-                const match = filterMonth === pageMonth;
-                console.log(`Month check for "${page.nombre}": "${dateField}" → month ${pageMonth} vs filter ${filterMonth} = ${match}`);
-                return match;
-            });
-        }
+            // Month filter
+            if (this.activeFilters.month) {
+                const pageMonth = page.fecha_de_cierre ? page.fecha_de_cierre.split('-')[1] : '';
+                if (pageMonth !== String(this.activeFilters.month).padStart(2, '0')) return false;
+            }
 
-        // Apply discipline filter
-        if (this.activeFilters.discipline !== 'todos') {
-            filtered = filtered.filter(page => {
-                if (!page.disciplina) return false;
-                const pageDisciplines = page.disciplina.split(',').map(d => d.trim());
-                return pageDisciplines.some(d => this.belongsToMainDiscipline(d, this.activeFilters.discipline));
-            });
-        }
-        
-        // Apply free-only filter (new)
-        if (this.activeFilters.freeOnly) {
-            filtered = filtered.filter(page => {
-                // Include pages that have no inscripcion value or have "Sin cargo"
-                return !page.inscripcion || page.inscripcion.trim().toLowerCase() === 'sin cargo';
-            });
-        }
+            // Free only filter
+            if (this.activeFilters.freeOnly && 
+                page.inscripcion && 
+                this.normalizeText(page.inscripcion) !== 'sin cargo') {
+                return false;
+            }
 
-        console.log('Filtered results:', filtered.length);
+            return true;
+        });
+
         this.updateResults(filtered, shouldScroll);
     },
 
     matchesSearchTerms(page, searchInput) {
-        const searchTerms = searchInput.split(',').map(term => Utils.normalizeText(term.trim()));
+        const searchTerms = searchInput.split(',').map(term => this.normalizeText(term.trim()));
         return searchTerms.every(term => {
-            // Handle both pais and país variations
-            const pageCountry = page.pais || page.país || '';
-            
-            // Special handling for country searches
-            // Check if the term might be a country name
-            if (term.length > 3) { // Only check for longer terms to avoid false positives
-                const normalizedCountry = Utils.normalizeText(pageCountry);
-                
-                // Direct country match
-                if (normalizedCountry === term) {
-                    console.log(`Direct country match: "${pageCountry}" (${normalizedCountry}) = "${term}"`);
-                    return true;
-                }
-                
-                // Check country aliases
-                for (const [country, aliases] of Object.entries(CONSTANTS.COUNTRY_ALIASES)) {
-                    const normalizedCountryName = Utils.normalizeText(country);
-                    
-                    // If the page's country matches this country name
-                    if (normalizedCountry === normalizedCountryName) {
-                        // Check if the search term matches any of the aliases
-                        if (term === normalizedCountryName || aliases.some(alias => Utils.normalizeText(alias) === term)) {
-                            console.log(`Country alias match: "${pageCountry}" matches alias "${term}"`);
-                            return true;
-                        }
-                    }
-                    
-                    // If the search term is a country name, check if the page's country matches any of its aliases
-                    if (term === normalizedCountryName) {
-                        if (aliases.some(alias => Utils.normalizeText(alias) === normalizedCountry)) {
-                            console.log(`Search term country match: "${term}" matches country alias "${pageCountry}"`);
-                            return true;
-                        }
-                    }
-                }
-                
-                // Check if country contains the term
-                if (normalizedCountry.includes(term)) {
-                    console.log(`Country contains term: "${pageCountry}" (${normalizedCountry}) contains "${term}"`);
-                    return true;
-                }
-                
-                // Check if term contains the country
-                if (term.includes(normalizedCountry) && normalizedCountry.length > 3) {
-                    console.log(`Term contains country: "${term}" contains "${pageCountry}" (${normalizedCountry})`);
-                    return true;
-                }
-            }
-            
-            const pageText = Utils.normalizeText([
+            const pageText = this.normalizeText([
                 page.nombre,
                 page.og_resumida,
                 page.entidad,
                 page.categoria,
                 page.disciplina,
-                pageCountry
+                page.pais
             ].join(' '));
-            
             return pageText.includes(term);
         });
     },
@@ -492,59 +372,35 @@ export const FilterModule = {
     },
 
     clearAllFilters() {
-        // Clear search input
-        document.getElementById('open-search').value = '';
-        
-        // Clear category filters
-        this.activeFilters.categories.clear();
-        this.selectedCategories = [];
-        document.querySelectorAll('.category-filter-btn').forEach(btn => {
-            btn.classList.remove('border-blue-500', 'bg-blue-50');
+        // Reset all active filters
+        this.activeFilters = {
+            categories: new Set(),
+            subdisciplinas: new Set(),
+            country: '',
+            month: '',
+            discipline: 'todos',
+            freeOnly: false
+        };
+
+        // Reset UI elements
+        const elements = {
+            'categories-filter': el => el.querySelectorAll('option').forEach(opt => opt.selected = false),
+            'subdisciplinas-filter': el => el.querySelectorAll('option').forEach(opt => opt.selected = false),
+            'country-filter': el => el.value = '',
+            'month-filter': el => el.value = '',
+            'inscripcion-checkbox': el => el.checked = false
+        };
+
+        Object.entries(elements).forEach(([id, resetFn]) => {
+            const element = document.getElementById(id);
+            if (element) resetFn(element);
         });
-        
-        // Clear country filter
-        document.getElementById('country-filter').value = '';
-        this.activeFilters.country = '';
-        
-        // Clear month filter
-        document.getElementById('month-filter').value = '';
-        this.activeFilters.month = '';
-        
-        // Reset discipline to 'todos'
-        this.activeFilters.discipline = 'todos';
-        document.querySelectorAll('[data-discipline-filter]').forEach(btn => {
-            btn.classList.remove('bg-blue-600', 'text-white');
-            btn.classList.add('border-gray-300', 'text-gray-700');
-            if (btn.dataset.disciplineFilter === 'todos') {
-                btn.classList.remove('border-gray-300', 'text-gray-700');
-                btn.classList.add('bg-blue-600', 'text-white');
-            }
-        });
-        
-        // Clear inscripcion filter
-        const inscripcionCheckbox = document.getElementById('inscripcion-checkbox');
-        if (inscripcionCheckbox) {
-            inscripcionCheckbox.checked = false;
-        }
-        this.activeFilters.freeOnly = false;
-        
-        // Reset pagination
-        SearchModule.pagination.currentPage = 1;
-        
-        // Trigger search to update results
+
+        // Update results
         this.applyFilters();
         
-        // Close the filters dropdown if it's open
-        document.getElementById('structured-filters').classList.add('hidden');
-        
-        // Show featured section and controls when clearing all filters
-        const destacadosContainer = document.querySelector('.destacados-container');
-        const prevControl = document.querySelector('.destacar-prev');
-        const nextControl = document.querySelector('.destacar-next');
-        
-        destacadosContainer?.classList.remove('hidden');
-        prevControl?.classList.remove('hidden');
-        nextControl?.classList.remove('hidden');
+        // Close dropdown
+        document.getElementById('structured-filters')?.classList.add('hidden');
     },
 
     removeExistingHandlers() {

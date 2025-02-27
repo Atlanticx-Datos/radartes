@@ -244,6 +244,12 @@ html {
     z-index: 9999;  /* Much higher z-index */
 }
 
+/* Chevron rotation for dropdown state */
+.rotate-180 {
+    transform: rotate(180deg);
+    transition: transform 0.2s ease;
+}
+
 /* Hide scrollbar for Chrome, Safari and Opera */
 .filter-container::-webkit-scrollbar {
     display: none;

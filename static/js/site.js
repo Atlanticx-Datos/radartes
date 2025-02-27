@@ -113,6 +113,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize SubscribeModule
     SubscribeModule.init();
+
+    // Populate filter dropdowns
+    populateSubdisciplinasDropdown();
+    populateCountryDropdown();
+    populateMonthDropdown();
 });
 
 // Setup user menu functionality
@@ -166,26 +171,77 @@ function setupFilterDropdown() {
             }
         });
         
-        // Set up category filter buttons
-        document.querySelectorAll('.category-filter-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                const category = button.dataset.category;
-                if (category) {
-                    button.classList.toggle('border-blue-500');
-                    button.classList.toggle('bg-blue-50');
-                    
-                    if (button.classList.contains('border-blue-500')) {
-                        // Add category to SearchModule's active filters
-                        SearchModule.activeFilters.categories.add(category);
-                    } else {
-                        // Remove category from SearchModule's active filters
-                        SearchModule.activeFilters.categories.delete(category);
+        // Set up collapsible filter sections
+        document.querySelectorAll('.filter-dropdown-trigger').forEach(trigger => {
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const targetId = trigger.dataset.target;
+                const content = document.getElementById(targetId);
+                const chevron = trigger.querySelector('svg');
+                
+                // Close all other dropdowns and reset their chevrons
+                document.querySelectorAll('.filter-dropdown-content').forEach(dropdown => {
+                    if (dropdown.id !== targetId) {
+                        dropdown.classList.add('hidden');
+                        // Reset other chevrons to point down
+                        const otherTrigger = document.querySelector(`[data-target="${dropdown.id}"]`);
+                        if (otherTrigger) {
+                            const otherChevron = otherTrigger.querySelector('svg');
+                            if (otherChevron) {
+                                otherChevron.classList.remove('rotate-180');
+                            }
+                        }
                     }
-                    
-                    console.log('Category filters updated:', Array.from(SearchModule.activeFilters.categories));
+                });
+                
+                // Toggle this dropdown
+                content.classList.toggle('hidden');
+                
+                // Toggle chevron direction
+                if (chevron) {
+                    chevron.classList.toggle('rotate-180');
                 }
             });
         });
+        
+        // Setup category checkboxes
+        document.querySelectorAll('input[name="categories"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                updateSelectedValues('categories-dropdown', 'categories');
+            });
+        });
+        
+        // Setup country radio buttons
+        const countryContainer = document.getElementById('country-container');
+        if (countryContainer) {
+            // We'll populate this dynamically, but set up the event delegation
+            countryContainer.addEventListener('change', (e) => {
+                if (e.target.name === 'country') {
+                    updateSelectedValues('country-dropdown', 'country');
+                }
+            });
+        }
+        
+        // Setup month radio buttons
+        const monthContainer = document.getElementById('month-container');
+        if (monthContainer) {
+            // We'll populate this dynamically, but set up the event delegation
+            monthContainer.addEventListener('change', (e) => {
+                if (e.target.name === 'month') {
+                    updateSelectedValues('month-dropdown', 'month');
+                }
+            });
+        }
+        
+        // Setup inscripcion checkbox
+        const inscripcionCheckbox = document.getElementById('inscripcion-checkbox');
+        if (inscripcionCheckbox) {
+            inscripcionCheckbox.addEventListener('change', () => {
+                updateSelectedValues('inscripcion-dropdown', 'inscripcion');
+            });
+        }
         
         // Set up search button
         const searchButton = document.getElementById('search-filters');
@@ -195,6 +251,304 @@ function setupFilterDropdown() {
                 SearchModule.handleStructuredSearch();
             });
         }
+        
+        // Setup clear filters button
+        const clearFiltersButton = document.getElementById('clear-filters');
+        if (clearFiltersButton) {
+            clearFiltersButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Call clearAllFilters but make sure the event doesn't bubble up
+                clearAllFilters();
+                
+                // Explicitly prevent the dropdown from closing
+                return false;
+            });
+        }
+    }
+}
+
+// Function to update the selected values display in the dropdown trigger
+function updateSelectedValues(dropdownId, filterType) {
+    const dropdown = document.getElementById(dropdownId);
+    const trigger = document.querySelector(`[data-target="${dropdownId}"]`);
+    const selectedValuesSpan = trigger.querySelector('.selected-values');
+    
+    if (!dropdown || !trigger || !selectedValuesSpan) return;
+    
+    let selectedText = '';
+    
+    if (filterType === 'categories') {
+        const selectedCheckboxes = dropdown.querySelectorAll('input[name="categories"]:checked');
+        const values = Array.from(selectedCheckboxes).map(cb => cb.nextElementSibling.textContent.trim());
+        
+        if (values.length > 0) {
+            selectedText = values.join(', ');
+            // Update SearchModule's active filters
+            SearchModule.activeFilters.categories = new Set(
+                Array.from(selectedCheckboxes).map(cb => cb.value)
+            );
+        } else {
+            SearchModule.activeFilters.categories.clear();
+        }
+    } 
+    else if (filterType === 'subdisciplinas') {
+        const selectedCheckboxes = dropdown.querySelectorAll('input[name="subdisciplinas"]:checked');
+        const values = Array.from(selectedCheckboxes).map(cb => cb.nextElementSibling.textContent.trim());
+        
+        if (values.length > 0) {
+            selectedText = values.join(', ');
+            // Update SearchModule's active filters
+            SearchModule.activeFilters.subdisciplinas = new Set(
+                Array.from(selectedCheckboxes).map(cb => cb.value)
+            );
+        } else {
+            SearchModule.activeFilters.subdisciplinas.clear();
+        }
+    }
+    else if (filterType === 'country') {
+        // Handle country as checkboxes for multiple selection
+        const selectedCheckboxes = dropdown.querySelectorAll('input[type="checkbox"][name="country"]:checked');
+        const values = Array.from(selectedCheckboxes).map(cb => cb.nextElementSibling.textContent.trim());
+        
+        if (values.length > 0) {
+            selectedText = values.join(', ');
+            // Update SearchModule's active filters with an array of countries
+            SearchModule.activeFilters.country = Array.from(selectedCheckboxes).map(cb => cb.value);
+        } else {
+            // No countries selected means no filtering by country
+            selectedText = '';
+            SearchModule.activeFilters.country = [];
+        }
+    }
+    else if (filterType === 'month') {
+        // Handle month as checkboxes for multiple selection
+        const selectedCheckboxes = dropdown.querySelectorAll('input[name="month"]:checked');
+        const values = Array.from(selectedCheckboxes).map(cb => cb.nextElementSibling.textContent.trim());
+        
+        if (values.length > 0) {
+            selectedText = values.join(', ');
+            // Update SearchModule's active filters with an array of months
+            SearchModule.activeFilters.month = values;
+        } else {
+            // No months selected means no filtering by month
+            selectedText = '';
+            SearchModule.activeFilters.month = [];
+        }
+    }
+    else if (filterType === 'inscripcion') {
+        const checkbox = document.getElementById('inscripcion-checkbox');
+        if (checkbox && checkbox.checked) {
+            selectedText = 'Sin pago';
+            // Update SearchModule's active filters
+            SearchModule.activeFilters.freeOnly = true;
+        } else {
+            SearchModule.activeFilters.freeOnly = false;
+        }
+    }
+    
+    selectedValuesSpan.textContent = selectedText;
+    
+    console.log('Updated SearchModule.activeFilters:', {
+        categories: Array.from(SearchModule.activeFilters.categories),
+        subdisciplinas: Array.from(SearchModule.activeFilters.subdisciplinas),
+        country: SearchModule.activeFilters.country,
+        month: SearchModule.activeFilters.month,
+        freeOnly: SearchModule.activeFilters.freeOnly
+    });
+}
+
+// Function to populate the subdisciplinas dropdown
+function populateSubdisciplinasDropdown() {
+    const pages = JSON.parse(document.getElementById('prefiltered-data')?.dataset.pages || '[]');
+    const subdisciplinasSet = new Set();
+    const container = document.getElementById('subdisciplinas-container');
+    
+    if (!container) return;
+    
+    // Extract subdisciplinas from the disciplina field (words after the first comma)
+    pages.forEach(page => {
+        if (page.disciplina) {
+            const parts = page.disciplina.split(',');
+            if (parts.length > 1) {
+                parts.slice(1).forEach(sub => {
+                    const trimmed = sub.trim();
+                    if (trimmed) subdisciplinasSet.add(trimmed);
+                });
+            }
+        }
+    });
+    
+    // Clear existing content
+    container.innerHTML = '';
+    
+    // Add checkboxes for each subdisciplina
+    [...subdisciplinasSet].sort().forEach(sub => {
+        const label = document.createElement('label');
+        label.className = 'flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer';
+        
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.className = 'form-checkbox h-4 w-4 text-blue-600';
+        input.value = sub;
+        input.name = 'subdisciplinas';
+        
+        input.addEventListener('change', () => {
+            updateSelectedValues('subdisciplinas-dropdown', 'subdisciplinas');
+        });
+        
+        const span = document.createElement('span');
+        span.className = 'ml-2 text-gray-700';
+        span.textContent = sub;
+        
+        label.appendChild(input);
+        label.appendChild(span);
+        container.appendChild(label);
+    });
+}
+
+// Function to populate the country dropdown
+function populateCountryDropdown() {
+    try {
+        const prefilteredData = document.getElementById('prefiltered-data');
+        if (!prefilteredData || !prefilteredData.dataset.pages) {
+            console.error('No prefiltered data found for country dropdown');
+            return;
+        }
+        
+        // Parse the data and extract unique countries
+        const pages = JSON.parse(prefilteredData.dataset.pages);
+        
+        // Debug the first few pages to see what fields are available
+        console.log('First 3 pages for debugging:', pages.slice(0, 3));
+        
+        // Try both 'pais' and 'país' fields
+        const countries = [...new Set(
+            pages.map(page => page.país || page.pais)
+                .filter(Boolean)
+        )].sort();
+        
+        console.log(`Found ${countries.length} unique countries:`, countries);
+        
+        const container = document.getElementById('country-container');
+        if (!container) {
+            console.error('Country container not found');
+            return;
+        }
+        
+        // Clear existing content
+        container.innerHTML = '';
+        
+        // Add checkboxes for each country (no "Todos los países" option)
+        countries.forEach(country => {
+            if (!country) return; // Skip empty values
+            
+            const label = document.createElement('label');
+            label.className = 'flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer';
+            
+            const input = document.createElement('input');
+            input.type = 'checkbox'; // Checkbox for multiple selection
+            input.className = 'form-checkbox h-4 w-4 text-blue-600';
+            input.value = country;
+            input.name = 'country';
+            
+            const span = document.createElement('span');
+            span.className = 'ml-2 text-gray-700';
+            span.textContent = country;
+            
+            label.appendChild(input);
+            label.appendChild(span);
+            container.appendChild(label);
+        });
+        
+        // Add change event listener for country checkboxes
+        container.querySelectorAll('input[name="country"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                updateSelectedValues('country-dropdown', 'country');
+            });
+        });
+        
+        console.log('Country dropdown populated successfully');
+    } catch (error) {
+        console.error('Error populating country dropdown:', error);
+    }
+}
+
+// Function to populate the month dropdown
+function populateMonthDropdown() {
+    const container = document.getElementById('month-container');
+    
+    if (!container) return;
+    
+    // Clear existing content
+    container.innerHTML = '';
+    
+    const months = [
+        { value: 'Enero', label: 'Enero' },
+        { value: 'Febrero', label: 'Febrero' },
+        { value: 'Marzo', label: 'Marzo' },
+        { value: 'Abril', label: 'Abril' },
+        { value: 'Mayo', label: 'Mayo' },
+        { value: 'Junio', label: 'Junio' },
+        { value: 'Julio', label: 'Julio' },
+        { value: 'Agosto', label: 'Agosto' },
+        { value: 'Septiembre', label: 'Septiembre' },
+        { value: 'Octubre', label: 'Octubre' },
+        { value: 'Noviembre', label: 'Noviembre' },
+        { value: 'Diciembre', label: 'Diciembre' }
+    ];
+    
+    // Add checkboxes for each month (no "Todos los meses" option)
+    months.forEach(month => {
+        const label = document.createElement('label');
+        label.className = 'flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer';
+        
+        const input = document.createElement('input');
+        input.type = 'checkbox'; // Checkbox for multiple selection
+        input.className = 'form-checkbox h-4 w-4 text-blue-600';
+        input.value = month.value;
+        input.name = 'month';
+        
+        const span = document.createElement('span');
+        span.className = 'ml-2 text-gray-700';
+        span.textContent = month.label;
+        
+        label.appendChild(input);
+        label.appendChild(span);
+        container.appendChild(label);
+    });
+    
+    // Add change event listener for month checkboxes
+    container.querySelectorAll('input[name="month"]').forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            updateSelectedValues('month-dropdown', 'month');
+        });
+    });
+    
+    console.log('Month dropdown populated successfully');
+}
+
+// Function to update selected values for subdisciplinas
+function updateSubdisciplinasSelectedValues() {
+    const dropdown = document.getElementById('subdisciplinas-dropdown');
+    const trigger = document.querySelector('[data-target="subdisciplinas-dropdown"]');
+    const selectedValuesSpan = trigger.querySelector('.selected-values');
+    
+    if (!dropdown || !trigger || !selectedValuesSpan) return;
+    
+    const selectedCheckboxes = dropdown.querySelectorAll('input[name="subdisciplinas"]:checked');
+    const values = Array.from(selectedCheckboxes).map(cb => cb.nextElementSibling.textContent.trim());
+    
+    if (values.length > 0) {
+        selectedValuesSpan.textContent = values.join(', ');
+        // Update SearchModule's active filters
+        SearchModule.activeFilters.subdisciplinas = new Set(
+            Array.from(selectedCheckboxes).map(cb => cb.value)
+        );
+    } else {
+        selectedValuesSpan.textContent = '';
+        SearchModule.activeFilters.subdisciplinas = new Set();
     }
 }
 
@@ -406,3 +760,61 @@ const handleModalClick = (e) => {
 
 // Add the single event listener when the script loads
 document.addEventListener('click', handleModalClick);
+
+// Function to clear all filters
+function clearAllFilters() {
+    // Reset all filter inputs
+    document.getElementById('open-search').value = '';
+    
+    // Reset all dropdown selections
+    document.querySelectorAll('#structured-filters input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    
+    // Reset radio buttons
+    document.querySelectorAll('#structured-filters input[type="radio"]').forEach(radio => {
+        if (radio.value === '') {
+            radio.checked = true;
+        } else {
+            radio.checked = false;
+        }
+    });
+    
+    // Reset selected values display
+    document.querySelectorAll('.selected-values').forEach(span => {
+        span.textContent = '';
+    });
+    
+    // Reset all chevrons to point down (not rotated)
+    document.querySelectorAll('.filter-dropdown-trigger svg').forEach(chevron => {
+        chevron.classList.remove('rotate-180');
+    });
+    
+    // Reset SearchModule's active filters
+    if (window.SearchModule) {
+        SearchModule.activeFilters.categories.clear();
+        SearchModule.activeFilters.subdisciplinas.clear();
+        SearchModule.activeFilters.country = [];
+        SearchModule.activeFilters.month = [];
+        SearchModule.activeFilters.freeOnly = false;
+        
+        // Perform search with cleared filters but don't scroll
+        SearchModule.handleStructuredSearch(false);
+    }
+    
+    console.log('All filters cleared');
+    
+    // Explicitly prevent the dropdown from closing
+    const event = window.event;
+    if (event) {
+        event.stopPropagation();
+    }
+    
+    // Make sure all filter dropdowns are hidden (collapsed)
+    document.querySelectorAll('.filter-dropdown-content').forEach(dropdown => {
+        dropdown.classList.add('hidden');
+    });
+    
+    // DO NOT hide the main structured filters dropdown
+    // document.getElementById('structured-filters').classList.add('hidden');
+}

@@ -6,7 +6,7 @@
   "scripts": {
     "build": "postcss static/css/tailwind.css -o static/css/tailwind-built.css",
     "watch": "postcss static/css/tailwind.css -o static/css/tailwind-built.css --watch",
-    "start": "concurrently -k \"source ./venv/bin/activate && FLASK_DEBUG=1 python3 ./api/main.py\" \"npm run watch\""
+    "start": "concurrently -k \"source ./myenv/bin/activate && FLASK_DEBUG=1 python3 ./api/main.py\" \"npm run watch\""
   },
   "dependencies": {
     "autoprefixer": "^10.3.1",

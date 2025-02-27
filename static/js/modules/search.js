@@ -9,7 +9,11 @@ export const SearchModule = {
     activeFilters: {
         categories: new Set(),
         months: new Set(),
-        countries: new Set()
+        countries: new Set(),
+        subdisciplinas: new Set(),
+        country: '',
+        month: '',
+        freeOnly: false
     },
     pagination: {
         currentPage: 1,
@@ -449,113 +453,156 @@ export const SearchModule = {
         }
     },
 
-    handleStructuredSearch() {
-        // Get the inscripcion checkbox state
-        const inscripcionCheckbox = document.getElementById('inscripcion-checkbox');
-        const freeOnly = inscripcionCheckbox && inscripcionCheckbox.checked;
+    /**
+     * Handles the structured search functionality
+     * This is triggered when the user clicks the "Buscar" button in the structured filters dropdown
+     * @param {boolean} shouldScroll - Whether to scroll to results after search (defaults to true)
+     */
+    handleStructuredSearch(shouldScroll = true) {
+        console.log('Handling structured search...');
         
-        // Get current filter states
-        const countryFilter = document.getElementById('country-filter');
-        const monthFilter = document.getElementById('month-filter');
-        const hasActiveCategories = this.activeFilters.categories.size > 0;
-        const hasActiveCountry = countryFilter && countryFilter.value;
-        const hasActiveMonth = monthFilter && monthFilter.value;
-        
-        console.log('Structured search with categories:', Array.from(this.activeFilters.categories));
-        
-        // Transfer active filters to the FilterModule
-        FilterModule.activeFilters.categories.clear();
-        if (hasActiveCategories) {
-            this.activeFilters.categories.forEach(category => {
-                FilterModule.activeFilters.categories.add(category.toLowerCase());
-            });
-        }
-
-        // Transfer month filter
-        FilterModule.activeFilters.month = hasActiveMonth ? monthFilter.value : '';
-
-        // Transfer country filter
-        FilterModule.activeFilters.country = hasActiveCountry ? countryFilter.value : '';
-        
-        // Transfer inscripcion filter
-        FilterModule.activeFilters.freeOnly = freeOnly;
-
-        console.log('Applying structured search with filters:', {
-            categories: Array.from(FilterModule.activeFilters.categories),
-            country: FilterModule.activeFilters.country,
-            month: FilterModule.activeFilters.month,
-            freeOnly: FilterModule.activeFilters.freeOnly
-        });
-        
-        // Perform the search with scrolling enabled
-        FilterModule.applyFilters('', true, true);
-
-        // Hide dropdown after search
-        const filtersElement = document.getElementById('structured-filters');
-        if (filtersElement) {
-            filtersElement.classList.add('hidden');
-        }
-    },
-
-    handleCategoryClick(category, element) {
-        if (element.checked) {
-            this.activeFilters.categories.add(category);
-        } else {
-            this.activeFilters.categories.delete(category);
-        }
-
-        this.updateFilterUI();
-        console.log('Updated categories:', Array.from(this.activeFilters.categories));
-    },
-
-    sortResults(results, column) {
-        if (!column || !this.sorting.active) return results;
-
-        const sortFunctions = {
-            nombre: (a, b) => {
-                const aName = (a.nombre_original || '').toLowerCase();
-                const bName = (b.nombre_original || '').toLowerCase();
-                return aName.localeCompare(bName);
-            },
-            disciplina: (a, b) => {
-                const aDisc = ((a.disciplina || '').split(',')[0] || '').toLowerCase().trim();
-                const bDisc = ((b.disciplina || '').split(',')[0] || '').toLowerCase().trim();
-                return aDisc.localeCompare(bDisc);
-            },
-            pais: (a, b) => {
-                const aPais = (a.pais || a.país || '').toLowerCase();
-                const bPais = (b.pais || b.país || '').toLowerCase();
-                return aPais.localeCompare(bPais);
-            },
-            fecha: (a, b) => {
-                const aDate = a.fecha_de_cierre === '1900-01-01' ? new Date(8640000000000000) : new Date(a.fecha_de_cierre);
-                const bDate = b.fecha_de_cierre === '1900-01-01' ? new Date(8640000000000000) : new Date(b.fecha_de_cierre);
-                return aDate - bDate;
+        try {
+            // Get the prefiltered data
+            const prefilteredData = document.getElementById('prefiltered-data');
+            if (!prefilteredData || !prefilteredData.dataset.pages) {
+                console.error('No prefiltered data found');
+                return;
             }
-        };
-
-        return [...results].sort(sortFunctions[column]);
-    },
-
-    handleSort(column) {
-        if (this.sorting.column === column) {
-            // Toggle active state if clicking the same column
-            this.sorting.active = !this.sorting.active;
-        } else {
-            // New column, set to active
-            this.sorting.column = column;
-            this.sorting.active = true;
+            
+            // Helper function to decode HTML entities
+            const decodeHtmlEntities = (html) => {
+                const textarea = document.createElement('textarea');
+                textarea.innerHTML = html;
+                return textarea.value;
+            };
+            
+            // Try to parse the data, handling potential HTML-escaped JSON
+            let pages;
+            try {
+                // First try direct parsing
+                pages = JSON.parse(prefilteredData.dataset.pages);
+            } catch (e) {
+                console.warn('Failed to parse JSON directly, trying to decode HTML entities first:', e);
+                try {
+                    // If that fails, try decoding HTML entities first
+                    const decoded = decodeHtmlEntities(prefilteredData.dataset.pages);
+                    pages = JSON.parse(decoded);
+                } catch (e2) {
+                    console.error('Failed to parse JSON even after decoding HTML entities:', e2);
+                    return;
+                }
+            }
+            
+            console.log(`Initial pages count: ${pages.length}`);
+            console.log('Active filters:', {
+                categories: Array.from(this.activeFilters.categories),
+                subdisciplinas: Array.from(this.activeFilters.subdisciplinas),
+                country: this.activeFilters.country,
+                month: this.activeFilters.month,
+                freeOnly: this.activeFilters.freeOnly
+            });
+            
+            // Filter by categories
+            if (this.activeFilters.categories.size > 0) {
+                console.log(`Filtering by categories: ${Array.from(this.activeFilters.categories).join(', ')}`);
+                pages = pages.filter(page => {
+                    // Check the categoria field (not disciplina)
+                    if (!page.categoria) return false;
+                    
+                    // Normalize the categoria for comparison
+                    const normalizedCategoria = page.categoria.toLowerCase().trim();
+                    
+                    // Check if any of the selected categories match
+                    return Array.from(this.activeFilters.categories).some(category => {
+                        const normalizedCategory = category.toLowerCase().trim();
+                        return normalizedCategoria.includes(normalizedCategory);
+                    });
+                });
+                console.log(`After category filtering: ${pages.length} pages`);
+            }
+            
+            // Filter by subdisciplinas
+            if (this.activeFilters.subdisciplinas.size > 0) {
+                console.log(`Filtering by subdisciplinas: ${Array.from(this.activeFilters.subdisciplinas).join(', ')}`);
+                pages = pages.filter(page => {
+                    if (!page.disciplina) return false;
+                    
+                    // Get all subdisciplines (after the first comma)
+                    const parts = page.disciplina.split(',');
+                    if (parts.length <= 1) return false;
+                    
+                    const subdisciplinas = parts.slice(1).map(sub => sub.trim());
+                    return subdisciplinas.some(sub => this.activeFilters.subdisciplinas.has(sub));
+                });
+                console.log(`After subdisciplina filtering: ${pages.length} pages`);
+            }
+            
+            // Filter by country
+            if (this.activeFilters.country && this.activeFilters.country.length > 0) {
+                console.log(`Filtering by countries: ${this.activeFilters.country.join(', ')}`);
+                pages = pages.filter(page => {
+                    // Check both país and pais fields
+                    const country = page.país || page.pais;
+                    return this.activeFilters.country.includes(country);
+                });
+                console.log(`After country filtering: ${pages.length} pages`);
+            }
+            
+            // Filter by month
+            if (this.activeFilters.month && this.activeFilters.month.length > 0) {
+                console.log(`Filtering by months: ${this.activeFilters.month.join(', ')}`);
+                pages = pages.filter(page => {
+                    if (!page.fecha_de_cierre) return false;
+                    
+                    try {
+                        // Parse the date
+                        const date = new Date(page.fecha_de_cierre);
+                        // Get the month name in Spanish
+                        const monthName = this.getMonthName(date.getMonth());
+                        
+                        console.log(`Page ${page.nombre}: fecha_de_cierre=${page.fecha_de_cierre}, month=${monthName}`);
+                        
+                        return this.activeFilters.month.includes(monthName);
+                    } catch (e) {
+                        console.error(`Error parsing date for page ${page.nombre}:`, e);
+                        return false;
+                    }
+                });
+                console.log(`After month filtering: ${pages.length} pages`);
+            }
+            
+            // Filter by free only
+            if (this.activeFilters.freeOnly) {
+                console.log('Filtering by free only');
+                pages = pages.filter(page => {
+                    // Check if inscripcion is empty or contains "sin pago" or similar
+                    return !page.inscripcion || 
+                           page.inscripcion.toLowerCase().includes('sin pago') || 
+                           page.inscripcion.toLowerCase().includes('gratis') ||
+                           page.inscripcion.toLowerCase().includes('gratuito');
+                });
+                console.log(`After free only filtering: ${pages.length} pages`);
+            }
+            
+            // Update the results
+            this.updateResults(pages);
+            
+            // Scroll to results only if shouldScroll is true
+            if (shouldScroll) {
+                this.scrollToResults();
+            }
+            
+        } catch (error) {
+            console.error('Error in handleStructuredSearch:', error);
         }
-
-        this.updateResults(this.pagination.allResults, true);
     },
 
-    // Function to get sort icon
-    getSortIcon(column) {
-        const isActive = this.sorting.column === column && this.sorting.active;
-        return `<svg class="w-4 h-4 ml-1 ${isActive ? 'text-blue-600' : 'text-gray-400'}" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
-        </svg>`;
+    getMonthName(monthIndex) {
+        const months = [
+            'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+            'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        ];
+        return months[monthIndex];
     },
 
     updateResults(results, preservePage = false) {
@@ -745,23 +792,64 @@ export const SearchModule = {
 
     // Function to scroll to results with some white space above the radar header
     scrollToResults() {
-        setTimeout(() => {
-            const radarHeader = document.getElementById('radar-header');
-            if (radarHeader) {
-                // Get the position of the radar header
-                const headerRect = radarHeader.getBoundingClientRect();
-                const scrollPosition = window.pageYOffset + headerRect.top - 100; // 100px of white space above
-                
-                // Scroll to the position
-                window.scrollTo({
-                    top: scrollPosition,
-                    behavior: 'smooth'
-                });
-                
-                console.log('Scrolled to radar header with offset');
-            } else {
-                console.log('Radar header not found');
+        console.log('Scrolling to results');
+        const resultsHeader = document.getElementById('radar-header');
+        if (resultsHeader) {
+            // Use smooth scrolling for better UX
+            resultsHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            console.log('Scrolled to results header');
+        } else {
+            console.warn('Results header not found for scrolling');
+        }
+    },
+
+    sortResults(results, column) {
+        if (!column || !this.sorting.active) return results;
+
+        const sortFunctions = {
+            nombre: (a, b) => {
+                const aName = (a.nombre_original || '').toLowerCase();
+                const bName = (b.nombre_original || '').toLowerCase();
+                return aName.localeCompare(bName);
+            },
+            disciplina: (a, b) => {
+                const aDisc = ((a.disciplina || '').split(',')[0] || '').toLowerCase().trim();
+                const bDisc = ((b.disciplina || '').split(',')[0] || '').toLowerCase().trim();
+                return aDisc.localeCompare(bDisc);
+            },
+            pais: (a, b) => {
+                const aPais = (a.pais || a.país || '').toLowerCase();
+                const bPais = (b.pais || b.país || '').toLowerCase();
+                return aPais.localeCompare(bPais);
+            },
+            fecha: (a, b) => {
+                const aDate = a.fecha_de_cierre === '1900-01-01' ? new Date(8640000000000000) : new Date(a.fecha_de_cierre);
+                const bDate = b.fecha_de_cierre === '1900-01-01' ? new Date(8640000000000000) : new Date(b.fecha_de_cierre);
+                return aDate - bDate;
             }
-        }, 100); // Small delay to ensure DOM is updated
+        };
+
+        return [...results].sort(sortFunctions[column]);
+    },
+
+    handleSort(column) {
+        if (this.sorting.column === column) {
+            // Toggle active state if clicking the same column
+            this.sorting.active = !this.sorting.active;
+        } else {
+            // New column, set to active
+            this.sorting.column = column;
+            this.sorting.active = true;
+        }
+
+        this.updateResults(this.pagination.allResults, true);
+    },
+
+    // Function to get sort icon
+    getSortIcon(column) {
+        const isActive = this.sorting.column === column && this.sorting.active;
+        return `<svg class="w-4 h-4 ml-1 ${isActive ? 'text-blue-600' : 'text-gray-400'}" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+        </svg>`;
     },
 }; 

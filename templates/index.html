@@ -2,6 +2,51 @@
 
 {% block head %}
 <script type="module" src="{{ url_for('static', filename='js/site.js') }}"></script>
+<style>
+    /* Custom styles for multiple select dropdowns */
+    select[multiple] {
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        border: 1px solid #e5e7eb;
+        width: 100%;
+        min-height: 120px;
+        background-color: white;
+    }
+
+    select[multiple] option {
+        padding: 0.375rem 0.75rem;
+        cursor: pointer;
+    }
+
+    select[multiple] option:checked {
+        background: #3b82f6 linear-gradient(0deg, #3b82f6 0%, #3b82f6 100%);
+        color: white;
+    }
+
+    select[multiple] option:hover {
+        background-color: #eff6ff;
+    }
+
+    /* Custom styles for single select dropdowns */
+    .form-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+        border-radius: 0.375rem;
+        border: 1px solid #e5e7eb;
+        width: 100%;
+    }
+
+    .form-select:focus {
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+</style>
 {% endblock %}
 
 {% block body %}
@@ -33,10 +78,8 @@
 
                     <!-- Filter trigger button (now first) -->
                     <button id="filter-dropdown-trigger" class="absolute right-16 p-2 text-gray-400 hover:text-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
-                                clip-rule="evenodd" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
                         </svg>
                     </button>
 
@@ -54,59 +97,141 @@
                     <div id="structured-filters"
                         class="hidden absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 p-4"
                         style="top: 100%; z-index: 999999;">
+                        <!-- Header with Filtros and trash icon -->
+                        <div class="flex justify-between items-center mb-4 pb-2 border-b">
+                            <div class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+                                </svg>
+                                <h3 class="text-lg font-semibold">Filtros</h3>
+                            </div>
+                            <button id="clear-filters" class="text-gray-400 hover:text-gray-600" type="button">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+
                         <!-- Categories Section -->
-                        <div class="mb-4">
-                            <h3 class="text-sm font-semibold mb-2">Categorías</h3>
-                            <div class="grid grid-cols-3 gap-2">
-                                <button
-                                    class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                                    data-category="beca">Beca</button>
-                                <button
-                                    class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                                    data-category="residencia">Residencia</button>
-                                <button
-                                    class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                                    data-category="premio">Premio</button>
-                                <button
-                                    class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                                    data-category="convocatoria">Convocatoria</button>
-                                <button
-                                    class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                                    data-category="oportunidad">Oportunidad</button>
-                                <button
-                                    class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                                    data-category="fondos">Fondos</button>
-                                <button
-                                    class="category-filter-btn px-3 py-1 rounded border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
-                                    data-category="apoyo">Apoyo</button>
+                        <div class="mb-4 filter-section">
+                            <button class="filter-dropdown-trigger w-full flex justify-between items-center py-2 px-3 bg-gray-50 hover:bg-gray-100 rounded-md" data-target="categories-dropdown" type="button">
+                                <span class="font-medium text-gray-700">Categorías</span>
+                                <span class="selected-values text-sm text-gray-500"></span>
+                                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <div id="categories-dropdown" class="filter-dropdown-content hidden mt-2 p-2 border border-gray-200 rounded-md bg-white">
+                                <div class="max-h-48 overflow-y-auto">
+                                    <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600" value="beca" name="categories">
+                                        <span class="ml-2 text-gray-700">Beca</span>
+                                    </label>
+                                    <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600" value="residencia" name="categories">
+                                        <span class="ml-2 text-gray-700">Residencia</span>
+                                    </label>
+                                    <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600" value="premio" name="categories">
+                                        <span class="ml-2 text-gray-700">Premio</span>
+                                    </label>
+                                    <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600" value="convocatoria" name="categories">
+                                        <span class="ml-2 text-gray-700">Convocatoria</span>
+                                    </label>
+                                    <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600" value="oportunidad" name="categories">
+                                        <span class="ml-2 text-gray-700">Oportunidad</span>
+                                    </label>
+                                    <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600" value="fondos" name="categories">
+                                        <span class="ml-2 text-gray-700">Fondos</span>
+                                    </label>
+                                    <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600" value="apoyo" name="categories">
+                                        <span class="ml-2 text-gray-700">Apoyo</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Subdisciplinas Section -->
+                        <div class="mb-4 filter-section">
+                            <button class="filter-dropdown-trigger w-full flex justify-between items-center py-2 px-3 bg-gray-50 hover:bg-gray-100 rounded-md" data-target="subdisciplinas-dropdown" type="button">
+                                <span class="font-medium text-gray-700">Subdisciplinas</span>
+                                <span class="selected-values text-sm text-gray-500"></span>
+                                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <div id="subdisciplinas-dropdown" class="filter-dropdown-content hidden mt-2 p-2 border border-gray-200 rounded-md bg-white">
+                                <div class="max-h-48 overflow-y-auto" id="subdisciplinas-container">
+                                    <!-- Will be populated dynamically -->
+                                </div>
                             </div>
                         </div>
 
                         <!-- Country Dropdown -->
-                        <div class="mb-4">
-                            <h3 class="text-sm font-semibold mb-2">País</h3>
-                            <select id="country-filter" class="form-select">
-                                <option value="">Todos los países</option>
-                            </select>
+                        <div class="mb-4 filter-section">
+                            <button class="filter-dropdown-trigger w-full flex justify-between items-center py-2 px-3 bg-gray-50 hover:bg-gray-100 rounded-md" data-target="country-dropdown" type="button">
+                                <span class="font-medium text-gray-700">País</span>
+                                <span class="selected-values text-sm text-gray-500"></span>
+                                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <div id="country-dropdown" class="filter-dropdown-content hidden mt-2 p-2 border border-gray-200 rounded-md bg-white">
+                                <div class="max-h-48 overflow-y-auto" id="country-container">
+                                    <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input type="radio" class="form-radio h-4 w-4 text-blue-600" value="" name="country" checked>
+                                        <span class="ml-2 text-gray-700">Todos los países</span>
+                                    </label>
+                                    <!-- Will be populated dynamically -->
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Month Dropdown -->
-                        <div class="mb-4">
-                            <h3 class="text-sm font-semibold mb-2">Mes de cierre</h3>
-                            <select id="month-filter" class="form-select">
-                                <option value="">Todos los meses</option>
-                            </select>
+                        <div class="mb-4 filter-section">
+                            <button class="filter-dropdown-trigger w-full flex justify-between items-center py-2 px-3 bg-gray-50 hover:bg-gray-100 rounded-md" data-target="month-dropdown" type="button">
+                                <span class="font-medium text-gray-700">Mes de cierre</span>
+                                <span class="selected-values text-sm text-gray-500"></span>
+                                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <div id="month-dropdown" class="filter-dropdown-content hidden mt-2 p-2 border border-gray-200 rounded-md bg-white">
+                                <div class="max-h-48 overflow-y-auto" id="month-container">
+                                    <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input type="radio" class="form-radio h-4 w-4 text-blue-600" value="" name="month" checked>
+                                        <span class="ml-2 text-gray-700">Todos los meses</span>
+                                    </label>
+                                    <!-- Will be populated dynamically -->
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- New checkbox for 'Inscripcion' filter -->
-                        <label class="flex items-center space-x-2">
-                            <input type="checkbox" id="inscripcion-checkbox" class="form-checkbox" />
-                            <span class="text-sm text-gray-700">Buscar solo oportunidades sin pago</span>
-                        </label>
+                        <!-- Inscripción filter -->
+                        <div class="mb-4 filter-section">
+                            <button class="filter-dropdown-trigger w-full flex justify-between items-center py-2 px-3 bg-gray-50 hover:bg-gray-100 rounded-md" data-target="inscripcion-dropdown" type="button">
+                                <span class="font-medium text-gray-700">Inscripción</span>
+                                <span class="selected-values text-sm text-gray-500"></span>
+                                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <div id="inscripcion-dropdown" class="filter-dropdown-content hidden mt-2 p-2 border border-gray-200 rounded-md bg-white">
+                                <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                    <input type="checkbox" id="inscripcion-checkbox" class="form-checkbox h-4 w-4 text-blue-600">
+                                    <span class="ml-2 text-gray-700">Solo oportunidades sin pago</span>
+                                </label>
+                            </div>
+                        </div>
 
                         <!-- Search Button -->
                         <button id="search-filters"
-                            class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            type="button">
                             Buscar
                         </button>
                     </div>
@@ -617,17 +742,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 {% block page_scripts %}
 <script type="module">
-    // Process data and store in a dedicated window property
-    try {
-        const rawData = {{ destacar_pages| tojson | safe }};
-        window.processedDestacarData = rawData.map(item => ({
-            ...item,
-            url_base: item.url_base || new URL(item.url).hostname.replace('www.', '')
-        }));
-        console.log('Processed data:', window.processedDestacarData);
-    } catch (error) {
-        console.error('Error processing destacar data:', error);
-        window.processedDestacarData = [];
-    }
+    import { processDestacarData } from "{{ url_for('static', filename='js/modules/data-processor.js') }}";
+    const rawData = {{ destacar_pages| tojson | safe }};
+    processDestacarData(rawData);
 </script>
 {% endblock %}
