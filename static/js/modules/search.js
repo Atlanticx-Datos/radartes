@@ -87,6 +87,9 @@ export const SearchModule = {
 
         this.attachSearchListeners();
         this.updateFilterUI();
+        
+        // Ensure clear button visibility is correct on initialization
+        this.ensureClearButtonVisible();
     },
 
     updateFilterUI() {
@@ -378,6 +381,9 @@ export const SearchModule = {
         if (shouldScroll && FilterModule.lastFilteredResults && FilterModule.lastFilteredResults.length > 0) {
             this.scrollToResults();
         }
+
+        // Ensure the clear button visibility is correct
+        this.ensureClearButtonVisible();
 
         // Track search if value is not empty
         if (searchInputValue.trim()) {
