@@ -1074,7 +1074,7 @@ def get_cached_database_content():
 
 @app.route("/refresh_database_cache", methods=["POST"])
 @csrf.exempt
-# @limiter.limit("1/hour")  # Temporarily removed for testing
+@limiter.limit("1/hour")  # Rate limit to prevent abuse
 def refresh_database_cache():
     # Check for API key authentication
     api_key = request.headers.get('X-API-Key')
