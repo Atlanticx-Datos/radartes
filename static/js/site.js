@@ -25,6 +25,23 @@ function exposeModules() {
     window.TopModule = TopModule;
     window.SharingModule = SharingModule;
     
+    // Add global functions for destacar navigation
+    window.nextDestacarPage = function() {
+        if (window.DestacarModule) {
+            window.DestacarModule.nextPage();
+        } else {
+            console.error('DestacarModule not available');
+        }
+    };
+    
+    window.prevDestacarPage = function() {
+        if (window.DestacarModule) {
+            window.DestacarModule.prevPage();
+        } else {
+            console.error('DestacarModule not available');
+        }
+    };
+    
     // Initialize modules
     SearchModule.init();
     FilterModule.init();
@@ -77,11 +94,139 @@ document.addEventListener('DOMContentLoaded', function() {
     FilterModule.init();
     SearchModule.init();
     
-    // Initialize DestacarModule if featured content exists
-    if (window.processedDestacarData) {
-        DestacarModule.init(window.processedDestacarData);
+    // Get prefiltered data for module initialization
+    const preFilteredData = document.getElementById('prefiltered-data');
+    console.log('Checking prefiltered-data element:', preFilteredData);
+    
+    // Initialize modules with data from prefiltered-data
+    if (preFilteredData) {
+        console.log('prefiltered-data element found:', preFilteredData);
+        console.log('prefiltered-data attributes:', 
+            'has pages:', !!preFilteredData.dataset.pages,
+            'has results:', !!preFilteredData.dataset.results);
+        console.log('pages data length:', preFilteredData.dataset.pages ? preFilteredData.dataset.pages.length : 0);
+        console.log('results data length:', preFilteredData.dataset.results ? preFilteredData.dataset.results.length : 0);
+        
+        // Parse pages data for TopModule and DestacarModule
+        if (preFilteredData.dataset.pages) {
+            try {
+                const tempParser = new DOMParser();
+                const pagesString = tempParser.parseFromString(preFilteredData.dataset.pages || '[]', 'text/html').body.textContent;
+                console.log('Unescaped pages string length:', pagesString.length);
+                
+                const pages = JSON.parse(pagesString);
+                console.log('Successfully parsed pages data, count:', pages.length);
+                console.log('First page sample:', pages.length > 0 ? JSON.stringify(pages[0]).substring(0, 200) + '...' : 'No pages available');
+                
+                // Find pages with top=true for TopModule (accept both boolean true and string "true")
+                const topPages = pages.filter(page => page.top === true || page.top === "true");
+                console.log('Found', topPages.length, 'top pages for TopModule');
+                
+                // Log more details about the top pages
+                if (topPages.length > 0) {
+                    console.log('Top pages details:', topPages.map(p => ({
+                        nombre: p.nombre_original,
+                        top: p.top,
+                        id: p.id
+                    })));
+                }
+                
+                // Check if any pages have top as a string "true" instead of boolean true
+                const topPagesString = pages.filter(page => page.top === "true");
+                if (topPagesString.length > 0) {
+                    console.log('Found pages with top="true" (string):', topPagesString.length);
+                    console.log('String top pages details:', topPagesString.map(p => ({
+                        nombre: p.nombre_original,
+                        top: p.top,
+                        id: p.id
+                    })));
+                }
+                
+                // Log more details about the pages
+                console.log('Sample of all pages:', pages.slice(0, 3).map(p => ({
+                    nombre: p.nombre_original,
+                    top: p.top,
+                    hasTopProperty: 'top' in p
+                })));
+                
+                // Check if any pages have the top property
+                const pagesWithTopProperty = pages.filter(page => 'top' in page);
+                console.log('Pages with top property:', pagesWithTopProperty.length);
+                
+                // If no top pages found, create a mock top page from the first destacar page
+                let topPagesToUse = topPages;
+                if (topPages.length === 0 && pages.length > 0) {
+                    console.log('No top pages found, creating mock top page from first destacar page');
+                    // Try to find a destacar page first
+                    const destacarPages = pages.filter(page => page.destinatarios === 'Destacar');
+                    if (destacarPages.length > 0) {
+                        // Create a copy of the first destacar page and set top to true
+                        const mockTopPage = {...destacarPages[0], top: true};
+                        topPagesToUse = [mockTopPage];
+                        console.log('Created mock top page from destacar page:', mockTopPage.nombre_original);
+                    } else {
+                        // If no destacar pages, use the first page
+                        const mockTopPage = {...pages[0], top: true};
+                        topPagesToUse = [mockTopPage];
+                        console.log('Created mock top page from first page:', mockTopPage.nombre_original);
+                    }
+                }
+                
+                // Initialize TopModule with the top pages (real or mock)
+                if (window.TopModule && typeof window.TopModule.init === 'function') {
+                    if (topPagesToUse.length > 0) {
+                        console.log('Initializing TopModule with', topPagesToUse.length, 'pages');
+                        window.TopModule.init(topPagesToUse);
+                    } else {
+                        console.warn('No top pages available for TopModule');
+                    }
+                } else {
+                    console.warn('TopModule not available');
+                }
+                
+                // IMPORTANT: Always update SearchModule with ALL pages for initial load
+                if (window.SearchModule && typeof window.SearchModule.updateResults === 'function') {
+                    console.log('Initializing SearchModule with ALL pages:', pages.length);
+                    window.SearchModule.updateResults(pages);
+                } else {
+                    console.warn('SearchModule not available for initialization');
+                }
+                
+                // Check if DestacarModule needs initialization
+                if (!window.processedDestacarData || !Array.isArray(window.processedDestacarData) || window.processedDestacarData.length === 0) {
+                    // Filter pages with destinatarios === 'Destacar'
+                    const destacarPages = pages.filter(page => page.destinatarios === 'Destacar');
+                    if (destacarPages.length > 0) {
+                        console.log('Found', destacarPages.length, 'destacar pages in prefiltered-data');
+                        window.processedDestacarData = destacarPages;
+                        
+                        if (window.DestacarModule && typeof window.DestacarModule.init === 'function') {
+                            console.log('Initializing DestacarModule with', destacarPages.length, 'items from prefiltered-data');
+                            window.DestacarModule.init(destacarPages);
+                        } else {
+                            console.warn('DestacarModule not available for initialization');
+                        }
+                    } else {
+                        console.warn('No destacar pages found in prefiltered-data');
+                    }
+                } else {
+                    console.log('DestacarModule already has processedDestacarData:', window.processedDestacarData.length, 'items');
+                    
+                    if (window.DestacarModule && typeof window.DestacarModule.init === 'function') {
+                        console.log('Initializing DestacarModule with existing processedDestacarData');
+                        window.DestacarModule.init(window.processedDestacarData);
+                    }
+                }
+            } catch (error) {
+                console.error('Error parsing pages data:', error);
+            }
+        } else {
+            console.warn('No pages data available in prefiltered-data');
+        }
+    } else {
+        console.warn('prefiltered-data element not found');
     }
-
+    
     // Setup user menu functionality
     setupUserMenu();
     
@@ -101,12 +246,45 @@ document.addEventListener('DOMContentLoaded', function() {
     //     });
     // });
 
+    /* 
+    // This section is now handled in the DOMContentLoaded event handler above
     // Initialize TopModule if we have pages data
     const preFilteredData = document.getElementById('prefiltered-data');
     if (preFilteredData) {
-        const pages = JSON.parse(preFilteredData.dataset.pages);
-        TopModule.init(pages);
+        console.log('Found prefiltered-data element:', preFilteredData);
+        console.log('Data attributes:', {
+            results: preFilteredData.dataset.results ? 'exists' : 'missing',
+            pages: preFilteredData.dataset.pages ? 'exists' : 'missing'
+        });
+        
+        try {
+            // Use DOMParser to unescape HTML entities in the JSON string
+            const tempParser = new DOMParser();
+            const pagesString = tempParser.parseFromString(preFilteredData.dataset.pages || '[]', 'text/html').body.textContent;
+            console.log('Unescaped pages string length:', pagesString.length);
+            
+            const pages = JSON.parse(pagesString);
+            console.log('Parsed pages count:', pages.length);
+            console.log('First page sample:', pages.length > 0 ? pages[0] : 'No pages available');
+            
+            if (pages.length > 0) {
+                // Initialize TopModule with all pages
+                TopModule.init(pages);
+                console.log('TopModule initialized with', pages.length, 'pages');
+                
+                // Also initialize SearchModule with initial results if not already done
+                if (window.SearchModule && typeof window.SearchModule.updateResults === 'function') {
+                    window.SearchModule.updateResults(pages);
+                    console.log('SearchModule initialized with initial results');
+                }
+            } else {
+                console.warn('No pages data available for TopModule initialization');
+            }
+        } catch (error) {
+            console.error('Error parsing pages data for TopModule:', error);
+        }
     }
+    */
     
     // Add navigation functions to window
     window.nextTopPage = TopModule.nextPage.bind(TopModule);
@@ -635,6 +813,21 @@ window.toggleDisciplineFilter = function(button, discipline) {
     
     // Call the FilterModule's handleDisciplineFilter method
     FilterModule.handleDisciplineFilter(button);
+    
+    // Explicitly hide/show destacados container based on active discipline
+    const destacadosContainer = document.querySelector('.destacados-container');
+    const prevControl = document.querySelector('.destacar-prev');
+    const nextControl = document.querySelector('.destacar-next');
+    
+    if (button.dataset.active === 'true' && discipline !== 'todos') {
+        destacadosContainer?.classList.add('hidden');
+        prevControl?.classList.add('hidden');
+        nextControl?.classList.add('hidden');
+    } else if (discipline === 'todos' || button.dataset.active === 'false') {
+        destacadosContainer?.classList.remove('hidden');
+        prevControl?.classList.remove('hidden');
+        nextControl?.classList.remove('hidden');
+    }
 };
 window.goToPage = SearchModule.goToPage.bind(SearchModule);
 window.toggleDropdown = toggleDropdown;
@@ -779,7 +972,8 @@ const handleModalClick = (e) => {
             dataset.og_resumida || dataset.summary,
             dataset.id,
             dataset.categoria || dataset.category,
-            dataset.baseUrl || dataset.base_url
+            dataset.baseUrl || dataset.base_url,
+            dataset.requisitos
         );
     }
 };

@@ -268,7 +268,7 @@
                         {% elif discipline == 'Música' %}
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                         </svg>
                         {% elif discipline == 'Escénicas' %}
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -436,38 +436,46 @@
         console.log('Initializing dropdowns');
         // Initialize country dropdown
         const countryFilter = document.getElementById('country-filter');
-        const countries = [...new Set(pages.map(page => page.pais).filter(Boolean))].sort();
+        if (countryFilter) {
+            const countries = [...new Set(pages.map(page => page.pais).filter(Boolean))].sort();
 
-        countries.forEach(country => {
-            const option = document.createElement('option');
-            option.value = country;
-            option.textContent = country;
-            countryFilter.appendChild(option);
-        });
+            countries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = country;
+                countryFilter.appendChild(option);
+            });
+        } else {
+            console.warn('country-filter element not found');
+        }
 
         // Initialize month dropdown
         const monthFilter = document.getElementById('month-filter');
-        const months = [
-            { value: '1', label: 'Enero' },
-            { value: '2', label: 'Febrero' },
-            { value: '3', label: 'Marzo' },
-            { value: '4', label: 'Abril' },
-            { value: '5', label: 'Mayo' },
-            { value: '6', label: 'Junio' },
-            { value: '7', label: 'Julio' },
-            { value: '8', label: 'Agosto' },
-            { value: '9', label: 'Septiembre' },
-            { value: '10', label: 'Octubre' },
-            { value: '11', label: 'Noviembre' },
-            { value: '12', label: 'Diciembre' }
-        ];
+        if (monthFilter) {
+            const months = [
+                { value: '1', label: 'Enero' },
+                { value: '2', label: 'Febrero' },
+                { value: '3', label: 'Marzo' },
+                { value: '4', label: 'Abril' },
+                { value: '5', label: 'Mayo' },
+                { value: '6', label: 'Junio' },
+                { value: '7', label: 'Julio' },
+                { value: '8', label: 'Agosto' },
+                { value: '9', label: 'Septiembre' },
+                { value: '10', label: 'Octubre' },
+                { value: '11', label: 'Noviembre' },
+                { value: '12', label: 'Diciembre' }
+            ];
 
-        months.forEach(month => {
-            const option = document.createElement('option');
-            option.value = month.value;
-            option.textContent = month.label;
-            monthFilter.appendChild(option);
-        });
+            months.forEach(month => {
+                const option = document.createElement('option');
+                option.value = month.value;
+                option.textContent = month.label;
+                monthFilter.appendChild(option);
+            });
+        } else {
+            console.warn('month-filter element not found');
+        }
     }
 
     function updateResults(results) {
@@ -587,6 +595,7 @@
         });
 
         console.log('Filtered results:', filtered.length);
+        console.log('Filtered data:', filtered);
         updateResults(filtered);
     }
 
@@ -617,11 +626,52 @@
     document.addEventListener('DOMContentLoaded', function () {
         console.log('DOM Content Loaded - Setting up event listeners');
         
-        const allPages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
-        initializeDropdowns(allPages);
+        try {
+            const prefilteredData = document.getElementById('prefiltered-data');
+            if (!prefilteredData) {
+                console.error('prefiltered-data element not found');
+                return;
+            }
+            
+            // Parse the pages data safely
+            let allPages = [];
+            try {
+                const tempParser = new DOMParser();
+                const pagesString = tempParser.parseFromString(prefilteredData.dataset.pages || '[]', 'text/html').body.textContent;
+                allPages = JSON.parse(pagesString);
+                console.log(`Successfully parsed ${allPages.length} pages`);
+            } catch (error) {
+                console.error('Error parsing pages data:', error);
+                allPages = [];
+            }
+            
+            // Only try to initialize dropdowns if we have pages
+            if (allPages.length > 0) {
+                try {
+                    initializeDropdowns(allPages);
+                } catch (error) {
+                    console.error('Error initializing dropdowns:', error);
+                }
+            }
+            
+            // Log the total number of pages fetched
+            console.log('Initial load - Total pages fetched:', allPages.length);
 
-        // Initialize the view with all results
-        applyFilters();
+            // Note: The actual initialization of results is now handled by site.js
+            // to ensure consistent behavior
+            
+            // Initialize TopModule directly if it exists
+            if (window.TopModule && typeof window.TopModule.init === 'function') {
+                try {
+                    window.TopModule.init(allPages);
+                    console.log('TopModule initialized directly');
+                } catch (error) {
+                    console.error('Error initializing TopModule:', error);
+                }
+            }
+        } catch (error) {
+            console.error('Error in DOMContentLoaded handler:', error);
+        }
 
         // Setup category filter buttons
         document.querySelectorAll('.category-filter-btn').forEach(button => {
@@ -743,7 +793,7 @@ document.addEventListener('DOMContentLoaded', function() {
 {% block page_scripts %}
 <script type="module">
     import { processDestacarData } from "{{ url_for('static', filename='js/modules/data-processor.js') }}";
-    const rawData = {{ destacar_pages| tojson | safe }};
+    const rawData = JSON.parse('{{ destacar_pages| tojson | safe }}');
     processDestacarData(rawData);
 </script>
 {% endblock %}

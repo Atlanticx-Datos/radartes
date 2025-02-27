@@ -108,6 +108,7 @@
                    data-name="{{ page.nombre }}"
                    data-country="{{ page.país }}"
                    data-summary="{{ page.og_resumida }}"
+                   data-requisitos="{{ page.requisitos }}"
                    class="opportunity-link flex items-center justify-center w-5 h-5 truncate bg-neutral-400 rounded-full"
                    title="{{ page.nombre }}">
                     <svg class="w-4 md:w-6 text-white" data-slot="icon" fill="none"
@@ -193,20 +194,4 @@
     </td>
 </tr>
 {% endif %}
-
-<div class="opportunity-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
-    <h3 class="font-bold text-lg mb-2">${nombre}</h3>
-    <p class="text-sm text-gray-600 mb-2">${resumida}</p>
-    <div class="flex justify-between items-center">
-        <span class="text-sm text-gray-500">${pais}</span>
-        <button 
-            class="preview-btn text-blue-600 hover:underline text-sm"
-            data-url="${url}"
-            data-name="${nombre}"
-            data-country="${pais}"
-            data-summary="${resumida}">
-            Ver más
-        </button>
-    </div>
-</div>
 

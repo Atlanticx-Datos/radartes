@@ -3,7 +3,7 @@ import { CONSTANTS } from '../constants.js';
 
 // Handles modal functionality
 export const ModalModule = {
-    showPreviewModal(url, nombre, pais, og_resumida, id, categoria, base_url) {
+    showPreviewModal(url, nombre, pais, og_resumida, id, categoria, base_url, requisitos) {
         // Clean up any existing modals first
         const existingModals = document.querySelectorAll('[id^="modal-"]');
         const existingOverlays = document.querySelectorAll('[id$="-overlay"]');
@@ -44,6 +44,8 @@ export const ModalModule = {
             transition: opacity 300ms ease-out, transform 300ms ease-out;
             width: 90%;
             max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
         `;
 
         // Get CSRF token safely
@@ -109,7 +111,14 @@ export const ModalModule = {
                         </svg>
                         ${Utils.escapeHTML(categoria)}
                     </div>
-                    <p class="text-gray-600">${Utils.escapeHTML(og_resumida)}</p>
+                    <p class="text-gray-600 mb-4">${Utils.escapeHTML(og_resumida)}</p>
+                    
+                    ${requisitos ? `
+                    <div class="mt-4 border-t pt-4">
+                        <h4 class="font-medium text-gray-800 mb-2">Requisitos</h4>
+                        <p class="text-gray-600">${Utils.escapeHTML(requisitos)}</p>
+                    </div>
+                    ` : ''}
                 </div>
 
                 <!-- Footer -->

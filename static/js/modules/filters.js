@@ -16,12 +16,31 @@ export const FilterModule = {
     selectedCategories: [],
 
     init() {
+        console.log('FilterModule initialized');
+        
+        // Get prefiltered data
         const preFilteredData = document.getElementById('prefiltered-data');
-        if (!preFilteredData) return;
-
-        this.initializeDropdowns();
-        this.setupEventListeners();
-        this.populateSubdisciplinas();
+        if (preFilteredData && preFilteredData.dataset.pages) {
+            try {
+                // Initialize dropdowns with the data
+                this.initializeDropdowns();
+                
+                // Populate subdisciplinas dropdown
+                this.populateSubdisciplinas();
+                
+                // Set up event listeners
+                this.setupEventListeners();
+                
+                console.log('FilterModule initialization complete');
+                
+                // Note: We no longer apply filters on initialization to ensure
+                // all pages are shown initially
+            } catch (error) {
+                console.error('Error initializing FilterModule:', error);
+            }
+        } else {
+            console.warn('No prefiltered data available for FilterModule');
+        }
     },
 
     initializeDropdowns() {

@@ -17,7 +17,7 @@ export const SearchModule = {
     },
     pagination: {
         currentPage: 1,
-        itemsPerPage: 12,
+        itemsPerPage: 10,
         totalPages: 1,
         allResults: []
     },
@@ -30,10 +30,19 @@ export const SearchModule = {
         // Initialize with data from the page
         const preFilteredData = document.getElementById('prefiltered-data');
         if (preFilteredData) {
+            console.log('SearchModule: Found prefiltered-data element');
+            console.log('SearchModule: Data attributes:', {
+                results: preFilteredData.dataset.results ? 'exists' : 'missing',
+                pages: preFilteredData.dataset.pages ? 'exists' : 'missing'
+            });
+            
             try {
                 const tempParser = new DOMParser();
-                const pagesString = tempParser.parseFromString(preFilteredData.dataset.pages, 'text/html').body.textContent;
+                const pagesString = tempParser.parseFromString(preFilteredData.dataset.pages || '[]', 'text/html').body.textContent;
+                console.log('SearchModule: Unescaped pages string length:', pagesString.length);
+                
                 const pages = JSON.parse(pagesString);
+                console.log('SearchModule: Parsed pages count:', pages.length);
 
                 console.log('Initializing search module with:', {
                     pageCount: pages.length,
@@ -41,6 +50,9 @@ export const SearchModule = {
                 });
 
                 this.initializeStructuredFilters(pages);
+                
+                // Note: We don't apply any filtering on initialization
+                // to ensure all pages are shown initially
                 
                 // Add single event listener for preview buttons using event delegation
                 document.addEventListener('click', (e) => {
@@ -60,7 +72,9 @@ export const SearchModule = {
                             dataset.pais || dataset.country,
                             dataset.og_resumida || dataset.summary,
                             dataset.id,
-                            dataset.categoria || dataset.category
+                            dataset.categoria || dataset.category,
+                            null, // base_url parameter
+                            dataset.requisitos
                         );
                     } else {
                         console.error('ModalModule not found or showPreviewModal not available');
@@ -734,6 +748,7 @@ export const SearchModule = {
                                         data-og_resumida="${Utils.escapeHTML(page.og_resumida || '')}"
                                         data-id="${Utils.escapeHTML(page.id || '')}"
                                         data-categoria="${Utils.escapeHTML(page.categoria || '')}"
+                                        data-requisitos="${Utils.escapeHTML(page.requisitos || '')}"
                                         data-inscripcion="${Utils.escapeHTML(page.inscripcion || '')}"
                                     >
                                         Ver
@@ -745,38 +760,57 @@ export const SearchModule = {
                 </table>
             </div>
             ${this.pagination.totalPages > 1 ? `
-                <div class="flex justify-center mt-6">
+                <div class="flex flex-col items-center mt-6">
                     <div class="flex items-center gap-2">
+                        <!-- First page button -->
+                        <button 
+                            class="pagination-nav w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 ${this.pagination.currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                            ${this.pagination.currentPage === 1 ? 'disabled' : 'onclick="SearchModule.goToPage(1)"'}
+                            title="Primera página"
+                        >
+                            «
+                        </button>
+                        
+                        <!-- Previous page button -->
                         <button 
                             class="pagination-nav w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 ${this.pagination.currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
                             ${this.pagination.currentPage === 1 ? 'disabled' : 'onclick="SearchModule.goToPage(' + (this.pagination.currentPage - 1) + ')"'}
+                            title="Página anterior"
                         >
-                            ←
+                            ‹
                         </button>
-                        ${Array.from({ length: this.pagination.totalPages }, (_, i) => i + 1).map(pageNum => `
-                            <button 
-                                class="pagination-number w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium ${
-                                    pageNum === this.pagination.currentPage 
-                                    ? 'bg-blue-600 text-white' 
-                                    : 'text-gray-700 hover:bg-gray-100'
-                                }"
-                                onclick="SearchModule.goToPage(${pageNum})"
-                            >
-                                ${pageNum}
-                            </button>
-                        `).join('')}
+                        
+                        <!-- Page numbers with ellipsis -->
+                        ${this.renderPageNumbers()}
+                        
+                        <!-- Next page button -->
                         <button 
                             class="pagination-nav w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 ${this.pagination.currentPage === this.pagination.totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
                             ${this.pagination.currentPage === this.pagination.totalPages ? 'disabled' : 'onclick="SearchModule.goToPage(' + (this.pagination.currentPage + 1) + ')"'}
+                            title="Página siguiente"
                         >
-                            →
+                            ›
                         </button>
+                        
+                        <!-- Last page button -->
+                        <button 
+                            class="pagination-nav w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 ${this.pagination.currentPage === this.pagination.totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
+                            ${this.pagination.currentPage === this.pagination.totalPages ? 'disabled' : 'onclick="SearchModule.goToPage(' + this.pagination.totalPages + ')"'}
+                            title="Última página"
+                        >
+                            »
+                        </button>
+                    </div>
+                    
+                    <!-- Page info -->
+                    <div class="text-sm text-gray-500 mt-2">
+                        Página ${this.pagination.currentPage} de ${this.pagination.totalPages}
                     </div>
                 </div>
             ` : ''}
         `;
 
-        counter.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''}`;
+        counter.textContent = `Mostrando ${startIndex + 1}-${Math.min(endIndex, results.length)} de ${results.length} resultado${results.length !== 1 ? 's' : ''}`;
     },
 
     goToPage(page) {
@@ -851,5 +885,71 @@ export const SearchModule = {
         return `<svg class="w-4 h-4 ml-1 ${isActive ? 'text-blue-600' : 'text-gray-400'}" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
         </svg>`;
+    },
+
+    // Function to render page numbers with ellipsis for many pages
+    renderPageNumbers() {
+        const { currentPage, totalPages } = this.pagination;
+        const maxVisiblePages = 5; // Maximum number of page buttons to show
+        
+        // If we have fewer pages than the max visible, just show all pages
+        if (totalPages <= maxVisiblePages) {
+            return Array.from({ length: totalPages }, (_, i) => i + 1)
+                .map(pageNum => this.renderPageButton(pageNum))
+                .join('');
+        }
+        
+        // Otherwise, we need to show a subset with ellipsis
+        const pages = [];
+        
+        // Always show first page
+        pages.push(this.renderPageButton(1));
+        
+        // Calculate range of pages to show around current page
+        let rangeStart = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+        let rangeEnd = Math.min(totalPages - 1, rangeStart + maxVisiblePages - 3);
+        
+        // Adjust range if we're near the end
+        if (rangeEnd >= totalPages - 1) {
+            rangeStart = Math.max(2, totalPages - maxVisiblePages + 1);
+            rangeEnd = totalPages - 1;
+        }
+        
+        // Add ellipsis before range if needed
+        if (rangeStart > 2) {
+            pages.push('<span class="w-8 h-8 flex items-center justify-center">…</span>');
+        }
+        
+        // Add range of pages
+        for (let i = rangeStart; i <= rangeEnd; i++) {
+            pages.push(this.renderPageButton(i));
+        }
+        
+        // Add ellipsis after range if needed
+        if (rangeEnd < totalPages - 1) {
+            pages.push('<span class="w-8 h-8 flex items-center justify-center">…</span>');
+        }
+        
+        // Always show last page
+        pages.push(this.renderPageButton(totalPages));
+        
+        return pages.join('');
+    },
+    
+    // Helper to render a single page button
+    renderPageButton(pageNum) {
+        const isActive = pageNum === this.pagination.currentPage;
+        return `
+            <button 
+                class="pagination-number w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium ${
+                    isActive 
+                    ? 'bg-blue-600 text-white' 
+                    : 'text-gray-700 hover:bg-gray-100'
+                }"
+                onclick="SearchModule.goToPage(${pageNum})"
+            >
+                ${pageNum}
+            </button>
+        `;
     },
 }; 

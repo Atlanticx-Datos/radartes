@@ -6,30 +6,65 @@ export const DestacarModule = {
     pages: [],
 
     init(pages) {
+        console.log('DestacarModule.init called with pages:', pages);
+        console.log('Pages type:', typeof pages);
+        console.log('Pages length:', Array.isArray(pages) ? pages.length : 'not an array');
+        
+        if (!pages || !Array.isArray(pages) || pages.length === 0) {
+            console.warn('DestacarModule initialized with empty or invalid pages array');
+            this.pages = [];
+            return;
+        }
+        
         this.pages = pages;
+        console.log('First page in DestacarModule:', this.pages[0]);
+        
         this.updateDisplay();
         this.attachNavigationListeners();
     },
 
     nextPage() {
+        console.log('DestacarModule.nextPage called');
+        console.log('Current index:', this.currentIndex);
+        console.log('Pages length:', this.pages.length);
+        
         if (this.currentIndex + 3 < this.pages.length) {
             this.currentIndex += 3;
             console.log('New index:', this.currentIndex);
             this.updateDisplay();
+        } else {
+            console.log('Already at the last page');
         }
     },
 
     prevPage() {
+        console.log('DestacarModule.prevPage called');
+        console.log('Current index:', this.currentIndex);
+        
         if (this.currentIndex > 0) {
             this.currentIndex -= 3;
             console.log('New index:', this.currentIndex);
             this.updateDisplay();
+        } else {
+            console.log('Already at the first page');
         }
     },
 
     updateDisplay() {
+        console.log('DestacarModule.updateDisplay called');
+        
         const container = document.querySelector('.featured-opportunities .grid');
-        if (!container || !this.pages || !this.pages.length) return;
+        if (!container) {
+            console.error('Featured opportunities container not found');
+            return;
+        }
+        
+        if (!this.pages || !this.pages.length) {
+            console.warn('No pages available to display');
+            return;
+        }
+        
+        console.log('Updating display with pages:', this.pages.slice(this.currentIndex, this.currentIndex + 3));
 
         // Function to format date
         const formatDate = (dateStr) => {
@@ -84,6 +119,7 @@ export const DestacarModule = {
                      data-summary="${Utils.escapeHTML(page.og_resumida || '')}"
                      data-id="${Utils.escapeHTML(page.id)}"
                      data-category="${Utils.escapeHTML(page.categoria)}"
+                     data-requisitos="${Utils.escapeHTML(page.requisitos || '')}"
                      data-inscripcion="${Utils.escapeHTML(page.inscripcion || '')}">
                     <div class="relative h-48 bg-gray-200">
                         <img src="/static/public/IsoAtx.png" alt="Atlantic x Logo" class="w-full h-full object-contain p-4">
@@ -147,7 +183,9 @@ export const DestacarModule = {
                         dataset.country,
                         dataset.summary,
                         dataset.id,
-                        dataset.category
+                        dataset.category,
+                        null,  // base_url parameter
+                        dataset.requisitos
                     );
                 } else {
                     console.error('ModalModule not found or showPreviewModal not available');

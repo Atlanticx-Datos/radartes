@@ -63,6 +63,9 @@ from werkzeug.urls import url_parse  # Add to existing imports
 
 from flask_wtf.csrf import CSRFProtect
 
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
 
 load_dotenv()
 
@@ -170,6 +173,14 @@ app = Flask(__name__, static_folder='../static', static_url_path='/static', temp
 
 # Set secret key first
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "default_fallback_secret_key")
+
+# Initialize rate limiter
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri=os.environ.get("REDIS_URL", "memory://"),
+)
 
 # Determine if the app is in production
 is_production = os.getenv("FLASK_ENV") == "production" or os.environ.get("RENDER") == "1"
@@ -827,6 +838,7 @@ def index():
     try:
         cached_content = get_cached_database_content()
         if not cached_content:
+            app.logger.error("No cached content available")
             return render_template("error.html", 
                                 message="No cached content available",
                                 total_opportunities=0,
@@ -835,6 +847,16 @@ def index():
 
         pages = cached_content.get('pages', [])
         destacar_pages = cached_content.get('destacar_pages', [])
+        
+        # Add more detailed logging
+        app.logger.info(f"Index route - Total pages: {len(pages)}")
+        app.logger.info(f"Index route - Total destacar pages: {len(destacar_pages)}")
+        
+        if len(pages) > 0:
+            app.logger.info(f"Index route - First page sample: {pages[0].get('nombre_original', 'No name')}")
+        
+        if len(destacar_pages) > 0:
+            app.logger.info(f"Index route - First destacar page sample: {destacar_pages[0].get('nombre_original', 'No name')}")
         
         # Check for user preferences
         user_prefs = set()
@@ -1025,18 +1047,43 @@ def update_total_nuevas():
 def get_cached_database_content():
     cached = redis.get('database_content')
     if cached:
-        data = json.loads(cached)
-        # Return pre-filtered sections
-        return {
-            'pages': data['pages'],
-            'closing_soon_pages': data['closing_soon_pages'],
-            'destacar_pages': data['destacar_pages']
-        }
+        try:
+            if isinstance(cached, bytes):
+                cached = cached.decode('utf-8')
+            
+            data = json.loads(cached)
+            
+            # Add detailed logging
+            app.logger.info(f"get_cached_database_content - Retrieved data from Redis")
+            app.logger.info(f"get_cached_database_content - Pages count: {len(data.get('pages', []))}")
+            app.logger.info(f"get_cached_database_content - Destacar pages count: {len(data.get('destacar_pages', []))}")
+            app.logger.info(f"get_cached_database_content - Closing soon pages count: {len(data.get('closing_soon_pages', []))}")
+            
+            # Return pre-filtered sections
+            return {
+                'pages': data['pages'],
+                'closing_soon_pages': data['closing_soon_pages'],
+                'destacar_pages': data['destacar_pages']
+            }
+        except Exception as e:
+            app.logger.error(f"Error parsing cached database content: {str(e)}")
+            return None
+    
+    app.logger.error("No cached database content found in Redis")
     return None
 
 @app.route("/refresh_database_cache", methods=["POST"])
 @csrf.exempt
+# @limiter.limit("1/hour")  # Temporarily removed for testing
 def refresh_database_cache():
+    # Check for API key authentication
+    api_key = request.headers.get('X-API-Key')
+    expected_api_key = os.getenv('CACHE_REFRESH_API_KEY')
+    
+    # If API key is set in environment and doesn't match, return unauthorized
+    if expected_api_key and api_key != expected_api_key:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    
     if not redis:
         return jsonify({"status": "error", "message": "Redis not available"}), 500
 
@@ -1050,6 +1097,15 @@ def refresh_database_cache():
                 "Notion-Version": "2022-06-28",
             }
             
+            app.logger.debug("Starting Notion database query")
+            
+            try:
+                response = requests.get(f"https://api.notion.com/v1/databases/{DATABASE_ID}", headers=headers)
+                db_info = response.json()
+                app.logger.debug(f"Database schema: {json.dumps(db_info.get('properties', {}), indent=2)}")
+            except Exception as e:
+                app.logger.error(f"Error fetching database schema: {str(e)}")
+
             json_body = {
                 "filter": {
                     "and": [
@@ -1069,6 +1125,27 @@ def refresh_database_cache():
             while True:
                 response = requests.post(url, headers=headers, json=json_body)
                 data = response.json()
+                
+                # Log the first page's properties to check for Top
+                try:
+                    if 'results' not in data:
+                        app.logger.error(f"No results in response: {json.dumps(data)}")
+                        raise ValueError("No results in Notion API response")
+                        
+                    # Log details about the first page
+                    if data['results']:
+                        first_page = data['results'][0]
+                        app.logger.debug(f"First page ID: {first_page.get('id')}")
+                        app.logger.debug(f"First page properties keys: {list(first_page.get('properties', {}).keys())}")
+                        
+                        if 'Top' in first_page.get('properties', {}):
+                            top_prop = first_page['properties']['Top']
+                            app.logger.debug(f"Top property structure: {json.dumps(top_prop)}")
+                            
+                except Exception as e:
+                    app.logger.error(f"Error processing Notion API response: {str(e)}")
+                    raise
+                
                 all_pages.extend(data.get("results", []))
                 
                 if not data.get("has_more"):
@@ -1177,11 +1254,18 @@ def refresh_database_cache():
 
                     # Add Top checkbox field
                     if "Top" in page["properties"]:
-                        page_data["top"] = (
-                            page["properties"]["Top"]["checkbox"]
-                            if page["properties"]["Top"]
-                            else False
-                        )
+                        top_value = page["properties"]["Top"]["checkbox"] if page["properties"]["Top"] else False
+                        page_data["top"] = top_value
+                        app.logger.info(f"Top property for {page_data.get('nombre_original', 'Unknown')}: {top_value}")
+                        app.logger.info(f"Top property type: {type(top_value).__name__}")
+                        
+                        # Log when a page has top=true
+                        if top_value:
+                            app.logger.info(f"Found page with top=true: {page_data.get('nombre_original', 'Unknown')}")
+                            app.logger.info(f"Top property value: {page['properties']['Top']}")
+                    else:
+                        app.logger.debug(f"No Top property found for page: {page_data.get('nombre_original', 'Unknown')}")
+                        page_data["top"] = False
 
                     # Add Inscripcion select field
                     if "Inscripcion" in page["properties"]:
@@ -1258,6 +1342,12 @@ def refresh_database_cache():
             'timestamp': datetime.now().isoformat()
         }
         
+        # Count and log pages with top=true
+        top_pages = [page for page in sorted_pages if page.get('top') == True]
+        app.logger.info(f"Found {len(top_pages)} pages with top=true")
+        if top_pages:
+            app.logger.info(f"First top page: {top_pages[0].get('nombre_original', 'Unknown')}")
+        
         # Convert to JSON string
         cache_json = json.dumps(cache_data, ensure_ascii=False)
         
@@ -1272,6 +1362,7 @@ def refresh_database_cache():
             app.logger.debug("Cached Content: %s", cached_content)
 
         app.logger.info(f"Cache refreshed with {len(sorted_pages)} pages")
+        app.logger.info(f"API response - Total pages: {len(pages)}")
         return jsonify({
             "status": "success", 
             "message": f"Cache refreshed with {len(sorted_pages)} pages"
