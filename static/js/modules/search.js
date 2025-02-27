@@ -360,12 +360,15 @@ export const SearchModule = {
         const clearButton = document.getElementById('clear-search');
         const destacadosContainer = document.querySelector('.destacados-container');
 
-        // Show/hide clear button based on input content
-        if (searchInput.value.length > 0) {
+        // Always show the clear button
+        if (clearButton) {
             clearButton.style.display = 'block';
+        }
+
+        // Hide destacados container if there's search input
+        if (searchInput.value.length > 0) {
             destacadosContainer?.classList.add('hidden');
         } else {
-            clearButton.style.display = 'none';
             if (!FilterModule.activeFilters.categories.size && 
                 !FilterModule.activeFilters.country && 
                 !FilterModule.activeFilters.month && 
@@ -403,7 +406,11 @@ export const SearchModule = {
 
         // Clear search input
         searchInput.value = '';
-        clearButton.style.display = 'none';
+        
+        // Always show the clear button
+        if (clearButton) {
+            clearButton.style.display = 'block';
+        }
         
         // Reset inscripcion checkbox
         if (inscripcionCheckbox) {
@@ -483,12 +490,8 @@ export const SearchModule = {
         const clearButton = document.getElementById('clear-search');
         
         if (searchInput && clearButton) {
-            // Show clear button if there's text in the search input
-            if (searchInput.value.length > 0) {
-                clearButton.style.display = 'block';
-            } else {
-                clearButton.style.display = 'none';
-            }
+            // Always show the clear button
+            clearButton.style.display = 'block';
         }
     },
 
