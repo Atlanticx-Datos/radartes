@@ -111,7 +111,52 @@ export const DestacarModule = {
 
         container.innerHTML = this.pages
             .slice(this.currentIndex, this.currentIndex + 3)
-            .map(page => `
+            .map(page => {
+                // Extract the first discipline for the badge
+                const disciplines = page.disciplina ? page.disciplina.split(',').map(d => d.trim()).filter(Boolean) : [];
+                const mainDiscipline = disciplines.length > 0 ? disciplines[0] : 'General';
+                
+                // Get the normalized discipline for the class
+                const normalizedDiscipline = mainDiscipline.toLowerCase()
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
+                    .replace(/\s+/g, ''); // Remove spaces
+                
+                // Get the discipline class
+                const disciplineClass = this.getDisciplineClass(normalizedDiscipline);
+                
+                // Clean up the title (remove category if present)
+                let title = '';
+                
+                // Handle the title extraction
+                if (page.nombre_original) {
+                    // Check if the title contains the separator
+                    if (page.nombre_original.includes('⎮')) {
+                        // Split by the separator and take only the part after it
+                        const parts = page.nombre_original.split('⎮');
+                        if (parts.length > 1 && parts[1] && parts[1].trim()) {
+                            title = parts[1].trim();
+                        } else {
+                            // If there's nothing after the separator, use the nombre field if available
+                            title = (page.nombre && page.nombre.trim()) || 'Sin título';
+                        }
+                    } else {
+                        // If no separator, use the nombre field if available, otherwise the original
+                        title = (page.nombre && page.nombre.trim()) || page.nombre_original.trim();
+                    }
+                } else if (page.nombre) {
+                    // If nombre_original is not available but nombre is, use nombre
+                    title = page.nombre.trim();
+                } else {
+                    // Fallback if neither is available
+                    title = 'Sin título';
+                }
+                
+                console.log('Final title:', title);
+                
+                // Get subdisciplines (everything after the first discipline)
+                const subdisciplines = disciplines.slice(1).join(', ');
+                
+                return `
                 <div class="bg-white rounded-lg shadow-md overflow-hidden relative cursor-pointer opportunity-preview"
                      data-url="${Utils.escapeHTML(page.url)}"
                      data-nombre="${Utils.escapeHTML(page.nombre_original)}"
@@ -122,9 +167,12 @@ export const DestacarModule = {
                      data-requisitos="${Utils.escapeHTML(page.requisitos || '')}"
                      data-inscripcion="${Utils.escapeHTML(page.inscripcion || '')}">
                     <div class="relative h-48 bg-gray-200">
-                        <img src="/static/public/IsoAtx.png" alt="Atlantic x Logo" class="w-full h-full object-contain p-4">
-                        <span class="absolute top-3 left-3 bg-gray-100 text-sm px-2 py-1 rounded-md">
+                        <img src="/static/public/IsoAtx.png" alt="Atlantic x Logo" class="w-full h-full object-contain">
+                        <span class="absolute top-3 left-3 text-sm">
                             ${Utils.escapeHTML(page.categoria)}
+                        </span>
+                        <span class="discipline-badge ${disciplineClass}">
+                            ${Utils.escapeHTML(mainDiscipline)}
                         </span>
                         <button class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,42 +181,47 @@ export const DestacarModule = {
                         </button>
                     </div>
                     
-                    <div class="p-4">
-                        <h3 class="font-medium text-lg mb-2">${Utils.escapeHTML(page.nombre_original)}</h3>
+                    <div class="p-2">
+                        <h3 class="font-medium text-lg" title="${Utils.escapeHTML(title)}">
+                            ${Utils.escapeHTML(title)}
+                        </h3>
                         
-                        <div class="flex flex-wrap gap-4 text-sm text-gray-600 mt-3">
-                            <div class="flex items-center gap-1">
-                                <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-                                </svg>
-                                <span>${Utils.escapeHTML(page.país)}</span>
+                        <div class="flex flex-wrap gap-4 text-sm text-gray-600">
+                            <div class="meta-row">
+                                <div class="flex items-center gap-1">
+                                    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>${Utils.escapeHTML(page.país)}</span>
+                                </div>
+                                
+                                <div class="flex items-center gap-1">
+                                    ${page.inscripcion === 'Sin cargo' || !page.inscripcion ? 
+                                        '<div class="relative inline-block"><svg class="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg><svg class="absolute top-0 left-0 w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="5" y1="5" x2="19" y2="19"/></svg></div>' : 
+                                        '<svg class="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg>'
+                                    }
+                                </div>
+                                
+                                <div class="flex items-center gap-1 subdisciplines-inline">
+                                    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span title="${Utils.escapeHTML(subdisciplines)}">${Utils.escapeHTML(subdisciplines || 'Sin subdisciplinas')}</span>
+                                </div>
                             </div>
                             
-                            <div class="flex items-center gap-1">
-                                ${page.inscripcion === 'Sin cargo' || !page.inscripcion ? 
-                                    '<div class="relative inline-block"><svg class="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg><svg class="absolute top-0 left-0 w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="5" y1="5" x2="19" y2="19"/></svg></div>' : 
-                                    '<svg class="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg>'
-                                }
-                            </div>
-                            
-                            <div class="flex items-center gap-1">
-                                <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
-                                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
-                                </svg>
-                                <span>${Utils.escapeHTML(page.disciplina.split(',').slice(0, 2).join(', '))}</span>
-                            </div>
-                            
-                            <div class="flex items-center gap-1">
+                            <div class="flex items-center gap-1 date-row">
                                 <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
                                 </svg>
-                                <span>${formatDate(page.fecha_de_cierre)}</span>
+                                <span>Cierre: ${formatDate(page.fecha_de_cierre)}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
 
         // Attach click handlers to the newly created opportunity cards
         container.querySelectorAll('.opportunity-preview').forEach(element => {
@@ -204,5 +257,29 @@ export const DestacarModule = {
         if (nextButton) {
             nextButton.addEventListener('click', () => this.nextPage());
         }
+    },
+
+    /**
+     * Get the CSS class for a discipline
+     */
+    getDisciplineClass(discipline) {
+        const disciplineMap = {
+            'visuales': 'discipline-visuales',
+            'musica': 'discipline-musica',
+            'escenicas': 'discipline-escenicas',
+            'literatura': 'discipline-literatura',
+            'diseno': 'discipline-diseno',
+            'cine': 'discipline-cine',
+            'otras': 'discipline-otras'
+        };
+        
+        // Check for partial matches
+        for (const [key, className] of Object.entries(disciplineMap)) {
+            if (discipline.includes(key)) {
+                return className;
+            }
+        }
+        
+        return 'discipline-default';
     }
 }; 

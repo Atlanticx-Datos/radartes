@@ -1,0 +1,207 @@
+/**
+ * Custom styles for the destacar cards
+ */
+
+/* Category badge - primary color */
+.featured-opportunities .absolute.top-3.left-3 {
+    background-color: #6232FF;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 150%;
+    letter-spacing: 0;
+    text-align: center;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    text-transform: capitalize;
+}
+
+/* Add discipline badge */
+.featured-opportunities .discipline-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    margin-top: 32px; /* Position below category badge */
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 150%;
+    letter-spacing: 0;
+    text-align: center;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    color: white;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: capitalize;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Discipline colors */
+.discipline-visuales { background-color: #E92E4A; }
+.discipline-musica { background-color: #FF7022; }
+.discipline-escenicas { background-color: #F3CE3A; }
+.discipline-literatura { background-color: #2ED0FF; }
+.discipline-diseno { background-color: #17A398; }
+.discipline-cine { background-color: #64113F; }
+.discipline-otras { background-color: #F15BB5; }
+.discipline-default { background-color: #6B7280; }
+
+/* Date styling */
+.featured-opportunities .flex.items-center.gap-1:last-child {
+    color: #6232FF;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 150%;
+    letter-spacing: 0;
+}
+
+.featured-opportunities .flex.items-center.gap-1:last-child svg {
+    color: #6232FF;
+    width: 16px;
+    height: 16px;
+}
+
+/* Card structure */
+.featured-opportunities .opportunity-preview {
+    width: 416px;
+    height: 290px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Image container */
+.featured-opportunities .relative.h-48 {
+    height: 196px;
+    background-color: #f3f4f6;
+}
+
+/* Image styling */
+.featured-opportunities .relative.h-48 img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+/* Content container */
+.featured-opportunities .p-2 {
+    height: auto;
+    padding: 10px 20px 6px;
+    position: relative;
+    top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    justify-content: flex-start;
+    overflow: visible;
+}
+
+/* Title styling */
+.featured-opportunities .font-medium.text-lg {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1.2;
+    letter-spacing: 0;
+    color: #1F2937;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0;
+    max-width: 100%;
+    min-height: 20px;
+}
+
+/* Meta info styling (country, paid, disciplines) */
+.featured-opportunities .flex.flex-wrap.gap-4 {
+    gap: 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* First row with country, payment info, and subdisciplines */
+.featured-opportunities .meta-row {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+/* Inline subdisciplines */
+.featured-opportunities .subdisciplines-inline {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1; /* Take remaining space */
+    min-width: 0; /* Allow flexbox to shrink below content size */
+    color: #6B7280; /* design-gray-500 - same as country text */
+}
+
+/* Subdisciplines icon */
+.featured-opportunities .subdisciplines-inline svg {
+    color: #6B7280; /* design-gray-500 - same as text */
+    width: 14px;
+    height: 14px;
+}
+
+/* Subdisciplines truncation */
+.featured-opportunities .subdisciplines-inline span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: inline-block;
+    color: #6B7280; /* design-gray-500 - same as country text */
+}
+
+/* Date row - always on a new line */
+.featured-opportunities .date-row {
+    width: 100%;
+    color: #6232FF;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 150%;
+    letter-spacing: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+}
+
+/* Date row icon */
+.featured-opportunities .date-row svg {
+    color: #6232FF;
+    width: 14px;
+    height: 14px;
+}
+
+/* All icons in meta info */
+.featured-opportunities .flex.items-center.gap-1 svg {
+    width: 14px;
+    height: 14px;
+}
+
+.featured-opportunities .flex.items-center.gap-1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 150%;
+    letter-spacing: 0;
+    color: #6B7280; /* design-gray-500 */
+} 

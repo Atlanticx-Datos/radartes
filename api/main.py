@@ -1352,7 +1352,7 @@ def refresh_database_cache():
         cache_json = json.dumps(cache_data, ensure_ascii=False)
         
         # Store in Redis
-        redis.set('database_content', cache_json, ex=604800)  # 7 days
+        redis.set('database_content', cache_json, ex=7776000)  # 3 months (90 days)
 
         # Debug: Log the cached content
         cached_content = redis.get('database_content')

@@ -320,7 +320,7 @@
             </div>
 
             <!-- Destacados section with proper spacing and full width -->
-            <div class="relative max-w-7xl mx-auto destacados-container mb-8">
+            <div class="relative max-w-7xl mx-auto destacados-container mb-12">
                 <h2 class="text-2xl font-bold mb-8 destacados-header text-design-gray-900">Destacados de la semana 🔥</h2>
                 <div class="relative">
                     <!-- Previous button - adjusted to -ml-14 -->
@@ -806,6 +806,7 @@ document.addEventListener('DOMContentLoaded', function() {
 {% block page_scripts %}
 <script type="module">
     import { processDestacarData } from "{{ url_for('static', filename='js/modules/data-processor.js') }}";
+    
     const rawData = JSON.parse('{{ destacar_pages| tojson | safe }}');
     processDestacarData(rawData);
 </script>

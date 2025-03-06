@@ -627,20 +627,25 @@ html {
     background: white !important;
 }
 
-/* Adjust destacados container z-index */
+/* Destacados container */
 .destacados-container {
-    position: relative;
-    z-index: 1;  /* Much lower z-index */
-}
-
-/* Ensure the search container has proper stacking */
-.relative.w-full.max-w-2xl {
     position: relative;
     z-index: 9999;  /* Match filter container */
 }
 
 .destacados-container .featured-opportunities {
     margin-top: 1rem;
+    margin-bottom: 3rem;
+}
+
+/* Hide scrollbar but keep functionality */
+.hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;     /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;             /* Chrome, Safari and Opera */
 }
 
 
