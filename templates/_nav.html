@@ -1,11 +1,8 @@
-<nav class="flex justify-between items-center h-16 max-w-[1292px] mx-auto px-8">
+<nav class="flex justify-between items-center h-[60px] max-w-[1292px] mx-auto px-8">
     <!-- Logo Section -->
     <div class="flex items-center">
-        <a href="{{ url_for('index') }}" class="text-2xl font-bold tracking-tight text-neutral-700 flex items-center gap-[2px] hover:opacity-80 transition-opacity">
-            <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-neutral-700"></span>
-            <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-neutral-400"></span>
-            <span class="inline-block w-[0.7em] h-[0.7em] rounded-full bg-red-500"></span>
-            <span class="font-black ml-1">RAD/AR/TES</span>
+        <a href="{{ url_for('index') }}" class="text-2xl font-bold tracking-tight text-design-gray-900 flex items-center gap-[2px] hover:opacity-80 transition-opacity">
+            <span class="font-bold ml-1">RAD/AR/TES</span>
         </a>
     </div>
 
@@ -19,20 +16,20 @@
                         {% if session.user.get('picture') and 'http' in session.user.picture %}
                             <!-- Case 1: User has a valid picture URL -->
                             <img src="{{ session.user.picture }}" alt="{{ session.user.name }}" class="w-full h-full object-cover"
-                                 onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\'w-full h-full bg-blue-600 text-white flex items-center justify-center font-medium\'>{{ session.user.email[:1].upper() }}</div>';">
+                                 onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\'w-full h-full bg-design-primary text-white flex items-center justify-center font-medium\'>{{ session.user.email[:1].upper() }}</div>';">
                         {% elif session.user.get('name') %}
                             <!-- Case 2: User has a name but no picture -->
-                            <div class="w-full h-full bg-blue-600 text-white flex items-center justify-center font-medium">
+                            <div class="w-full h-full bg-design-primary text-white flex items-center justify-center font-medium">
                                 {{ session.user.name[:1].upper() }}{{ session.user.name.split(' ')[1][:1].upper() if ' ' in session.user.name else '' }}
                             </div>
                         {% else %}
                             <!-- Case 3: User only has email -->
-                            <div class="w-full h-full bg-gray-600 text-white flex items-center justify-center">
+                            <div class="w-full h-full bg-design-gray-600 text-white flex items-center justify-center">
                                 {{ session.user.email[:1].upper() }}
                             </div>
                         {% endif %}
                     </div>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-design-gray-500" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                 </button>
@@ -41,14 +38,14 @@
                 <div id="user-menu" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg z-50">
                     <div class="p-4 border-b">
                         <p class="font-semibold">{{ session.user.name }}</p>
-                        <p class="text-sm text-gray-600">{{ session.user.email }}</p>
-                        <p class="text-xs text-gray-500 mt-1">{{ session.user.user_type }}</p>
+                        <p class="text-sm text-design-gray-600">{{ session.user.email }}</p>
+                        <p class="text-xs text-design-gray-500 mt-1">{{ session.user.user_type }}</p>
                     </div>
                     <div class="p-2">
-                        <a href="{{ url_for('mi_espacio') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg">
+                        <a href="{{ url_for('mi_espacio') }}" class="block px-4 py-2 text-sm text-design-gray-700 hover:bg-design-gray-100 rounded-lg">
                             Mi espacio
                         </a>
-                        <a href="{{ url_for('logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg">
+                        <a href="{{ url_for('logout') }}" class="block px-4 py-2 text-sm text-design-gray-700 hover:bg-design-gray-100 rounded-lg">
                             Cerrar sesión
                         </a>
                     </div>
@@ -56,7 +53,7 @@
             </div>
         {% else %}
             <!-- Login Button (Only visible when not logged in) -->
-            <a href="{{ url_for('login') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+            <a href="{{ url_for('login') }}" class="bg-design-primary text-white px-4 py-2 rounded-full text-sm font-bold hover:bg-opacity-90 transition-colors">
                 Iniciar sesión
             </a>
         {% endif %}

@@ -56,18 +56,18 @@
     <!-- Background image with overlay -->
     <div class="absolute inset-0 z-0">
         <div class="absolute inset-0" style="height: calc(100% + 2rem);">
-            <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80" 
+            <img src="{{ url_for('static', filename='public/mirada.png') }}" 
                  alt="Background" 
                  class="w-full h-full object-cover">
-            <div class="absolute inset-0 bg-black/70"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-[#6232FF]/75 to-[#CEFF1C]/20 mix-blend-multiply"></div>
         </div>
     </div>
     
     <!-- Content container -->
     <div class="container max-w-[1292px] mx-auto px-8 h-full">
         <div class="relative z-10 flex flex-col items-center text-center justify-center h-full">
-            <h1 class="text-5xl font-bold mb-4 text-white drop-shadow-lg">un radar global para tus</h1>
-            <h1 class="text-5xl text-gray-100 mb-8 max-w-2xl drop-shadow">oportunidades</h1>
+            <h1 class="text-[40px] font-bold leading-[130%] tracking-normal text-center text-white">Descubrí tu próxima</h1>
+            <h1 class="text-[40px] font-bold leading-[130%] tracking-normal text-center text-[#CEFF1C] mb-8">oportunidad</h1>
            
             <!-- Search Section -->
             <div class="relative w-full max-w-2xl">
@@ -230,7 +230,7 @@
 
                         <!-- Search Button -->
                         <button id="search-filters"
-                            class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            class="w-full py-2 px-4 bg-design-primary text-white rounded-lg hover:bg-opacity-90 transition-colors"
                             type="button">
                             Buscar
                         </button>
