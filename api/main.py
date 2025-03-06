@@ -2129,6 +2129,22 @@ def subscribe():
         app.logger.error(f"Subscription error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def server_error(e):
+    return render_template('500.html'), 500
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # For any other exception, use the generic error template
+    return render_template('error.html', 
+                          code=500, 
+                          message="Error Inesperado", 
+                          description="Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo más tarde."), 500
+
 if __name__ == "__main__":
     # Ensure session directory exists
     os.makedirs(os.path.join(app.root_path, 'flask_session'), exist_ok=True)

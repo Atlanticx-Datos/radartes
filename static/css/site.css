@@ -233,15 +233,12 @@ html {
 ==================================== */
 .filter-container {
     display: flex;
-    flex-wrap: nowrap;
-    gap: 0.75rem;
+    flex-wrap: wrap;
+    gap: 10px;
     width: 100%;
     overflow-x: auto;
     padding: 0.5rem 0;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    position: relative;
-    z-index: 9999;  /* Much higher z-index */
+    margin-bottom: 1rem;
 }
 
 /* Chevron rotation for dropdown state */
@@ -255,71 +252,187 @@ html {
     display: none;
 }
 
+/* Filter button */
 .filter-btn {
-    padding: 0.5rem 1rem;
-    margin-right: 0.5rem;
-    margin-bottom: 0.5rem;
-    border-width: 1px;
+    display: flex;
+    align-items: center;
+    height: 50px;
+    width: 144px;
+    padding: 8px 16px 8px 8px;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    line-height: 150%;
+    letter-spacing: 0;
     transition: all 0.2s ease;
+    background-color: white;
+    border: 1px solid #E5E7EB;
+    color: #4B5563;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.06);
+    position: relative;
 }
 
-.filter-btn:hover {
-    background-color: rgba(59, 130, 246, 0.1);
-    border-color: rgba(59, 130, 246, 0.5);
+/* Filter button text */
+.filter-btn span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    text-align: center;
+    margin-left: -10px; /* Offset to center text in remaining space */
 }
 
-.filter-btn.active-filter {
-    background-color: rgba(59, 130, 246, 0.2);
-    border-color: rgba(59, 130, 246, 0.8);
-    color: rgb(37, 99, 235);
-    font-weight: 500;
-}
-
-.filter-btn svg {
-    transition: stroke 0.2s ease;
-    stroke: currentColor;
-    width: 1.25rem;
-    height: 1.25rem;
+/* Icon container */
+.filter-btn .icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    margin-right: 10px;
+    border-radius: 50%;
+    background-color: #F3F4F6;
     flex-shrink: 0;
-    margin-bottom: 0;
 }
 
-.filter-btn:active {
-    transform: scale(0.95);
+/* Filter button svg */
+.filter-btn svg {
+    width: 16px;
+    height: 16px;
 }
 
-/* Remove the after pseudo-element animation since it doesn't fit the badge style */
-.filter-btn::after {
-    display: none;
+/* Filter button active state */
+.filter-btn[data-active="true"] {
+    background-color: #F3F4F6;
+    border-color: #D1D5DB;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-/* Contextual styles - make inactive badges more subtle */
+/* Filter button hover state */
+.filter-btn:hover {
+    background-color: #F9FAFB;
+    border-color: #D1D5DB;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* Filter button discipline-specific colors */
+.filter-btn[data-discipline-filter="Visuales"] .icon-container {
+    background-color: rgba(236, 72, 153, 0.1);
+}
+
+.filter-btn[data-discipline-filter="Música"] .icon-container {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+.filter-btn[data-discipline-filter="Escénicas"] .icon-container {
+    background-color: rgba(245, 158, 11, 0.1);
+}
+
+.filter-btn[data-discipline-filter="Literatura"] .icon-container {
+    background-color: rgba(16, 185, 129, 0.1);
+}
+
+.filter-btn[data-discipline-filter="Diseño"] .icon-container {
+    background-color: rgba(139, 92, 246, 0.1);
+}
+
+.filter-btn[data-discipline-filter="Cine"] .icon-container {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.filter-btn[data-discipline-filter="Otras"] .icon-container {
+    background-color: rgba(75, 85, 99, 0.1);
+}
+
+.filter-btn[data-discipline-filter="todos"] .icon-container {
+    background-color: rgba(55, 65, 81, 0.1);
+}
+
+/* Filter button discipline-specific icon colors */
+.filter-btn[data-discipline-filter="Visuales"] svg {
+    color: rgb(236, 72, 153);
+}
+
+.filter-btn[data-discipline-filter="Música"] svg {
+    color: rgb(59, 130, 246);
+}
+
+.filter-btn[data-discipline-filter="Escénicas"] svg {
+    color: rgb(245, 158, 11);
+}
+
+.filter-btn[data-discipline-filter="Literatura"] svg {
+    color: rgb(16, 185, 129);
+}
+
+.filter-btn[data-discipline-filter="Diseño"] svg {
+    color: rgb(139, 92, 246);
+}
+
+.filter-btn[data-discipline-filter="Cine"] svg {
+    color: rgb(239, 68, 68);
+}
+
+.filter-btn[data-discipline-filter="Otras"] svg {
+    color: rgb(75, 85, 99);
+}
+
+.filter-btn[data-discipline-filter="todos"] svg {
+    color: rgb(55, 65, 81);
+}
+
+/* Filter button opacity for inactive buttons when some are active */
 .filter-container:has(.filter-btn[data-active="true"]) .filter-btn:not([data-active="true"]) {
-    opacity: 0.75;
+    opacity: 0.7;
 }
 
 @media (hover: hover) {
     .filter-container:has(.filter-btn[data-active="true"]) .filter-btn:not([data-active="true"]):hover {
-        opacity: 1;
+        opacity: 0.9;
     }
 }
 
 /* Responsive adjustments */
 @media (max-width: 640px) {
     .filter-container {
-        gap: 0.5rem;
+        gap: 8px;
         padding: 0.25rem 0;
+        overflow-x: auto;
+        flex-wrap: nowrap;
     }
-
+    
     .filter-btn {
-        padding: 0.5rem 1rem;
-        font-size: 0.75rem;
-        height: 2rem;
+        width: auto;
+        min-width: 120px;
+        height: 44px;
+        padding: 8px 12px 8px 8px;
+        white-space: nowrap;
+        font-size: 13px;
+        box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1), 0px 1px 1px rgba(0, 0, 0, 0.06);
     }
-
+    
+    .filter-btn:hover {
+        box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.06);
+    }
+    
+    .filter-btn[data-active="true"] {
+        box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .filter-btn .icon-container {
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
+    }
+    
     .filter-btn svg {
-        width: 1rem;
-        height: 1rem;
+        width: 14px;
+        height: 14px;
+    }
+    
+    .filter-btn span {
+        margin-left: -8px;
     }
 }
 
@@ -524,6 +637,10 @@ html {
 .relative.w-full.max-w-2xl {
     position: relative;
     z-index: 9999;  /* Match filter container */
+}
+
+.destacados-container .featured-opportunities {
+    margin-top: 1rem;
 }
 
 

@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<title>Error {{ code }} - RAD/AR/TES</title>
+{% endblock %}
+
+{% block body %}
+<div class="w-full bg-gray-50 min-h-screen">
+    <div class="container max-w-[1292px] mx-auto px-8 py-16">
+        <div class="text-center max-w-2xl mx-auto">
+            <h1 class="text-6xl font-bold text-design-gray-900 mb-4">{{ code }}</h1>
+            <h2 class="text-2xl font-bold text-design-gray-900 mb-8">{{ message }}</h2>
+            <p class="text-lg text-gray-600 mb-8">{{ description }}</p>
+            <a href="{{ url_for('index') }}" class="inline-block bg-design-primary text-white px-8 py-3 rounded-full font-medium hover:bg-opacity-90 transition-colors text-lg">
+                Volver al inicio
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

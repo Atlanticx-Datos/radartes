@@ -250,61 +250,78 @@
 <div class="w-full bg-gray-50 rounded-t-[40px] overflow-hidden relative z-10 -mt-8">
     <!-- Re-open container for content alignment -->
     <div class="container max-w-[1292px] mx-auto px-8">
-        <div class="pt-16 relative z-20">
+        <div class="pt-10 relative z-20">
             <!-- Filter buttons section -->
             <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-6 text-design-gray-900">Oportunidades por disciplina</h2>
                 <div class="filter-container">
-                    {% for discipline in discipline_groups.keys() %}
                     <button
-                        class="filter-btn flex items-center justify-center rounded-med border text-gray-700 transition-all"
+                        class="filter-btn"
+                        data-discipline-filter="todos" data-active="true"
+                        onclick="this.dataset.active = this.dataset.active === 'true' ? 'false' : 'true'; toggleDisciplineFilter(this, 'todos')">
+                        <div class="icon-container">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 12h16m-7 6h7" />
+                            </svg>
+                        </div>
+                        <span>Todos</span>
+                    </button>
+                    
+                    {% for discipline in discipline_groups.keys() %}
+                    {% if discipline != 'todos' %}
+                    <button
+                        class="filter-btn"
                         data-discipline-filter="{{ discipline }}" data-active="false"
                         onclick="this.dataset.active = this.dataset.active === 'true' ? 'false' : 'true'; toggleDisciplineFilter(this, '{{ discipline }}')">
-                        <!-- Icons for each discipline -->
-                        {% if discipline == 'Visuales' %}
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        {% elif discipline == 'Música' %}
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                        </svg>
-                        {% elif discipline == 'Escénicas' %}
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                        {% elif discipline == 'Literatura' %}
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
-                        {% elif discipline == 'Diseño' %}
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                        </svg>
-                        {% elif discipline == 'Cine' %}
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
-                        </svg>
-                        {% else %}
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                        {% endif %}
-                        <span class="ml-2">{{ discipline|title }}</span>
+                        <div class="icon-container">
+                            {% if discipline == 'Visuales' %}
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            {% elif discipline == 'Música' %}
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                            </svg>
+                            {% elif discipline == 'Escénicas' %}
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                            {% elif discipline == 'Literatura' %}
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            {% elif discipline == 'Diseño' %}
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                            </svg>
+                            {% elif discipline == 'Cine' %}
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                            </svg>
+                            {% elif discipline == 'Otras' %}
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            {% endif %}
+                        </div>
+                        <span>{{ discipline }}</span>
                     </button>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>
 
             <!-- Destacados section with proper spacing and full width -->
-            <div class="relative max-w-7xl mx-auto destacados-container">
-                <h2 class="text-2xl font-bold mb-6 destacados-header">Destacados de la semana 🔥</h2>
+            <div class="relative max-w-7xl mx-auto destacados-container mb-8">
+                <h2 class="text-2xl font-bold mb-8 destacados-header text-design-gray-900">Destacados de la semana 🔥</h2>
                 <div class="relative">
                     <!-- Previous button - adjusted to -ml-14 -->
                     <button onclick="prevDestacarPage()"
@@ -333,18 +350,18 @@
             </div>
 
             <!-- Results Section -->
-            <div class="mt-8 mb-6">
-                <h2 id="radar-header" class="text-2xl font-bold mb-6">Radar de oportunidades 🌎</h2>
+            <div class="mb-8">
+                <h2 id="radar-header" class="text-2xl font-bold mb-6 text-design-gray-900">Radar de oportunidades 🌎</h2>
                 <!-- Results Counter -->
-                <div class="text-sm text-gray-600 my-4" id="results-counter"></div>
+                <div class="text-sm text-gray-600 mb-4" id="results-counter"></div>
 
                 <!-- Results Grid -->
                 <div id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             </div>
 
             <!-- New Top Opportunities Section -->
-            <div class="mt-16 mb-12">
-                <h2 class="text-2xl font-bold mb-6">Top convocatorias 🎯</h2>
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-6 text-design-gray-900">Top convocatorias 🎯</h2>
                 <div class="relative">
                     <!-- Previous button -->
                     <button onclick="prevTopPage()"
@@ -373,41 +390,37 @@
             </div>
 
             <!-- Newsletter Section -->
-            <div class="mt-16 mb-12 bg-[#8B8B9D] rounded-lg overflow-hidden">
-                <div class="container mx-auto px-8 py-12">
+            <div class="mb-8 bg-[#8B8B9D] rounded-lg overflow-hidden">
+                <div class="container mx-auto px-6 py-10">
                     <div class="text-center">
                         {% if existing_email %}
-                            <!-- Already subscribed -->
-                            <div id="newsletter-status" class="text-center">
-                                <h2 class="text-2xl font-bold text-white mb-2">¡Ya estás suscrito!</h2>
-                                <p class="text-gray-200">
-                                    Recibirás actualizaciones en {{ existing_email }}
-                                </p>
-                            </div>
+                        <!-- Already subscribed -->
+                        <h2 class="text-3xl font-bold text-white mb-4">¡Ya estás suscripto!</h2>
+                        <p class="text-gray-200 mb-8 text-lg">
+                            Estás recibiendo actualizaciones con el email: <strong>{{ existing_email }}</strong>
+                        </p>
+                        <form action="/unsubscribe" method="post" class="mt-6">
+                            <input type="hidden" name="email" value="{{ existing_email }}">
+                            <button type="submit"
+                                class="bg-white text-gray-800 px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors text-lg">
+                                Cancelar suscripción
+                            </button>
+                        </form>
                         {% else %}
-                            <!-- Not subscribed -->
-                            <h2 class="text-3xl font-bold text-white mb-2">Suscribite a nuestro newsletter</h2>
-                            <p class="text-gray-200 mb-8">
-                                Recibí actualizaciones mensuales de fotografía, arte, literatura y mucho más.
-                            </p>
-                            <form id="subscribe-form" class="max-w-xl mx-auto flex gap-2">
-                                <div class="flex-1">
-                                    <input 
-                                        type="email" 
-                                        id="subscribe-email"
-                                        placeholder="Ingresa tu correo electrónico"
-                                        class="w-full px-6 py-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-                                        required
-                                    >
-                                </div>
-                                <button 
-                                    type="submit"
-                                    class="bg-[#00FF85] text-gray-900 px-6 py-3 rounded-lg font-medium hover:bg-[#00CC6A] transition-colors"
-                                >
-                                    Suscribirse
-                                </button>
-                            </form>
+                        <!-- Not subscribed -->
+                        <h2 class="text-3xl font-bold text-white mb-4">Suscribite a nuestro newsletter</h2>
+                        <p class="text-gray-200 mb-8 text-lg max-w-2xl mx-auto">
+                            Recibí actualizaciones mensuales de fotografía, arte, literatura y mucho más.
+                        </p>
+                        <form action="/subscribe" method="post" class="mt-6 flex flex-col sm:flex-row justify-center max-w-lg mx-auto">
+                            <input type="email" name="email" placeholder="Tu email"
+                                class="px-6 py-3 rounded-full mb-3 sm:mb-0 sm:mr-3 w-full sm:w-auto flex-grow focus:outline-none text-lg"
+                                required>
+                            <button type="submit"
+                                class="bg-white text-gray-800 px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors text-lg">
+                                Suscribirme
+                            </button>
+                        </form>
                         {% endif %}
                     </div>
                 </div>
