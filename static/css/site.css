@@ -226,7 +226,7 @@ html {
 }
 
 /* ====================================
-   FILTER BUTTON COMPONENTS
+   FILTER BUTTONS
    Used in: index.html filter buttons
    Purpose: Custom interactive filter UI
    Why custom: Complex state management and animations
@@ -237,8 +237,8 @@ html {
     gap: 10px;
     width: 100%;
     overflow-x: auto;
-    padding: 0.5rem 0;
-    margin-bottom: 1rem;
+    padding: 0.25rem 0;
+    margin-bottom: 0; /* Remove bottom margin as the parent container handles spacing */
 }
 
 /* Chevron rotation for dropdown state */
@@ -268,9 +268,10 @@ html {
     transition: all 0.2s ease;
     background-color: white;
     border: 1px solid #E5E7EB;
-    color: #4B5563;
-    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.06);
+    color: #1F1B2D;
+    box-shadow: 0px 4px 12px 0px rgba(31, 27, 45, 0.08), 0px 2px 2px -2px rgba(31, 27, 45, 0.08);
     position: relative;
+    isolation: isolate;
 }
 
 /* Filter button text */
@@ -281,6 +282,8 @@ html {
     flex: 1;
     text-align: center;
     margin-left: -10px; /* Offset to center text in remaining space */
+    color: #1F1B2D; /* Updated text color to match Figma design */
+    font-weight: 600; /* Slightly bolder to match design */
 }
 
 /* Icon container */
@@ -294,26 +297,57 @@ html {
     border-radius: 50%;
     background-color: #F3F4F6;
     flex-shrink: 0;
+    transition: all 0.2s ease;
 }
 
 /* Filter button svg */
 .filter-btn svg {
     width: 16px;
     height: 16px;
+    color: #1F1B2D; /* Updated icon color to match text */
+    transition: all 0.2s ease;
 }
 
 /* Filter button active state */
 .filter-btn[data-active="true"] {
     background-color: #F3F4F6;
     border-color: #D1D5DB;
-    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0px 2px 4px 0px rgba(31, 27, 45, 0.06), 0px 1px 1px -1px rgba(31, 27, 45, 0.06);
+}
+
+/* Filter button active state - text */
+.filter-btn[data-active="true"] span {
+    color: #1F1B2D;
+    font-weight: 700;
+}
+
+/* Filter button active state - update icon container */
+.filter-btn[data-active="true"] .icon-container {
+    background-color: rgba(31, 27, 45, 0.1); /* Slightly darker background when active */
+}
+
+/* Filter button active state - update icon */
+.filter-btn[data-active="true"] svg {
+    color: #1F1B2D;
 }
 
 /* Filter button hover state */
 .filter-btn:hover {
     background-color: #F9FAFB;
     border-color: #D1D5DB;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.06);
+    box-shadow: 0px 6px 16px 0px rgba(31, 27, 45, 0.1), 0px 2px 4px -2px rgba(31, 27, 45, 0.1);
+}
+
+.filter-btn:hover span {
+    color: #1F1B2D;
+}
+
+.filter-btn:hover .icon-container {
+    background-color: rgba(31, 27, 45, 0.05);
+}
+
+.filter-btn:hover svg {
+    color: #1F1B2D;
 }
 
 /* Filter button discipline-specific colors */
@@ -409,15 +443,16 @@ html {
         padding: 8px 12px 8px 8px;
         white-space: nowrap;
         font-size: 13px;
-        box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1), 0px 1px 1px rgba(0, 0, 0, 0.06);
+        color: #1F1B2D;
+        box-shadow: 0px 4px 12px 0px rgba(31, 27, 45, 0.08), 0px 2px 2px -2px rgba(31, 27, 45, 0.08);
     }
     
     .filter-btn:hover {
-        box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.06);
+        box-shadow: 0px 6px 16px 0px rgba(31, 27, 45, 0.1), 0px 2px 4px -2px rgba(31, 27, 45, 0.1);
     }
     
     .filter-btn[data-active="true"] {
-        box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+        box-shadow: 0px 2px 4px 0px rgba(31, 27, 45, 0.06), 0px 1px 1px -1px rgba(31, 27, 45, 0.06);
     }
     
     .filter-btn .icon-container {
@@ -429,10 +464,17 @@ html {
     .filter-btn svg {
         width: 14px;
         height: 14px;
+        color: #1F1B2D;
     }
     
     .filter-btn span {
         margin-left: -8px;
+        color: #1F1B2D;
+        font-weight: 600;
+    }
+    
+    .filter-btn[data-active="true"] span {
+        font-weight: 700;
     }
 }
 

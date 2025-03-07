@@ -823,19 +823,22 @@ window.toggleDisciplineFilter = function(button, discipline) {
         button.classList.remove('active-filter');
     }
     
-    // Call the FilterModule's handleDisciplineFilter method
-    FilterModule.handleDisciplineFilter(button);
+    // Call the FilterModule's handleDisciplineFilter method with shouldScroll=true
+    FilterModule.handleDisciplineFilter(button, true);
     
-    // Explicitly hide/show destacados container based on active discipline
-    const destacadosContainer = document.querySelector('.destacados-container');
+    // Explicitly hide/show destacados section based on active discipline
+    const destacadosSection = document.querySelector('.destacados-section');
+    const destacadosContainer = document.querySelector('.featured-opportunities');
     const prevControl = document.querySelector('.destacar-prev');
     const nextControl = document.querySelector('.destacar-next');
     
     if (button.dataset.active === 'true' && discipline !== 'todos') {
+        destacadosSection?.classList.add('hidden');
         destacadosContainer?.classList.add('hidden');
         prevControl?.classList.add('hidden');
         nextControl?.classList.add('hidden');
     } else if (discipline === 'todos' || button.dataset.active === 'false') {
+        destacadosSection?.classList.remove('hidden');
         destacadosContainer?.classList.remove('hidden');
         prevControl?.classList.remove('hidden');
         nextControl?.classList.remove('hidden');

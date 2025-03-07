@@ -210,7 +210,7 @@ export const FilterModule = {
         return false;
     },
 
-    handleDisciplineFilter(button) {
+    handleDisciplineFilter(button, shouldScroll = false) {
         console.log('=== Discipline Filter Start ===');
         const discipline = button.dataset.disciplineFilter;
         console.log('Current discipline:', this.activeFilters.discipline);
@@ -248,15 +248,18 @@ export const FilterModule = {
         }
 
         // Update visibility of featured section
-        const destacadosContainer = document.querySelector('.destacados-container');
+        const destacadosSection = document.querySelector('.destacados-section');
+        const destacadosContainer = document.querySelector('.featured-opportunities');
         const prevControl = document.querySelector('.destacar-prev');
         const nextControl = document.querySelector('.destacar-next');
         
         if (this.activeFilters.discipline !== 'todos') {
+            destacadosSection?.classList.add('hidden');
             destacadosContainer?.classList.add('hidden');
             prevControl?.classList.add('hidden');
             nextControl?.classList.add('hidden');
         } else {
+            destacadosSection?.classList.remove('hidden');
             destacadosContainer?.classList.remove('hidden');
             prevControl?.classList.remove('hidden');
             nextControl?.classList.remove('hidden');
@@ -266,7 +269,7 @@ export const FilterModule = {
         this.updateDisciplineButtons();
 
         console.log('Filtered results count:', filtered.length);
-        this.updateResults(filtered);
+        this.updateResults(filtered, shouldScroll);
         console.log('=== Discipline Filter End ===');
     },
 

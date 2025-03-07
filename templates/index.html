@@ -59,7 +59,7 @@
             <img src="{{ url_for('static', filename='public/mirada.png') }}" 
                  alt="Background" 
                  class="w-full h-full object-cover">
-            <div class="absolute inset-0 bg-gradient-to-r from-[#6232FF]/75 to-[#CEFF1C]/20 mix-blend-multiply"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-[#CEFF1C]/20 to-[#6232FF]/75 mix-blend-multiply"></div>
         </div>
     </div>
     
@@ -73,18 +73,24 @@
             <div class="relative w-full max-w-2xl">
                 <!-- Search input and buttons -->
                 <div class="relative flex items-center">
-                    <input type="text" id="open-search" placeholder="Buscar (acepta combinaciones, por ej.: 'Visuales, España')"
-                        class="w-full p-4 pr-28 border rounded-full shadow-xl bg-white/95 placeholder-gray-500">
+                    <!-- Search icon on the left -->
+                    <div class="absolute left-4 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <input type="text" id="open-search" placeholder="¿Qué estás buscando?"
+                        class="w-full p-4 pl-12 pr-28 border rounded-full shadow-xl bg-white/95 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">
 
-                    <!-- Filter trigger button (now first) -->
-                    <button id="filter-dropdown-trigger" class="absolute right-16 p-2 text-gray-400 hover:text-gray-600">
+                    <!-- Filter trigger button -->
+                    <button id="filter-dropdown-trigger" class="absolute p-2 text-[#454056] transition-all duration-200">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
                         </svg>
                     </button>
 
-                    <!-- Clear all filters button (now second) -->
-                    <button type="button" id="clear-search" class="absolute right-4 p-2 text-gray-400 hover:text-gray-600"
+                    <!-- Clear all filters button -->
+                    <button type="button" id="clear-search" class="absolute right-4 p-2 text-[#454056] hidden"
                         onclick="clearSearch();">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
@@ -344,10 +350,10 @@
 <!-- Full width background container with rounded top corners -->
 <div class="w-full bg-gray-50 rounded-t-[40px] overflow-hidden relative z-10 -mt-8">
     <!-- Re-open container for content alignment -->
-    <div class="container max-w-[1292px] mx-auto px-8">
+    <div class="container max-w-[1440px] mx-auto px-8">
         <div class="pt-10 relative z-20">
             <!-- Filter buttons section -->
-            <div class="mb-8">
+            <div class="mb-14">
                 <h2 class="text-2xl font-bold mb-6 text-design-gray-900">Oportunidades por disciplina</h2>
                 <div class="filter-container">
                     <button
@@ -415,8 +421,8 @@
             </div>
 
             <!-- Destacados Section -->
-            <div class="mb-16">
-                <h2 class="text-2xl font-bold mb-6 text-design-gray-900">Destacados de la semana 🔥</h2>
+            <div class="mb-14 destacados-section">
+                <h2 class="text-2xl font-bold mb-8 text-design-gray-900">Destacados de la semana 🔥</h2>
                 <div class="relative">
                     <!-- Previous button -->
                     <button onclick="prevDestacarPage()"
@@ -497,8 +503,8 @@
             </div>
 
             <!-- Results Section -->
-            <div class="mb-16">
-                <h2 id="radar-header" class="text-2xl font-bold mb-6 text-design-gray-900">Radar de oportunidades 🌎</h2>
+            <div class="mb-14">
+                <h2 id="radar-header" class="text-2xl font-bold mb-8 text-design-gray-900">Radar de oportunidades 🌎</h2>
                 <!-- Results Counter -->
                 <div class="text-sm text-gray-600 mb-4" id="results-counter"></div>
 
@@ -507,8 +513,8 @@
             </div>
 
             <!-- New Top Opportunities Section -->
-            <div class="mb-16">
-                <h2 class="text-2xl font-bold mb-6 text-design-gray-900">Top convocatorias 🎯</h2>
+            <div class="mb-14">
+                <h2 class="text-2xl font-bold mb-8 text-design-gray-900">Top convocatorias 🎯</h2>
                 <div class="relative">
                     <!-- Previous button -->
                     <button onclick="prevTopPage()"
@@ -694,16 +700,25 @@
         console.log('applyFilters called with:', { searchInput, activeFilters });
         
         const featuredSection = document.querySelector('.featured-opportunities');
+        const destacadosSection = document.querySelector('.destacados-section');
+        const prevControl = document.querySelector('.destacar-prev');
+        const nextControl = document.querySelector('.destacar-next');
 
         if (searchInput ||
             activeFilters.categories.size > 0 ||
             activeFilters.country ||
             activeFilters.month ||
             activeFilters.discipline !== 'todos') {
+            destacadosSection?.classList.add('hidden');
             featuredSection?.classList.add('hidden');
+            prevControl?.classList.add('hidden');
+            nextControl?.classList.add('hidden');
             // Removed scroll logic as the featured section is now hidden
         } else {
+            destacadosSection?.classList.remove('hidden');
             featuredSection?.classList.remove('hidden');
+            prevControl?.classList.remove('hidden');
+            nextControl?.classList.remove('hidden');
         }
 
         const allPages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
