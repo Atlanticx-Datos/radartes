@@ -114,7 +114,7 @@ function createDestacarCard(item) {
     // Create card HTML
     card.innerHTML = `
         <div class="destacar-card-image">
-            <img src="${item.image_url || 'static/public/placeholder.jpg'}" alt="${item.nombre || 'Oportunidad destacada'}">
+            <img src="${item.image_url || 'static/public/IsoAtx.png'}" alt="${item.nombre || 'Oportunidad destacada'}">
             <div class="destacar-card-badges">
                 <span class="destacar-badge destacar-badge-category">${item.categoria || 'Oportunidad'}</span>
                 <span class="destacar-badge destacar-badge-discipline">${mainDiscipline}</span>

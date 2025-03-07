@@ -290,8 +290,17 @@ document.addEventListener('DOMContentLoaded', function() {
     */
     
     // Add navigation functions to window
-    window.nextTopPage = TopModule.nextPage.bind(TopModule);
-    window.prevTopPage = TopModule.prevPage.bind(TopModule);
+    window.nextTopPage = function() {
+        if (window.TopModule && typeof window.TopModule.nextPage === 'function') {
+            window.TopModule.nextPage();
+        }
+    };
+
+    window.prevTopPage = function() {
+        if (window.TopModule && typeof window.TopModule.prevPage === 'function') {
+            window.TopModule.prevPage();
+        }
+    };
 
     // Initialize SubscribeModule
     SubscribeModule.init();
@@ -1059,6 +1068,35 @@ function initDestacar() {
         console.warn('No prefiltered data found for destacar section');
     }
 }
+
+// Make showOpportunityDetails function globally available
+window.showOpportunityDetails = function(button) {
+    // Get data from button attributes
+    const url = button.getAttribute('data-url');
+    const name = button.getAttribute('data-nombre');
+    const country = button.getAttribute('data-pais');
+    const summary = button.getAttribute('data-og-resumida');
+    const id = button.getAttribute('data-id');
+    const category = button.getAttribute('data-categoria');
+    const requisitos = button.getAttribute('data-requisitos');
+    
+    // Call the modal function if it exists
+    if (window.ModalModule && window.ModalModule.showPreviewModal) {
+        window.ModalModule.showPreviewModal(
+            url,
+            name,
+            country,
+            summary,
+            id,
+            category,
+            null,  // base_url parameter
+            requisitos
+        );
+    } else {
+        // Fallback - open in new tab
+        window.open(url, '_blank');
+    }
+};
 
 // Export any functions that need to be accessed from outside
 export {

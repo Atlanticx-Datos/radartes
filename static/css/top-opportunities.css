@@ -1,0 +1,275 @@
+/* Top Opportunities Section Styling */
+.top-opportunities-container {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+}
+
+.top-opportunities-container .grid {
+    width: 100%;
+}
+
+.top-opportunity-card {
+    display: flex;
+    flex-direction: row;
+    background-color: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    height: 350px; /* Set a fixed height to match the image */
+}
+
+.top-opportunity-image {
+    position: relative;
+    width: 57%; /* 746px out of 1300px = ~57% */
+    overflow: hidden;
+    background-color: #f3f4f6;
+}
+
+.top-opportunity-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.top-opportunity-content {
+    padding: 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 43%; /* Remaining 43% of the width */
+    gap: 1.5rem;
+}
+
+.top-opportunity-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.top-opportunity-discipline {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.top-opportunity-discipline svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.top-opportunity-description {
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.5;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.top-opportunity-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.top-opportunity-badges {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 10;
+}
+
+.top-opportunity-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 150%;
+    letter-spacing: 0;
+    text-align: center;
+    height: 24px;
+    color: white;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: capitalize;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.top-opportunity-badge.category {
+    background-color: #6232FF;
+}
+
+.top-opportunity-badge.discipline-tag.visuales {
+    background-color: #E92E4A;
+}
+
+.top-opportunity-favorite {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    background-color: white;
+    border-radius: 9999px;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.top-opportunity-favorite svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: #6232FF;
+}
+
+.top-opportunity-location {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.top-opportunity-location svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.top-opportunity-date {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.top-opportunity-date svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.top-opportunity-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1.5rem;
+    background-color: #6232FF;
+    color: white;
+    border-radius: 9999px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    align-self: flex-start;
+    margin-top: 0.5rem;
+    height: 36px;
+}
+
+.top-opportunity-button:hover {
+    background-color: #5128d8;
+}
+
+/* Discipline tag colors - using colors from Tailwind config */
+.discipline-tag.visuales { background-color: #E92E4A; }
+.discipline-tag.musica { background-color: #FF7022; }
+.discipline-tag.escenicas { background-color: #F3CE3A; color: #333 !important; }
+.discipline-tag.literatura { background-color: #2ED0FF; }
+.discipline-tag.diseno { background-color: #17A398; }
+.discipline-tag.cine { background-color: #64113F; }
+.discipline-tag.otros { background-color: #F15BB5; }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .top-opportunity-card {
+        flex-direction: column;
+        height: auto;
+    }
+    
+    .top-opportunity-image {
+        width: 100%;
+        height: 200px;
+    }
+    
+    .top-opportunity-content {
+        width: 100%;
+        padding: 1.25rem;
+    }
+    
+    .top-opportunity-title {
+        font-size: 1.25rem;
+    }
+    
+    .top-opportunity-description {
+        -webkit-line-clamp: 2;
+    }
+}
+
+@media (max-width: 640px) {
+    .top-opportunity-card {
+        flex-direction: column;
+        height: auto;
+    }
+    
+    .top-opportunity-image {
+        height: 160px;
+    }
+    
+    .top-opportunity-content {
+        padding: 1rem;
+    }
+    
+    .top-opportunity-badges {
+        top: 8px;
+        left: 8px;
+        gap: 6px;
+    }
+    
+    .top-opportunity-badge {
+        font-size: 12px;
+        padding: 3px 10px;
+        height: 22px;
+    }
+    
+    .top-opportunity-favorite {
+        top: 8px;
+        right: 8px;
+        width: 2rem;
+        height: 2rem;
+    }
+    
+    .top-opportunity-favorite svg {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+    
+    .top-opportunity-title {
+        font-size: 1.125rem;
+    }
+    
+    .top-opportunity-meta {
+        gap: 0.25rem;
+    }
+} 

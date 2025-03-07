@@ -72,64 +72,135 @@ export const TopModule = {
         const currentPage = this.pages[this.currentIndex];
         if (!currentPage) return;
 
+        // Get discipline class for styling
+        const disciplineClass = this.getDisciplineClass(currentPage.disciplina);
+        
+        // Format date
+        const formattedDate = this.formatDate(currentPage.fecha_de_cierre);
+        
+        // Extract category and name
+        let category = 'Beca';
+        let name = currentPage.nombre_original;
+        
+        if (currentPage.nombre_original && currentPage.nombre_original.includes('︱')) {
+            const parts = currentPage.nombre_original.split('︱');
+            if (parts.length > 1) {
+                category = parts[0].trim();
+                name = parts[1].trim();
+            }
+        } else if (currentPage.categoria) {
+            category = currentPage.categoria;
+        }
+
         container.innerHTML = `
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden p-6">
-                <div class="grid grid-cols-2 gap-8">
-                    <!-- Left side: Image placeholder -->
-                    <div class="bg-gray-100 rounded-lg flex items-center justify-center">
-                        <img src="/static/public/IsoAtx.png" alt="Atlantic x Logo" class="w-full h-48 object-contain p-8">
+            <div class="top-opportunity-card">
+                <div class="top-opportunity-image">
+                    <div class="top-opportunity-badges">
+                        <span class="top-opportunity-badge category">${Utils.escapeHTML(category)}</span>
+                        <span class="top-opportunity-badge discipline-tag ${disciplineClass}">${Utils.escapeHTML(this.getMainDiscipline(currentPage.disciplina))}</span>
                     </div>
-                    
-                    <!-- Right side: Content -->
-                    <div class="flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-xl font-semibold mb-4">${Utils.escapeHTML(currentPage.nombre_original)}</h3>
-                            
-                            <!-- Meta information -->
-                            <div class="space-y-2 mb-4">
-                                <div class="flex items-center text-gray-600">
-                                    <svg class="w-4 h-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-                                    </svg>
-                                    ${Utils.escapeHTML(currentPage.país)}
-                                </div>
-                                
-                                <div class="flex items-center text-gray-600">
-                                    <svg class="w-4 h-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
-                                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
-                                    </svg>
-                                    ${Utils.escapeHTML(currentPage.disciplina)}
-                                </div>
-                                
-                                <div class="flex items-center text-gray-600">
-                                    <svg class="w-4 h-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
-                                    </svg>
-                                    ${currentPage.fecha_de_cierre === '1900-01-01' ? 'Confirmar en bases' : Utils.escapeHTML(currentPage.fecha_de_cierre)}
-                                </div>
+                    <div class="top-opportunity-favorite">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                    </div>
+                    <img src="${currentPage.image_url || '/static/public/IsoAtx.png'}" alt="${Utils.escapeHTML(name)}" onerror="this.src='/static/public/IsoAtx.png'">
+                </div>
+                <div class="top-opportunity-content">
+                    <div>
+                        <h3 class="top-opportunity-title">${Utils.escapeHTML(name)}</h3>
+                        <div class="top-opportunity-meta">
+                            <div class="top-opportunity-location">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                ${Utils.escapeHTML(currentPage.país)}
                             </div>
-
-                            <p class="text-gray-600 text-sm mb-4">${Utils.escapeHTML(currentPage.og_resumida)}</p>
+                            <div class="top-opportunity-discipline">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                                </svg>
+                                ${Utils.escapeHTML(this.getMainDiscipline(currentPage.disciplina))}
+                            </div>
+                            <div class="top-opportunity-date">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                ${formattedDate}
+                            </div>
                         </div>
-
-                        <button 
-                            type="button"
-                            class="preview-btn mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors w-fit"
-                            data-url="${Utils.escapeHTML(currentPage.url)}"
-                            data-nombre="${Utils.escapeHTML(currentPage.nombre)}"
-                            data-pais="${Utils.escapeHTML(currentPage.país)}"
-                            data-og-resumida="${Utils.escapeHTML(currentPage.og_resumida)}"
-                            data-id="${Utils.escapeHTML(currentPage.id)}"
-                            data-categoria="${Utils.escapeHTML(currentPage.categoria)}"
-                            data-requisitos="${Utils.escapeHTML(currentPage.requisitos || '')}"
-                        >
-                            Ver más
-                        </button>
+                        <div class="top-opportunity-description">
+                            ${currentPage.og_resumida ? 
+                                Utils.escapeHTML(currentPage.og_resumida.length > 150 ? 
+                                    currentPage.og_resumida.substring(0, 150) + '...' : 
+                                    currentPage.og_resumida) : 
+                                'Sin descripción disponible'}
+                        </div>
                     </div>
+                    <button 
+                        type="button"
+                        class="top-opportunity-button"
+                        data-url="${Utils.escapeHTML(currentPage.url)}"
+                        data-nombre="${Utils.escapeHTML(currentPage.nombre)}"
+                        data-pais="${Utils.escapeHTML(currentPage.país)}"
+                        data-og-resumida="${Utils.escapeHTML(currentPage.og_resumida)}"
+                        data-id="${Utils.escapeHTML(currentPage.id)}"
+                        data-categoria="${Utils.escapeHTML(currentPage.categoria)}"
+                        data-requisitos="${Utils.escapeHTML(currentPage.requisitos || '')}"
+                        onclick="showOpportunityDetails(this)">
+                        Ver más
+                    </button>
                 </div>
             </div>
         `;
+    },
+
+    formatDate(dateStr) {
+        if (!dateStr || dateStr === '1900-01-01') {
+            return 'Confirmar en bases';
+        }
+        
+        try {
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) {
+                return dateStr;
+            }
+            
+            // Format as DD/MM/YYYY
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            
+            return `${day}/${month}/${year}`;
+        } catch (e) {
+            console.error('Error formatting date:', e);
+            return dateStr;
+        }
+    },
+
+    getMainDiscipline(disciplineStr) {
+        if (!disciplineStr) return 'Otras';
+        
+        const disciplines = disciplineStr.split(',');
+        return disciplines[0].trim();
+    },
+
+    getDisciplineClass(disciplineStr) {
+        if (!disciplineStr) return 'otros';
+        
+        const mainDiscipline = this.getMainDiscipline(disciplineStr).toLowerCase();
+        
+        if (mainDiscipline.includes('visual')) return 'visuales';
+        if (mainDiscipline.includes('music') || mainDiscipline.includes('músic')) return 'musica';
+        if (mainDiscipline.includes('escénic') || mainDiscipline.includes('escenic') || 
+            mainDiscipline.includes('teatro') || mainDiscipline.includes('danza')) return 'escenicas';
+        if (mainDiscipline.includes('literatur') || mainDiscipline.includes('escrit')) return 'literatura';
+        if (mainDiscipline.includes('diseñ') || mainDiscipline.includes('design')) return 'diseno';
+        if (mainDiscipline.includes('cine') || mainDiscipline.includes('audio') || 
+            mainDiscipline.includes('film')) return 'cine';
+        
+        return 'otros';
     },
 
     attachNavigationListeners() {
