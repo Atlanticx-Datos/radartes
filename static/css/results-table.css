@@ -5,28 +5,32 @@
     width: 100%;
     overflow-x: auto;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 2px solid #6232FF !important; /* Primary color border, slightly wider */
+    box-shadow: none !important; /* Remove box shadow */
 }
 
 /* Main table styling */
 .results-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: collapse !important;
     font-family: 'Inter', sans-serif;
+    border: none !important; /* Remove default border */
 }
 
 /* Table header */
 .results-table thead {
-    background-color: #6232FF; /* Primary color from Tailwind config */
+    background-color: #6232FF !important; /* Primary color from Tailwind config */
+    border-bottom: 1px solid #6232FF !important; /* Ensure border consistency */
 }
 
 .results-table th {
-    color: white;
+    color: white !important;
     font-weight: 600;
     font-size: 14px;
     text-align: left;
     padding: 12px 16px;
     white-space: nowrap;
+    border: none !important; /* Remove default border */
 }
 
 /* Sort icons in header */
@@ -41,8 +45,12 @@
 /* Table body */
 .results-table tbody tr {
     background-color: white;
-    border-bottom: 1px solid #E5E7EB;
+    border-bottom: 1px solid #6232FF !important; /* Primary color for row separators, thinner */
     transition: background-color 0.2s;
+}
+
+.results-table tbody tr:last-child {
+    border-bottom: 1px solid #6232FF !important; /* Keep bottom border for last row */
 }
 
 .results-table tbody tr:hover {
@@ -55,6 +63,40 @@
     font-size: 14px;
     color: #374151;
     vertical-align: middle;
+    border: none !important; /* Remove default border */
+}
+
+/* Force all table borders to be primary color */
+table, th, td, tr {
+    border-color: #6232FF !important;
+}
+
+/* Force all dividers to be primary color */
+.divide-y > * {
+    border-top-color: #6232FF !important;
+    border-bottom-color: #6232FF !important;
+}
+
+/* Target any table in the results container */
+#results-container table {
+    border-collapse: collapse !important;
+}
+
+#results-container table tr {
+    border-bottom: 1px solid #6232FF !important;
+}
+
+/* Target any dynamically generated tables */
+[id*="results"] table,
+.results-table,
+.min-w-full {
+    border-collapse: collapse !important;
+}
+
+[id*="results"] tr,
+.results-table tr,
+.min-w-full tr {
+    border-bottom: 1px solid #6232FF !important;
 }
 
 /* Opportunity column */
@@ -164,74 +206,75 @@
 /* Pagination */
 .pagination-container {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-top: 16px;
-    font-size: 14px;
+    justify-content: flex-end;
+    margin-top: 1rem;
 }
 
-.pagination-info {
-    color: #6B7280;
-}
-
-.pagination-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.pagination-button {
+.pagination-nav {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 32px;
     height: 32px;
-    border-radius: 4px;
-    border: 1px solid #D1D5DB;
-    background-color: white;
-    color: #374151;
-    transition: all 0.2s;
+    color: #6B7280; /* gray-500 */
+    transition: color 0.2s;
 }
 
-.pagination-button:hover {
-    background-color: #F3F4F6;
+.pagination-nav:hover {
+    color: #111827; /* gray-900 */
 }
 
-.pagination-button.active {
-    background-color: #6232FF; /* Primary color from Tailwind config */
-    color: white;
-    border-color: #6232FF;
-}
-
-.pagination-button.disabled {
-    opacity: 0.5;
+.pagination-nav.disabled {
+    color: #D1D5DB; /* gray-300 */
     cursor: not-allowed;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .results-table th,
-    .results-table td {
-        padding: 8px 12px;
-    }
-    
-    .discipline-tag {
-        padding: 3px 8px;
-        font-size: 12px;
-    }
-    
-    .action-button {
-        padding: 4px 12px;
-        font-size: 13px;
-    }
+/* Clean select without border or background */
+.form-select-clean {
+    appearance: none;
+    background-color: transparent;
+    border: none;
+    padding-right: 1.5rem;
+    font-size: 14px;
+    color: #111827; /* gray-900 */
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0 center;
+    background-repeat: no-repeat;
+    background-size: 1.25em 1.25em;
+}
+
+.form-select-clean:focus {
+    outline: none;
 }
 
 @media (max-width: 640px) {
-    .results-table-container {
-        overflow-x: auto;
+    .pagination-container {
+        flex-direction: column;
+        align-items: center;
     }
     
-    .results-table {
-        min-width: 640px;
+    .pagination-container > div {
+        margin-bottom: 0.5rem;
     }
+}
+
+/* Typography for pagination controls */
+.pagination-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.15px;
+    line-height: 20px;
+    color: #4B5563; /* gray-700 */
+}
+
+.pagination-counter {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.15px;
+    line-height: 20px;
+    color: #111827; /* gray-900 */
 } 

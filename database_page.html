@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        
+        Oportunidades: 83 en total
+        
+    </title>
+    
+    <!-- App Metadata for Sharing Module -->
+    <meta name="app-name" content="100 ︱ Oportunidades">
+    <meta name="description" content="Convocatorias, Becas y Recursos Globales para Artistas.">
+    <meta name="app-url" content="http://oportunidades.lat">
+    <meta name="app-image" content="http://oportunidades.lat/static/public/LogoCienOpps.png">
+    
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="
+        
+            Oportunidades: 83 en total
+        ">
+    <meta property="og:description"
+        content="Convocatorias, Becas y Recursos Globales para Artistas.">
+    <meta property="og:url" content="http://oportunidades.lat">
+    <meta property="og:image"
+        content="http://oportunidades.lat/static/public/LogoCienOpps.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@your_twitter_username">
+    <meta name="twitter:title" content="100 + Oportunidades">
+    <meta name="twitter:description"
+        content="Convocatorias, Becas y Recursos Globales para Artistas.">
+    <meta name="twitter:image"
+        content="http://oportunidades.lat/static/public/LogoCienOpps.png">
+
+    <!-- Open Graph Tags for Facebook -->
+    <meta property="og:title" content="100 + Oportunidades">
+    <meta property="og:description"
+        content="Convocatorias, Becas y Recursos Globales para Artistas.">
+    <meta property="og:url" content="http://oportunidades.lat">
+    <meta property="og:image"
+        content="http://oportunidades.lat/static/public/LogoCienOpps.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="100 + Oportunidades">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-36M4V4L5RX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-36M4V4L5RX', {
+            'anonymize_ip': true,
+            'cookie_flags': 'SameSite=None;Secure'
+        });
+    </script>
+
+    <link href="/static/css/tailwind-built.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Londrina+Solid&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/htmx.org@1.7.0/dist/htmx.min.js"></script>
+    <link href="/static/css/site.css" rel="stylesheet">
+    <link href="/static/css/destacar-cards.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/results-table.css">
+
+    <!-- Preload the poster image -->
+
+
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap"
+        as="style">
+
+    <!-- Move critical CSS to site.css -->
+    <style>
+        /* Keep only animation since it's JS-dependent */
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+
+    <!-- Defer non-critical CSS -->
+    <link rel="stylesheet" href="/static/css/tailwind-built.css" media="print"
+        onload="this.media='all'">
+
+    <!-- Favicon Links -->
+    <link rel="icon" type="image/png" href="/static/public/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/static/public/favicon.svg" />
+    <link rel="shortcut icon" href="/static/public/favicon.ico" />
+</head>
+
+<body class="flex justify-center max-sm:items-start bg-gray-800 min-h-screen" data-route="static_proxy">
+
+    <!-- Alert container -->
+    <div id="alert-container" hx-preserve="true"></div>
+
+    <!-- Server notification target (hidden) -->
+    <div id="notification"
+        class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999] bg-white p-4 rounded shadow-lg"
+        hx-preserve="true">
+    </div>
+
+    <!-- Global spinner -->
+    <div id="layout-spinner" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] h-8 w-8 hidden"
+        hx-preserve="true">
+        <img src="/static/public/spinner.gif?v=1.0" alt="Loading..."
+            class="h-full w-full object-contain">
+    </div>
+
+    <main class="w-full flex flex-col max-sm:rounded-lg">
+        <!-- Navigation with light background -->
+        <div class="w-full bg-white flex-shrink-0">
+            <div class="mx-auto">
+                <nav class="flex justify-between items-center h-[60px] max-w-[1292px] mx-auto px-8">
+    <!-- Logo Section -->
+    <div class="flex items-center">
+        <a href="/" class="text-2xl font-bold tracking-tight text-design-gray-900 flex items-center gap-[2px] hover:opacity-80 transition-opacity">
+            <span class="font-bold ml-1">RAD/AR/TES</span>
+        </a>
+    </div>
+
+    <!-- Right Section: Avatar Dropdown or CTA -->
+    <div class="flex items-center gap-4">
+        
+            <!-- Login Button (Only visible when not logged in) -->
+            <a href="/login" class="bg-design-primary text-white px-4 py-2 rounded-full text-sm font-bold hover:bg-opacity-90 transition-colors">
+                Iniciar sesión
+            </a>
+        
+    </div>
+</nav>
+            </div>
+        </div>
+
+        <!-- Content blocks will inherit dark background -->
+        <div class="flex-1">
+            
+<div class="w-full bg-gray-50 min-h-screen">
+    <div class="container max-w-[1292px] mx-auto px-8 py-16">
+        <div class="text-center max-w-2xl mx-auto">
+            <h1 class="text-6xl font-bold text-design-gray-900 mb-4">404</h1>
+            <h2 class="text-2xl font-bold text-design-gray-900 mb-8">Página no encontrada</h2>
+            <p class="text-lg text-gray-600 mb-8">Lo sentimos, la página que estás buscando no existe o ha sido movida.</p>
+            <a href="/" class="inline-block bg-design-primary text-white px-8 py-3 rounded-full font-medium hover:bg-opacity-90 transition-colors text-lg">
+                Volver al inicio
+            </a>
+        </div>
+    </div>
+</div>
+
+        </div>
+    </main>
+    
+    <!-- First: Initialize any data needed by site.js -->
+    
+    
+    <!-- Then: Load site.js -->
+    <script type="module" src="/static/js/site.js"></script>
+    
+    <style>
+        /* Add smooth transitions for alerts */
+        #alert-container>div {
+            opacity: 1;
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+
+    <!-- Add this inside the <body> tag -->
+    <div id="csrf-container" class="hidden">
+        <input type="hidden" name="csrf_token" value="IjliZDBhMjUwMzk5NWVmNGI4YmVjNTY5M2ViMTBjMDU2NmJiNDAxMTEi.Z8sQyw.HGGNg87i-DICFM7eTGNgja8zrXo">
+    </div>
+</body>
+
+</html>

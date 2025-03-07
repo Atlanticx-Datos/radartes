@@ -27,6 +27,31 @@ export const SearchModule = {
     },
 
     init() {
+        console.log('SearchModule initialized');
+        
+        // Initialize pagination
+        this.pagination = {
+            currentPage: 1,
+            itemsPerPage: 10,
+            totalPages: 1,
+            allResults: []
+        };
+        
+        // Initialize sort column
+        this.sortColumn = '';
+        this.sortDirection = 'asc';
+        
+        // Store original order of results
+        this.originalOrder = [];
+        
+        // Attach event listeners
+        this.attachSearchListeners();
+        
+        // Apply table borders to any existing tables
+        setTimeout(() => {
+            this.applyTableBorders();
+        }, 300);
+
         // Initialize with data from the page
         const preFilteredData = document.getElementById('prefiltered-data');
         if (preFilteredData) {
@@ -85,7 +110,6 @@ export const SearchModule = {
             }
         }
 
-        this.attachSearchListeners();
         this.updateFilterUI();
         
         // Ensure clear button visibility is correct on initialization
@@ -760,41 +784,41 @@ export const SearchModule = {
 
         // Create table with results
         container.innerHTML = `
-            <div class="results-table-container overflow-x-auto">
-                <table class="results-table min-w-full divide-y divide-gray-200">
-                    <thead style="background-color: #6232FF; color: white;">
+            <div class="results-table-container overflow-x-auto" style="border: 2px solid #6232FF !important; box-shadow: none !important; border-radius: 8px !important;">
+                <table class="results-table min-w-full" style="border-collapse: collapse !important;">
+                    <thead style="background-color: #6232FF !important; color: white !important; border-bottom: 1px solid #6232FF !important;">
                         <tr>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('nombre')" style="color: white; padding: 12px 16px; font-weight: 600; font-size: 14px;">
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('nombre')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
                                 <div class="flex items-center">
                                     OPORTUNIDAD
                                     ${this.getSortIcon('nombre')}
                                 </div>
                             </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('disciplina')" style="color: white; padding: 12px 16px; font-weight: 600; font-size: 14px;">
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('disciplina')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
                                 <div class="flex items-center">
                                     DISCIPLINA
                                     ${this.getSortIcon('disciplina')}
                                 </div>
                             </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('pais')" style="color: white; padding: 12px 16px; font-weight: 600; font-size: 14px;">
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('pais')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
                                 <div class="flex items-center">
                                     PAÍS
                                     ${this.getSortIcon('pais')}
                                 </div>
                             </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white; padding: 12px 16px; font-weight: 600; font-size: 14px;">
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
                                 PAGO
                             </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white; padding: 12px 16px; font-weight: 600; font-size: 14px;">
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
                                 CIERRE
                             </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white; padding: 12px 16px; font-weight: 600; font-size: 14px;">
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
                                 ACCIÓN
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        ${results.length > 0 ? results.map((page, index) => {
+                    <tbody>
+                        ${paginatedResults.length > 0 ? paginatedResults.map((page, index) => {
                             // Get the first discipline for the tag
                             const mainDiscipline = page.disciplina ? page.disciplina.split(',')[0].trim().toLowerCase() : '';
                             
@@ -818,48 +842,32 @@ export const SearchModule = {
                             // Get colors for this discipline
                             const colors = disciplineColors[normalizedDiscipline] || disciplineColors['otros'];
                             
-                            // Format date
-                            const formatDate = (dateStr) => {
-                                if (!dateStr || dateStr === '1900-01-01') {
-                                    return 'Confirmar en bases';
-                                }
-                                try {
-                                    const date = new Date(dateStr);
-                                    const day = String(date.getDate()).padStart(2, '0');
-                                    const month = date.toLocaleString('es', { month: 'short' }).slice(0, 3);
-                                    const year = date.getFullYear();
-                                    return `${day} ${month} ${year}`;
-                                } catch (e) {
-                                    return dateStr;
-                                }
-                            };
-                            
                             return `
-                            <tr class="${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">
-                                <td class="px-4 py-4 whitespace-nowrap">
+                            <tr style="border-bottom: 1px solid #6232FF !important; background-color: ${index % 2 === 0 ? 'white' : '#f9fafb'};">
+                                <td class="px-4 py-4 whitespace-nowrap" style="border: none !important;">
                                     <div class="text-sm font-medium text-gray-900">
                                         ${page.nombre || ''}
                                     </div>
                                 </td>
-                                <td class="px-4 py-4 whitespace-nowrap">
+                                <td class="px-4 py-4 whitespace-nowrap" style="border: none !important;">
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm" 
                                           style="background-color: ${colors.bg}; color: ${colors.text}; font-weight: 500;">
                                         ${mainDiscipline.charAt(0).toUpperCase() + mainDiscipline.slice(1)}
                                     </span>
                                 </td>
-                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900" style="border: none !important;">
                                     ${page.pais || page.país || ''}
                                 </td>
-                                <td class="px-4 py-4 whitespace-nowrap">
+                                <td class="px-4 py-4 whitespace-nowrap" style="border: none !important;">
                                     ${page.inscripcion === 'Sin cargo' || !page.inscripcion ? 
                                         '<div class="relative inline-block"><svg class="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg><svg class="absolute top-0 left-0 w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="5" y1="5" x2="19" y2="19"/></svg></div>' : 
                                         '<svg class="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg>'
                                     }
                                 </td>
-                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900" style="border: none !important;">
                                     ${formatDate(page.fecha_de_cierre)}
                                 </td>
-                                <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium" style="border: none !important;">
                                     <button 
                                         class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
                                         style="background-color: #F0EBFF; color: #6232FF;"
@@ -871,8 +879,8 @@ export const SearchModule = {
                             </tr>
                             `;
                         }).join('') : `
-                            <tr>
-                                <td colspan="6" class="px-4 py-4 text-center text-gray-500">
+                            <tr style="border-bottom: 1px solid #6232FF !important;">
+                                <td colspan="6" class="px-4 py-4 text-center text-gray-500" style="border: none !important;">
                                     No se encontraron resultados para tu búsqueda.
                                 </td>
                             </tr>
@@ -882,52 +890,46 @@ export const SearchModule = {
             </div>
 
             ${this.pagination.totalPages > 1 ? `
-                <div class="pagination-container mt-4 flex flex-col sm:flex-row items-center justify-between">
-                    <!-- Pagination controls -->
-                    <div class="flex items-center space-x-1 mb-2 sm:mb-0">
-                        <!-- First page button -->
-                        <button 
-                            class="pagination-nav w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 ${this.pagination.currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
-                            ${this.pagination.currentPage === 1 ? 'disabled' : 'onclick="SearchModule.goToPage(1)"'}
-                            title="Primera página"
-                        >
-                            «
-                        </button>
-                        
+                <div class="pagination-container mt-4 flex items-center justify-end">
+                    <!-- Results per page dropdown with label -->
+                    <div class="flex items-center mr-4">
+                        <span class="pagination-label mr-2">Filas por página:</span>
+                        <select id="results-per-page" class="form-select-clean" onchange="SearchModule.changeResultsPerPage(this.value)">
+                            <option value="10" ${this.pagination.itemsPerPage === 10 ? 'selected' : ''}>10</option>
+                            <option value="20" ${this.pagination.itemsPerPage === 20 ? 'selected' : ''}>20</option>
+                            <option value="50" ${this.pagination.itemsPerPage === 50 ? 'selected' : ''}>50</option>
+                            <option value="100" ${this.pagination.itemsPerPage === 100 ? 'selected' : ''}>100</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Page counter -->
+                    <div class="pagination-counter mr-4">
+                        Página ${this.pagination.currentPage} de ${this.pagination.totalPages}
+                    </div>
+                    
+                    <!-- Navigation buttons -->
+                    <div class="flex items-center">
                         <!-- Previous page button -->
                         <button 
-                            class="pagination-nav w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 ${this.pagination.currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                            class="pagination-nav flex items-center justify-center ${this.pagination.currentPage === 1 ? 'disabled' : ''}"
                             ${this.pagination.currentPage === 1 ? 'disabled' : 'onclick="SearchModule.goToPage(' + (this.pagination.currentPage - 1) + ')"'}
                             title="Página anterior"
                         >
-                            ‹
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                            </svg>
                         </button>
-                        
-                        <!-- Page numbers -->
-                        ${this.renderPageNumbers()}
                         
                         <!-- Next page button -->
                         <button 
-                            class="pagination-nav w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 ${this.pagination.currentPage === this.pagination.totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
+                            class="pagination-nav flex items-center justify-center ml-2 ${this.pagination.currentPage === this.pagination.totalPages ? 'disabled' : ''}"
                             ${this.pagination.currentPage === this.pagination.totalPages ? 'disabled' : 'onclick="SearchModule.goToPage(' + (this.pagination.currentPage + 1) + ')"'}
                             title="Página siguiente"
                         >
-                            ›
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
                         </button>
-                        
-                        <!-- Last page button -->
-                        <button 
-                            class="pagination-nav w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 ${this.pagination.currentPage === this.pagination.totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
-                            ${this.pagination.currentPage === this.pagination.totalPages ? 'disabled' : 'onclick="SearchModule.goToPage(' + this.pagination.totalPages + ')"'}
-                            title="Última página"
-                        >
-                            »
-                        </button>
-                    </div>
-                    
-                    <!-- Page info -->
-                    <div class="text-sm text-gray-500 mt-2">
-                        Página ${this.pagination.currentPage} de ${this.pagination.totalPages}
                     </div>
                 </div>
             ` : ''}
@@ -975,6 +977,11 @@ export const SearchModule = {
             
             console.log('Applied custom styles to search results table');
         }, 100); // Small delay to ensure the DOM is updated
+
+        // After rendering the table, apply primary color borders
+        setTimeout(() => {
+            this.applyTableBorders();
+        }, 100);
     },
 
     goToPage(page) {
@@ -984,28 +991,23 @@ export const SearchModule = {
         // Update the results with the new page
         this.updateResults(this.pagination.allResults, true);
         
-        // Scroll to top of results
-        document.getElementById('results-container')?.scrollIntoView({ behavior: 'smooth' });
+        // No scrolling when navigating between pages
     },
 
     // Function to scroll to results with some white space above the radar header
     scrollToResults() {
         console.log('Scrolling to results');
-        const resultsHeader = document.getElementById('radar-header');
-        if (resultsHeader) {
-            // Use smooth scrolling for better UX
-            // Use 'start' alignment with a negative margin to add white space above
-            const headerRect = resultsHeader.getBoundingClientRect();
-            const scrollPosition = window.scrollY + headerRect.top - 100; // 100px of white space
-            
-            window.scrollTo({
-                top: scrollPosition,
-                behavior: 'smooth'
+        const resultsContainer = document.getElementById('results-container');
+        if (resultsContainer) {
+            // Scroll to the results container with a smooth animation
+            resultsContainer.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start'
             });
             
-            console.log('Scrolled to results header with white space');
+            console.log('Scrolled to results container');
         } else {
-            console.warn('Results header not found for scrolling');
+            console.warn('Results container not found for scrolling');
         }
     },
 
@@ -1096,7 +1098,7 @@ export const SearchModule = {
     // Function to render page numbers with ellipsis for many pages
     renderPageNumbers() {
         const { currentPage, totalPages } = this.pagination;
-        const maxVisiblePages = 5; // Maximum number of page buttons to show
+        const maxVisiblePages = 10; // Maximum number of page buttons to show
         
         // If we have fewer pages than the max visible, just show all pages
         if (totalPages <= maxVisiblePages) {
@@ -1112,12 +1114,12 @@ export const SearchModule = {
         pages.push(this.renderPageButton(1));
         
         // Calculate range of pages to show around current page
-        let rangeStart = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+        let rangeStart = Math.max(2, currentPage - Math.floor((maxVisiblePages - 2) / 2));
         let rangeEnd = Math.min(totalPages - 1, rangeStart + maxVisiblePages - 3);
         
         // Adjust range if we're near the end
         if (rangeEnd >= totalPages - 1) {
-            rangeStart = Math.max(2, totalPages - maxVisiblePages + 1);
+            rangeStart = Math.max(2, totalPages - maxVisiblePages + 2);
             rangeEnd = totalPages - 1;
         }
         
@@ -1157,5 +1159,51 @@ export const SearchModule = {
                 ${pageNum}
             </button>
         `;
+    },
+
+    // Function to change the number of results per page
+    changeResultsPerPage(value) {
+        // Convert value to number
+        const newItemsPerPage = parseInt(value, 10);
+        
+        // Update pagination settings
+        this.pagination.itemsPerPage = newItemsPerPage;
+        this.pagination.totalPages = Math.ceil(this.pagination.allResults.length / newItemsPerPage);
+        
+        // Reset to first page when changing items per page
+        this.pagination.currentPage = 1;
+        
+        // Update the results with the new pagination settings
+        this.updateResults(this.pagination.allResults, true);
+    },
+
+    applyTableBorders() {
+        // Apply primary color borders to all table elements
+        const tables = document.querySelectorAll('.results-table, #results-container table, [id*="results"] table');
+        tables.forEach(table => {
+            table.style.borderCollapse = 'collapse';
+            
+            // Apply styles to table container
+            const container = table.closest('.results-table-container');
+            if (container) {
+                container.style.border = '2px solid #6232FF';
+                container.style.boxShadow = 'none';
+                container.style.borderRadius = '8px';
+            }
+            
+            // Apply styles to rows
+            const rows = table.querySelectorAll('tr');
+            rows.forEach(row => {
+                row.style.borderBottom = '1px solid #6232FF';
+            });
+            
+            // Apply styles to header
+            const header = table.querySelector('thead');
+            if (header) {
+                header.style.backgroundColor = '#6232FF';
+                header.style.color = 'white';
+                header.style.borderBottom = '1px solid #6232FF';
+            }
+        });
     },
 }; 
