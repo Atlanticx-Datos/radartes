@@ -83,7 +83,7 @@
                         class="w-full p-4 pl-12 pr-28 border rounded-full shadow-xl bg-white/95 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">
 
                     <!-- Filter trigger button -->
-                    <button id="filter-dropdown-trigger" class="absolute p-2 text-[#454056] transition-all duration-200">
+                    <button id="filter-dropdown-trigger" class="absolute right-4 p-2 text-[#454056] transition-all duration-200">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
                         </svg>
@@ -91,7 +91,7 @@
 
                     <!-- Clear all filters button -->
                     <button type="button" id="clear-search" class="absolute right-4 p-2 text-[#454056] hidden"
-                        onclick="clearSearch();">
+                        onclick="SearchModule.clearSearch();">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                 d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"

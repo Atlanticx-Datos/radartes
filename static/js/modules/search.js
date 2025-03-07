@@ -379,13 +379,27 @@ export const SearchModule = {
             searchInput.parentNode.replaceChild(newSearchInput, searchInput);
 
             // Add our listeners
-            newSearchInput.addEventListener('input', () => this.performSearch());
+            newSearchInput.addEventListener('input', () => {
+                this.performSearch();
+                this.ensureClearButtonVisible();
+            });
             newSearchInput.addEventListener('keypress', this.handleKeyPress.bind(this));
         }
 
         // Initial check for existing input
-        if (searchInput?.value.length > 0) {
-            clearButton.style.display = 'block';
+        if (searchInput?.value.trim().length > 0) {
+            this.ensureClearButtonVisible();
+        } else {
+            // Make sure the clear button is hidden and filter trigger is positioned correctly on page load
+            const filterTrigger = document.getElementById('filter-dropdown-trigger');
+            if (clearButton) {
+                clearButton.classList.add('hidden');
+                clearButton.style.display = 'none';
+            }
+            if (filterTrigger) {
+                filterTrigger.classList.remove('right-12');
+                filterTrigger.classList.add('right-4');
+            }
         }
     },
 
@@ -431,6 +445,7 @@ export const SearchModule = {
     clearSearch() {
         const searchInput = document.getElementById('open-search');
         const clearButton = document.getElementById('clear-search');
+        const filterTrigger = document.getElementById('filter-dropdown-trigger');
         const destacadosContainer = document.querySelector('.destacados-container');
         const inscripcionCheckbox = document.getElementById('inscripcion-checkbox');
         const prevControl = document.querySelector('.destacar-prev');
@@ -439,11 +454,19 @@ export const SearchModule = {
         console.log('clearSearch called');
 
         // Clear search input
-        searchInput.value = '';
+        if (searchInput) {
+            searchInput.value = '';
+        }
         
-        // Always show the clear button
-        if (clearButton) {
-            clearButton.style.display = 'block';
+        // Hide clear button and reposition filter trigger
+        if (clearButton && filterTrigger) {
+            // Use both classList and style.display to ensure the button is hidden
+            clearButton.classList.add('hidden');
+            clearButton.style.display = 'none';
+            
+            // Reposition filter trigger
+            filterTrigger.classList.remove('right-12');
+            filterTrigger.classList.add('right-4');
         }
         
         // Reset inscripcion checkbox
@@ -522,10 +545,22 @@ export const SearchModule = {
     ensureClearButtonVisible() {
         const searchInput = document.getElementById('open-search');
         const clearButton = document.getElementById('clear-search');
+        const filterTrigger = document.getElementById('filter-dropdown-trigger');
         
-        if (searchInput && clearButton) {
-            // Always show the clear button
-            clearButton.style.display = 'block';
+        if (searchInput && clearButton && filterTrigger) {
+            if (searchInput.value.trim() !== '') {
+                // Show clear button and move filter trigger to the left
+                clearButton.classList.remove('hidden');
+                clearButton.style.display = 'block';
+                filterTrigger.classList.remove('right-4');
+                filterTrigger.classList.add('right-12');
+            } else {
+                // Hide clear button and move filter trigger back to the right
+                clearButton.classList.add('hidden');
+                clearButton.style.display = 'none';
+                filterTrigger.classList.remove('right-12');
+                filterTrigger.classList.add('right-4');
+            }
         }
     },
 
@@ -890,7 +925,7 @@ export const SearchModule = {
             </div>
 
             ${this.pagination.totalPages > 1 ? `
-                <div class="pagination-container mt-4 flex items-center justify-end">
+                <div class="pagination-container mt-0 flex items-center justify-end">
                     <!-- Results per page dropdown with label -->
                     <div class="flex items-center mr-4">
                         <span class="pagination-label mr-2">Filas por página:</span>
@@ -996,18 +1031,34 @@ export const SearchModule = {
 
     // Function to scroll to results with some white space above the radar header
     scrollToResults() {
-        console.log('Scrolling to results');
-        const resultsContainer = document.getElementById('results-container');
-        if (resultsContainer) {
-            // Scroll to the results container with a smooth animation
-            resultsContainer.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'start'
+        console.log('Scrolling to radar header');
+        const radarHeader = document.getElementById('radar-header');
+        
+        if (radarHeader) {
+            // Get the position of the header
+            const headerRect = radarHeader.getBoundingClientRect();
+            const absoluteHeaderTop = headerRect.top + window.pageYOffset;
+            
+            // Scroll to a position 50px above the header for some breathing space
+            window.scrollTo({
+                top: absoluteHeaderTop - 50,
+                behavior: 'smooth'
             });
             
-            console.log('Scrolled to results container');
+            console.log('Scrolled to radar header with offset');
         } else {
-            console.warn('Results container not found for scrolling');
+            // Fallback to the results container if the header is not found
+            console.warn('Radar header not found, falling back to results container');
+            const resultsContainer = document.getElementById('results-container');
+            
+            if (resultsContainer) {
+                resultsContainer.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start'
+                });
+            } else {
+                console.warn('Results container not found for scrolling');
+            }
         }
     },
 

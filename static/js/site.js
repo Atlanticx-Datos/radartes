@@ -1101,6 +1101,34 @@ window.showOpportunityDetails = function(button) {
     }
 };
 
+// Global function to clear search, delegating to SearchModule
+function clearSearch() {
+    if (window.SearchModule && typeof window.SearchModule.clearSearch === 'function') {
+        window.SearchModule.clearSearch();
+    } else {
+        console.error('SearchModule.clearSearch is not available');
+        
+        // Fallback implementation if SearchModule is not available
+        const searchInput = document.getElementById('open-search');
+        const clearButton = document.getElementById('clear-search');
+        const filterTrigger = document.getElementById('filter-dropdown-trigger');
+        
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        
+        if (clearButton) {
+            clearButton.classList.add('hidden');
+            clearButton.style.display = 'none';
+        }
+        
+        if (filterTrigger) {
+            filterTrigger.classList.remove('right-12');
+            filterTrigger.classList.add('right-4');
+        }
+    }
+}
+
 // Export any functions that need to be accessed from outside
 export {
     initDestacar

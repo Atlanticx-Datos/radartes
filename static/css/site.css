@@ -608,10 +608,10 @@ html {
    Why custom: Complex responsive behavior
 ==================================== */
 .pagination-container {
-    margin-top: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    margin-top: 2px !important;
 }
 
 .pagination-nav {
@@ -887,14 +887,6 @@ html {
 
 .action-button:hover {
     background-color: #5429e0 !important; /* Slightly darker */
-}
-
-/* Pagination */
-.pagination-container {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    margin-top: 16px !important;
 }
 
 /* JavaScript-specific selectors */
