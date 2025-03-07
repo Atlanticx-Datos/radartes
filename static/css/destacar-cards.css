@@ -19,6 +19,7 @@
     align-items: center;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     text-transform: capitalize;
+    z-index: 10;
 }
 
 /* Add discipline badge */
@@ -45,6 +46,7 @@
     text-overflow: ellipsis;
     text-transform: capitalize;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
 }
 
 /* Discipline colors */
@@ -57,90 +59,143 @@
 .discipline-otras { background-color: #F15BB5; }
 .discipline-default { background-color: #6B7280; }
 
-/* Date styling */
-.featured-opportunities .flex.items-center.gap-1:last-child {
-    color: #6232FF;
+/* Date styling - Updated with primary color for icon */
+.featured-opportunities .date-row {
+    width: 100%;
+    color: #666276; /* Text color as specified */
     font-family: 'Inter', sans-serif;
     font-weight: 700;
     font-size: 12px;
     line-height: 150%;
     letter-spacing: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Space between icon and date */
 }
 
-.featured-opportunities .flex.items-center.gap-1:last-child svg {
-    color: #6232FF;
-    width: 16px;
-    height: 16px;
+.featured-opportunities .date-row svg {
+    color: #6232FF; /* Primary color for the icon */
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
 }
 
-/* Card structure */
+/* Card structure - updated to match Figma height of 313px */
 .featured-opportunities .opportunity-preview {
-    width: 416px;
-    height: 290px;
+    height: 313px; /* Total card height from Figma */
     border-radius: 12px;
     overflow: hidden;
+    flex: 1;
+    min-width: 0; /* Allow cards to shrink below content size */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.06);
 }
 
-/* Image container */
+.featured-opportunities .opportunity-preview:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Image container - updated to exactly 200px */
 .featured-opportunities .relative.h-48 {
-    height: 196px;
+    height: 200px; /* Exact height from Figma */
     background-color: #f3f4f6;
+    flex-shrink: 0; /* Prevent image from shrinking */
+    position: relative;
+    overflow: hidden;
 }
 
 /* Image styling */
 .featured-opportunities .relative.h-48 img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover; /* Changed to cover to match the image */
     object-position: center;
 }
 
-/* Content container */
-.featured-opportunities .p-2 {
-    height: auto;
-    padding: 10px 20px 6px;
-    position: relative;
-    top: 4px;
+/* Favorite button styling */
+.featured-opportunities .absolute.top-3.right-3 {
+    background-color: white;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
     display: flex;
-    flex-direction: column;
-    gap: 3px;
-    justify-content: flex-start;
-    overflow: visible;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
 }
 
-/* Title styling */
+.featured-opportunities .absolute.top-3.right-3 svg {
+    color: #6232FF;
+    width: 20px;
+    height: 20px;
+}
+
+/* Content container - updated to exactly 113px (313px - 200px) */
+.featured-opportunities .p-2 {
+    padding: 16px 20px; /* Adjusted based on the image */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 0; /* Don't allow content to grow */
+    flex-shrink: 0; /* Don't allow content to shrink */
+    height: 113px; /* Exact height: 313px total - 200px image */
+}
+
+/* Content inner container for even spacing */
+.featured-opportunities .p-2 > div {
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Take full height of parent */
+}
+
+/* Title styling - Updated to match Figma specs with correct color */
 .featured-opportunities .font-medium.text-lg {
     font-family: 'Inter', sans-serif;
     font-weight: 700;
     font-size: 18px;
-    line-height: 1.2;
+    line-height: 150%;
     letter-spacing: 0;
-    color: #1F2937;
+    color: #454056; /* Updated to the correct dark gray color */
     display: -webkit-box;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 0;
     max-width: 100%;
-    min-height: 20px;
+    margin-bottom: 10px; /* Adjusted for exact spacing */
 }
 
 /* Meta info styling (country, paid, disciplines) */
 .featured-opportunities .flex.flex-wrap.gap-4 {
-    gap: 3px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    gap: 10px; /* Adjusted for exact spacing */
 }
 
 /* First row with country, payment info, and subdisciplines */
 .featured-opportunities .meta-row {
     display: flex;
-    gap: 12px;
+    gap: 16px; /* Adjusted based on the image */
     width: 100%;
     flex-wrap: nowrap;
     align-items: center;
+}
+
+/* Meta info text styling - Updated to match Figma specs */
+.featured-opportunities .meta-row .flex.items-center.gap-1,
+.featured-opportunities .subdisciplines-inline,
+.featured-opportunities .subdisciplines-inline span {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 150%;
+    letter-spacing: 0;
+    color: #9691A4; /* Updated to match the image */
 }
 
 /* Inline subdisciplines */
@@ -150,58 +205,63 @@
     text-overflow: ellipsis;
     flex: 1; /* Take remaining space */
     min-width: 0; /* Allow flexbox to shrink below content size */
-    color: #6B7280; /* design-gray-500 - same as country text */
 }
 
 /* Subdisciplines icon */
 .featured-opportunities .subdisciplines-inline svg {
-    color: #6B7280; /* design-gray-500 - same as text */
-    width: 14px;
-    height: 14px;
-}
-
-/* Subdisciplines truncation */
-.featured-opportunities .subdisciplines-inline span {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-    display: inline-block;
-    color: #6B7280; /* design-gray-500 - same as country text */
-}
-
-/* Date row - always on a new line */
-.featured-opportunities .date-row {
-    width: 100%;
-    color: #6232FF;
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
-    font-size: 12px;
-    line-height: 150%;
-    letter-spacing: 0;
-    margin-top: 1px;
-    display: flex;
-    align-items: center;
-}
-
-/* Date row icon */
-.featured-opportunities .date-row svg {
-    color: #6232FF;
+    color: #9691A4 !important; /* Updated to match design spec */
     width: 14px;
     height: 14px;
 }
 
 /* All icons in meta info */
-.featured-opportunities .flex.items-center.gap-1 svg {
+.featured-opportunities .meta-row svg {
     width: 14px;
     height: 14px;
+    flex-shrink: 0;
+    color: #9691A4; /* Updated to match design spec */
 }
 
-.featured-opportunities .flex.items-center.gap-1 {
-    font-family: 'Inter', sans-serif;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 150%;
-    letter-spacing: 0;
-    color: #6B7280; /* design-gray-500 */
+/* Grid container for featured opportunities */
+.featured-opportunities .grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+/* Responsive card sizing */
+@media (min-width: 768px) {
+    .featured-opportunities .grid {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    .featured-opportunities .opportunity-preview {
+        flex-basis: calc(50% - 12px);
+        max-width: calc(50% - 12px);
+    }
+}
+
+@media (min-width: 1024px) {
+    .featured-opportunities .opportunity-preview {
+        flex-basis: calc(33.333% - 16px);
+        max-width: calc(33.333% - 16px);
+    }
+}
+
+/* Ensure navigation buttons don't overlap with content on smaller screens */
+@media (max-width: 1100px) {
+    .destacar-prev, .destacar-next {
+        top: -40px !important;
+        transform: none !important;
+    }
+    
+    .destacar-prev {
+        left: auto !important;
+        right: 50px !important;
+    }
+    
+    .destacar-next {
+        right: 0 !important;
+    }
 } 

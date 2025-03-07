@@ -1,197 +1,505 @@
-{% for page in pages %}
-<tr data-id="{{ page.id }}" class="{% if page.destinatarios == 'Destacar' %}bg-gray-100 border-l-4 border-red-500{% elif page.is_closing_soon %}bg-yellow-50 border-l-4 border-amber-500{% else %}bg-transparent{% endif %} pl-2 ring-1 ring-gray-200 ring-inset">
-    <th class="w-[7%]">
-        <label class="flex justify-center items-center w-full h-full">
-            <input type="checkbox" 
-                   name="selected_pages" 
-                   value="{{ page.id }}"
-                   class="h-4 w-4 rounded-none border-gray-300 text-primary focus:ring-primary">
-        </label>
-    </th>
-    <td class="w-[45%] md:w-[38%] pl-6">
-        <div class="flex items-center">
-            <div>
-                <div class="font-medium text-sm leading-tight mb-1">
-                    <span class="md:hidden">{{ page.nombre | truncate(25) }}</span>
-                    <span class="hidden md:inline">{{ page.nombre }}</span>
-                </div>
-                <div class="text-xs opacity-50 leading-none flex items-center gap-2">
-                    {{ page.país }}
-                    {% if page.disciplina %}
-                        <span class="opacity-50">/</span>
-                        <div class="flex gap-1 md:flex-nowrap flex-wrap">
-                            {% set total_length = 0 %}
-                            {% set max_length = 60 %}  {# Adjust max_length as needed #}
-                            {% set disciplinas = page.disciplina.split(',') %}
-                            {% for disciplina in disciplinas %}
-                                {% set disciplina_trimmed = disciplina.strip() %}
-                                {% set disciplina_length = disciplina_trimmed | length %}
-                                {% if total_length + disciplina_length + 2 > max_length %}
-                                    <span class="truncate" title="{{ disciplina_trimmed }}">
-                                        {{ disciplina_trimmed | truncate((max_length - total_length - 3), True, "...") }}
-                                    </span>
-                                    {% set total_length = max_length %} {# Set total_length to max_length to prevent further additions #}
-                                {% else %}
-                                    <a href="#" 
-                                       class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-normal 
-                                              bg-gray-300 text-gray-700 
-                                              hover:bg-gray-400 hover:text-gray-900 transition-colors
-                                              md:max-w-none max-w-[100px] truncate"
-                                       hx-get="/find_similar_opportunities" 
-                                       hx-target="#search-results" 
-                                       hx-swap="innerHTML" 
-                                       hx-push-url="true" 
-                                       hx-vals='{"keyword": "{{ disciplina_trimmed }}"}'
-                                       title="{{ disciplina_trimmed }}">
-                                        <span class="md:hidden">{{ disciplina_trimmed[:7] + '...' if disciplina_trimmed|length > 7 else disciplina_trimmed | capitalize }}</span>
-                                        <span class="hidden md:inline">{{ disciplina_trimmed | capitalize }}</span>
-                                    </a>
-                                    {% set total_length = total_length + disciplina_length + 2 %}
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <input type="hidden" name="name_{{ page.id }}" value="{{ page.nombre }}">
-        <input type="hidden" name="country_{{ page.id }}" value="{{ page.país }}">
-        <input type="hidden" name="url_{{ page.id }}" value="{{ page.base_url if page.base_url else page.url }}">
-        <input type="hidden" name="recipients_{{ page.id }}" value="{{ page.destinatarios }}">
-        <input type="hidden" name="fecha_de_cierre_{{ page.id }}" value="{{ page.fecha_de_cierre }}">
-    </td>
-    <td class="w-[30%] md:w-[35%]">
-        <div class="border-left-custom text-sm py-2 capitalize-first h-12 flex items-center pl-6" style="line-height: 0.8rem;">
-            <span class="md:hidden whitespace-nowrap">
-                <a href="#" 
-                   class="opportunity-link truncate" 
-                   hx-get="/find_similar_opportunities" 
-                   hx-target="#search-results" 
-                   hx-swap="innerHTML" 
-                   hx-push-url="true" 
-                   hx-vals='{"keyword": "{{ page.categoria.strip() }}"}'
-                   title="{{ page.categoria.strip() | capitalize }}">
-                   {{ page.categoria | capitalize }}
-                </a>
-                / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
-                    {{ page.url_base }}
-                </span>
-            </span>
-            <span class="hidden md:inline whitespace-nowrap">
-                <a href="#" 
-                   class="opportunity-link truncate" 
-                   hx-get="/find_similar_opportunities" 
-                   hx-target="#search-results" 
-                   hx-swap="innerHTML" 
-                   hx-push-url="true" 
-                   hx-vals='{"keyword": "{{ page.categoria.strip() }}"}'
-                   title="{{ page.categoria.strip() | capitalize }}">
-                   {{ page.categoria | capitalize }}
-                </a>
-                / <span class="bg-gray-200 bg-opacity-75 backdrop-blur-md px-1 ml-1 whitespace-nowrap">
-                    {{ page.url_base }}
-                </span>
-            </span>
-        </div>
-    </td>
-    <td class="w-[10%] md:w-[12%] text-xs text-center fecha-de-cierre {% if page.fecha_de_cierre|is_today %}text-red-600 font-bold{% endif %}">
-        {{ page.fecha_de_cierre | default("Sin cierre") | format_date }}
-    </td>
-    <th class="w-[8%] md:w-[8%] min-w-[70px] relative">
-        <div class="flex items-center justify-center">
-            <div class="inline-flex items-center gap-1.5 md:gap-3 bg-gray-200 py-2 px-3 md:px-4 ml-9 md:ml-1 mr-4">
-                <button
-                   role="button"
-                   tabindex="0"
-                   data-url="{{ page.base_url if page.base_url else page.url }}"
-                   data-keywords="{{ page.ai_keywords }}"
-                   data-name="{{ page.nombre }}"
-                   data-country="{{ page.país }}"
-                   data-summary="{{ page.og_resumida }}"
-                   data-requisitos="{{ page.requisitos }}"
-                   class="opportunity-link flex items-center justify-center w-5 h-5 truncate bg-neutral-400 rounded-full"
-                   title="{{ page.nombre }}">
-                    <svg class="w-4 md:w-6 text-white" data-slot="icon" fill="none"
-                        stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" 
-                              d="M12 4.5v15m7.5-7.5h-15"/>
+<!-- Table container with proper class -->
+<div class="results-table-container">
+    <table class="results-table">
+        <thead>
+            <tr>
+                <th class="oportunidad-col">OPORTUNIDAD
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                     </svg>
-                </button>
-                <div class="static">
-                    <button tabindex="0" 
-                            role="button" 
-                            class="flex items-center justify-center w-4 h-4"
-                            onclick="toggleDropdown(this)">
-                        <svg class="w-3 md:w-4" data-slot="icon" fill="none"
-                            stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"></path>
+                </th>
+                <th class="disciplina-col">DISCIPLINA
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                    </svg>
+                </th>
+                <th class="pais-col">PAÍS
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                    </svg>
+                </th>
+                <th class="cierre-col">CIERRE
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                    </svg>
+                </th>
+                <th class="pago-col">PAGO
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                    </svg>
+                </th>
+                <th class="accion-col">ACCIÓN
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                    </svg>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for page in pages %}
+            <tr>
+                <td class="oportunidad-col">
+                    {{ page.categoria | capitalize }} | {{ page.nombre }}
+                    <input type="hidden" name="name_{{ page.id }}" value="{{ page.nombre }}">
+                    <input type="hidden" name="country_{{ page.id }}" value="{{ page.país }}">
+                    <input type="hidden" name="url_{{ page.id }}" value="{{ page.base_url if page.base_url else page.url }}">
+                    <input type="hidden" name="recipients_{{ page.id }}" value="{{ page.destinatarios }}">
+                    <input type="hidden" name="fecha_de_cierre_{{ page.id }}" value="{{ page.fecha_de_cierre }}">
+                </td>
+                <td class="disciplina-col">
+                    {% if page.disciplina %}
+                        {% set disciplinas = page.disciplina.split(',') %}
+                        {% if disciplinas|length > 0 %}
+                            {% set disciplina_principal = disciplinas[0].strip() | lower %}
+                            {% set disciplina_class = disciplina_principal %}
+                            {% if 'visual' in disciplina_principal %}
+                                {% set disciplina_class = 'visuales' %}
+                            {% elif 'music' in disciplina_principal or 'músic' in disciplina_principal %}
+                                {% set disciplina_class = 'musica' %}
+                            {% elif 'escénic' in disciplina_principal or 'escenic' in disciplina_principal or 'teatro' in disciplina_principal or 'danza' in disciplina_principal %}
+                                {% set disciplina_class = 'escenicas' %}
+                            {% elif 'literatur' in disciplina_principal or 'escrit' in disciplina_principal %}
+                                {% set disciplina_class = 'literatura' %}
+                            {% elif 'diseñ' in disciplina_principal or 'design' in disciplina_principal %}
+                                {% set disciplina_class = 'diseno' %}
+                            {% elif 'cine' in disciplina_principal or 'audio' in disciplina_principal or 'film' in disciplina_principal %}
+                                {% set disciplina_class = 'cine' %}
+                            {% else %}
+                                {% set disciplina_class = 'otros' %}
+                            {% endif %}
+                            <span class="discipline-tag {{ disciplina_class }}" id="discipline-tag-{{ loop.index }}">{{ disciplinas[0].strip() | capitalize }}</span>
+                        {% endif %}
+                    {% endif %}
+                </td>
+                <td class="pais-col">{{ page.país }}</td>
+                <td class="cierre-col">{{ page.fecha_de_cierre | default("Sin cierre") | format_date }}</td>
+                <td class="pago-col">
+                    <div class="payment-status {% if page.inscripcion == 'Sin cargo' or not page.inscripcion %}free{% else %}paid{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/>
                         </svg>
+                    </div>
+                </td>
+                <td class="accion-col">
+                    <button 
+                        class="action-button"
+                        data-url="{{ page.base_url if page.base_url else page.url }}"
+                        data-name="{{ page.nombre }}"
+                        data-country="{{ page.país }}"
+                        data-summary="{{ page.og_resumida }}"
+                        data-id="{{ page.id }}"
+                        data-category="{{ page.categoria }}"
+                        data-requisitos="{{ page.requisitos }}"
+                        onclick="showOpportunityDetails(this)">
+                        Ver
                     </button>
-                    <ul class="hidden absolute right-0 mt-3 w-52 bg-zinc-100 shadow-xl border border-black p-2 z-50 dropdown-menu">
-                        <li class="hover:bg-gray-200">
-                            <a href="#" class="block px-4 py-2 text-sm" onclick="copyUrl('{{ page.base_url if page.base_url else page.url }}'); return false;">Copiar URL</a>
-                        </li>
-                        <li class="hover:bg-gray-200">
-                            <a href="#" class="block px-4 py-2 text-sm" onclick="shareOpportunity(
-                                '{{ page.url }}', 
-                                '{{ page.nombre }}', 
-                                'whatsapp',
-                                {
-                                    id: '{{ page.id }}',
-                                    country: '{{ page.país }}',
-                                    disciplina: '{{ page.disciplina }}',
-                                    fecha_de_cierre: '{{ page.fecha_de_cierre }}',
-                                    inscripcion: '{{ page.inscripcion }}',
-                                    base_url: '{{ page.base_url if page.base_url else "" }}'
-                                }
-                            ); return false;">WhatsApp</a>
-                        </li>
-                        <li class="hover:bg-gray-200">
-                            <a href="#" class="block px-4 py-2 text-sm" onclick="shareOpportunity(
-                                '{{ page.url }}', 
-                                '{{ page.nombre }}', 
-                                'linkedin',
-                                {
-                                    id: '{{ page.id }}',
-                                    country: '{{ page.país }}',
-                                    disciplina: '{{ page.disciplina }}',
-                                    fecha_de_cierre: '{{ page.fecha_de_cierre }}',
-                                    inscripcion: '{{ page.inscripcion }}',
-                                    base_url: '{{ page.base_url if page.base_url else "" }}'
-                                }
-                            ); return false;">LinkedIn</a>
-                        </li>
-                        <li class="hover:bg-gray-200">
-                            <a href="#" class="block px-4 py-2 text-sm" onclick="shareOpportunity(
-                                '{{ page.url }}', 
-                                '{{ page.nombre }}', 
-                                'email',
-                                {
-                                    id: '{{ page.id }}',
-                                    country: '{{ page.país }}',
-                                    disciplina: '{{ page.disciplina }}',
-                                    fecha_de_cierre: '{{ page.fecha_de_cierre }}',
-                                    inscripcion: '{{ page.inscripcion }}',
-                                    base_url: '{{ page.base_url if page.base_url else "" }}'
-                                }
-                            ); return false;">Email</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </th>
-</tr>
-{% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
 
-{% if no_results %}
-<tr>
-    <td colspan="5" class="text-center py-4 text-gray-500">
-        No se encontraron resultados
-    </td>
-</tr>
-{% endif %}
+            {% if no_results %}
+            <tr>
+                <td colspan="6" class="text-center py-4 text-gray-500">
+                    No se encontraron resultados
+                </td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+<div class="pagination-container">
+    <div class="pagination-info">
+        Filas por página: 
+        <select id="rows-per-page" class="border rounded px-2 py-1 ml-2">
+            <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+            <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
+            <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+        </select>
+    </div>
+    
+    <div class="pagination-controls">
+        <button class="pagination-button {% if current_page == 1 %}disabled{% endif %}" 
+                {% if current_page > 1 %}onclick="changePage({{ current_page - 1 }})"{% endif %}>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+        </button>
+        
+        <span>Página {{ current_page }} de {{ total_pages }}</span>
+        
+        <button class="pagination-button {% if current_page == total_pages %}disabled{% endif %}" 
+                {% if current_page < total_pages %}onclick="changePage({{ current_page + 1 }})"{% endif %}>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            </svg>
+        </button>
+    </div>
+</div>
+
+<script>
+function showOpportunityDetails(button) {
+    // Get data from button attributes
+    const url = button.getAttribute('data-url');
+    const name = button.getAttribute('data-name');
+    const country = button.getAttribute('data-country');
+    const summary = button.getAttribute('data-summary');
+    const id = button.getAttribute('data-id');
+    const category = button.getAttribute('data-category');
+    const requisitos = button.getAttribute('data-requisitos');
+    
+    // Call the modal function if it exists
+    if (window.ModalModule && window.ModalModule.showPreviewModal) {
+        window.ModalModule.showPreviewModal(
+            url,
+            name,
+            country,
+            summary,
+            id,
+            category,
+            null,  // base_url parameter
+            requisitos
+        );
+    } else {
+        // Fallback - open in new tab
+        window.open(url, '_blank');
+    }
+}
+
+function changePage(page) {
+    // Get current URL
+    const url = new URL(window.location.href);
+    
+    // Update page parameter
+    url.searchParams.set('page', page);
+    
+    // Navigate to new URL
+    window.location.href = url.toString();
+}
+
+document.getElementById('rows-per-page').addEventListener('change', function() {
+    const url = new URL(window.location.href);
+    url.searchParams.set('per_page', this.value);
+    url.searchParams.set('page', 1); // Reset to first page
+    window.location.href = url.toString();
+});
+
+// Add debugging code to check styles
+window.addEventListener('DOMContentLoaded', function() {
+    console.log('Checking styles for results table...');
+    
+    // Check header background color
+    const tableHeader = document.querySelector('.results-table thead');
+    if (tableHeader) {
+        const headerStyle = window.getComputedStyle(tableHeader);
+        console.log('Header background color:', headerStyle.backgroundColor);
+    } else {
+        console.log('Table header not found');
+    }
+    
+    // Check discipline tag colors
+    const disciplineTags = document.querySelectorAll('.discipline-tag');
+    disciplineTags.forEach((tag, index) => {
+        const tagStyle = window.getComputedStyle(tag);
+        console.log(`Discipline tag ${index} (${tag.className}) background color:`, tagStyle.backgroundColor);
+    });
+    
+    // Check action button color
+    const actionButtons = document.querySelectorAll('.action-button');
+    if (actionButtons.length > 0) {
+        const buttonStyle = window.getComputedStyle(actionButtons[0]);
+        console.log('Action button background color:', buttonStyle.backgroundColor);
+        console.log('Action button text color:', buttonStyle.color);
+    } else {
+        console.log('Action buttons not found');
+    }
+    
+    // Apply direct styles to elements
+    applyDirectStyles();
+});
+
+function applyDirectStyles() {
+    // Apply styles directly to elements
+    const tableHeader = document.querySelector('.results-table thead');
+    if (tableHeader) {
+        tableHeader.style.backgroundColor = '#6232FF';
+    }
+    
+    // Apply styles to discipline tags
+    document.querySelectorAll('.discipline-tag.visuales').forEach(tag => {
+        tag.style.backgroundColor = '#E92E4A';
+        tag.style.color = 'white';
+    });
+    
+    document.querySelectorAll('.discipline-tag.musica').forEach(tag => {
+        tag.style.backgroundColor = '#FF7022';
+        tag.style.color = 'white';
+    });
+    
+    document.querySelectorAll('.discipline-tag.escenicas').forEach(tag => {
+        tag.style.backgroundColor = '#F3CE3A';
+        tag.style.color = '#333';
+    });
+    
+    document.querySelectorAll('.discipline-tag.literatura').forEach(tag => {
+        tag.style.backgroundColor = '#2ED0FF';
+        tag.style.color = 'white';
+    });
+    
+    document.querySelectorAll('.discipline-tag.diseno').forEach(tag => {
+        tag.style.backgroundColor = '#17A398';
+        tag.style.color = 'white';
+    });
+    
+    document.querySelectorAll('.discipline-tag.cine').forEach(tag => {
+        tag.style.backgroundColor = '#64113F';
+        tag.style.color = 'white';
+    });
+    
+    document.querySelectorAll('.discipline-tag.otros').forEach(tag => {
+        tag.style.backgroundColor = '#F15BB5';
+        tag.style.color = 'white';
+    });
+    
+    // Apply styles to action buttons
+    document.querySelectorAll('.action-button').forEach(button => {
+        button.style.backgroundColor = '#EDE9FE';
+        button.style.color = '#6232FF';
+    });
+    
+    // Apply styles to table headers
+    document.querySelectorAll('.results-table th').forEach(th => {
+        th.style.color = 'white';
+    });
+}
+</script>
+
+<!-- Add a style tag to ensure the styles are applied -->
+<style>
+/* Table container */
+.results-table-container {
+    width: 100% !important;
+    overflow-x: auto !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    margin-bottom: 16px !important;
+}
+
+/* Main table styling */
+.results-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+/* Table header */
+.results-table thead {
+    background-color: #6232FF !important; /* Primary color from Tailwind config */
+}
+
+.results-table th {
+    color: white !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    text-align: left !important;
+    padding: 12px 16px !important;
+    white-space: nowrap !important;
+}
+
+/* Sort icons in header */
+.results-table th svg {
+    width: 16px !important;
+    height: 16px !important;
+    vertical-align: middle !important;
+    margin-left: 4px !important;
+    opacity: 0.7 !important;
+}
+
+/* Table body */
+.results-table tbody tr {
+    background-color: white !important;
+    border-bottom: 1px solid #E5E7EB !important;
+    transition: background-color 0.2s !important;
+}
+
+.results-table tbody tr:hover {
+    background-color: #F9FAFB !important;
+}
+
+/* Table cells */
+.results-table td {
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+    color: #374151 !important;
+    vertical-align: middle !important;
+}
+
+/* Opportunity column */
+.results-table td.oportunidad-col {
+    font-weight: 500 !important;
+    color: #111827 !important;
+    line-height: 1.4 !important;
+}
+
+/* Column widths */
+.results-table th.oportunidad-col,
+.results-table td.oportunidad-col {
+    width: 40% !important;
+}
+
+.results-table th.disciplina-col,
+.results-table td.disciplina-col {
+    width: 15% !important;
+}
+
+.results-table th.pais-col,
+.results-table td.pais-col {
+    width: 15% !important;
+}
+
+.results-table th.cierre-col,
+.results-table td.cierre-col {
+    width: 15% !important;
+    text-align: center !important;
+}
+
+.results-table th.pago-col,
+.results-table td.pago-col {
+    width: 5% !important;
+    text-align: center !important;
+}
+
+.results-table th.accion-col,
+.results-table td.accion-col {
+    width: 10% !important;
+    text-align: center !important;
+}
+
+/* Discipline tags */
+.discipline-tag {
+    display: inline-block !important;
+    padding: 4px 12px !important;
+    border-radius: 16px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: white !important;
+    text-align: center !important;
+}
+
+/* Discipline tag colors - using colors from Tailwind config */
+.discipline-tag.visuales { background-color: #E92E4A !important; } /* design.visuales */
+.discipline-tag.musica { background-color: #FF7022 !important; } /* design.musica */
+.discipline-tag.escenicas { background-color: #F3CE3A !important; color: #333 !important; } /* design.escenicas */
+.discipline-tag.literatura { background-color: #2ED0FF !important; } /* design.literatura */
+.discipline-tag.diseno { background-color: #17A398 !important; } /* design.diseno */
+.discipline-tag.cine { background-color: #64113F !important; } /* design.cine */
+.discipline-tag.otros { background-color: #F15BB5 !important; } /* design.otros */
+
+/* Payment status */
+.payment-status {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+}
+
+.payment-status.free svg {
+    color: #111827 !important;
+}
+
+.payment-status.paid svg {
+    color: #111827 !important;
+}
+
+.payment-status.free::after {
+    content: "" !important;
+    position: absolute !important;
+    width: 20px !important;
+    height: 2px !important;
+    background-color: #EF4444 !important;
+    transform: rotate(-45deg) !important;
+}
+
+/* Action button */
+.action-button {
+    display: inline-block !important;
+    padding: 6px 16px !important;
+    background-color: #EDE9FE !important;
+    color: #6232FF !important; /* Primary color from Tailwind config */
+    border-radius: 16px !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    transition: all 0.2s !important;
+    border: none !important;
+    cursor: pointer !important;
+}
+
+.action-button:hover {
+    background-color: #DDD6FE !important;
+}
+
+/* Pagination */
+.pagination-container {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-top: 16px !important;
+    font-size: 14px !important;
+}
+
+.pagination-info {
+    color: #6B7280 !important;
+}
+
+.pagination-controls {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .results-table th,
+    .results-table td {
+        padding: 8px 12px !important;
+    }
+    
+    .discipline-tag {
+        padding: 3px 8px !important;
+        font-size: 12px !important;
+    }
+    
+    .action-button {
+        padding: 4px 12px !important;
+        font-size: 13px !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .results-table-container {
+        overflow-x: auto !important;
+    }
+    
+    .results-table {
+        min-width: 640px !important;
+    }
+}
+</style>
+
+<!-- Inline styles for critical elements -->
+<style>
+/* Direct element styling */
+#discipline-tag-1 { background-color: #E92E4A !important; color: white !important; }
+#discipline-tag-2 { background-color: #FF7022 !important; color: white !important; }
+#discipline-tag-3 { background-color: #F3CE3A !important; color: #333 !important; }
+#discipline-tag-4 { background-color: #2ED0FF !important; color: white !important; }
+#discipline-tag-5 { background-color: #17A398 !important; color: white !important; }
+#discipline-tag-6 { background-color: #64113F !important; color: white !important; }
+#discipline-tag-7 { background-color: #F15BB5 !important; color: white !important; }
+#discipline-tag-8 { background-color: #E92E4A !important; color: white !important; }
+#discipline-tag-9 { background-color: #FF7022 !important; color: white !important; }
+#discipline-tag-10 { background-color: #F3CE3A !important; color: #333 !important; }
+</style>
 

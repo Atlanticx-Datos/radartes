@@ -90,6 +90,16 @@ export const SearchModule = {
         
         // Ensure clear button visibility is correct on initialization
         this.ensureClearButtonVisible();
+
+        // Initialize sorting state
+        this.sortColumn = null;
+        this.sortActive = false;
+        this.originalOrder = []; // Store original order of results
+        
+        // Remove any old sorting properties if they exist
+        if (this.sorting) {
+            delete this.sorting;
+        }
     },
 
     updateFilterUI() {
@@ -664,6 +674,11 @@ export const SearchModule = {
     },
 
     updateResults(results, preservePage = false) {
+        // Store original order if this is the first load
+        if (!this.originalOrder.length && results.length > 0) {
+            this.originalOrder = [...results];
+        }
+        
         const container = document.getElementById('results-container');
         const counter = document.getElementById('results-counter');
 
@@ -707,7 +722,7 @@ export const SearchModule = {
         }
 
         // Sort results if a sort column is selected and active
-        const sortedResults = this.sortResults(results, this.sorting.column);
+        const sortedResults = this.sortResults(results, this.sortColumn);
 
         // Calculate pagination slice
         const startIndex = (this.pagination.currentPage - 1) * this.pagination.itemsPerPage;
@@ -745,88 +760,131 @@ export const SearchModule = {
 
         // Create table with results
         container.innerHTML = `
-            <div class="overflow-x-auto rounded-lg border border-gray-200">
-                <table class="results-table w-full table-fixed border-collapse">
-                    <thead>
+            <div class="results-table-container overflow-x-auto">
+                <table class="results-table min-w-full divide-y divide-gray-200">
+                    <thead style="background-color: #6232FF; color: white;">
                         <tr>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50 cursor-pointer hover:bg-gray-100" onclick="SearchModule.handleSort('nombre')">
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('nombre')" style="color: white; padding: 12px 16px; font-weight: 600; font-size: 14px;">
                                 <div class="flex items-center">
-                                    Oportunidad
+                                    OPORTUNIDAD
                                     ${this.getSortIcon('nombre')}
                                 </div>
                             </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50 cursor-pointer hover:bg-gray-100" onclick="SearchModule.handleSort('disciplina')">
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('disciplina')" style="color: white; padding: 12px 16px; font-weight: 600; font-size: 14px;">
                                 <div class="flex items-center">
-                                    Disciplina
+                                    DISCIPLINA
                                     ${this.getSortIcon('disciplina')}
                                 </div>
                             </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50 cursor-pointer hover:bg-gray-100" onclick="SearchModule.handleSort('pais')">
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('pais')" style="color: white; padding: 12px 16px; font-weight: 600; font-size: 14px;">
                                 <div class="flex items-center">
-                                    País
+                                    PAÍS
                                     ${this.getSortIcon('pais')}
                                 </div>
                             </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
-                                $
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white; padding: 12px 16px; font-weight: 600; font-size: 14px;">
+                                PAGO
                             </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50 cursor-pointer hover:bg-gray-100" onclick="SearchModule.handleSort('fecha')">
-                                <div class="flex items-center">
-                                    Cierre
-                                    ${this.getSortIcon('fecha')}
-                                </div>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white; padding: 12px 16px; font-weight: 600; font-size: 14px;">
+                                CIERRE
                             </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white; padding: 12px 16px; font-weight: 600; font-size: 14px;">
+                                ACCIÓN
                             </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        ${paginatedResults.map(page => `
-                            <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="px-4 py-3 text-sm text-gray-900">
-                                    ${Utils.escapeHTML(page.nombre_original || '')}
+                        ${results.length > 0 ? results.map((page, index) => {
+                            // Get the first discipline for the tag
+                            const mainDiscipline = page.disciplina ? page.disciplina.split(',')[0].trim().toLowerCase() : '';
+                            
+                            // Normalize the discipline name for class
+                            const normalizedDiscipline = mainDiscipline
+                                .normalize("NFD")
+                                .replace(/[\u0300-\u036f]/g, "")
+                                .replace(/\s+/g, '');
+                            
+                            // Define color mappings for each discipline
+                            const disciplineColors = {
+                                'visuales': { bg: '#FDE8EB', text: '#E92E4A' },
+                                'musica': { bg: '#FFF0E8', text: '#FF7022' },
+                                'escenicas': { bg: '#FFFBE8', text: '#F3CE3A' },
+                                'literatura': { bg: '#E8F9FF', text: '#2ED0FF' },
+                                'diseno': { bg: '#E8F6F5', text: '#17A398' },
+                                'cine': { bg: '#F0E8EC', text: '#64113F' },
+                                'otros': { bg: '#FCE8F4', text: '#F15BB5' }
+                            };
+                            
+                            // Get colors for this discipline
+                            const colors = disciplineColors[normalizedDiscipline] || disciplineColors['otros'];
+                            
+                            // Format date
+                            const formatDate = (dateStr) => {
+                                if (!dateStr || dateStr === '1900-01-01') {
+                                    return 'Confirmar en bases';
+                                }
+                                try {
+                                    const date = new Date(dateStr);
+                                    const day = String(date.getDate()).padStart(2, '0');
+                                    const month = date.toLocaleString('es', { month: 'short' }).slice(0, 3);
+                                    const year = date.getFullYear();
+                                    return `${day} ${month} ${year}`;
+                                } catch (e) {
+                                    return dateStr;
+                                }
+                            };
+                            
+                            return `
+                            <tr class="${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">
+                                        ${page.nombre || ''}
+                                    </div>
                                 </td>
-                                <td class="px-4 py-3 text-sm text-gray-600">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                        ${Utils.escapeHTML(page.disciplina ? page.disciplina.split(',')[0].trim() : '')}
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm" 
+                                          style="background-color: ${colors.bg}; color: ${colors.text}; font-weight: 500;">
+                                        ${mainDiscipline.charAt(0).toUpperCase() + mainDiscipline.slice(1)}
                                     </span>
                                 </td>
-                                <td class="px-4 py-3 text-sm text-gray-600">
-                                    ${Utils.escapeHTML(page.pais || page.país || '')}
+                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    ${page.pais || page.país || ''}
                                 </td>
-                                <td class="px-4 py-3 text-sm text-gray-600">
+                                <td class="px-4 py-4 whitespace-nowrap">
                                     ${page.inscripcion === 'Sin cargo' || !page.inscripcion ? 
                                         '<div class="relative inline-block"><svg class="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg><svg class="absolute top-0 left-0 w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="5" y1="5" x2="19" y2="19"/></svg></div>' : 
                                         '<svg class="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg>'
                                     }
                                 </td>
-                                <td class="px-4 py-3 text-sm text-gray-600">
+                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                                     ${formatDate(page.fecha_de_cierre)}
                                 </td>
-                                <td class="px-4 py-3 text-sm text-gray-600">
+                                <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <button 
-                                        type="button"
-                                        class="preview-btn px-3 py-1 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100"
-                                        data-url="${Utils.escapeHTML(page.url || '')}"
-                                        data-nombre="${Utils.escapeHTML(page.nombre_original || '')}"
-                                        data-pais="${Utils.escapeHTML(page.pais || page.país || '')}"
-                                        data-og_resumida="${Utils.escapeHTML(page.og_resumida || '')}"
-                                        data-id="${Utils.escapeHTML(page.id || '')}"
-                                        data-categoria="${Utils.escapeHTML(page.categoria || '')}"
-                                        data-requisitos="${Utils.escapeHTML(page.requisitos || '')}"
-                                        data-inscripcion="${Utils.escapeHTML(page.inscripcion || '')}"
+                                        class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                                        style="background-color: #F0EBFF; color: #6232FF;"
+                                        onclick="window.ModalModule.showPreviewModal('${page.url || ''}', '${page.nombre_original || page.nombre || ''}', '${page.pais || page.país || ''}', '${page.og_resumida || ''}', '${page.id || ''}', '${page.categoria || ''}', null, '${page.requisitos || ''}')"
                                     >
                                         Ver
                                     </button>
                                 </td>
                             </tr>
-                        `).join('')}
+                            `;
+                        }).join('') : `
+                            <tr>
+                                <td colspan="6" class="px-4 py-4 text-center text-gray-500">
+                                    No se encontraron resultados para tu búsqueda.
+                                </td>
+                            </tr>
+                        `}
                     </tbody>
                 </table>
             </div>
+
             ${this.pagination.totalPages > 1 ? `
-                <div class="flex flex-col items-center mt-6">
-                    <div class="flex items-center gap-2">
+                <div class="pagination-container mt-4 flex flex-col sm:flex-row items-center justify-between">
+                    <!-- Pagination controls -->
+                    <div class="flex items-center space-x-1 mb-2 sm:mb-0">
                         <!-- First page button -->
                         <button 
                             class="pagination-nav w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 ${this.pagination.currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
@@ -845,7 +903,7 @@ export const SearchModule = {
                             ‹
                         </button>
                         
-                        <!-- Page numbers with ellipsis -->
+                        <!-- Page numbers -->
                         ${this.renderPageNumbers()}
                         
                         <!-- Next page button -->
@@ -874,6 +932,49 @@ export const SearchModule = {
                 </div>
             ` : ''}
         `;
+
+        // Apply our custom styles to the results table
+        setTimeout(() => {
+            console.log('Applying direct styles to search results table');
+            
+            // First, remove problematic classes from header cells
+            const headerCells = document.querySelectorAll('.results-table th, table[id*="results"] th');
+            headerCells.forEach(cell => {
+                // Remove Tailwind background classes that might be interfering
+                cell.classList.remove('bg-gray-50', 'hover:bg-gray-100');
+                
+                // Add our own class for styling
+                cell.classList.add('results-header-cell');
+                
+                // Apply direct styles that will override any other styles
+                cell.style.backgroundColor = '#6232FF';
+                cell.style.color = 'white';
+                cell.style.padding = '12px 16px';
+                cell.style.fontWeight = '600';
+                cell.style.fontSize = '14px';
+            });
+            
+            // Apply styles to the thead element
+            const tableHeaders = document.querySelectorAll('.results-table thead, table[id*="results"] thead');
+            tableHeaders.forEach(header => {
+                // Remove any background classes
+                header.classList.remove('bg-gray-50');
+                
+                // Apply direct styles
+                header.style.backgroundColor = '#6232FF';
+                header.style.color = 'white';
+            });
+            
+            // Fix the sort icons in the header
+            const sortIcons = document.querySelectorAll('.results-table th svg, table[id*="results"] th svg');
+            sortIcons.forEach(icon => {
+                icon.style.color = 'white';
+                icon.classList.remove('text-gray-400');
+                icon.classList.add('text-white');
+            });
+            
+            console.log('Applied custom styles to search results table');
+        }, 100); // Small delay to ensure the DOM is updated
     },
 
     goToPage(page) {
@@ -909,12 +1010,16 @@ export const SearchModule = {
     },
 
     sortResults(results, column) {
-        if (!column || !this.sorting.active) return results;
+        // If sorting is not active, return to original order
+        if (!this.sortActive || !column) {
+            return this.originalOrder.length > 0 ? [...this.originalOrder] : results;
+        }
 
+        // Sort if active
         const sortFunctions = {
             nombre: (a, b) => {
-                const aName = (a.nombre_original || '').toLowerCase();
-                const bName = (b.nombre_original || '').toLowerCase();
+                const aName = (a.nombre || '').toLowerCase();
+                const bName = (b.nombre || '').toLowerCase();
                 return aName.localeCompare(bName);
             },
             disciplina: (a, b) => {
@@ -928,33 +1033,63 @@ export const SearchModule = {
                 return aPais.localeCompare(bPais);
             },
             fecha: (a, b) => {
-                const aDate = a.fecha_de_cierre === '1900-01-01' ? new Date(8640000000000000) : new Date(a.fecha_de_cierre);
-                const bDate = b.fecha_de_cierre === '1900-01-01' ? new Date(8640000000000000) : new Date(b.fecha_de_cierre);
+                // Special handling for dates
+                // Convert '1900-01-01' to a far future date for sorting purposes
+                const parseDate = (dateStr) => {
+                    if (!dateStr || dateStr === '1900-01-01') {
+                        return new Date(8640000000000000); // Far future date
+                    }
+                    return new Date(dateStr);
+                };
+                
+                const aDate = parseDate(a.fecha_de_cierre);
+                const bDate = parseDate(b.fecha_de_cierre);
+                
+                // Compare dates
                 return aDate - bDate;
             }
         };
-
+        
         return [...results].sort(sortFunctions[column]);
     },
 
     handleSort(column) {
-        if (this.sorting.column === column) {
+        console.log('Handling sort for column:', column);
+        console.log('Current sort state:', { column: this.sortColumn, active: this.sortActive });
+        
+        if (this.sortColumn === column) {
             // Toggle active state if clicking the same column
-            this.sorting.active = !this.sorting.active;
+            this.sortActive = !this.sortActive;
         } else {
             // New column, set to active
-            this.sorting.column = column;
-            this.sorting.active = true;
+            this.sortColumn = column;
+            this.sortActive = true;
         }
+        
+        console.log('New sort state:', { column: this.sortColumn, active: this.sortActive });
 
-        this.updateResults(this.pagination.allResults, true);
+        // Get the results to display
+        let resultsToDisplay;
+        if (this.sortActive) {
+            // Sort the results if active
+            resultsToDisplay = this.sortResults(this.pagination.allResults, column);
+        } else {
+            // Use original order if not active
+            resultsToDisplay = this.originalOrder.length > 0 ? [...this.originalOrder] : this.pagination.allResults;
+        }
+        
+        // Update the display with sorted or original results
+        this.updateResults(resultsToDisplay, true);
     },
 
     // Function to get sort icon
     getSortIcon(column) {
-        const isActive = this.sorting.column === column && this.sorting.active;
-        return `<svg class="w-4 h-4 ml-1 ${isActive ? 'text-blue-600' : 'text-gray-400'}" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+        // Always use the arrows icon, but change color if active
+        const isActive = this.sortColumn === column && this.sortActive;
+        const iconColor = isActive ? '#FFFFFF' : '#BBBBBB';
+        
+        return `<svg class="w-4 h-4 ml-1" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
         </svg>`;
     },
 
@@ -1013,10 +1148,10 @@ export const SearchModule = {
         return `
             <button 
                 class="pagination-number w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium ${
-                    isActive 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-700 hover:bg-gray-100'
-                }"
+                        isActive 
+                        ? 'bg-blue-600 text-white' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }"
                 onclick="SearchModule.goToPage(${pageNum})"
             >
                 ${pageNum}

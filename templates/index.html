@@ -246,6 +246,101 @@
     data-pages="{{ pages|tojson|forceescape }}" class="hidden">
 </div>
 
+<!-- Script to fix table styling -->
+<script>
+    // Function to fix table styling
+    function fixTableStyling() {
+        console.log('Fixing table styling on page load');
+        
+        // Fix header background
+        const tableHeaders = document.querySelectorAll('.results-table thead, table[id*="results"] thead');
+        tableHeaders.forEach(header => {
+            header.style.backgroundColor = '#6232FF';
+            header.style.color = 'white';
+        });
+        
+        // Fix header cells
+        const headerCells = document.querySelectorAll('.results-table th, table[id*="results"] th');
+        headerCells.forEach(cell => {
+            // Remove problematic classes
+            cell.classList.remove('bg-gray-50', 'hover:bg-gray-100', 'text-gray-500');
+            
+            // Apply direct styles
+            cell.style.backgroundColor = '#6232FF';
+            cell.style.color = 'white';
+            cell.style.padding = '12px 16px';
+            cell.style.fontWeight = '600';
+            cell.style.fontSize = '14px';
+        });
+        
+        // Fix sort icons
+        const sortIcons = document.querySelectorAll('.results-table th svg, table[id*="results"] th svg');
+        sortIcons.forEach(icon => {
+            icon.style.color = 'white';
+            icon.classList.remove('text-gray-400');
+            icon.classList.add('text-white');
+        });
+        
+        // Fix discipline tags
+        const disciplineTags = document.querySelectorAll('.discipline-tag');
+        disciplineTags.forEach(tag => {
+            // Apply common styles
+            tag.style.display = 'inline-block';
+            tag.style.padding = '4px 12px';
+            tag.style.borderRadius = '16px';
+            tag.style.fontSize = '13px';
+            tag.style.fontWeight = '500';
+            
+            // Apply discipline-specific styles
+            if (tag.classList.contains('visuales')) {
+                tag.style.backgroundColor = '#E92E4A';
+                tag.style.color = 'white';
+            } else if (tag.classList.contains('musica')) {
+                tag.style.backgroundColor = '#FF7022';
+                tag.style.color = 'white';
+            } else if (tag.classList.contains('escenicas')) {
+                tag.style.backgroundColor = '#F3CE3A';
+                tag.style.color = '#333';
+            } else if (tag.classList.contains('literatura')) {
+                tag.style.backgroundColor = '#2ED0FF';
+                tag.style.color = 'white';
+            } else if (tag.classList.contains('diseno')) {
+                tag.style.backgroundColor = '#17A398';
+                tag.style.color = 'white';
+            } else if (tag.classList.contains('cine')) {
+                tag.style.backgroundColor = '#64113F';
+                tag.style.color = 'white';
+            } else {
+                tag.style.backgroundColor = '#F15BB5';
+                tag.style.color = 'white';
+            }
+        });
+        
+        // Fix action buttons
+        const actionButtons = document.querySelectorAll('.action-button');
+        actionButtons.forEach(button => {
+            button.style.backgroundColor = '#6232FF';
+            button.style.color = 'white';
+            button.style.padding = '6px 12px';
+            button.style.borderRadius = '6px';
+            button.style.fontWeight = '500';
+            button.style.fontSize = '13px';
+            button.style.cursor = 'pointer';
+        });
+    }
+    
+    // Run immediately
+    document.addEventListener('DOMContentLoaded', fixTableStyling);
+    
+    // Also run when the page is fully loaded
+    window.addEventListener('load', fixTableStyling);
+    
+    // Run again after a short delay to catch any late-rendered elements
+    setTimeout(fixTableStyling, 500);
+    setTimeout(fixTableStyling, 1000);
+    setTimeout(fixTableStyling, 2000);
+</script>
+
 <!-- Full width background container with rounded top corners -->
 <div class="w-full bg-gray-50 rounded-t-[40px] overflow-hidden relative z-10 -mt-8">
     <!-- Re-open container for content alignment -->
@@ -320,28 +415,80 @@
             </div>
 
             <!-- Destacados section with proper spacing and full width -->
-            <div class="relative max-w-7xl mx-auto destacados-container mb-12">
+            <div class="relative max-w-full mx-auto destacados-container mb-12">
                 <h2 class="text-2xl font-bold mb-8 destacados-header text-design-gray-900">Destacados de la semana 🔥</h2>
                 <div class="relative">
-                    <!-- Previous button - adjusted to -ml-14 -->
+                    <!-- Previous button - adjusted position for better responsiveness -->
                     <button onclick="prevDestacarPage()"
-                        class="destacar-prev absolute left-0 top-1/2 -translate-y-1/2 -ml-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200"
+                        class="destacar-prev absolute left-0 top-1/2 -translate-y-1/2 -ml-4 sm:-ml-8 lg:-ml-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200"
                         aria-disabled="true">
                         <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                         </svg>
                     </button>
 
-                    <!-- Featured opportunities grid - full width -->
-                    <div class="featured-opportunities w-full">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <!-- Content will be populated by JavaScript -->
+                    <!-- Featured opportunities grid - full width with flex container -->
+                    <div class="featured-opportunities w-full overflow-hidden">
+                        <div class="flex flex-wrap gap-6">
+                            <!-- Content will be populated by JavaScript, but we can add a template for reference -->
+                            <!-- This template won't be displayed, it's just for reference -->
+                            <template id="destacar-card-template">
+                                <div class="bg-white rounded-lg shadow-md overflow-hidden relative cursor-pointer opportunity-preview">
+                                    <div class="relative h-48 bg-gray-200">
+                                        <img src="/static/public/IsoAtx.png" alt="Atlantic x Logo" class="w-full h-full object-contain">
+                                        <span class="absolute top-3 left-3 text-sm">Categoría</span>
+                                        <span class="discipline-badge discipline-default">Disciplina</span>
+                                        <button class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <!-- Card Details Section-->
+                                    <div class="p-2">
+                                        <h3 class="font-medium text-lg">Título de la oportunidad</h3>
+                                        
+                                        <div class="flex flex-wrap gap-4 text-sm text-gray-600">
+                                            <div class="meta-row">
+                                                <div class="flex items-center gap-1">
+                                                    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                    <span>País</span>
+                                                </div>
+                                                
+                                                <div class="flex items-center gap-1">
+                                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                        <circle cx="12" cy="12" r="10"/>
+                                                        <path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/>
+                                                    </svg>
+                                                </div>
+                                                
+                                                <div class="flex items-center gap-1 subdisciplines-inline">
+                                                    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                                                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                    <span>Subdisciplinas</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="flex items-center gap-1 date-row">
+                                                <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                                </svg>
+                                                <span>Cierre: 01/Ene/2023</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                     </div>
 
-                    <!-- Next button - adjusted to -mr-14 -->
+                    <!-- Next button - adjusted position for better responsiveness -->
                     <button onclick="nextDestacarPage()"
-                        class="destacar-next absolute right-0 top-1/2 -translate-y-1/2 -mr-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200">
+                        class="destacar-next absolute right-0 top-1/2 -translate-y-1/2 -mr-4 sm:-mr-8 lg:-mr-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200">
                         <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>

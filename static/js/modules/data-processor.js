@@ -1,64 +1,98 @@
+/**
+ * Data processor module for handling raw data from the server
+ */
+
+import { DestacarModule } from './destacar.js';
+
+/**
+ * Process the raw data for the destacar section
+ * @param {Array} rawData - The raw data from the server
+ */
 export function processDestacarData(rawData) {
-    try {
-        console.log('Processing destacar data, raw data:', rawData);
-        console.log('Raw data type:', typeof rawData);
-        console.log('Raw data length:', Array.isArray(rawData) ? rawData.length : 'not an array');
+    console.log('Processing destacar data:', rawData);
+    
+    // Ensure we have valid data
+    if (!rawData || !Array.isArray(rawData) || rawData.length === 0) {
+        console.warn('No valid data to process for destacar section');
+        return;
+    }
+    
+    // Pre-process the data to ensure all fields are properly formatted
+    const processedData = rawData.map(page => {
+        // Make a copy to avoid modifying the original
+        const processedPage = { ...page };
         
-        if (!Array.isArray(rawData) || rawData.length === 0) {
-            console.warn('Raw destacar data is empty or not an array');
-            window.processedDestacarData = [];
-            return;
-        }
-        
-        window.processedDestacarData = rawData.map(function(item) {
-            try {
-                // First check if url_base already exists
-                if (item.url_base) {
-                    return item;
-                }
-                
-                // If not, try to extract it from the URL
-                let url_base = '';
-                if (item.url) {
-                    try {
-                        url_base = new URL(item.url).hostname.replace('www.', '');
-                    } catch (urlError) {
-                        console.warn('Error parsing URL:', item.url, urlError);
-                        // Try a simple regex extraction as fallback
-                        const match = item.url.match(/https?:\/\/(?:www\.)?([^\/]+)/i);
-                        url_base = match ? match[1] : '';
-                    }
-                }
-                
-                return Object.assign({}, item, { url_base });
-            } catch (itemError) {
-                console.error('Error processing item:', item, itemError);
-                return item; // Return the original item to avoid breaking the array
-            }
-        });
-        
-        console.log('Processed destacar data:', window.processedDestacarData.length, 'items');
-        
-        // Immediately initialize DestacarModule if it exists
-        if (window.DestacarModule && typeof window.DestacarModule.init === 'function') {
-            console.log('Directly initializing DestacarModule from processDestacarData');
-            window.DestacarModule.init(window.processedDestacarData);
-        } else {
-            console.warn('DestacarModule not available for initialization');
+        // Debug the title field
+        if (processedPage.nombre_original) {
+            console.log(`Original title for page ${processedPage.id}: "${processedPage.nombre_original}"`);
             
-            // Set a timeout to try again in case the module is loaded later
-            setTimeout(() => {
-                if (window.DestacarModule && typeof window.DestacarModule.init === 'function') {
-                    console.log('Initializing DestacarModule after delay');
-                    window.DestacarModule.init(window.processedDestacarData);
-                } else {
-                    console.error('DestacarModule still not available after delay');
+            // Check for both possible separator characters
+            const verticalEmDash = '︱'; // U+FE31: PRESENTATION FORM FOR VERTICAL EM DASH
+            const integralExtension = '⎮'; // U+23AE: INTEGRAL EXTENSION
+            const regularPipe = '|'; // Regular pipe character
+            
+            // Check which separator is present
+            const hasVerticalEmDash = processedPage.nombre_original.includes(verticalEmDash);
+            const hasIntegralExtension = processedPage.nombre_original.includes(integralExtension);
+            const hasRegularPipe = processedPage.nombre_original.includes(regularPipe);
+            
+            // Determine which separator to use
+            let separator = null;
+            if (hasVerticalEmDash) {
+                separator = verticalEmDash;
+                console.log(`Found vertical em dash separator '︱' in title for page ${processedPage.id}`);
+            } else if (hasIntegralExtension) {
+                separator = integralExtension;
+                console.log(`Found integral extension separator '⎮' in title for page ${processedPage.id}`);
+            } else if (hasRegularPipe) {
+                separator = regularPipe;
+                console.log(`Found regular pipe separator '|' in title for page ${processedPage.id}`);
+            }
+            
+            if (separator) {
+                // For debugging, show the character code
+                console.log('Separator character code:', separator.charCodeAt(0).toString(16));
+                
+                // Split the title by the separator
+                const parts = processedPage.nombre_original.split(separator);
+                console.log('Title parts after split:', parts);
+                
+                // Store the category and title separately for easier access
+                if (parts.length > 1) {
+                    processedPage.title_category = parts[0].trim();
+                    processedPage.title_name = parts[1].trim();
+                    console.log('Extracted category:', processedPage.title_category);
+                    console.log('Extracted title:', processedPage.title_name);
                 }
-            }, 500);
+            }
         }
-    } catch (error) {
-        console.error('Error processing destacar data:', error);
-        window.processedDestacarData = [];
+        
+        // Ensure all required fields exist
+        processedPage.id = processedPage.id || '';
+        processedPage.nombre = processedPage.nombre || '';
+        processedPage.nombre_original = processedPage.nombre_original || processedPage.nombre || '';
+        processedPage.url = processedPage.url || '';
+        processedPage.país = processedPage.país || processedPage.pais || '';
+        processedPage.pais = processedPage.pais || processedPage.país || '';
+        processedPage.categoria = processedPage.categoria || '';
+        processedPage.disciplina = processedPage.disciplina || '';
+        processedPage.fecha_de_cierre = processedPage.fecha_de_cierre || '';
+        processedPage.og_resumida = processedPage.og_resumida || '';
+        processedPage.requisitos = processedPage.requisitos || '';
+        processedPage.inscripcion = processedPage.inscripcion || '';
+        
+        return processedPage;
+    });
+    
+    console.log('Processed data:', processedData);
+    
+    // Initialize the DestacarModule with the processed data
+    if (window.DestacarModule && typeof window.DestacarModule.init === 'function') {
+        window.DestacarModule.init(processedData);
+    } else if (DestacarModule && typeof DestacarModule.init === 'function') {
+        DestacarModule.init(processedData);
+    } else {
+        console.error('DestacarModule not found or init method not available');
     }
 }
 

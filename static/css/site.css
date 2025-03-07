@@ -648,4 +648,361 @@ html {
     display: none;             /* Chrome, Safari and Opera */
 }
 
+/* ====================================
+   RESULTS TABLE STYLING - NEW
+   Used in: _search_results.html
+   Purpose: Style the results table to match the design
+   Why custom: Complex styling with specific colors
+==================================== */
+
+/* Table container */
+.results-table-container {
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    margin-bottom: 24px !important;
+}
+
+/* Main table styling */
+.results-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+/* Table header */
+.results-table thead {
+    background-color: #6232FF !important; /* Primary color from Tailwind config */
+    color: white !important;
+}
+
+.results-table th {
+    padding: 12px 16px !important;
+    text-align: left !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    white-space: nowrap !important;
+}
+
+.results-table th svg {
+    width: 16px !important;
+    height: 16px !important;
+    margin-right: 6px !important;
+    vertical-align: middle !important;
+    display: inline !important;
+}
+
+/* Table body */
+.results-table tbody tr {
+    border-bottom: 1px solid #f3f4f6 !important;
+    background-color: white !important;
+}
+
+.results-table tbody tr:last-child {
+    border-bottom: none !important;
+}
+
+.results-table tbody tr:hover {
+    background-color: #f9fafb !important;
+}
+
+.results-table td {
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+    color: #1f1b2d !important; /* design-gray-900 */
+}
+
+/* Opportunity column */
+.results-table td.oportunidad-col {
+    font-weight: 600 !important;
+    max-width: 300px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Discipline Tags */
+.discipline-tag {
+    display: inline-block !important;
+    padding: 4px 12px !important;
+    border-radius: 16px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: white !important;
+    text-align: center !important;
+    margin-right: 4px !important;
+    margin-bottom: 4px !important;
+}
+
+/* Discipline tag colors - using colors from Tailwind config */
+.discipline-tag.visuales, 
+[data-discipline="visuales"] .discipline-tag,
+.discipline-tag[data-discipline="visuales"] {
+    background-color: #E92E4A !important; /* design.visuales */
+}
+
+.discipline-tag.musica, 
+[data-discipline="musica"] .discipline-tag,
+.discipline-tag[data-discipline="musica"] {
+    background-color: #FF7022 !important; /* design.musica */
+}
+
+.discipline-tag.escenicas, 
+[data-discipline="escenicas"] .discipline-tag,
+.discipline-tag[data-discipline="escenicas"] {
+    background-color: #F3CE3A !important; 
+    color: #333 !important; /* design.escenicas */
+}
+
+.discipline-tag.literatura, 
+[data-discipline="literatura"] .discipline-tag,
+.discipline-tag[data-discipline="literatura"] {
+    background-color: #2ED0FF !important; /* design.literatura */
+}
+
+.discipline-tag.diseno, 
+[data-discipline="diseno"] .discipline-tag,
+.discipline-tag[data-discipline="diseno"] {
+    background-color: #17A398 !important; /* design.diseno */
+}
+
+.discipline-tag.cine, 
+[data-discipline="cine"] .discipline-tag,
+.discipline-tag[data-discipline="cine"] {
+    background-color: #64113F !important; /* design.cine */
+}
+
+.discipline-tag.otros, 
+[data-discipline="otros"] .discipline-tag,
+.discipline-tag[data-discipline="otros"] {
+    background-color: #F15BB5 !important; /* design.otros */
+}
+
+/* Payment Status */
+.payment-status {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+}
+
+.payment-status.free svg {
+    color: #111827 !important;
+}
+
+.payment-status.paid svg {
+    color: #111827 !important;
+}
+
+.payment-status.free::after {
+    content: "" !important;
+    position: absolute !important;
+    width: 20px !important;
+    height: 2px !important;
+    background-color: #EF4444 !important;
+    transform: rotate(-45deg) !important;
+}
+
+/* Action Button */
+.action-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 6px 12px !important;
+    background-color: #6232FF !important; /* Primary color */
+    color: white !important;
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    transition: background-color 0.2s !important;
+}
+
+.action-button:hover {
+    background-color: #5429e0 !important; /* Slightly darker */
+}
+
+/* Pagination */
+.pagination-container {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-top: 16px !important;
+}
+
+/* JavaScript-specific selectors */
+#search-results-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+}
+
+#search-results-table thead {
+    background-color: #6232FF !important;
+    color: white !important;
+}
+
+#search-results-table th {
+    padding: 12px 16px !important;
+    text-align: left !important;
+    font-weight: 600 !important;
+}
+
+#search-results-table tbody tr {
+    border-bottom: 1px solid #f3f4f6 !important;
+}
+
+#search-results-table td {
+    padding: 12px 16px !important;
+}
+
+/* Add styles for any ID or class that might be used in the JavaScript */
+.search-result-row {
+    background-color: white !important;
+}
+
+.search-result-row:hover {
+    background-color: #f9fafb !important;
+}
+
+.search-result-discipline {
+    display: inline-block !important;
+    padding: 4px 12px !important;
+    border-radius: 16px !important;
+    color: white !important;
+}
+
+/* Ensure these styles apply to any dynamically generated content */
+table[id*="results"] thead {
+    background-color: #6232FF !important;
+    color: white !important;
+}
+
+table[id*="results"] th {
+    padding: 12px 16px !important;
+    text-align: left !important;
+}
+
+/* Add a script to apply styles directly via JavaScript */
+</style>
+<script>
+// Apply styles directly to search results table when it's created
+document.addEventListener('DOMContentLoaded', function() {
+    // Initial application
+    applyResultsTableStyles();
+    
+    // Set up a MutationObserver to watch for dynamically added content
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+                // Check if our target elements were added
+                for (let i = 0; i < mutation.addedNodes.length; i++) {
+                    const node = mutation.addedNodes[i];
+                    if (node.nodeType === 1) { // Element node
+                        if (node.classList && 
+                            (node.classList.contains('results-table-container') || 
+                             node.querySelector('.results-table-container'))) {
+                            applyResultsTableStyles();
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+    });
+    
+    // Start observing the document with the configured parameters
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    // Function to apply styles directly to elements
+    function applyResultsTableStyles() {
+        console.log('Applying styles to search results table');
+        
+        // Apply styles to table header
+        const tableHeaders = document.querySelectorAll('.results-table thead, table[id*="results"] thead');
+        tableHeaders.forEach(header => {
+            header.style.backgroundColor = '#6232FF';
+            header.style.color = 'white';
+        });
+        
+        // Apply styles to table header cells
+        const headerCells = document.querySelectorAll('.results-table th, table[id*="results"] th');
+        headerCells.forEach(cell => {
+            cell.style.color = 'white';
+            cell.style.padding = '12px 16px';
+            cell.style.fontWeight = '600';
+            cell.style.fontSize = '14px';
+        });
+        
+        // Apply styles to discipline tags
+        const disciplineTags = document.querySelectorAll('.discipline-tag');
+        disciplineTags.forEach(tag => {
+            // Get discipline type from class or data attribute
+            let disciplineType = '';
+            if (tag.classList.contains('visuales')) disciplineType = 'visuales';
+            else if (tag.classList.contains('musica')) disciplineType = 'musica';
+            else if (tag.classList.contains('escenicas')) disciplineType = 'escenicas';
+            else if (tag.classList.contains('literatura')) disciplineType = 'literatura';
+            else if (tag.classList.contains('diseno')) disciplineType = 'diseno';
+            else if (tag.classList.contains('cine')) disciplineType = 'cine';
+            else disciplineType = 'otros';
+            
+            // Apply appropriate background color
+            switch (disciplineType) {
+                case 'visuales':
+                    tag.style.backgroundColor = '#E92E4A';
+                    tag.style.color = 'white';
+                    break;
+                case 'musica':
+                    tag.style.backgroundColor = '#FF7022';
+                    tag.style.color = 'white';
+                    break;
+                case 'escenicas':
+                    tag.style.backgroundColor = '#F3CE3A';
+                    tag.style.color = '#333';
+                    break;
+                case 'literatura':
+                    tag.style.backgroundColor = '#2ED0FF';
+                    tag.style.color = 'white';
+                    break;
+                case 'diseno':
+                    tag.style.backgroundColor = '#17A398';
+                    tag.style.color = 'white';
+                    break;
+                case 'cine':
+                    tag.style.backgroundColor = '#64113F';
+                    tag.style.color = 'white';
+                    break;
+                default:
+                    tag.style.backgroundColor = '#F15BB5';
+                    tag.style.color = 'white';
+                    break;
+            }
+            
+            // Apply common styles
+            tag.style.display = 'inline-block';
+            tag.style.padding = '4px 12px';
+            tag.style.borderRadius = '16px';
+            tag.style.fontSize = '13px';
+            tag.style.fontWeight = '500';
+        });
+        
+        // Apply styles to action buttons
+        const actionButtons = document.querySelectorAll('.action-button');
+        actionButtons.forEach(button => {
+            button.style.backgroundColor = '#6232FF';
+            button.style.color = 'white';
+            button.style.padding = '6px 12px';
+            button.style.borderRadius = '6px';
+            button.style.fontWeight = '500';
+            button.style.fontSize = '13px';
+            button.style.cursor = 'pointer';
+        });
+    }
+});
+</script>
+<!-- This is the end of the CSS file -->
+<style>
+/* Any additional CSS can go here */
+</style>
+
 

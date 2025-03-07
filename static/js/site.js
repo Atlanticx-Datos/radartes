@@ -14,6 +14,7 @@ import { TopModule } from './modules/top.js';
 import { SubscribeModule } from './modules/subscribe.js';
 import { SharingModule } from './modules/sharing.js';
 import { SharingTestModule } from './modules/sharing-test.js';
+import { processDestacarData } from './modules/data-processor.js';
 
 // Expose modules to window object using a more reliable approach
 function exposeModules() {
@@ -1040,3 +1041,26 @@ function clearAllFilters() {
     // DO NOT hide the main structured filters dropdown
     // document.getElementById('structured-filters').classList.add('hidden');
 }
+
+// Function to initialize the destacar section
+function initDestacar() {
+    console.log('Initializing destacar section');
+    
+    // Check if we have preloaded data
+    const prefilteredData = document.getElementById('prefiltered-data');
+    if (prefilteredData && prefilteredData.dataset.results) {
+        try {
+            const destacarPages = JSON.parse(prefilteredData.dataset.results);
+            processDestacarData(destacarPages);
+        } catch (error) {
+            console.error('Error parsing destacar data:', error);
+        }
+    } else {
+        console.warn('No prefiltered data found for destacar section');
+    }
+}
+
+// Export any functions that need to be accessed from outside
+export {
+    initDestacar
+};

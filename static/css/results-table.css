@@ -1,0 +1,237 @@
+/* Results Table Styling */
+
+/* Table container */
+.results-table-container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Main table styling */
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Table header */
+.results-table thead {
+    background-color: #6232FF; /* Primary color from Tailwind config */
+}
+
+.results-table th {
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    text-align: left;
+    padding: 12px 16px;
+    white-space: nowrap;
+}
+
+/* Sort icons in header */
+.results-table th svg {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-left: 4px;
+    opacity: 0.7;
+}
+
+/* Table body */
+.results-table tbody tr {
+    background-color: white;
+    border-bottom: 1px solid #E5E7EB;
+    transition: background-color 0.2s;
+}
+
+.results-table tbody tr:hover {
+    background-color: #F9FAFB;
+}
+
+/* Table cells */
+.results-table td {
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #374151;
+    vertical-align: middle;
+}
+
+/* Opportunity column */
+.results-table td:first-child {
+    font-weight: 500;
+    color: #111827;
+    line-height: 1.4;
+}
+
+/* Column widths */
+.results-table th.oportunidad-col,
+.results-table td.oportunidad-col {
+    width: 40%;
+}
+
+.results-table th.disciplina-col,
+.results-table td.disciplina-col {
+    width: 15%;
+}
+
+.results-table th.pais-col,
+.results-table td.pais-col {
+    width: 15%;
+}
+
+.results-table th.cierre-col,
+.results-table td.cierre-col {
+    width: 15%;
+    text-align: center;
+}
+
+.results-table th.pago-col,
+.results-table td.pago-col {
+    width: 5%;
+    text-align: center;
+}
+
+.results-table th.accion-col,
+.results-table td.accion-col {
+    width: 10%;
+    text-align: center;
+}
+
+/* Discipline tags */
+.discipline-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: white;
+    text-align: center;
+}
+
+/* Discipline tag colors - using colors from Tailwind config */
+.discipline-tag.visuales { background-color: #E92E4A; } /* design.visuales */
+.discipline-tag.musica { background-color: #FF7022; } /* design.musica */
+.discipline-tag.escenicas { background-color: #F3CE3A; color: #333; } /* design.escenicas */
+.discipline-tag.literatura { background-color: #2ED0FF; } /* design.literatura */
+.discipline-tag.diseno { background-color: #17A398; } /* design.diseno */
+.discipline-tag.cine { background-color: #64113F; } /* design.cine */
+.discipline-tag.otros { background-color: #F15BB5; } /* design.otros */
+
+/* Payment status */
+.payment-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative; /* Added to ensure the ::after pseudo-element is positioned correctly */
+}
+
+.payment-status.free svg {
+    color: #111827;
+}
+
+.payment-status.paid svg {
+    color: #111827;
+}
+
+.payment-status.free::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 2px;
+    background-color: #EF4444;
+    transform: rotate(-45deg);
+}
+
+/* Action button */
+.action-button {
+    display: inline-block;
+    padding: 6px 16px;
+    background-color: #EDE9FE;
+    color: #6232FF; /* Primary color from Tailwind config */
+    border-radius: 16px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.action-button:hover {
+    background-color: #DDD6FE;
+}
+
+/* Pagination */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    font-size: 14px;
+}
+
+.pagination-info {
+    color: #6B7280;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pagination-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    border: 1px solid #D1D5DB;
+    background-color: white;
+    color: #374151;
+    transition: all 0.2s;
+}
+
+.pagination-button:hover {
+    background-color: #F3F4F6;
+}
+
+.pagination-button.active {
+    background-color: #6232FF; /* Primary color from Tailwind config */
+    color: white;
+    border-color: #6232FF;
+}
+
+.pagination-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .results-table th,
+    .results-table td {
+        padding: 8px 12px;
+    }
+    
+    .discipline-tag {
+        padding: 3px 8px;
+        font-size: 12px;
+    }
+    
+    .action-button {
+        padding: 4px 12px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 640px) {
+    .results-table-container {
+        overflow-x: auto;
+    }
+    
+    .results-table {
+        min-width: 640px;
+    }
+} 
