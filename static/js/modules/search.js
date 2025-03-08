@@ -25,6 +25,7 @@ export const SearchModule = {
         column: null,
         active: false
     },
+    isFiltered: false,
 
     init() {
         console.log('SearchModule initialized');
@@ -426,6 +427,17 @@ export const SearchModule = {
         }
 
         const searchInputValue = searchInput.value;
+        
+        // Set the isFiltered flag if there's a search input or any filters are active
+        this.isFiltered = searchInputValue.trim().length > 0 || 
+                         FilterModule.activeFilters.categories.size > 0 || 
+                         FilterModule.activeFilters.country || 
+                         FilterModule.activeFilters.month || 
+                         FilterModule.activeFilters.discipline !== 'todos' ||
+                         FilterModule.activeFilters.freeOnly;
+        
+        console.log('Search is filtered:', this.isFiltered);
+        
         FilterModule.applyFilters(searchInputValue, false);
 
         // Directly handle scrolling here if requested
@@ -448,71 +460,38 @@ export const SearchModule = {
         const filterTrigger = document.getElementById('filter-dropdown-trigger');
         const destacadosContainer = document.querySelector('.destacados-container');
         const inscripcionCheckbox = document.getElementById('inscripcion-checkbox');
-        const prevControl = document.querySelector('.destacar-prev');
-        const nextControl = document.querySelector('.destacar-next');
 
-        console.log('clearSearch called');
-
-        // Clear search input
+        // Reset search input
         if (searchInput) {
             searchInput.value = '';
         }
-        
-        // Hide clear button and reposition filter trigger
-        if (clearButton && filterTrigger) {
-            // Use both classList and style.display to ensure the button is hidden
+
+        // Hide clear button
+        if (clearButton) {
             clearButton.classList.add('hidden');
             clearButton.style.display = 'none';
-            
-            // Reposition filter trigger
+        }
+
+        // Reset filter trigger position
+        if (filterTrigger) {
             filterTrigger.classList.remove('right-12');
             filterTrigger.classList.add('right-4');
         }
-        
-        // Reset inscripcion checkbox
-        if (inscripcionCheckbox) {
-            inscripcionCheckbox.checked = false;
+
+        // Show destacados container
+        if (destacadosContainer) {
+            destacadosContainer.classList.remove('hidden');
         }
-        
-        // Reset all filters in FilterModule
-        FilterModule.activeFilters = {
-            categories: new Set(),
-            subdisciplinas: new Set(),
-            country: '',
-            month: '',
-            discipline: 'todos',
-            freeOnly: false
-        };
-        
-        // Reset UI elements
-        FilterModule.updateDisciplineButtons();
-        
-        // Reset dropdowns
-        const countryFilter = document.getElementById('country-filter');
-        const monthFilter = document.getElementById('month-filter');
-        if (countryFilter) countryFilter.value = '';
-        if (monthFilter) monthFilter.value = '';
-        
-        // Reset checkboxes in structured filters
-        document.querySelectorAll('#structured-filters input[type="checkbox"]').forEach(checkbox => {
-            checkbox.checked = false;
-        });
-        
-        // Reset selected values display in structured filters
-        document.querySelectorAll('.selected-values').forEach(span => {
-            span.textContent = '';
-        });
-        
-        // Show destacados section and controls
-        destacadosContainer?.classList.remove('hidden');
-        prevControl?.classList.remove('hidden');
-        nextControl?.classList.remove('hidden');
-        
-        // Trigger search to reset results
-        this.performSearch(false); // Pass false to avoid scrolling
-        
-        // Replace current URL without query parameters
-        history.replaceState(null, null, window.location.pathname);
+
+        // Reset inscripcion checkbox
+        if (inscripcionCheckbox) inscripcionCheckbox.checked = false;
+
+        // Reset isFiltered flag
+        this.isFiltered = false;
+        console.log('Search cleared, isFiltered reset to false');
+
+        // Clear FilterModule filters and update results
+        FilterModule.clearAllFilters();
     },
 
     handleKeyPress(event) {
@@ -733,8 +712,9 @@ export const SearchModule = {
     },
 
     updateResults(results, preservePage = false) {
-        // Store original order if this is the first load
-        if (!this.originalOrder.length && results.length > 0) {
+        // Store original order only on first load with all results
+        if (!this.originalOrder.length && results.length > 0 && !this.isFiltered) {
+            console.log('Storing original order with', results.length, 'items');
             this.originalOrder = [...results];
         }
         
@@ -782,11 +762,17 @@ export const SearchModule = {
 
         // Sort results if a sort column is selected and active
         const sortedResults = this.sortResults(results, this.sortColumn);
+        
+        // Log the number of results before and after sorting
+        console.log(`Results before sorting: ${results.length}, after sorting: ${sortedResults.length}`);
 
         // Calculate pagination slice
         const startIndex = (this.pagination.currentPage - 1) * this.pagination.itemsPerPage;
         const endIndex = startIndex + this.pagination.itemsPerPage;
         const paginatedResults = sortedResults.slice(startIndex, endIndex);
+        
+        // Log the number of paginated results
+        console.log(`Paginated results: ${paginatedResults.length} (page ${this.pagination.currentPage} of ${this.pagination.totalPages})`);
 
         // Function to format date
         const formatDate = (dateStr) => {
@@ -1063,9 +1049,9 @@ export const SearchModule = {
     },
 
     sortResults(results, column) {
-        // If sorting is not active, return to original order
+        // If sorting is not active, return the filtered results as is
         if (!this.sortActive || !column) {
-            return this.originalOrder.length > 0 ? [...this.originalOrder] : results;
+            return results;
         }
 
         // Sort if active

@@ -5,34 +5,9 @@ export const TopModule = {
     pages: [],
 
     init(pages) {
-        console.log('TopModule init called with', pages.length, 'total pages');
-        console.log('Sample of pages received:', pages.slice(0, 3).map(p => ({
-            nombre: p.nombre_original,
-            top: p.top,
-            destinatarios: p.destinatarios,
-            id: p.id
-        })));
-        
         // Filter pages where top is true (accept both boolean true and string "true")
         this.pages = pages.filter(page => page.top === true || page.top === "true");
-        console.log('TopModule filtered to', this.pages.length, 'top pages');
         
-        if (this.pages.length > 0) {
-            console.log('TopModule selected pages:', this.pages.map(p => ({
-                nombre: p.nombre_original,
-                top: p.top,
-                destinatarios: p.destinatarios,
-                id: p.id
-            })));
-        } else {
-            console.log('No pages with top=true found. Checking all page top values:', 
-                pages.map(p => ({
-                    nombre: p.nombre_original.substring(0, 30) + '...',
-                    top: p.top,
-                    topType: typeof p.top
-                })).slice(0, 5)
-            );
-        }
         this.updateDisplay();
         this.attachNavigationListeners();
     },
@@ -174,7 +149,6 @@ export const TopModule = {
             
             return `${day}/${month}/${year}`;
         } catch (e) {
-            console.error('Error formatting date:', e);
             return dateStr;
         }
     },

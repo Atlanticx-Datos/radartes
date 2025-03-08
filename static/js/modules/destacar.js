@@ -81,28 +81,10 @@ export const DestacarModule = {
 
     // Helper function to extract the title from nombre_original
     extractTitle(page) {
-        // Debug the input
-        console.log('Extracting title from page:', {
-            id: page.id,
-            nombre_original: page.nombre_original,
-            nombre: page.nombre
-        });
-        
         let title = '';
         
         // Check if nombre_original exists and is a string
         if (page.nombre_original && typeof page.nombre_original === 'string') {
-            // Log the raw string and its character codes
-            console.log('Raw nombre_original:', page.nombre_original);
-            
-            // Log character codes for debugging
-            console.log('Character codes in nombre_original:');
-            for (let i = 0; i < page.nombre_original.length; i++) {
-                const char = page.nombre_original.charAt(i);
-                const code = page.nombre_original.charCodeAt(i);
-                console.log(`Position ${i}: '${char}' - Unicode: U+${code.toString(16).toUpperCase().padStart(4, '0')}`);
-            }
-            
             // Define all possible separator characters
             const separators = [
                 { char: '︱', name: 'PRESENTATION FORM FOR VERTICAL EM DASH', code: 0xFE31 },
@@ -124,7 +106,6 @@ export const DestacarModule = {
                 if (index !== -1) {
                     foundSeparator = separator;
                     separatorIndex = index;
-                    console.log(`Found separator: '${separator.char}' (${separator.name}, U+${separator.code.toString(16).toUpperCase()}) at position ${index}`);
                     break;
                 }
             }
@@ -135,16 +116,11 @@ export const DestacarModule = {
                 const category = page.nombre_original.substring(0, separatorIndex).trim();
                 const name = page.nombre_original.substring(separatorIndex + 1).trim();
                 
-                console.log('Extracted category:', category);
-                console.log('Extracted name:', name);
-                
                 if (name) {
                     title = name;
-                    console.log('Using extracted title:', title);
                 } else {
                     // If there's nothing after the separator, use the nombre field if available
                     title = (page.nombre && page.nombre.trim()) || 'Sin título';
-                    console.log('Using fallback title (empty after split):', title);
                 }
             } else {
                 // If no separator found, try to extract from the fallback title
@@ -152,25 +128,13 @@ export const DestacarModule = {
                 
                 // Check if the nombre field contains a separator
                 if (page.nombre && typeof page.nombre === 'string') {
-                    console.log('Checking nombre field for separators:', page.nombre);
-                    
-                    // Log character codes for the nombre field
-                    console.log('Character codes in nombre:');
-                    for (let i = 0; i < page.nombre.length; i++) {
-                        const char = page.nombre.charAt(i);
-                        const code = page.nombre.charCodeAt(i);
-                        console.log(`Position ${i}: '${char}' - Unicode: U+${code.toString(16).toUpperCase().padStart(4, '0')}`);
-                    }
-                    
                     // Check for separators in the nombre field
                     for (const separator of separators) {
                         const index = page.nombre.indexOf(separator.char);
                         if (index !== -1) {
-                            console.log(`Found separator in nombre: '${separator.char}' at position ${index}`);
                             const parts = page.nombre.split(separator.char);
                             if (parts.length > 1 && parts[1] && parts[1].trim()) {
                                 title = parts[1].trim();
-                                console.log('Using title from nombre field after separator:', title);
                                 return title; // Return early since we found a valid title
                             }
                         }
@@ -188,7 +152,6 @@ export const DestacarModule = {
                         if (afterCategory) {
                             title = afterCategory;
                             foundCategory = true;
-                            console.log(`Found category "${category}" at start of title, using remainder as title:`, title);
                             break;
                         }
                     }
@@ -196,34 +159,27 @@ export const DestacarModule = {
                 
                 if (!foundCategory) {
                     // Special case: Check if the fallback title already contains the separator
-                    // This is for debugging the issue where the separator appears in the fallback but not in the original
                     const fallbackTitle = (page.nombre && page.nombre.trim()) || page.nombre_original.trim();
-                    console.log('Checking fallback title for separators:', fallbackTitle);
                     
                     // If the fallback title contains "︱", try to extract the part after it
                     if (fallbackTitle.includes('︱')) {
-                        console.log('Fallback title contains vertical em dash, splitting it');
                         const parts = fallbackTitle.split('︱');
                         if (parts.length > 1 && parts[1] && parts[1].trim()) {
                             title = parts[1].trim();
-                            console.log('Using title from fallback after separator:', title);
                             return title;
                         }
                     }
                     
                     // If we still don't have a title, use the fallback
                     title = fallbackTitle;
-                    console.log('Using fallback title (no separator or category):', title);
                 }
             }
         } else if (page.nombre && typeof page.nombre === 'string') {
             // If nombre_original is not available but nombre is, use nombre
             title = page.nombre.trim();
-            console.log('Using nombre as title:', title);
         } else {
             // Fallback if neither is available
             title = 'Sin título';
-            console.log('No title found, using default');
         }
         
         return title;

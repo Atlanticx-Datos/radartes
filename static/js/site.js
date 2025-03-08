@@ -309,6 +309,34 @@ document.addEventListener('DOMContentLoaded', function() {
     populateSubdisciplinasDropdown();
     populateCountryDropdown();
     populateMonthDropdown();
+
+    // Ensure search input uses SearchModule
+    const searchInput = document.getElementById('open-search');
+    if (searchInput && window.SearchModule) {
+        console.log('Setting up search input with SearchModule');
+        
+        // Remove any existing listeners to prevent conflicts
+        const newSearchInput = searchInput.cloneNode(true);
+        searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+        
+        // Add SearchModule listeners
+        newSearchInput.addEventListener('input', () => {
+            SearchModule.performSearch();
+            SearchModule.ensureClearButtonVisible();
+        });
+        
+        newSearchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                SearchModule.performSearch(true); // true to scroll to results
+            }
+        });
+        
+        // Initial check for existing input
+        if (newSearchInput.value.trim().length > 0) {
+            SearchModule.ensureClearButtonVisible();
+        }
+    }
 });
 
 // Setup user menu functionality

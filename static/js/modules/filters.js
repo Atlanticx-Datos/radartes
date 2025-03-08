@@ -224,6 +224,12 @@ export const FilterModule = {
         }
         
         console.log('New discipline state:', this.activeFilters.discipline);
+        
+        // Update SearchModule's isFiltered flag
+        if (window.SearchModule) {
+            SearchModule.isFiltered = this.activeFilters.discipline !== 'todos';
+            console.log('Updated SearchModule.isFiltered to', SearchModule.isFiltered);
+        }
 
         // Get fresh data and apply filter
         const pages = JSON.parse(document.getElementById('prefiltered-data').dataset.pages);
@@ -233,43 +239,50 @@ export const FilterModule = {
             filtered = filtered.filter(page => {
                 if (!page.disciplina) return false;
                 
-                const pageDisciplines = page.disciplina
-                    .split(',')
-                    .map(d => d.trim());
+                // Simplify the matching logic - just check if the discipline is contained in the page's disciplina field
+                const normalizedPageDisciplina = this.normalizeText(page.disciplina);
+                const normalizedFilterDiscipline = this.normalizeText(this.activeFilters.discipline);
                 
-                console.log(`Checking ${page.nombre} with disciplines:`, pageDisciplines);
-
-                return pageDisciplines.some(d => {
-                    const isMatch = this.belongsToMainDiscipline(d, this.activeFilters.discipline);
-                    console.log(`- "${d}" → "${this.normalizeText(d)}" vs "${this.activeFilters.discipline}" → "${this.normalizeText(this.activeFilters.discipline)}": ${isMatch ? 'MATCH' : 'NO MATCH'}`);
-                    return isMatch;
-                });
+                // Check if the discipline is contained in the page's disciplina field
+                const isMatch = normalizedPageDisciplina.includes(normalizedFilterDiscipline);
+                
+                console.log(`Checking ${page.nombre} - Discipline: "${page.disciplina}" - Match: ${isMatch ? 'YES' : 'NO'}`);
+                
+                return isMatch;
             });
         }
 
         // Update visibility of featured section
+        const featuredSection = document.querySelector('.featured-opportunities');
         const destacadosSection = document.querySelector('.destacados-section');
-        const destacadosContainer = document.querySelector('.featured-opportunities');
-        const prevControl = document.querySelector('.destacar-prev');
-        const nextControl = document.querySelector('.destacar-next');
         
         if (this.activeFilters.discipline !== 'todos') {
+            featuredSection?.classList.add('hidden');
             destacadosSection?.classList.add('hidden');
-            destacadosContainer?.classList.add('hidden');
-            prevControl?.classList.add('hidden');
-            nextControl?.classList.add('hidden');
         } else {
+            featuredSection?.classList.remove('hidden');
             destacadosSection?.classList.remove('hidden');
-            destacadosContainer?.classList.remove('hidden');
-            prevControl?.classList.remove('hidden');
-            nextControl?.classList.remove('hidden');
         }
-
-        // Update the visual state of discipline buttons
-        this.updateDisciplineButtons();
-
-        console.log('Filtered results count:', filtered.length);
-        this.updateResults(filtered, shouldScroll);
+        
+        console.log(`Filtered results: ${filtered.length} items`);
+        
+        // Store the filtered results for reference
+        this.lastFilteredResults = filtered;
+        
+        // Use SearchModule to update the results display with pagination
+        if (window.SearchModule && typeof window.SearchModule.updateResults === 'function') {
+            console.log('Using SearchModule.updateResults to display results');
+            window.SearchModule.updateResults(filtered);
+            
+            // Scroll to results if requested
+            if (shouldScroll && filtered.length > 0 && window.SearchModule.scrollToResults) {
+                window.SearchModule.scrollToResults();
+            }
+        } else {
+            console.warn('SearchModule not available, using fallback updateResults');
+            this.updateResults(filtered, shouldScroll);
+        }
+        
         console.log('=== Discipline Filter End ===');
     },
 
@@ -306,6 +319,17 @@ export const FilterModule = {
 
     applyFilters(searchInput = '', shouldScroll = false) {
         const pages = JSON.parse(document.getElementById('prefiltered-data')?.dataset.pages || '[]');
+        
+        // Update SearchModule's isFiltered flag
+        if (window.SearchModule) {
+            SearchModule.isFiltered = searchInput.trim().length > 0 || 
+                                     this.activeFilters.categories.size > 0 || 
+                                     this.activeFilters.country || 
+                                     this.activeFilters.month || 
+                                     this.activeFilters.discipline !== 'todos' ||
+                                     this.activeFilters.freeOnly;
+            console.log('Updated SearchModule.isFiltered to', SearchModule.isFiltered);
+        }
         
         const filtered = pages.filter(page => {
             // Text search filter
@@ -344,6 +368,17 @@ export const FilterModule = {
                 if (pageMonth !== String(this.activeFilters.month).padStart(2, '0')) return false;
             }
 
+            // Discipline filter - use the simplified matching logic
+            if (this.activeFilters.discipline !== 'todos') {
+                if (!page.disciplina) return false;
+                
+                const normalizedPageDisciplina = this.normalizeText(page.disciplina);
+                const normalizedFilterDiscipline = this.normalizeText(this.activeFilters.discipline);
+                
+                // Check if the discipline is contained in the page's disciplina field
+                if (!normalizedPageDisciplina.includes(normalizedFilterDiscipline)) return false;
+            }
+
             // Free only filter
             if (this.activeFilters.freeOnly && 
                 page.inscripcion && 
@@ -356,6 +391,8 @@ export const FilterModule = {
 
         // Store the filtered results
         this.lastFilteredResults = filtered;
+        
+        console.log(`FilterModule.applyFilters: Filtered ${pages.length} pages down to ${filtered.length} results`);
         
         this.updateResults(filtered, shouldScroll);
     },
@@ -376,21 +413,93 @@ export const FilterModule = {
     },
 
     updateResults(results, shouldScroll = false) {
-        // Reset pagination in SearchModule when filter results change
-        SearchModule.pagination.currentPage = 1;
-        SearchModule.pagination.allResults = results;
-        SearchModule.pagination.totalPages = Math.ceil(results.length / SearchModule.pagination.itemsPerPage);
+        console.log(`FilterModule.updateResults called with ${results.length} results`);
         
-        // Use SearchModule's updateResults to maintain consistent pagination
-        SearchModule.updateResults(results);
+        // Store the filtered results for reference
+        this.lastFilteredResults = results;
         
-        // Only trigger scrolling if explicitly requested (Enter key or button click)
-        if (shouldScroll && results.length > 0) {
-            // Use SearchModule's scrollToResults function if available
-            if (SearchModule.scrollToResults) {
-                SearchModule.scrollToResults();
+        // Use SearchModule's updateResults if available
+        if (window.SearchModule && typeof window.SearchModule.updateResults === 'function') {
+            console.log('Using SearchModule.updateResults from FilterModule');
+            
+            // Reset pagination in SearchModule when filter results change
+            SearchModule.pagination.currentPage = 1;
+            SearchModule.pagination.allResults = results;
+            SearchModule.pagination.totalPages = Math.ceil(results.length / SearchModule.pagination.itemsPerPage);
+            
+            // Use SearchModule's updateResults to maintain consistent pagination
+            SearchModule.updateResults(results);
+            
+            // Only trigger scrolling if explicitly requested (Enter key or button click)
+            if (shouldScroll && results.length > 0) {
+                // Use SearchModule's scrollToResults function if available
+                if (SearchModule.scrollToResults) {
+                    SearchModule.scrollToResults();
+                }
+            }
+        } else {
+            console.warn('SearchModule not available, using fallback display logic');
+            
+            // Fallback display logic if SearchModule is not available
+            const container = document.getElementById('results-container');
+            const counter = document.getElementById('results-counter');
+            
+            if (!container || !counter) {
+                console.error('Results container or counter not found');
+                return;
+            }
+            
+            if (!results.length) {
+                container.innerHTML = '<p class="text-center text-gray-500 my-8">No se encontraron resultados.</p>';
+                counter.textContent = '0 resultados encontrados';
+                return;
+            }
+            
+            // Simple display of all results without pagination
+            container.innerHTML = results.map(page => `
+                <div class="opportunity-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <h3 class="font-bold text-lg mb-2">${this.escapeHTML(page.nombre || 'Sin nombre')}</h3>
+                    <p class="text-sm text-gray-600 mb-2">${this.escapeHTML(page.og_resumida || '')}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">${this.escapeHTML(page.disciplina || '')}</span>
+                        <button 
+                            class="preview-btn text-blue-600 hover:underline text-sm"
+                            data-url="${this.escapeHTML(page.url || '')}"
+                            data-name="${this.escapeHTML(page.nombre || '')}"
+                            data-country="${this.escapeHTML(page.pais || '')}"
+                            data-summary="${this.escapeHTML(page.og_resumida || '')}"
+                            data-category="${this.escapeHTML(page.categoria || '')}"
+                            data-id="${this.escapeHTML(page.id || '')}"
+                        >
+                            Ver más
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            counter.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''}`;
+            
+            // Scroll to results if requested
+            if (shouldScroll && results.length > 0) {
+                const radarHeader = document.getElementById('radar-header');
+                if (radarHeader) {
+                    radarHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             }
         }
+    },
+    
+    // Helper function to escape HTML
+    escapeHTML(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     },
 
     clearAllFilters() {
@@ -417,6 +526,12 @@ export const FilterModule = {
             const element = document.getElementById(id);
             if (element) resetFn(element);
         });
+        
+        // Reset SearchModule's isFiltered flag
+        if (window.SearchModule) {
+            SearchModule.isFiltered = false;
+            console.log('Reset SearchModule.isFiltered to false');
+        }
 
         // Update results
         this.applyFilters();
@@ -437,11 +552,3 @@ export const FilterModule = {
         });
     }
 };
-
-// Remove the global handler
-window.handleDisciplineFilter = undefined;
-
-// Initialize the module
-document.addEventListener('DOMContentLoaded', () => {
-    FilterModule.init();
-}); 
