@@ -508,7 +508,7 @@
                     <button
                         class="filter-btn"
                         data-discipline-filter="todos" data-active="true"
-                        onclick="this.dataset.active = this.dataset.active === 'true' ? 'false' : 'true'; toggleDisciplineFilter(this, 'todos')">
+                        onclick="toggleDisciplineFilter(this, 'todos')">
                         <div class="icon-container">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -523,7 +523,7 @@
                     <button
                         class="filter-btn"
                         data-discipline-filter="{{ discipline }}" data-active="false"
-                        onclick="this.dataset.active = this.dataset.active === 'true' ? 'false' : 'true'; toggleDisciplineFilter(this, '{{ discipline }}')">
+                        onclick="toggleDisciplineFilter(this, '{{ discipline }}')">
                         <div class="icon-container">
                             {% if discipline == 'Visuales' %}
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

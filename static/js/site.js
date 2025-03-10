@@ -841,6 +841,8 @@ window.performSearch = SearchModule.performSearch.bind(SearchModule);
 window.showAlert = Utils.showAlert.bind(Utils);
 window.clearAllFilters = FilterModule.clearAllFilters.bind(FilterModule);
 window.toggleDisciplineFilter = function(button, discipline) {
+    console.log('toggleDisciplineFilter called with discipline:', discipline);
+    
     // Ensure the button has the correct discipline value in its dataset
     button.dataset.disciplineFilter = discipline;
     
@@ -863,25 +865,21 @@ window.toggleDisciplineFilter = function(button, discipline) {
         button.classList.remove('active-filter');
     }
     
-    // Call the FilterModule's handleDisciplineFilter method with shouldScroll=true
-    FilterModule.handleDisciplineFilter(button, true);
+    // Directly handle the destacados section visibility
+    const shouldHide = button.dataset.active === 'true' && discipline !== 'todos';
+    updateDestacadosVisibility(shouldHide);
     
-    // Explicitly hide/show destacados section based on active discipline
-    const destacadosSection = document.querySelector('.destacados-section');
-    const destacadosContainer = document.querySelector('.featured-opportunities');
-    const prevControl = document.querySelector('.destacar-prev');
-    const nextControl = document.querySelector('.destacar-next');
-    
-    if (button.dataset.active === 'true' && discipline !== 'todos') {
-        destacadosSection?.classList.add('hidden');
-        destacadosContainer?.classList.add('hidden');
-        prevControl?.classList.add('hidden');
-        nextControl?.classList.add('hidden');
-    } else if (discipline === 'todos' || button.dataset.active === 'false') {
-        destacadosSection?.classList.remove('hidden');
-        destacadosContainer?.classList.remove('hidden');
-        prevControl?.classList.remove('hidden');
-        nextControl?.classList.remove('hidden');
+    // Now call FilterModule's handleDisciplineFilter
+    if (window.FilterModule) {
+        // Set the discipline in FilterModule
+        if (button.dataset.active === 'true') {
+            FilterModule.activeFilters.discipline = discipline;
+        } else {
+            FilterModule.activeFilters.discipline = 'todos';
+        }
+        
+        // Call the filter method with scrolling
+        FilterModule.handleDisciplineFilter(button, true);
     }
 };
 window.goToPage = SearchModule.goToPage.bind(SearchModule);
@@ -1166,6 +1164,29 @@ function clearSearch() {
             filterTrigger.classList.remove('right-12');
             filterTrigger.classList.add('right-4');
         }
+    }
+}
+
+// Add a direct function to hide/show the destacados section
+function updateDestacadosVisibility(shouldHide) {
+    console.log('Direct updateDestacadosVisibility called with shouldHide:', shouldHide);
+    const destacadosSection = document.querySelector('.destacados-section');
+    const featuredOpportunities = document.querySelector('.featured-opportunities');
+    const prevControl = document.querySelector('.destacar-prev');
+    const nextControl = document.querySelector('.destacar-next');
+    
+    if (shouldHide) {
+        console.log('Directly hiding destacados section');
+        destacadosSection?.classList.add('hidden');
+        featuredOpportunities?.classList.add('hidden');
+        prevControl?.classList.add('hidden');
+        nextControl?.classList.add('hidden');
+    } else {
+        console.log('Directly showing destacados section');
+        destacadosSection?.classList.remove('hidden');
+        featuredOpportunities?.classList.remove('hidden');
+        prevControl?.classList.remove('hidden');
+        nextControl?.classList.remove('hidden');
     }
 }
 

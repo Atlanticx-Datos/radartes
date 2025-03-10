@@ -252,16 +252,26 @@ export const FilterModule = {
             });
         }
 
-        // Update visibility of featured section
+        // Update visibility of featured section - IMPORTANT: This must happen AFTER filtering
         const featuredSection = document.querySelector('.featured-opportunities');
         const destacadosSection = document.querySelector('.destacados-section');
+        const prevControl = document.querySelector('.destacar-prev');
+        const nextControl = document.querySelector('.destacar-next');
+        
+        console.log('Updating visibility of destacados section. Current discipline:', this.activeFilters.discipline);
         
         if (this.activeFilters.discipline !== 'todos') {
+            console.log('Hiding destacados section from FilterModule');
             featuredSection?.classList.add('hidden');
             destacadosSection?.classList.add('hidden');
+            prevControl?.classList.add('hidden');
+            nextControl?.classList.add('hidden');
         } else {
+            console.log('Showing destacados section from FilterModule');
             featuredSection?.classList.remove('hidden');
             destacadosSection?.classList.remove('hidden');
+            prevControl?.classList.remove('hidden');
+            nextControl?.classList.remove('hidden');
         }
         
         console.log(`Filtered results: ${filtered.length} items`);

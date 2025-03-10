@@ -277,6 +277,8 @@ export const SearchModule = {
 
         // Get all relevant elements
         const destacadosContainer = document.querySelector('.destacados-container');
+        const destacadosSection = document.querySelector('.destacados-section');
+        const featuredOpportunities = document.querySelector('.featured-opportunities');
         const prevControl = document.querySelector('.destacar-prev');
         const nextControl = document.querySelector('.destacar-next');
 
@@ -295,6 +297,8 @@ export const SearchModule = {
 
         // Always hide destacados section when structured search is used
         destacadosContainer?.classList.add('hidden');
+        destacadosSection?.classList.add('hidden');
+        featuredOpportunities?.classList.add('hidden');
         prevControl?.classList.add('hidden');
         nextControl?.classList.add('hidden');
 
@@ -408,6 +412,10 @@ export const SearchModule = {
         const searchInput = document.getElementById('open-search');
         const clearButton = document.getElementById('clear-search');
         const destacadosContainer = document.querySelector('.destacados-container');
+        const destacadosSection = document.querySelector('.destacados-section');
+        const featuredOpportunities = document.querySelector('.featured-opportunities');
+        const prevControl = document.querySelector('.destacar-prev');
+        const nextControl = document.querySelector('.destacar-next');
 
         // Always show the clear button
         if (clearButton) {
@@ -417,12 +425,20 @@ export const SearchModule = {
         // Hide destacados container if there's search input
         if (searchInput.value.length > 0) {
             destacadosContainer?.classList.add('hidden');
+            destacadosSection?.classList.add('hidden');
+            featuredOpportunities?.classList.add('hidden');
+            prevControl?.classList.add('hidden');
+            nextControl?.classList.add('hidden');
         } else {
             if (!FilterModule.activeFilters.categories.size && 
                 !FilterModule.activeFilters.country && 
                 !FilterModule.activeFilters.month && 
                 FilterModule.activeFilters.discipline === 'todos') {
                 destacadosContainer?.classList.remove('hidden');
+                destacadosSection?.classList.remove('hidden');
+                featuredOpportunities?.classList.remove('hidden');
+                prevControl?.classList.remove('hidden');
+                nextControl?.classList.remove('hidden');
             }
         }
 
@@ -459,6 +475,10 @@ export const SearchModule = {
         const clearButton = document.getElementById('clear-search');
         const filterTrigger = document.getElementById('filter-dropdown-trigger');
         const destacadosContainer = document.querySelector('.destacados-container');
+        const destacadosSection = document.querySelector('.destacados-section');
+        const featuredOpportunities = document.querySelector('.featured-opportunities');
+        const prevControl = document.querySelector('.destacar-prev');
+        const nextControl = document.querySelector('.destacar-next');
         const inscripcionCheckbox = document.getElementById('inscripcion-checkbox');
 
         // Reset search input
@@ -481,6 +501,18 @@ export const SearchModule = {
         // Show destacados container
         if (destacadosContainer) {
             destacadosContainer.classList.remove('hidden');
+        }
+        if (destacadosSection) {
+            destacadosSection.classList.remove('hidden');
+        }
+        if (featuredOpportunities) {
+            featuredOpportunities.classList.remove('hidden');
+        }
+        if (prevControl) {
+            prevControl.classList.remove('hidden');
+        }
+        if (nextControl) {
+            nextControl.classList.remove('hidden');
         }
 
         // Reset inscripcion checkbox
