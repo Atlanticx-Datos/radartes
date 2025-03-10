@@ -420,9 +420,9 @@ export const ModalModule = {
                     </div>
 
                     <!-- Title and Details Section -->
-                    <div class="px-6 pt-5 pb-3" style="height: 120px; overflow-y: auto;">
+                    <div class="px-6 pt-5 pb-3" style="height: 120px; overflow-y: auto; width: 100%;">
                         <!-- Title -->
-                        <h3 style="font-family: Inter; font-weight: 700; font-size: 18px; line-height: 150%; letter-spacing: 0%; color: #1F1B2D; margin-bottom: 8px;">
+                        <h3 style="font-family: Inter; font-weight: 700; font-size: 18px; line-height: 150%; letter-spacing: 0%; color: #1F1B2D; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;" title="${Utils.escapeHTML(displayTitle || nombre || '')}">
                             ${Utils.escapeHTML(displayTitle || nombre || '')}
                         </h3>
                         
