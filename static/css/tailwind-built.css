@@ -553,6 +553,9 @@ video {
 .col-span-1 {
   grid-column: span 1 / span 1;
 }
+.-m-4 {
+  margin: -1rem;
+}
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -682,6 +685,9 @@ video {
 }
 .h-\[400px\] {
   height: 400px;
+}
+.h-\[44px\] {
+  height: 44px;
 }
 .h-\[550px\] {
   height: 550px;
@@ -969,6 +975,9 @@ video {
 .rounded {
   border-radius: 0.25rem;
 }
+.rounded-\[12px\] {
+  border-radius: 12px;
+}
 .rounded-full {
   border-radius: 9999px;
 }
@@ -983,6 +992,10 @@ video {
 }
 .rounded-xl {
   border-radius: 0.75rem;
+}
+.rounded-t-\[12px\] {
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
 }
 .rounded-t-\[40px\] {
   border-top-left-radius: 40px;
@@ -1034,6 +1047,10 @@ video {
 .bg-\[\#6232FF\] {
   --tw-bg-opacity: 1;
   background-color: rgb(98 50 255 / var(--tw-bg-opacity));
+}
+.bg-\[\#F9F8FA\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(249 248 250 / var(--tw-bg-opacity));
 }
 .bg-amber-500 {
   --tw-bg-opacity: 1;
@@ -1282,6 +1299,9 @@ video {
 .text-center {
   text-align: center;
 }
+.font-\[\'Inter\'\] {
+  font-family: 'Inter';
+}
 .text-2xl {
   font-size: 1.35rem;
   line-height: 2rem;
@@ -1300,6 +1320,9 @@ video {
 }
 .text-\[1\.8rem\] {
   font-size: 1.8rem;
+}
+.text-\[16px\] {
+  font-size: 16px;
 }
 .text-\[4\.2rem\] {
   font-size: 4.2rem;
@@ -1360,8 +1383,14 @@ video {
 .leading-\[130\%\] {
   line-height: 130%;
 }
+.leading-\[150\%\] {
+  line-height: 150%;
+}
 .leading-snug {
   line-height: 1.375;
+}
+.tracking-\[0\%\] {
+  letter-spacing: 0%;
 }
 .tracking-normal {
   letter-spacing: 0em;

@@ -101,31 +101,33 @@
 
                     <!-- Structured filters dropdown -->
                     <div id="structured-filters"
-                        class="hidden absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 p-4"
+                        class="hidden absolute right-0 mt-2 w-96 bg-white rounded-[12px] shadow-2xl border border-gray-200 p-4"
                         style="top: 100%; z-index: 999999;">
-                        <!-- Header with Filtros and trash icon -->
-                        <div class="flex justify-between items-center mb-4 pb-2 border-b">
-                            <div class="flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
-                                </svg>
-                                <h3 class="text-lg font-semibold">Filtros</h3>
+                        <!-- Header with Filtros and X icon -->
+                        <div class="flex justify-between items-center mb-4 border-b h-[44px] bg-[#F9F8FA] -m-4 px-4 rounded-t-[12px]">
+                            <div class="flex items-center h-full">
+                                <h3 class="font-['Inter'] text-[16px] font-bold leading-[150%] tracking-[0%] my-auto">Filtros</h3>
                             </div>
-                            <button id="clear-filters" class="text-gray-400 hover:text-gray-600" type="button">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
+                            <button id="clear-filters" class="text-gray-400 hover:text-gray-600 flex items-center justify-center h-full" type="button">
+                                <span class="text-xl font-medium">×</span>
                             </button>
                         </div>
 
                         <!-- Categories Section -->
                         <div class="mb-4 filter-section">
-                            <button class="filter-dropdown-trigger w-full flex justify-between items-center py-2 px-3 bg-gray-50 hover:bg-gray-100 rounded-md" data-target="categories-dropdown" type="button">
-                                <span class="font-medium text-gray-700">Categorías</span>
-                                <span class="selected-values text-sm text-gray-500"></span>
-                                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
+                            <button class="filter-dropdown-trigger w-full flex justify-between items-center py-3 px-4 bg-white border border-[#D5D2DC] rounded-md" data-target="categories-dropdown" type="button">
+                                <div class="flex items-center">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-2">
+                                        <path d="M4 6H20M4 12H20M4 18H20" stroke="#454056" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span class="font-['Inter'] text-[16px] font-normal leading-[150%] tracking-[0%] text-gray-700">Categorías</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="selected-values text-sm text-gray-500 mr-2"></span>
+                                    <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
                             </button>
                             <div id="categories-dropdown" class="filter-dropdown-content hidden mt-2 p-2 border border-gray-200 rounded-md bg-white">
                                 <div class="max-h-48 overflow-y-auto">
@@ -163,12 +165,19 @@
 
                         <!-- Subdisciplinas Section -->
                         <div class="mb-4 filter-section">
-                            <button class="filter-dropdown-trigger w-full flex justify-between items-center py-2 px-3 bg-gray-50 hover:bg-gray-100 rounded-md" data-target="subdisciplinas-dropdown" type="button">
-                                <span class="font-medium text-gray-700">Subdisciplinas</span>
-                                <span class="selected-values text-sm text-gray-500"></span>
-                                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
+                            <button class="filter-dropdown-trigger w-full flex justify-between items-center py-3 px-4 bg-white border border-[#D5D2DC] rounded-md" data-target="subdisciplinas-dropdown" type="button">
+                                <div class="flex items-center">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-2">
+                                        <path d="M4 5H11M4 12H11M4 19H13M17 5L19 7L23 3M15 12H23M17 19L19 21L23 17" stroke="#454056" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span class="font-['Inter'] text-[16px] font-normal leading-[150%] tracking-[0%] text-gray-700">Subdisciplinas</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="selected-values text-sm text-gray-500 mr-2"></span>
+                                    <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
                             </button>
                             <div id="subdisciplinas-dropdown" class="filter-dropdown-content hidden mt-2 p-2 border border-gray-200 rounded-md bg-white">
                                 <div class="max-h-48 overflow-y-auto" id="subdisciplinas-container">
@@ -179,12 +188,23 @@
 
                         <!-- Country Dropdown -->
                         <div class="mb-4 filter-section">
-                            <button class="filter-dropdown-trigger w-full flex justify-between items-center py-2 px-3 bg-gray-50 hover:bg-gray-100 rounded-md" data-target="country-dropdown" type="button">
-                                <span class="font-medium text-gray-700">País</span>
-                                <span class="selected-values text-sm text-gray-500"></span>
-                                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
+                            <button class="filter-dropdown-trigger w-full flex justify-between items-center py-3 px-4 bg-white border border-[#D5D2DC] rounded-md" data-target="country-dropdown" type="button">
+                                <div class="flex items-center">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-2">
+                                        <path d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" stroke="#454056" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M3.6001 9H20.4001" stroke="#454056" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M3.6001 15H20.4001" stroke="#454056" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M11.5 3C9.81534 5.69961 8.9375 8.81787 8.9375 12C8.9375 15.1821 9.81534 18.3004 11.5 21" stroke="#454056" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12.5 3C14.1847 5.69961 15.0625 8.81787 15.0625 12C15.0625 15.1821 14.1847 18.3004 12.5 21" stroke="#454056" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span class="font-['Inter'] text-[16px] font-normal leading-[150%] tracking-[0%] text-gray-700">País</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="selected-values text-sm text-gray-500 mr-2"></span>
+                                    <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
                             </button>
                             <div id="country-dropdown" class="filter-dropdown-content hidden mt-2 p-2 border border-gray-200 rounded-md bg-white">
                                 <div class="max-h-48 overflow-y-auto" id="country-container">
@@ -199,12 +219,22 @@
 
                         <!-- Month Dropdown -->
                         <div class="mb-4 filter-section">
-                            <button class="filter-dropdown-trigger w-full flex justify-between items-center py-2 px-3 bg-gray-50 hover:bg-gray-100 rounded-md" data-target="month-dropdown" type="button">
-                                <span class="font-medium text-gray-700">Mes de cierre</span>
-                                <span class="selected-values text-sm text-gray-500"></span>
-                                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
+                            <button class="filter-dropdown-trigger w-full flex justify-between items-center py-3 px-4 bg-white border border-[#D5D2DC] rounded-md" data-target="month-dropdown" type="button">
+                                <div class="flex items-center">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-2">
+                                        <path d="M19 4H5C3.89543 4 3 4.89543 3 6V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V6C21 4.89543 20.1046 4 19 4Z" stroke="#454056" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M16 2V6" stroke="#454056" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M8 2V6" stroke="#454056" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M3 10H21" stroke="#454056" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span class="font-['Inter'] text-[16px] font-normal leading-[150%] tracking-[0%] text-gray-700">Mes de cierre</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="selected-values text-sm text-gray-500 mr-2"></span>
+                                    <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
                             </button>
                             <div id="month-dropdown" class="filter-dropdown-content hidden mt-2 p-2 border border-gray-200 rounded-md bg-white">
                                 <div class="max-h-48 overflow-y-auto" id="month-container">
@@ -219,12 +249,20 @@
 
                         <!-- Inscripción filter -->
                         <div class="mb-4 filter-section">
-                            <button class="filter-dropdown-trigger w-full flex justify-between items-center py-2 px-3 bg-gray-50 hover:bg-gray-100 rounded-md" data-target="inscripcion-dropdown" type="button">
-                                <span class="font-medium text-gray-700">Inscripción</span>
-                                <span class="selected-values text-sm text-gray-500"></span>
-                                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
+                            <button class="filter-dropdown-trigger w-full flex justify-between items-center py-3 px-4 bg-white border border-[#D5D2DC] rounded-md" data-target="inscripcion-dropdown" type="button">
+                                <div class="flex items-center">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-2">
+                                        <path d="M12 1V23" stroke="#454056" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6" stroke="#454056" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span class="font-['Inter'] text-[16px] font-normal leading-[150%] tracking-[0%] text-gray-700">Pago / Honorarios</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="selected-values text-sm text-gray-500 mr-2"></span>
+                                    <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
                             </button>
                             <div id="inscripcion-dropdown" class="filter-dropdown-content hidden mt-2 p-2 border border-gray-200 rounded-md bg-white">
                                 <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
@@ -234,12 +272,19 @@
                             </div>
                         </div>
 
-                        <!-- Search Button -->
-                        <button id="search-filters"
-                            class="w-full py-2 px-4 bg-design-primary text-white rounded-lg hover:bg-opacity-90 transition-colors"
-                            type="button">
-                            Buscar
-                        </button>
+                        <!-- Search and Reset Buttons -->
+                        <div class="flex gap-4">
+                            <button id="clear-all-filters"
+                                class="w-1/2 py-3 px-4 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+                                type="button" onclick="SearchModule.clearSearch();">
+                                Restablecer
+                            </button>
+                            <button id="search-filters"
+                                class="w-1/2 py-3 px-4 bg-[#6232FF] text-white rounded-md hover:bg-opacity-90 transition-colors"
+                                type="button">
+                                Buscar
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
