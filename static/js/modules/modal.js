@@ -420,18 +420,18 @@ export const ModalModule = {
                     </div>
 
                     <!-- Title and Details Section -->
-                    <div class="px-6 py-4" style="height: 120px; overflow-y: auto;">
+                    <div class="px-6 pt-5 pb-3" style="height: 120px; overflow-y: auto;">
                         <!-- Title -->
-                        <h3 class="text-xl font-semibold text-gray-800 break-words mb-3">
+                        <h3 style="font-family: Inter; font-weight: 700; font-size: 18px; line-height: 150%; letter-spacing: 0%; color: #1F1B2D; margin-bottom: 8px;">
                             ${Utils.escapeHTML(displayTitle || nombre || '')}
                         </h3>
                         
                         <!-- Inline Details: Location, Payment, Subdisciplines -->
-                        <div class="flex flex-col gap-2 text-sm text-gray-600">
+                        <div class="flex flex-col gap-1" style="font-family: Inter; font-weight: 400; font-size: 12px; color: #666276; line-height: 150%; letter-spacing: 0%;">
                             <!-- First row: Location, Payment, and Main Discipline -->
                             <div class="flex items-center gap-4">
                                 <div class="flex items-center gap-1">
-                                    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                                     </svg>
                                     <span>${Utils.escapeHTML(pais || '')}</span>
@@ -439,14 +439,14 @@ export const ModalModule = {
                                 
                                 <div class="flex items-center gap-1">
                                     ${inscripcion === 'Sin cargo' || !inscripcion ? 
-                                        '<div class="relative inline-block"><svg class="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg><svg class="absolute top-0 left-0 w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="5" y1="5" x2="19" y2="19"/></svg></div>' : 
-                                        '<svg class="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg>'
+                                        '<div class="relative inline-block"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg><svg class="absolute top-0 left-0 w-3 h-3 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="5" y1="5" x2="19" y2="19"/></svg></div>' : 
+                                        '<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg>'
                                     }
                                 </div>
                                 
                                 <!-- Show all disciplines in a comma-separated list -->
                                 <div class="flex items-center gap-1">
-                                    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
                                         <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
                                         <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
                                     </svg>
@@ -455,11 +455,11 @@ export const ModalModule = {
                             </div>
                             
                             <!-- Always show closing date -->
-                            <div class="flex items-center gap-1">
-                                <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                            <div class="flex items-center gap-1 mt-1">
+                                <svg class="w-3 h-3" viewBox="0 0 20 20" fill="#6232FF">
                                     <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
                                 </svg>
-                                <span>Cierre: ${formatDate(fechaCierre) || 'Confirmar en bases'}</span>
+                                <span style="font-weight: 700; color: #1F1B2D;">Cierre: ${formatDate(fechaCierre) || 'Confirmar en bases'}</span>
                                 <!-- Debug info -->
                                 <span class="hidden">Raw date: ${fechaCierre}</span>
                             </div>
@@ -467,15 +467,15 @@ export const ModalModule = {
                     </div>
                     
                     <!-- Resumen Section -->
-                    <div class="px-6 py-4" style="overflow-y: auto;">
-                        <div class="border-t" style="border-color: #D5D2DC; padding-top: 16px; margin-top: 8px;">
-                            <h4 style="font-family: Inter; font-weight: 700; font-size: 18px; line-height: 150%; letter-spacing: 0%; color: #666276; margin-bottom: 8px;">Resumen</h4>
+                    <div class="px-6 pt-2 pb-4" style="overflow-y: auto;">
+                        <div class="border-t" style="border-color: #D5D2DC; padding-top: 20px; margin-top: 0;">
+                            <h4 style="font-family: Inter; font-weight: 700; font-size: 18px; line-height: 150%; letter-spacing: 0%; color: #666276; margin-bottom: 4px;">Resumen</h4>
                             <p style="font-family: Inter; font-weight: 400; font-size: 14px; line-height: 150%; letter-spacing: 0%; color: #666276;">${Utils.escapeHTML(og_resumida || '')}</p>
                             
                             <!-- Requisitos Section (if available) -->
                             ${requisitos ? `
-                            <div style="border-top: 1px solid #D5D2DC; padding-top: 16px; margin-top: 16px;">
-                                <h4 style="font-family: Inter; font-weight: 700; font-size: 18px; line-height: 150%; letter-spacing: 0%; color: #666276; margin-bottom: 8px;">Requisitos</h4>
+                            <div style="border-top: 1px solid #D5D2DC; padding-top: 20px; margin-top: 20px;">
+                                <h4 style="font-family: Inter; font-weight: 700; font-size: 18px; line-height: 150%; letter-spacing: 0%; color: #666276; margin-bottom: 4px;">Requisitos</h4>
                                 <p style="font-family: Inter; font-weight: 400; font-size: 14px; line-height: 150%; letter-spacing: 0%; color: #666276;">${Utils.escapeHTML(requisitos)}</p>
                             </div>
                             ` : ''}
@@ -483,12 +483,12 @@ export const ModalModule = {
                     </div>
 
                     <!-- CTA Section -->
-                    <div class="px-6 py-4" style="height: 108px;">
-                        <div class="border-t" style="border-color: #D5D2DC; padding-top: 16px; margin-top: 8px; display: flex; justify-content: flex-start; align-items: center;">
+                    <div class="px-6 pt-2 pb-5" style="height: 108px;">
+                        <div class="border-t" style="border-color: #D5D2DC; padding-top: 25px; margin-top: 0; display: flex; justify-content: flex-start; align-items: center; height: calc(100% - 25px);">
                             <a href="${Utils.escapeHTML(url)}" 
                                target="_blank" 
-                               class="text-center text-white rounded-full flex items-center justify-center"
-                               style="height: 44px; width: 176px; background-color: #FFA00F; transition: background-color 0.3s;">
+                               class="text-center rounded-full flex items-center justify-center"
+                               style="height: 44px; width: 176px; background-color: white; color: black; border: 1px solid black; transition: all 0.3s;">
                                 Ver oportunidad
                             </a>
                         </div>
