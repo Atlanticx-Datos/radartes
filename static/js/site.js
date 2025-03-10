@@ -1021,6 +1021,46 @@ const handleModalClick = (e) => {
 
     if (window.ModalModule?.showPreviewModal) {
         const dataset = previewButton.dataset;
+        
+        // CRITICAL: Try to get the date from the table cell if this is a table row button
+        let tableCellDate = '';
+        try {
+            // Check if this button is inside a table row
+            const row = previewButton.closest('tr');
+            if (row) {
+                // Find the date cell in this row (typically the 4th cell, index 3)
+                // But we'll search for a cell with class 'cierre-col' to be safe
+                const dateCell = row.querySelector('.cierre-col');
+                if (dateCell) {
+                    // Get the text content of the cell, excluding any hidden elements
+                    tableCellDate = dateCell.innerText.split('\n')[0].trim();
+                    console.log('Extracted table cell date:', tableCellDate);
+                }
+            }
+        } catch (e) {
+            console.error('Error extracting date from table cell:', e);
+        }
+        
+        // Check if we have a formatted date
+        const fechaCierre = tableCellDate || dataset.fechaCierreFormatted || dataset.fechaCierre || dataset.fecha_cierre;
+        
+        // Log the data being passed to the modal
+        console.log('Modal data from handleModalClick:', {
+            url: dataset.url,
+            nombre: dataset.nombre || dataset.name,
+            pais: dataset.pais || dataset.country,
+            og_resumida: dataset.og_resumida || dataset.summary,
+            id: dataset.id,
+            categoria: dataset.categoria || dataset.category,
+            base_url: dataset.baseUrl || dataset.base_url,
+            requisitos: dataset.requisitos,
+            disciplina: dataset.disciplina || dataset.disciplinas,
+            fecha_cierre: fechaCierre,
+            fecha_cierre_raw: dataset.fechaCierre || dataset.fecha_cierre,
+            tableCellDate: tableCellDate,
+            inscripcion: dataset.inscripcion
+        });
+
         ModalModule.showPreviewModal(
             dataset.url,
             dataset.nombre || dataset.name,
@@ -1029,7 +1069,10 @@ const handleModalClick = (e) => {
             dataset.id,
             dataset.categoria || dataset.category,
             dataset.baseUrl || dataset.base_url,
-            dataset.requisitos
+            dataset.requisitos,
+            dataset.disciplina || dataset.disciplinas,
+            fechaCierre,
+            dataset.inscripcion
         );
     }
 };
@@ -1117,12 +1160,20 @@ function initDestacar() {
 window.showOpportunityDetails = function(button) {
     // Get data from button attributes
     const url = button.getAttribute('data-url');
-    const name = button.getAttribute('data-nombre');
-    const country = button.getAttribute('data-pais');
-    const summary = button.getAttribute('data-og-resumida');
+    const name = button.getAttribute('data-name');
+    const country = button.getAttribute('data-country');
+    const summary = button.getAttribute('data-summary');
     const id = button.getAttribute('data-id');
-    const category = button.getAttribute('data-categoria');
+    const category = button.getAttribute('data-category');
     const requisitos = button.getAttribute('data-requisitos');
+    const disciplina = button.getAttribute('data-disciplina');
+    const fecha_cierre = button.getAttribute('data-fecha-cierre');
+    const inscripcion = button.getAttribute('data-inscripcion');
+    
+    console.log('showOpportunityDetails data:', {
+        url, name, country, summary, id, category, requisitos,
+        disciplina, fecha_cierre, inscripcion
+    });
     
     // Call the modal function if it exists
     if (window.ModalModule && window.ModalModule.showPreviewModal) {
@@ -1134,7 +1185,10 @@ window.showOpportunityDetails = function(button) {
             id,
             category,
             null,  // base_url parameter
-            requisitos
+            requisitos,
+            disciplina,
+            fecha_cierre,
+            inscripcion
         );
     } else {
         // Fallback - open in new tab

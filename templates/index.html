@@ -860,20 +860,20 @@
             }
 
             container.innerHTML = results.map(page => `
-                <div class="opportunity-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+                <div class="opportunity-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200"
+                     data-url="${escapeHTML(page.url || '')}"
+                     data-name="${escapeHTML(page.nombre || '')}"
+                     data-country="${escapeHTML(page.pais || '')}"
+                     data-summary="${escapeHTML(page.og_resumida || '')}"
+                     data-category="${escapeHTML(page.categoria || '')}"
+                     data-id="${escapeHTML(page.id || '')}"
+                     data-disciplina="${escapeHTML(page.disciplina || page.disciplinas || '')}"
+                     data-fecha-cierre="${escapeHTML(page.fecha_de_cierre || page.fechaCierre || '')}">
                     <h3 class="font-bold text-lg mb-2">${escapeHTML(page.nombre || 'Sin nombre')}</h3>
                     <p class="text-sm text-gray-600 mb-2">${escapeHTML(page.og_resumida || '')}</p>
                     <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-500">${escapeHTML(page.disciplina || '')}</span>
-                        <button 
-                            class="preview-btn text-blue-600 hover:underline text-sm"
-                            data-url="${escapeHTML(page.url || '')}"
-                            data-name="${escapeHTML(page.nombre || '')}"
-                            data-country="${escapeHTML(page.pais || '')}"
-                            data-summary="${escapeHTML(page.og_resumida || '')}"
-                            data-category="${escapeHTML(page.categoria || '')}"
-                            data-id="${escapeHTML(page.id || '')}"
-                        >
+                        <span class="text-sm text-gray-500">${escapeHTML(page.disciplina || page.disciplinas || '')}</span>
+                        <button class="preview-btn text-blue-600 hover:underline text-sm">
                             Ver más
                         </button>
                     </div>

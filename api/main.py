@@ -985,12 +985,50 @@ def share_opportunity(opportunity_id):
 @app.template_filter('format_date')
 def format_date(value, date_format='%d/%m/%Y'):
     placeholder_date = '1900-01-01'
-    if not value or value == placeholder_date:
+    app.logger.debug(f"format_date filter called with value: '{value}', type: {type(value)}")
+    
+    # Handle empty values or placeholder date
+    if not value or value == placeholder_date or value == 'null' or value == 'undefined':
+        app.logger.debug(f"format_date: Empty or placeholder date, returning 'Confirmar en bases'")
         return 'Confirmar en bases'
+    
+    # Handle already formatted dates (to avoid double formatting)
+    if isinstance(value, str) and '/' in value and any(month in value for month in ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']):
+        app.logger.debug(f"format_date: Already formatted date: '{value}', returning as is")
+        return value
+    
     try:
+        # Try to parse the date in ISO format (YYYY-MM-DD)
         date_obj = datetime.strptime(value, '%Y-%m-%d')
-        return date_obj.strftime(date_format)  # Use the provided format
-    except ValueError:
+        formatted = date_obj.strftime(date_format)  # Use the provided format
+        app.logger.debug(f"format_date: Successfully formatted date to: '{formatted}'")
+        return formatted
+    except ValueError as e:
+        app.logger.debug(f"format_date: ValueError: {e}, returning original value: '{value}'")
+        
+        # Try to parse the date in other formats
+        try:
+            # Try DD/MM/YYYY format
+            if '/' in value:
+                parts = value.split('/')
+                if len(parts) == 3:
+                    day, month, year = parts
+                    date_obj = datetime.strptime(f"{year}-{month}-{day}", '%Y-%m-%d')
+                    formatted = date_obj.strftime(date_format)
+                    app.logger.debug(f"format_date: Successfully formatted DD/MM/YYYY date to: '{formatted}'")
+                    return formatted
+            
+            # Try DD-MM-YYYY format
+            if '-' in value and len(value.split('-')) == 3:
+                day, month, year = value.split('-')
+                if len(year) == 4:  # Ensure it's not YYYY-MM-DD
+                    date_obj = datetime.strptime(f"{year}-{month}-{day}", '%Y-%m-%d')
+                    formatted = date_obj.strftime(date_format)
+                    app.logger.debug(f"format_date: Successfully formatted DD-MM-YYYY date to: '{formatted}'")
+                    return formatted
+        except ValueError:
+            app.logger.debug(f"format_date: Failed to parse in alternative formats, returning original value: '{value}'")
+        
         return value
 
 @app.route("/update_total_nuevas", methods=["GET"])

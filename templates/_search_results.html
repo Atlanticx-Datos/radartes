@@ -72,7 +72,11 @@
                     {% endif %}
                 </td>
                 <td class="pais-col">{{ page.país }}</td>
-                <td class="cierre-col">{{ page.fecha_de_cierre | default("Sin cierre") | format_date }}</td>
+                <td class="cierre-col">
+                    {{ page.fecha_de_cierre | default("Sin cierre") | format_date }}
+                    <!-- Debug info -->
+                    <span class="hidden">Raw date: {{ page.fecha_de_cierre }}</span>
+                </td>
                 <td class="pago-col">
                     <div class="payment-status {% if page.inscripcion == 'Sin cargo' or not page.inscripcion %}free{% else %}paid{% endif %}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -91,6 +95,10 @@
                         data-id="{{ page.id }}"
                         data-category="{{ page.categoria }}"
                         data-requisitos="{{ page.requisitos }}"
+                        data-disciplina="{{ page.disciplina }}"
+                        data-fecha-cierre="{{ page.fecha_de_cierre }}"
+                        data-fecha-cierre-formatted="{{ page.fecha_de_cierre | default('') | format_date }}"
+                        data-inscripcion="{{ page.inscripcion }}"
                         onclick="showOpportunityDetails(this)">
                         Ver
                     </button>
@@ -149,9 +157,40 @@ function showOpportunityDetails(button) {
     const id = button.getAttribute('data-id');
     const category = button.getAttribute('data-category');
     const requisitos = button.getAttribute('data-requisitos');
+    const disciplina = button.getAttribute('data-disciplina');
+    const fecha_cierre = button.getAttribute('data-fecha-cierre');
+    const fecha_cierre_formatted = button.getAttribute('data-fecha-cierre-formatted');
+    const inscripcion = button.getAttribute('data-inscripcion');
+    
+    // CRITICAL: Get the date directly from the table cell
+    let tableCellDate = '';
+    try {
+        // Find the row that contains this button
+        const row = button.closest('tr');
+        if (row) {
+            // Find the date cell in this row (it's the 4th cell, index 3)
+            const dateCell = row.cells[3]; // This is the cierre-col cell
+            if (dateCell) {
+                // Get the text content of the cell, excluding any hidden elements
+                tableCellDate = dateCell.innerText.split('\n')[0].trim();
+                console.log('Extracted table cell date:', tableCellDate);
+            }
+        }
+    } catch (e) {
+        console.error('Error extracting date from table cell:', e);
+    }
+    
+    // Log all date values for debugging
+    console.log('All date values:', {
+        fecha_cierre: fecha_cierre,
+        fecha_cierre_formatted: fecha_cierre_formatted,
+        tableCellDate: tableCellDate,
+        final_date_to_use: tableCellDate || fecha_cierre_formatted || fecha_cierre || ''
+    });
     
     // Call the modal function if it exists
     if (window.ModalModule && window.ModalModule.showPreviewModal) {
+        // IMPORTANT: Pass the table cell date directly as the date parameter
         window.ModalModule.showPreviewModal(
             url,
             name,
@@ -160,7 +199,10 @@ function showOpportunityDetails(button) {
             id,
             category,
             null,  // base_url parameter
-            requisitos
+            requisitos,
+            disciplina,
+            tableCellDate || fecha_cierre_formatted || fecha_cierre || '', // Use table cell date as first priority
+            inscripcion
         );
     } else {
         // Fallback - open in new tab

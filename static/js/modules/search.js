@@ -92,6 +92,7 @@ export const SearchModule = {
                     console.log('Preview button clicked, data:', dataset);
                     
                     if (window.ModalModule && window.ModalModule.showPreviewModal) {
+                        console.log('Search module preview button click data:', dataset);
                         window.ModalModule.showPreviewModal(
                             dataset.url,
                             dataset.nombre || dataset.name,
@@ -100,7 +101,10 @@ export const SearchModule = {
                             dataset.id,
                             dataset.categoria || dataset.category,
                             null, // base_url parameter
-                            dataset.requisitos
+                            dataset.requisitos,
+                            dataset.disciplina,
+                            dataset.fecha_cierre || dataset.fechaCierre,
+                            dataset.inscripcion
                         );
                     } else {
                         console.error('ModalModule not found or showPreviewModal not available');
@@ -925,7 +929,7 @@ export const SearchModule = {
                                     <button 
                                         class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
                                         style="background-color: #F0EBFF; color: #6232FF;"
-                                        onclick="window.ModalModule.showPreviewModal('${page.url || ''}', '${page.nombre_original || page.nombre || ''}', '${page.pais || page.país || ''}', '${page.og_resumida || ''}', '${page.id || ''}', '${page.categoria || ''}', null, '${page.requisitos || ''}')"
+                                        onclick="window.ModalModule.showPreviewModal('${page.url || ''}', '${page.nombre_original || page.nombre || ''}', '${page.pais || page.país || ''}', '${page.og_resumida || ''}', '${page.id || ''}', '${page.categoria || ''}', null, '${page.requisitos || ''}', '${page.disciplina || ''}', '${page.fecha_de_cierre || ''}', '${page.inscripcion || ''}')"
                                     >
                                         Ver
                                     </button>

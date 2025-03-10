@@ -276,7 +276,10 @@ export const DestacarModule = {
                      data-id="${Utils.escapeHTML(page.id || '')}"
                      data-category="${Utils.escapeHTML(page.categoria || '')}"
                      data-requisitos="${Utils.escapeHTML(page.requisitos || '')}"
-                     data-inscripcion="${Utils.escapeHTML(page.inscripcion || '')}">
+                     data-inscripcion="${Utils.escapeHTML(page.inscripcion || '')}"
+                     data-disciplina="${Utils.escapeHTML(page.disciplina || '')}"
+                     data-fecha-cierre="${Utils.escapeHTML(page.fecha_de_cierre || '')}"
+                     data-fecha-cierre-raw="${page.fecha_de_cierre || ''}">
                     <div class="relative h-48 bg-gray-200">
                         <img src="/static/public/IsoAtx.png" alt="Atlantic x Logo" class="w-full h-full object-contain">
                         <span class="absolute top-3 left-3 text-sm">
@@ -343,6 +346,7 @@ export const DestacarModule = {
                 const dataset = element.dataset;
                 
                 if (window.ModalModule && window.ModalModule.showPreviewModal) {
+                    console.log('Destacar module click handler data:', dataset);
                     window.ModalModule.showPreviewModal(
                         dataset.url,
                         dataset.nombre,
@@ -351,7 +355,10 @@ export const DestacarModule = {
                         dataset.id,
                         dataset.category,
                         null,  // base_url parameter
-                        dataset.requisitos
+                        dataset.requisitos,
+                        dataset.disciplina,
+                        dataset.fechaCierre || dataset.fecha_cierre, // Try both kebab-case and camelCase
+                        dataset.inscripcion
                     );
                 } else {
                     console.error('ModalModule not found or showPreviewModal not available');
