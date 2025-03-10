@@ -1008,4 +1008,56 @@ table[id*="results"] th {
 
 /* Add a script to apply styles directly via JavaScript */
 
+/* ====================================
+   ANIMATED WORD STYLES
+   Used in: index.html hero section
+   Purpose: Create smooth word rotation animation
+   Why custom: Requires specific transition effects
+==================================== */
+.animated-word {
+    display: inline-block;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease, transform 0.5s ease, clip-path 0.5s ease, text-shadow 0.5s ease;
+    position: relative;
+    min-width: 200px; /* Ensures container doesn't resize dramatically */
+    text-align: center;
+    overflow: hidden;
+}
+
+/* Animation states for the word */
+.animated-word.fade-out {
+    opacity: 0;
+    transform: translateY(10px);
+    clip-path: inset(0 0 100% 0); /* Clip from bottom */
+    text-shadow: 0 0 0 rgba(206, 255, 28, 0);
+}
+
+.animated-word.fade-in {
+    opacity: 1;
+    transform: translateY(0);
+    clip-path: inset(0 0 0 0); /* Fully visible */
+    text-shadow: 0 0 10px rgba(206, 255, 28, 0.5);
+    animation: wordPulse 1s ease-out;
+}
+
+@keyframes wordPulse {
+    0% {
+        text-shadow: 0 0 15px rgba(206, 255, 28, 0.7);
+        transform: scale(1.05);
+    }
+    100% {
+        text-shadow: 0 0 10px rgba(206, 255, 28, 0.5);
+        transform: scale(1);
+    }
+}
+
+/* Ensure the parent container maintains consistent height */
+.animated-word::after {
+    content: '';
+    display: block;
+    height: 0;
+    visibility: hidden;
+}
+
 

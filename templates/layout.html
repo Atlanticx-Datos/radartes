@@ -167,6 +167,65 @@
         input[type="radio"]:hover {
             border-color: #6232FF !important;
         }
+
+        /* Animated Word Styles */
+        .animated-word {
+            display: inline-block;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.5s ease, transform 0.5s ease, clip-path 0.5s ease, text-shadow 0.5s ease;
+            position: relative;
+            min-width: 200px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        /* Fallback animation that will work even if transitions fail */
+        @keyframes fadeInOut {
+            0% { opacity: 1; }
+            40% { opacity: 0; }
+            60% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* Apply the fallback animation if needed */
+        .animated-word.fallback-animation {
+            animation: fadeInOut 3s infinite;
+            transition: none;
+        }
+
+        .animated-word.fade-out {
+            opacity: 0;
+            transform: translateY(10px);
+            clip-path: inset(0 0 100% 0);
+            text-shadow: 0 0 0 rgba(206, 255, 28, 0);
+        }
+
+        .animated-word.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+            clip-path: inset(0 0 0 0);
+            text-shadow: 0 0 10px rgba(206, 255, 28, 0.5);
+            animation: wordPulse 1s ease-out;
+        }
+
+        @keyframes wordPulse {
+            0% {
+                text-shadow: 0 0 15px rgba(206, 255, 28, 0.7);
+                transform: scale(1.05);
+            }
+            100% {
+                text-shadow: 0 0 10px rgba(206, 255, 28, 0.5);
+                transform: scale(1);
+            }
+        }
+
+        .animated-word::after {
+            content: '';
+            display: block;
+            height: 0;
+            visibility: hidden;
+        }
     </style>
 </head>
 
