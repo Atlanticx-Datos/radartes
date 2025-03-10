@@ -216,14 +216,8 @@ export const FilterModule = {
         console.log('Current discipline:', this.activeFilters.discipline);
         console.log('Clicked discipline:', discipline);
         
-        // Simple toggle: if same discipline is clicked, switch to 'todos'
-        if (discipline === this.activeFilters.discipline) {
-            this.activeFilters.discipline = 'todos';
-        } else {
-            this.activeFilters.discipline = discipline;
-        }
-        
-        console.log('New discipline state:', this.activeFilters.discipline);
+        // Don't change the discipline here - it should already be set by toggleDisciplineFilter
+        console.log('Using discipline:', this.activeFilters.discipline);
         
         // Update SearchModule's isFiltered flag
         if (window.SearchModule) {
@@ -330,52 +324,64 @@ export const FilterModule = {
     applyFilters(searchInput = '', shouldScroll = false) {
         const pages = JSON.parse(document.getElementById('prefiltered-data')?.dataset.pages || '[]');
         
-        // Update SearchModule's isFiltered flag
-        if (window.SearchModule) {
-            SearchModule.isFiltered = searchInput.trim().length > 0 || 
-                                     this.activeFilters.categories.size > 0 || 
-                                     this.activeFilters.country || 
-                                     this.activeFilters.month || 
-                                     this.activeFilters.discipline !== 'todos' ||
-                                     this.activeFilters.freeOnly;
-            console.log('Updated SearchModule.isFiltered to', SearchModule.isFiltered);
-        }
+        console.log('FilterModule.applyFilters called with:', {
+            searchInput,
+            shouldScroll,
+            activeFilters: this.activeFilters
+        });
+        
+        // Debug the current discipline filter
+        console.log('Current discipline filter:', this.activeFilters.discipline);
         
         const filtered = pages.filter(page => {
             // Text search filter
-            if (searchInput && !this.matchesSearchTerms(page, searchInput)) return false;
-
-            // Categories filter
+            if (searchInput) {
+                const searchTerms = searchInput.toLowerCase().split(' ').filter(term => term.length > 0);
+                
+                if (searchTerms.length > 0) {
+                    const pageText = [
+                        page.nombre || '',
+                        page.pais || '',
+                        page.disciplina || '',
+                        page.resumen || '',
+                        page.destinatarios || '',
+                        page.requisitos || ''
+                    ].join(' ').toLowerCase();
+                    
+                    // Check if all search terms are found in the page text
+                    const allTermsFound = searchTerms.every(term => pageText.includes(term));
+                    if (!allTermsFound) return false;
+                }
+            }
+            
+            // Category filter
             if (this.activeFilters.categories.size > 0) {
-                const pageCategory = this.normalizeText(page.categoria);
-                const categoryMatch = Array.from(this.activeFilters.categories).some(category => {
-                    const normalizedCategory = this.normalizeText(category);
-                    return pageCategory.startsWith(normalizedCategory);
-                });
-                if (!categoryMatch) return false;
-            }
-
-            // Subdisciplinas filter
-            if (this.activeFilters.subdisciplinas.size > 0) {
-                const disciplinaParts = (page.disciplina || '').split(',').map(p => p.trim());
-                const subdisciplinasMatch = Array.from(this.activeFilters.subdisciplinas).some(sub =>
-                    disciplinaParts.slice(1).some(pageSub => 
-                        this.normalizeText(pageSub) === this.normalizeText(sub)
-                    )
+                const pageCategories = page.categorias || [];
+                const normalizedPageCategories = pageCategories.map(cat => this.normalizeText(cat));
+                
+                // Check if any of the active categories match the page categories
+                const hasMatchingCategory = Array.from(this.activeFilters.categories).some(category => 
+                    normalizedPageCategories.includes(this.normalizeText(category))
                 );
-                if (!subdisciplinasMatch) return false;
+                
+                if (!hasMatchingCategory) return false;
             }
-
+            
             // Country filter
-            if (this.activeFilters.country && 
-                this.normalizeText(page.pais) !== this.normalizeText(this.activeFilters.country)) {
-                return false;
+            if (this.activeFilters.country) {
+                if (!page.pais || this.normalizeText(page.pais) !== this.normalizeText(this.activeFilters.country)) {
+                    return false;
+                }
             }
-
+            
             // Month filter
             if (this.activeFilters.month) {
-                const pageMonth = page.fecha_de_cierre ? page.fecha_de_cierre.split('-')[1] : '';
-                if (pageMonth !== String(this.activeFilters.month).padStart(2, '0')) return false;
+                if (!page.fecha_de_cierre) return false;
+                
+                const monthToFind = String(this.activeFilters.month).padStart(2, '0');
+                const pageMonth = page.fecha_de_cierre.split('-')[1];
+                
+                if (pageMonth !== monthToFind) return false;
             }
 
             // Discipline filter - use the simplified matching logic
@@ -386,7 +392,12 @@ export const FilterModule = {
                 const normalizedFilterDiscipline = this.normalizeText(this.activeFilters.discipline);
                 
                 // Check if the discipline is contained in the page's disciplina field
-                if (!normalizedPageDisciplina.includes(normalizedFilterDiscipline)) return false;
+                if (!normalizedPageDisciplina.includes(normalizedFilterDiscipline)) {
+                    console.log(`Filtering out ${page.nombre} - Discipline: "${page.disciplina}" doesn't match "${this.activeFilters.discipline}"`);
+                    return false;
+                }
+                
+                console.log(`Including ${page.nombre} - Discipline: "${page.disciplina}" matches "${this.activeFilters.discipline}"`);
             }
 
             // Free only filter

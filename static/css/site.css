@@ -1060,4 +1060,24 @@ table[id*="results"] th {
     visibility: hidden;
 }
 
+/* ====================================
+   RESULTS COUNTER TRASH ICON
+   Used in: search.js
+   Purpose: Align trash icon with "Ver" buttons
+   Why custom: Specific vertical alignment needed
+==================================== */
+#results-counter button {
+    height: 31px; /* Match the Ver button height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+#results-counter button svg {
+    vertical-align: middle;
+}
+
 

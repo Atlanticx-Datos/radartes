@@ -843,10 +843,10 @@ window.clearAllFilters = FilterModule.clearAllFilters.bind(FilterModule);
 window.toggleDisciplineFilter = function(button, discipline) {
     console.log('toggleDisciplineFilter called with discipline:', discipline);
     
-    // Ensure the button has the correct discipline value in its dataset
-    button.dataset.disciplineFilter = discipline;
+    // Get current active state of the button
+    const wasActive = button.dataset.active === 'true';
     
-    // Update the active state visually
+    // Update visual state of all buttons first
     const allButtons = document.querySelectorAll('[data-discipline-filter]');
     allButtons.forEach(btn => {
         if (btn !== button) {
@@ -856,8 +856,7 @@ window.toggleDisciplineFilter = function(button, discipline) {
     });
     
     // Toggle the active state of the clicked button
-    const isActive = button.dataset.active === 'true';
-    button.dataset.active = isActive ? 'false' : 'true';
+    button.dataset.active = wasActive ? 'false' : 'true';
     
     if (button.dataset.active === 'true') {
         button.classList.add('active-filter');
@@ -865,21 +864,25 @@ window.toggleDisciplineFilter = function(button, discipline) {
         button.classList.remove('active-filter');
     }
     
-    // Directly handle the destacados section visibility
+    // Handle destacados visibility
     const shouldHide = button.dataset.active === 'true' && discipline !== 'todos';
     updateDestacadosVisibility(shouldHide);
     
-    // Now call FilterModule's handleDisciplineFilter
+    // Set the discipline in FilterModule directly
     if (window.FilterModule) {
-        // Set the discipline in FilterModule
-        if (button.dataset.active === 'true') {
-            FilterModule.activeFilters.discipline = discipline;
-        } else {
-            FilterModule.activeFilters.discipline = 'todos';
-        }
+        // If button is active, set its discipline, otherwise reset to 'todos'
+        FilterModule.activeFilters.discipline = (button.dataset.active === 'true') ? discipline : 'todos';
+        
+        console.log('Setting FilterModule discipline to:', FilterModule.activeFilters.discipline);
+        
+        // Debug the state before calling handleDisciplineFilter
+        debugFilterState();
         
         // Call the filter method with scrolling
         FilterModule.handleDisciplineFilter(button, true);
+        
+        // Debug the state after calling handleDisciplineFilter
+        setTimeout(debugFilterState, 100);
     }
 };
 window.goToPage = SearchModule.goToPage.bind(SearchModule);
@@ -1188,6 +1191,19 @@ function updateDestacadosVisibility(shouldHide) {
         prevControl?.classList.remove('hidden');
         nextControl?.classList.remove('hidden');
     }
+}
+
+// Add a debugging function
+function debugFilterState() {
+    console.log('==== FILTER STATE DEBUG ====');
+    console.log('FilterModule discipline:', FilterModule.activeFilters.discipline);
+    
+    const buttons = document.querySelectorAll('[data-discipline-filter]');
+    buttons.forEach(btn => {
+        console.log(`Button ${btn.querySelector('span').textContent}: data-active=${btn.dataset.active}, data-discipline-filter=${btn.dataset.disciplineFilter}`);
+    });
+    
+    console.log('==== END DEBUG ====');
 }
 
 // Export any functions that need to be accessed from outside
