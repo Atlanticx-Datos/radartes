@@ -46,6 +46,64 @@
         border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
+    
+    /* Enhanced reset button functionality */
+    #reset-visual {
+        position: relative;
+        /* The button itself shouldn't receive clicks */
+        pointer-events: none;
+    }
+    
+    /* Create a transparent overlay that captures clicks */
+    #reset-visual::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+        /* The overlay should receive clicks */
+        pointer-events: auto;
+        cursor: pointer;
+    }
+    
+    /* Visual feedback when reset button is pressed */
+    #reset-visual:active {
+        background-color: #e5e7eb;
+        transform: scale(0.98);
+    }
+    
+    /* When reset button is active, fade out checked checkboxes */
+    #reset-visual:active ~ .filter-section input[type="checkbox"]:checked {
+        opacity: 0.3;
+    }
+    
+    /* When reset button is active, fade out checked radio buttons */
+    #reset-visual:active ~ .filter-section input[type="radio"]:checked:not([value=""]) {
+        opacity: 0.3;
+    }
+    
+    /* When reset button is active, hide selected values text */
+    #reset-visual:active ~ .filter-section .selected-values {
+        opacity: 0;
+    }
+    
+    /* When reset button is active, add a subtle overlay to dropdown content */
+    #reset-visual:active ~ .filter-section .filter-dropdown-content {
+        position: relative;
+    }
+    
+    #reset-visual:active ~ .filter-section .filter-dropdown-content::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.1);
+        pointer-events: none;
+    }
 </style>
 {% endblock %}
 
@@ -274,11 +332,13 @@
 
                         <!-- Search and Reset Buttons -->
                         <div class="flex gap-4">
-                            <button id="clear-all-filters"
+                            <!-- Custom clear button that won't close the dropdown -->
+                            <button id="custom-clear-button" 
                                 class="w-1/2 py-3 px-4 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-                                type="button" onclick="SearchModule.clearSearch();">
-                                Restablecer
+                                type="button">
+                                Limpiar
                             </button>
+                            
                             <button id="search-filters"
                                 class="w-1/2 py-3 px-4 bg-[#6232FF] text-white rounded-md hover:bg-opacity-90 transition-colors"
                                 type="button">
@@ -424,7 +484,7 @@
                             {% if discipline == 'Visuales' %}
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
                             </svg>
                             {% elif discipline == 'Música' %}
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1029,6 +1089,184 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000);
     });
 });
+</script>
+
+<!-- Script to handle the custom clear button -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the custom clear button
+        const clearButton = document.getElementById('custom-clear-button');
+        
+        if (clearButton) {
+            clearButton.addEventListener('click', function(e) {
+                // Prevent default button behavior and stop propagation
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('Custom clear button clicked - AGGRESSIVE RESET');
+                
+                // CRITICAL: Prevent dropdown from closing
+                // First, stop the event from bubbling up to any parent elements
+                e.stopImmediatePropagation();
+                
+                // Save reference to the dropdown element
+                const dropdown = document.getElementById('structured-filters');
+                
+                // STEP 1: Reset all UI elements
+                
+                // Uncheck ALL checkboxes (not just the checked ones)
+                document.querySelectorAll('.filter-section input[type="checkbox"]').forEach(function(checkbox) {
+                    if (checkbox.checked) {
+                        checkbox.checked = false;
+                        // Trigger change event to ensure any listeners update
+                        const event = new Event('change', { bubbles: true });
+                        checkbox.dispatchEvent(event);
+                    }
+                });
+                
+                // Reset ALL radio buttons to default (select the ones with empty value)
+                document.querySelectorAll('.filter-section input[type="radio"][value=""]').forEach(function(radio) {
+                    radio.checked = true;
+                    // Trigger change event
+                    const event = new Event('change', { bubbles: true });
+                    radio.dispatchEvent(event);
+                });
+                
+                // Clear ALL selected values text
+                document.querySelectorAll('.filter-section .selected-values').forEach(function(span) {
+                    span.textContent = '';
+                });
+                
+                // STEP 2: Reset global state
+                
+                // Reset global activeFilters if it exists
+                if (window.activeFilters) {
+                    window.activeFilters.categories = new Set();
+                    window.activeFilters.country = '';
+                    window.activeFilters.month = '';
+                    window.activeFilters.discipline = 'todos';
+                    console.log('Reset window.activeFilters:', window.activeFilters);
+                }
+                
+                // Reset window.selectedCategories if it exists
+                if (window.selectedCategories) {
+                    window.selectedCategories = [];
+                    console.log('Reset window.selectedCategories to empty array');
+                }
+                
+                // STEP 3: Reset FilterModule state
+                
+                // Reset any internal state tracking in FilterModule if it exists
+                if (window.FilterModule && window.FilterModule.activeFilters) {
+                    console.log('Resetting FilterModule state');
+                    
+                    // Clear categories
+                    if (window.FilterModule.activeFilters.categories) {
+                        window.FilterModule.activeFilters.categories.clear();
+                    }
+                    
+                    // Clear subdisciplinas
+                    if (window.FilterModule.activeFilters.subdisciplinas) {
+                        window.FilterModule.activeFilters.subdisciplinas.clear();
+                    }
+                    
+                    // Reset country and month
+                    window.FilterModule.activeFilters.country = '';
+                    window.FilterModule.activeFilters.month = '';
+                    
+                    // Reset freeOnly
+                    window.FilterModule.activeFilters.freeOnly = false;
+                    
+                    // Reset discipline
+                    window.FilterModule.activeFilters.discipline = 'todos';
+                    
+                    // If FilterModule has a clearAllFilters method, call it
+                    if (typeof window.FilterModule.clearAllFilters === 'function') {
+                        try {
+                            console.log('Calling FilterModule.clearAllFilters()');
+                            window.FilterModule.clearAllFilters();
+                        } catch (error) {
+                            console.error('Error calling FilterModule.clearAllFilters():', error);
+                        }
+                    }
+                    
+                    // Apply the filters with the cleared state
+                    try {
+                        console.log('Applying filters with cleared state');
+                        // IMPORTANT: Pass false as the second parameter to prevent closing the dropdown
+                        window.FilterModule.applyFilters('', false);
+                    } catch (error) {
+                        console.error('Error applying filters:', error);
+                    }
+                }
+                
+                // STEP 4: Try alternative methods if FilterModule approach fails
+                
+                // If FilterModule doesn't exist or fails, try to use the global applyFilters function
+                if (!window.FilterModule && typeof window.applyFilters === 'function') {
+                    try {
+                        console.log('Using global applyFilters function');
+                        window.applyFilters('');
+                    } catch (error) {
+                        console.error('Error applying filters with global function:', error);
+                    }
+                }
+                
+                // STEP 5: Direct update of SearchModule as last resort
+                
+                // As a last resort, try to directly update the SearchModule
+                if (window.SearchModule) {
+                    try {
+                        console.log('Directly updating SearchModule');
+                        
+                        // If SearchModule has a clearFilters method, call it
+                        if (typeof window.SearchModule.clearFilters === 'function') {
+                            console.log('Calling SearchModule.clearFilters()');
+                            window.SearchModule.clearFilters();
+                        }
+                        
+                        // If SearchModule has a clearStructuredFilters method, call it
+                        if (typeof window.SearchModule.clearStructuredFilters === 'function') {
+                            console.log('Calling SearchModule.clearStructuredFilters()');
+                            window.SearchModule.clearStructuredFilters();
+                        }
+                        
+                        // Get all pages from the prefiltered data and update results
+                        const prefilteredData = document.getElementById('prefiltered-data');
+                        if (prefilteredData && prefilteredData.dataset.pages) {
+                            const tempParser = new DOMParser();
+                            const pagesString = tempParser.parseFromString(prefilteredData.dataset.pages || '[]', 'text/html').body.textContent;
+                            const allPages = JSON.parse(pagesString);
+                            console.log(`Updating SearchModule with ${allPages.length} pages`);
+                            
+                            if (typeof window.SearchModule.updateResults === 'function') {
+                                window.SearchModule.updateResults(allPages);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error updating SearchModule directly:', error);
+                    }
+                }
+                
+                console.log('Aggressive reset completed');
+                
+                // CRITICAL: Ensure dropdown stays open
+                // Make sure the dropdown is still visible after all operations
+                if (dropdown) {
+                    console.log('Ensuring dropdown stays open');
+                    dropdown.classList.remove('hidden');
+                    
+                    // Add a small delay to ensure this happens after any other code that might try to close it
+                    setTimeout(function() {
+                        dropdown.classList.remove('hidden');
+                    }, 10);
+                }
+                
+                // Return false to prevent any default actions
+                return false;
+            });
+        }
+    });
 </script>
 
 {% endblock %}
