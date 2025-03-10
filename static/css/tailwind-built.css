@@ -1422,6 +1422,10 @@ video {
   --tw-text-opacity: 1;
   color: rgb(69 64 86 / var(--tw-text-opacity));
 }
+.text-\[\#6232FF\] {
+  --tw-text-opacity: 1;
+  color: rgb(98 50 255 / var(--tw-text-opacity));
+}
 .text-\[\#CEFF1C\] {
   --tw-text-opacity: 1;
   color: rgb(206 255 28 / var(--tw-text-opacity));

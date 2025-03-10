@@ -392,6 +392,9 @@ function setupFilterDropdown() {
         
         // Set up collapsible filter sections
         document.querySelectorAll('.filter-dropdown-trigger').forEach(trigger => {
+            // Initialize with aria-expanded="false"
+            trigger.setAttribute('aria-expanded', 'false');
+            
             trigger.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -409,19 +412,28 @@ function setupFilterDropdown() {
                         if (otherTrigger) {
                             const otherChevron = otherTrigger.querySelector('svg');
                             if (otherChevron) {
-                                otherChevron.classList.remove('rotate-180');
+                                otherChevron.style.transform = '';
                             }
+                            // Set aria-expanded to false for other triggers
+                            otherTrigger.setAttribute('aria-expanded', 'false');
                         }
                     }
                 });
                 
-                // Toggle this dropdown
+                // Toggle the current dropdown
                 content.classList.toggle('hidden');
                 
-                // Toggle chevron direction
+                // Update aria-expanded attribute based on visibility
+                const isExpanded = !content.classList.contains('hidden');
+                trigger.setAttribute('aria-expanded', isExpanded);
+                
+                // Rotate chevron based on state
                 if (chevron) {
-                    chevron.classList.toggle('rotate-180');
+                    chevron.style.transform = isExpanded ? 'rotate(180deg)' : '';
                 }
+                
+                // Update selected values text
+                updateSelectedValuesText(targetId);
             });
         });
         
