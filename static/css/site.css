@@ -1080,4 +1080,59 @@ table[id*="results"] th {
     vertical-align: middle;
 }
 
+/* ====================================
+   SLOT MACHINE WORD ANIMATION
+   Used in: index.html
+   Purpose: Create a slot machine effect for rotating words
+   Why custom: Requires keyframes and specific positioning
+==================================== */
+.slot-machine {
+    position: relative;
+    display: inline-block;
+    height: 60px;
+    overflow: hidden;
+    vertical-align: bottom;
+    min-width: 250px; /* Increased to accommodate longer words */
+}
+
+.slot-machine-words {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    animation: slotMachineRotate 15s cubic-bezier(0.6, -0.28, 0.735, 0.045) infinite;
+}
+
+.slot-word {
+    display: block;
+    height: 60px;
+    line-height: 60px;
+    color: #CEFF1C;
+    font-weight: bold;
+    text-shadow: none;
+}
+
+/* Remove the gradient overlays to keep only the words */
+.slot-machine::before,
+.slot-machine::after {
+    display: none;
+}
+
+@keyframes slotMachineRotate {
+    0%, 19% {
+        transform: translateY(0);
+    }
+    25%, 44% {
+        transform: translateY(-60px);
+    }
+    50%, 69% {
+        transform: translateY(-120px);
+    }
+    75%, 94% {
+        transform: translateY(-180px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
 

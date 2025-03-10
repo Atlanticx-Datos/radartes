@@ -336,17 +336,20 @@ export const FilterModule = {
         const filtered = pages.filter(page => {
             // Text search filter
             if (searchInput) {
-                const searchTerms = searchInput.toLowerCase().split(' ').filter(term => term.length > 0);
+                // Use normalizeText instead of just toLowerCase to handle diacritics and capitalization
+                const searchTerms = searchInput.split(' ')
+                    .map(term => this.normalizeText(term))
+                    .filter(term => term.length > 0);
                 
                 if (searchTerms.length > 0) {
-                    const pageText = [
+                    const pageText = this.normalizeText([
                         page.nombre || '',
                         page.pais || '',
                         page.disciplina || '',
                         page.resumen || '',
                         page.destinatarios || '',
                         page.requisitos || ''
-                    ].join(' ').toLowerCase();
+                    ].join(' '));
                     
                     // Check if all search terms are found in the page text
                     const allTermsFound = searchTerms.every(term => pageText.includes(term));

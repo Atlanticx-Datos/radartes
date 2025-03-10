@@ -651,12 +651,12 @@ export const SearchModule = {
                     // Check the categoria field (not disciplina)
                     if (!page.categoria) return false;
                     
-                    // Normalize the categoria for comparison
-                    const normalizedCategoria = page.categoria.toLowerCase().trim();
+                    // Normalize the categoria for comparison using FilterModule's normalizeText
+                    const normalizedCategoria = FilterModule.normalizeText(page.categoria);
                     
                     // Check if any of the selected categories match
                     return Array.from(this.activeFilters.categories).some(category => {
-                        const normalizedCategory = category.toLowerCase().trim();
+                        const normalizedCategory = FilterModule.normalizeText(category);
                         return normalizedCategoria.includes(normalizedCategory);
                     });
                 });
@@ -1094,18 +1094,18 @@ export const SearchModule = {
         // Sort if active
         const sortFunctions = {
             nombre: (a, b) => {
-                const aName = (a.nombre || '').toLowerCase();
-                const bName = (b.nombre || '').toLowerCase();
+                const aName = FilterModule.normalizeText(a.nombre || '');
+                const bName = FilterModule.normalizeText(b.nombre || '');
                 return aName.localeCompare(bName);
             },
             disciplina: (a, b) => {
-                const aDisc = ((a.disciplina || '').split(',')[0] || '').toLowerCase().trim();
-                const bDisc = ((b.disciplina || '').split(',')[0] || '').toLowerCase().trim();
+                const aDisc = FilterModule.normalizeText((a.disciplina || '').split(',')[0] || '');
+                const bDisc = FilterModule.normalizeText((b.disciplina || '').split(',')[0] || '');
                 return aDisc.localeCompare(bDisc);
             },
             pais: (a, b) => {
-                const aPais = (a.pais || a.país || '').toLowerCase();
-                const bPais = (b.pais || b.país || '').toLowerCase();
+                const aPais = FilterModule.normalizeText(a.pais || a.país || '');
+                const bPais = FilterModule.normalizeText(b.pais || b.país || '');
                 return aPais.localeCompare(bPais);
             },
             fecha: (a, b) => {

@@ -152,44 +152,6 @@
 {% endblock %}
 
 {% block body %}
-<!-- Inline script for word animation - ensures it runs as early as possible -->
-<script>
-    // This script will run as soon as the page starts loading
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log("Inline animation script running");
-        const animatedWordElement = document.querySelector('.animated-word');
-        
-        if (animatedWordElement) {
-            console.log("Found animated word element (inline script)");
-            const wordsList = ['oportunidad', 'beca', 'residencia', '...'];
-            let wordIndex = 0;
-            
-            // Simple animation that will definitely work
-            function changeWord() {
-                wordIndex = (wordIndex + 1) % wordsList.length;
-                
-                // Simple fade out
-                animatedWordElement.style.opacity = '0';
-                
-                // Change text after a short delay
-                setTimeout(function() {
-                    animatedWordElement.textContent = wordsList[wordIndex];
-                    // Fade back in
-                    animatedWordElement.style.opacity = '1';
-                }, 500);
-            }
-            
-            // Start changing words after 2 seconds
-            setTimeout(function() {
-                // Change words every 3 seconds
-                setInterval(changeWord, 3000);
-            }, 2000);
-        } else {
-            console.error("Could not find animated word element (inline script)");
-        }
-    });
-</script>
-
 <!-- Full width header section -->
 <header class="relative w-full h-[550px] overflow-visible">
     <!-- Background image with overlay -->
@@ -207,7 +169,15 @@
         <div class="relative z-10 flex flex-col items-center text-center justify-center h-full">
             <h1 class="text-[40px] font-bold leading-[130%] tracking-normal text-center text-white">Descubrí tu próxima</h1>
             <div class="text-[40px] font-bold leading-[130%] tracking-normal text-center text-[#CEFF1C] mb-8">
-                <span class="animated-word" style="display: inline-block; transition: opacity 0.5s ease; min-width: 200px;">oportunidad</span>
+                <div class="slot-machine" style="min-width: 280px;">
+                    <div class="slot-machine-words">
+                        <div class="slot-word">oportunidad</div>
+                        <div class="slot-word">beca</div>
+                        <div class="slot-word">residencia</div>
+                        <div class="slot-word">convocatoria</div>
+                        <div class="slot-word">oportunidad</div>
+                    </div>
+                </div>
             </div>
            
             <!-- Search Section -->
@@ -1388,100 +1358,5 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const rawData = JSON.parse('{{ destacar_pages| tojson | safe }}');
     processDestacarData(rawData);
-
-    // Word animation - IIFE for immediate execution
-    (function() {
-        console.log("Word animation script starting");
-        
-        // Words to cycle through
-        const words = ['oportunidad', 'beca', 'residencia', 'convocatoria', '...'];
-        
-        // Function to initialize the animation
-        function initWordAnimation() {
-            console.log("Initializing word animation");
-            const animatedWord = document.querySelector('.animated-word');
-            
-            if (!animatedWord) {
-                console.error("Could not find element with class 'animated-word'");
-                return;
-            }
-            
-            console.log("Found animated word element:", animatedWord);
-            let currentIndex = 0;
-            let useFallback = false;
-            
-            // Try to detect if CSS transitions are supported
-            const transitionTest = () => {
-                const testEl = document.createElement('div');
-                const transitionProps = ['transition', 'WebkitTransition', 'MozTransition', 'OTransition', 'msTransition'];
-                for (let prop of transitionProps) {
-                    if (testEl.style[prop] !== undefined) {
-                        return true;
-                    }
-                }
-                return false;
-            };
-            
-            // Check if we should use the fallback
-            if (!transitionTest()) {
-                console.log("CSS transitions not fully supported, using fallback animation");
-                useFallback = true;
-                animatedWord.classList.add('fallback-animation');
-            } else {
-                // Set initial state for CSS transition animation
-                animatedWord.classList.add('fade-in');
-            }
-            
-            function animateNextWord() {
-                console.log("Animating to next word");
-                const nextIndex = (currentIndex + 1) % words.length;
-                
-                if (useFallback) {
-                    // Simple text replacement for fallback
-                    setTimeout(() => {
-                        animatedWord.textContent = words[nextIndex];
-                        console.log("Changed text to:", words[nextIndex]);
-                        currentIndex = nextIndex;
-                    }, 1500); // Middle of the fadeInOut animation
-                } else {
-                    // CSS transition animation
-                    animatedWord.classList.remove('fade-in');
-                    animatedWord.classList.add('fade-out');
-                    
-                    setTimeout(() => {
-                        // Change text
-                        animatedWord.textContent = words[nextIndex];
-                        console.log("Changed text to:", words[nextIndex]);
-                        
-                        // Force reflow to ensure transition applies
-                        void animatedWord.offsetWidth;
-                        
-                        // Fade in new word
-                        animatedWord.classList.remove('fade-out');
-                        animatedWord.classList.add('fade-in');
-                        
-                        currentIndex = nextIndex;
-                    }, 500); // Half of the total animation time
-                }
-            }
-            
-            // Start animation after 2 seconds, then repeat every 3 seconds
-            console.log("Setting up animation interval");
-            setTimeout(() => {
-                console.log("Starting animation cycle");
-                setInterval(animateNextWord, 3000);
-            }, 2000);
-        }
-        
-        // Initialize when DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initWordAnimation);
-            console.log("Added DOMContentLoaded listener");
-        } else {
-            // DOM is already ready
-            initWordAnimation();
-            console.log("DOM already loaded, initializing immediately");
-        }
-    })();
 </script>
 {% endblock %}
