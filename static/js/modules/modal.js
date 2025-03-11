@@ -397,8 +397,11 @@ export const ModalModule = {
                             <span class="text-sm font-medium text-white px-3 py-1 rounded-full" style="background-color: #6366F1; margin-top: 24px;">${Utils.escapeHTML(categoria || '')}</span>
                         </div>
                         <div class="flex items-center" style="margin-right: 12px;">
-                            <button type="button" class="share-toggle-btn flex items-center justify-center rounded-full" style="width: 32px; height: 32px; background-color: rgba(99, 102, 241, 0.2);">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="#6366F1" style="transform: rotate(45deg);">
+                            <button type="button" class="share-toggle-btn flex items-center justify-center rounded-full" 
+                                   style="width: 32px; height: 32px; background-color: rgba(99, 102, 241, 0.2); transition: all 0.25s ease-in-out;"
+                                   onmouseover="this.style.backgroundColor='rgba(99, 102, 241, 0.3)'; this.style.transform='scale(1.05)';" 
+                                   onmouseout="this.style.backgroundColor='rgba(99, 102, 241, 0.2)'; this.style.transform='scale(1)';">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="#6366F1" style="transform: rotate(45deg); transition: all 0.25s ease-in-out;">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                                 </svg>
                             </button>
@@ -483,12 +486,14 @@ export const ModalModule = {
                     </div>
 
                     <!-- CTA Section -->
-                    <div class="px-6 pt-2 pb-5" style="height: 108px;">
+                    <div class="px-6 pt-2 pb-2" style="height: 120px;">
                         <div class="border-t" style="border-color: #D5D2DC; padding-top: 25px; margin-top: 0; display: flex; justify-content: flex-start; align-items: center; height: calc(100% - 25px);">
                             <a href="${Utils.escapeHTML(url)}" 
                                target="_blank" 
                                class="text-center rounded-full flex items-center justify-center"
-                               style="height: 44px; width: 176px; background-color: white; color: black; border: 1px solid black; transition: all 0.3s;">
+                               style="height: 44px; width: 176px; background-color: white; color: black; border: 1px solid black; transition: all 0.25s ease-in-out;"
+                               onmouseover="this.style.borderColor='#6232FF'; this.style.borderWidth='2px';"
+                               onmouseout="this.style.borderColor='black'; this.style.borderWidth='1px';">
                                 Ver oportunidad
                             </a>
                         </div>
