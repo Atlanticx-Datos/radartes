@@ -391,20 +391,34 @@ export const ModalModule = {
             
             modalContent.innerHTML = `
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden" style="border-radius: 12px;">
-                    <!-- New Header Section with Category and Share Icon -->
-                    <div class="px-6 py-3 flex justify-between items-center" style="height: 44px;">
+                    <!-- Header Section with completely restructured icon layout -->
+                    <div class="px-6 py-5 flex justify-between items-center">
                         <div class="flex items-center">
-                            <span class="text-sm font-medium text-white px-3 py-1 rounded-full" style="background-color: #6366F1; margin-top: 24px;">${Utils.escapeHTML(categoria || '')}</span>
+                            <span class="text-sm font-medium text-white px-3 py-1 rounded-full" style="background-color: #6366F1;">${Utils.escapeHTML(categoria || '')}</span>
                         </div>
-                        <div class="flex items-center" style="margin-right: 12px;">
-                            <button type="button" class="share-toggle-btn flex items-center justify-center rounded-full" 
-                                   style="width: 32px; height: 32px; background-color: rgba(99, 102, 241, 0.2); transition: all 0.25s ease-in-out;"
-                                   onmouseover="this.style.backgroundColor='rgba(99, 102, 241, 0.3)'; this.style.transform='scale(1.05)';" 
-                                   onmouseout="this.style.backgroundColor='rgba(99, 102, 241, 0.2)'; this.style.transform='scale(1)';">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="#6366F1" style="transform: rotate(45deg); transition: all 0.25s ease-in-out;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                </svg>
-                            </button>
+                        <div style="display: flex; align-items: center;">
+                            ${window.isUserLoggedIn ? `
+                            <div style="margin-right: 36px;">
+                                <button type="button" id="save-opportunity-btn" class="flex items-center justify-center rounded-full" 
+                                       style="width: 32px; height: 32px; background-color: rgba(98, 50, 255, 0.2); transition: all 0.25s ease-in-out;"
+                                       onmouseover="this.style.backgroundColor='rgba(98, 50, 255, 0.3)'; this.style.transform='scale(1.05)';" 
+                                       onmouseout="this.style.backgroundColor='rgba(98, 50, 255, 0.2)'; this.style.transform='scale(1)';">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="#6232FF">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                </button>
+                            </div>
+                            ` : ''}
+                            <div style="">
+                                <button type="button" class="share-toggle-btn flex items-center justify-center rounded-full mt-1" 
+                                       style="width: 32px; height: 32px; background-color: rgba(98, 50, 255, 0.2); transition: all 0.25s ease-in-out;"
+                                       onmouseover="this.style.backgroundColor='rgba(98, 50, 255, 0.3)'; this.style.transform='scale(1.05)';" 
+                                       onmouseout="this.style.backgroundColor='rgba(98, 50, 255, 0.2)'; this.style.transform='scale(1)';">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="#6232FF" style="transform: rotate(45deg) translate(1px, -2px); transition: all 0.25s ease-in-out; position: relative;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                         <div class="share-dropdown hidden absolute right-4 top-16 mt-1 w-40 bg-white border rounded-md shadow-lg z-52">
                             <button class="share-option w-full text-left px-4 py-2 hover:bg-gray-100" data-action="copy">
@@ -422,15 +436,15 @@ export const ModalModule = {
                         </div>
                     </div>
 
-                    <!-- Title and Details Section -->
-                    <div class="px-6 pt-5 pb-3" style="height: 120px; overflow-y: auto; width: 100%;">
+                    <!-- Title and Details Section - reduced spacing from header -->
+                    <div class="px-6 pb-2" style="overflow-y: auto; width: 100%;">
                         <!-- Title -->
-                        <h3 style="font-family: Inter; font-weight: 700; font-size: 18px; line-height: 150%; letter-spacing: 0%; color: #1F1B2D; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;" title="${Utils.escapeHTML(displayTitle || nombre || '')}">
+                        <h3 style="font-family: Inter; font-weight: 700; font-size: 18px; line-height: 1.3; letter-spacing: 0%; color: #1F1B2D; margin-bottom: 10px; overflow: hidden; text-overflow: ellipsis; width: 100%;" title="${Utils.escapeHTML(displayTitle || nombre || '')}">
                             ${Utils.escapeHTML(displayTitle || nombre || '')}
                         </h3>
                         
                         <!-- Inline Details: Location, Payment, Subdisciplines -->
-                        <div class="flex flex-col gap-1" style="font-family: Inter; font-weight: 400; font-size: 12px; color: #666276; line-height: 150%; letter-spacing: 0%;">
+                        <div class="flex flex-col" style="gap: 6px; font-family: Inter; font-weight: 400; font-size: 12px; color: #666276; line-height: 1.3; letter-spacing: 0%;">
                             <!-- First row: Location, Payment, and Main Discipline -->
                             <div class="flex items-center gap-4">
                                 <div class="flex items-center gap-1">
@@ -458,7 +472,7 @@ export const ModalModule = {
                             </div>
                             
                             <!-- Always show closing date -->
-                            <div class="flex items-center gap-1 mt-1">
+                            <div class="flex items-center gap-1">
                                 <svg class="w-3 h-3" viewBox="0 0 20 20" fill="#6232FF">
                                     <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
                                 </svg>
@@ -469,25 +483,25 @@ export const ModalModule = {
                         </div>
                     </div>
                     
-                    <!-- Resumen Section -->
-                    <div class="px-6 pt-2 pb-4" style="overflow-y: auto;">
-                        <div class="border-t" style="border-color: #D5D2DC; padding-top: 20px; margin-top: 0;">
-                            <h4 style="font-family: Inter; font-weight: 700; font-size: 18px; line-height: 150%; letter-spacing: 0%; color: #666276; margin-bottom: 4px;">Resumen</h4>
-                            <p style="font-family: Inter; font-weight: 400; font-size: 14px; line-height: 150%; letter-spacing: 0%; color: #666276;">${Utils.escapeHTML(og_resumida || '')}</p>
+                    <!-- Resumen Section - increased spacing from info section -->
+                    <div class="px-6 pt-4 pb-5" style="overflow-y: auto;">
+                        <div class="border-t" style="border-color: #D5D2DC; padding-top: 16px; margin-top: 0;">
+                            <h4 style="font-family: Inter; font-weight: 700; font-size: 16px; line-height: 1.3; letter-spacing: 0%; color: #666276; margin-bottom: 8px;">Resumen</h4>
+                            <p style="font-family: Inter; font-weight: 400; font-size: 14px; line-height: 1.4; letter-spacing: 0%; color: #666276;">${Utils.escapeHTML(og_resumida || '')}</p>
                             
                             <!-- Requisitos Section (if available) -->
                             ${requisitos ? `
-                            <div style="border-top: 1px solid #D5D2DC; padding-top: 20px; margin-top: 20px;">
-                                <h4 style="font-family: Inter; font-weight: 700; font-size: 18px; line-height: 150%; letter-spacing: 0%; color: #666276; margin-bottom: 4px;">Requisitos</h4>
-                                <p style="font-family: Inter; font-weight: 400; font-size: 14px; line-height: 150%; letter-spacing: 0%; color: #666276;">${Utils.escapeHTML(requisitos)}</p>
+                            <div style="border-top: 1px solid #D5D2DC; padding-top: 16px; margin-top: 16px;">
+                                <h4 style="font-family: Inter; font-weight: 700; font-size: 16px; line-height: 1.3; letter-spacing: 0%; color: #666276; margin-bottom: 8px;">Requisitos</h4>
+                                <p style="font-family: Inter; font-weight: 400; font-size: 14px; line-height: 1.4; letter-spacing: 0%; color: #666276;">${Utils.escapeHTML(requisitos)}</p>
                             </div>
                             ` : ''}
                         </div>
                     </div>
 
-                    <!-- CTA Section -->
-                    <div class="px-6 pt-2 pb-2" style="height: 120px;">
-                        <div class="border-t" style="border-color: #D5D2DC; padding-top: 25px; margin-top: 0; display: flex; justify-content: flex-start; align-items: center; height: calc(100% - 25px);">
+                    <!-- CTA Section - increased spacing from resumen section -->
+                    <div class="px-6 pt-3 pb-5" style="min-height: 100px;">
+                        <div class="border-t" style="border-color: #D5D2DC; padding-top: 20px; margin-top: 0; display: flex; justify-content: flex-start; align-items: center;">
                             <a href="${Utils.escapeHTML(url)}" 
                                target="_blank" 
                                class="text-center rounded-full flex items-center justify-center"
@@ -565,6 +579,95 @@ export const ModalModule = {
                         const action = option.dataset.action;
                         this.handleShare(action, url, nombre);
                         shareDropdown.classList.add('hidden');
+                    });
+                });
+            }
+            
+            // Add event handler for the save button if it exists
+            const saveButton = modalContent.querySelector('#save-opportunity-btn');
+            if (saveButton && window.isUserLoggedIn) {
+                // Check if the opportunity is already saved
+                fetch(`/is_opportunity_saved?page_id=${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.is_saved) {
+                        // Update the button to show it's already saved
+                        saveButton.querySelector('svg').setAttribute('fill', '#6232FF');
+                        saveButton.querySelector('svg').setAttribute('stroke', 'white');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking if opportunity is saved:', error);
+                });
+                
+                saveButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    
+                    // Get CSRF token
+                    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+                    if (!csrfToken) {
+                        console.error('No CSRF token found');
+                        return;
+                    }
+                    
+                    // Create form data
+                    const formData = new FormData();
+                    formData.append('page_id', id);
+                    formData.append('csrf_token', csrfToken);
+                    
+                    // Show loading state
+                    saveButton.disabled = true;
+                    const originalSvg = saveButton.innerHTML;
+                    saveButton.innerHTML = '<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+                    
+                    // Send save request
+                    fetch('/save_from_modal', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => {
+                        // Reset button state
+                        saveButton.disabled = false;
+                        saveButton.innerHTML = originalSvg;
+                        
+                        if (response.ok) {
+                            // Show success message
+                            if (window.Utils && window.Utils.showAlert) {
+                                window.Utils.showAlert('Oportunidad guardada exitosamente', 'success');
+                            } else {
+                                alert('Oportunidad guardada exitosamente');
+                            }
+                            
+                            // Change the button color to indicate it's saved
+                            saveButton.querySelector('svg').setAttribute('fill', '#6232FF');
+                            saveButton.querySelector('svg').setAttribute('stroke', 'white');
+                            
+                            // Refresh saved opportunities
+                            this.refreshSavedOpportunities();
+                        } else {
+                            throw new Error('Error saving opportunity');
+                        }
+                    })
+                    .catch(error => {
+                        // Reset button state
+                        saveButton.disabled = false;
+                        saveButton.innerHTML = originalSvg;
+                        
+                        console.error('Error saving opportunity:', error);
+                        if (window.Utils && window.Utils.showAlert) {
+                            window.Utils.showAlert('Error al guardar la oportunidad', 'error');
+                        } else {
+                            alert('Error al guardar la oportunidad');
+                        }
                     });
                 });
             }

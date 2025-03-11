@@ -15,6 +15,19 @@ import { SubscribeModule } from './modules/subscribe.js';
 import { SharingModule } from './modules/sharing.js';
 import { SharingTestModule } from './modules/sharing-test.js';
 import { processDestacarData } from './modules/data-processor.js';
+import { CONSTANTS } from './constants.js';
+
+// Set global variable to check if user is logged in
+// This is used by various modules to conditionally show UI elements
+window.isUserLoggedIn = (
+  // Check for user menu button (visible when logged in)
+  document.querySelector('#user-menu-button') !== null || 
+  // Check for user session data in the body tag (alternative method)
+  document.body.classList.contains('user-logged-in') ||
+  // Check if we're on a page that requires login
+  window.location.pathname === '/mi_espacio' || 
+  window.location.pathname === '/saved_opportunities'
+);
 
 // Expose modules to window object using a more reliable approach
 function exposeModules() {

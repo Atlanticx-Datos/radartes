@@ -229,7 +229,7 @@
     </style>
 </head>
 
-<body class="flex justify-center max-sm:items-start bg-gray-800 min-h-screen" data-route="{{ request.endpoint }}">
+<body class="flex justify-center max-sm:items-start bg-gray-800 min-h-screen{% if session.get('user') %} user-logged-in{% endif %}" data-route="{{ request.endpoint }}">
 
     <!-- Alert container -->
     <div id="alert-container" hx-preserve="true"></div>

@@ -2035,6 +2035,23 @@ def save_from_modal():
         app.logger.error(f"Error in save_from_modal: {str(e)}")
         return jsonify({"error": str(e)}), 400
 
+@app.route("/is_opportunity_saved", methods=["GET"])
+@login_required
+def is_opportunity_saved():
+    try:
+        user_id = session["user"]["sub"]
+        page_id = request.args.get("page_id")
+        
+        if not page_id:
+            return jsonify({"error": "Missing opportunity ID"}), 400
+            
+        is_saved = is_opportunity_already_saved(user_id, page_id)
+        return jsonify({"is_saved": is_saved}), 200
+        
+    except Exception as e:
+        app.logger.error(f"Error in is_opportunity_saved: {str(e)}")
+        return jsonify({"error": str(e)}), 400
+
 @app.route("/subscribe", methods=["POST"])
 def subscribe():
     try:

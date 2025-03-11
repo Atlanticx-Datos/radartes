@@ -288,11 +288,13 @@ export const DestacarModule = {
                         <span class="discipline-badge ${disciplineClass}">
                             ${Utils.escapeHTML(mainDiscipline)}
                         </span>
+                        ${window.isUserLoggedIn ? `
                         <button class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                             </svg>
                         </button>
+                        ` : ''}
                     </div>
                     
                     <div class="p-2">
@@ -364,6 +366,10 @@ export const DestacarModule = {
                     console.error('ModalModule not found or showPreviewModal not available');
                 }
             });
+            
+            // We're removing the separate event handler for the heart icon
+            // The heart icon will just be a visual indicator that the user is logged in
+            // The actual save functionality will be in the modal
         });
     },
 

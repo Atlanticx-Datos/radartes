@@ -54,17 +54,16 @@ export const TopModule = {
         const formattedDate = this.formatDate(currentPage.fecha_de_cierre);
         
         // Extract category and name
-        let category = 'Beca';
-        let name = currentPage.nombre_original;
+        let category = currentPage.categoria || '';
+        let name = currentPage.nombre || '';
         
-        if (currentPage.nombre_original && currentPage.nombre_original.includes('︱')) {
-            const parts = currentPage.nombre_original.split('︱');
-            if (parts.length > 1) {
+        // If name contains category with a separator, extract it
+        if (name.includes('|')) {
+            const parts = name.split('|');
+            if (parts.length > 1 && !category) {
                 category = parts[0].trim();
                 name = parts[1].trim();
             }
-        } else if (currentPage.categoria) {
-            category = currentPage.categoria;
         }
 
         container.innerHTML = `
@@ -74,11 +73,13 @@ export const TopModule = {
                         <span class="top-opportunity-badge category">${Utils.escapeHTML(category)}</span>
                         <span class="top-opportunity-badge discipline-tag ${disciplineClass}">${Utils.escapeHTML(this.getMainDiscipline(currentPage.disciplina))}</span>
                     </div>
+                    ${window.isUserLoggedIn ? `
                     <div class="top-opportunity-favorite">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
                     </div>
+                    ` : ''}
                     <img src="${currentPage.image_url || '/static/public/IsoAtx.png'}" alt="${Utils.escapeHTML(name)}" onerror="this.src='/static/public/IsoAtx.png'">
                 </div>
                 <div class="top-opportunity-content">
