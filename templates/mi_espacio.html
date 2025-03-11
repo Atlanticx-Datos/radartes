@@ -1,57 +1,47 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
 
 {% block body %}
-<div class="w-full max-w-4xl mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold mb-6">
-        {% if user_name %}
-            ¡Bienvenido/a {{ user_name|title }} a tu espacio!
-        {% else %}
-            ¡Tu espacio personal!
-        {% endif %}
-    </h1>
+<!-- Header section with background and breadcrumb -->
+<header class="bg-gray-50 h-[180px] w-full flex items-center">
+    <div class="container mx-auto px-4">
+        <nav class="text-sm mb-4">
+            <a href="/" class="text-gray-600 hover:text-gray-900">Home</a>
+            <span class="mx-2 text-gray-400">&rsaquo;</span>
+            <span class="text-[#6232FF]">Mi cuenta</span>
+        </nav>
+        <h1 class="text-[28px] text-gray-900 text-center">
+            {% if user_name %}
+                Bienvenido <span class="text-[#6232FF]">{{ user_name|title }}</span> a tu espacio
+            {% else %}
+                ¡Bienvenido a <span class="text-[#6232FF]">tu espacio</span>!
+            {% endif %}
+        </h1>
+    </div>
+</header>
 
-    <div class="space-y-8">
-        <!-- Preferences Section -->
-        <section class="bg-white shadow-lg rounded-lg p-6">
-            <h2 class="text-xl font-semibold mb-4">Tus Preferencias</h2>
-            <p class="text-gray-600 mb-6">
-                Selecciona las disciplinas que te interesan para personalizar tu experiencia.
-            </p>
-            
-            <form method="POST" action="{{ url_for('mi_espacio') }}" class="space-y-6" data-form-type="mi-espacio">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <!-- Disciplines Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {% for discipline in disciplines %}
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="disciplines" 
-                               value="{{ discipline }}" id="{{ discipline }}"
-                               {% if normalize_discipline(discipline) in selected_disciplines %}checked{% endif %}>
-                        <label class="form-check-label" for="{{ discipline }}">
-                            {{ discipline }}
-                        </label>
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <!-- Newsletter Subscription -->
-                <div class="mt-8 border-t pt-6">
-                    <div class="flex items-start space-x-4">
+<!-- Main content -->
+<main class="container mx-auto px-4 py-8 bg-gray-50">
+    <div class="grid grid-cols-1 gap-8">
+        <!-- Newsletter Subscription Card -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden h-[120px]" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
+            <div class="flex flex-col md:flex-row h-full">
+                <div class="w-full md:w-2/3 p-4 overflow-y-auto">
+                    <div class="flex items-center">
                         <div class="flex-1">
-                            <h3 class="text-lg font-medium text-gray-900 mb-2">Newsletter (Opcional)</h3>
-                            <p class="text-gray-600 text-sm mb-4">
-                                Recibe notificaciones por correo sobre nuevas oportunidades en las disciplinas seleccionadas.
-                                Puedes cancelar la suscripción en cualquier momento. Si decides no darnos tu correo, no te enviaremos notificaciones.
-                            </p>
+                            <h2 class="text-lg font-semibold text-gray-900">Newsletter (Opcional)</h2>
+                            <p class="text-sm text-gray-600">Recibe notificaciones sobre nuevas oportunidades.</p>
+                        </div>
+                        <div class="w-1/2">
                             <div class="relative">
                                 <input type="email" 
                                        name="email" 
-                                       class="w-full px-3 py-2 border rounded-lg pr-12" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" 
                                        placeholder="tucorreo@ejemplo.com"
-                                       value="{{ existing_email if existing_email }}">
+                                       value="{{ existing_email if existing_email }}"
+                                       form="preferences-form">
                                 {% if existing_email %}
                                 <span class="absolute right-3 top-1/2 -translate-y-1/2">
-                                    <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                     </svg>
                                 </span>
@@ -60,50 +50,283 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Save Button -->
-                <div class="flex justify-end pt-4">
-                    <button type="submit" 
-                            class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium">
-                        Guardar Cambios
-                    </button>
+                <div class="w-full md:w-1/3 bg-gray-50 p-2 flex items-center justify-center">
+                    <img src="{{ url_for('static', filename='public/suscripcion.png') }}" alt="Suscripción" class="h-[80px] w-auto object-contain">
                 </div>
-            </form>
-        </section>
-
-        <!-- Saved Opportunities Section -->
-        <section class="bg-white shadow-lg rounded-lg p-6">
-            <h2 class="text-xl font-semibold mb-4">Tus Oportunidades Guardadas</h2>
-            <div class="overflow-x-auto rounded-lg border border-gray-200">
-                <table class="results-table w-full table-fixed border-collapse">
-                    <thead>
-                        <tr>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
-                                Oportunidad
-                            </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
-                                Disciplina
-                            </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
-                                País
-                            </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
-                                $
-                            </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
-                                Cierre
-                            </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
-                                Acciones
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="saved-opportunities-list">
-                        {% include "_saved_opportunities_list.html" %}
-                    </tbody>
-                </table>
             </div>
-        </section>
+        </div>
+
+        <!-- Disciplines Card -->
+        <form id="preferences-form" method="POST" action="{{ url_for('mi_espacio') }}" class="space-y-6" data-form-type="mi-espacio">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden h-[160px]" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
+                <div class="flex flex-col md:flex-row h-full">
+                    <div class="w-full md:w-2/3 p-4 overflow-y-auto">
+                        <div class="flex flex-col h-full">
+                            <div class="mb-2">
+                                <h2 class="text-lg font-semibold text-gray-900">Disciplinas de interés</h2>
+                                <p class="text-sm text-gray-600">Selecciona las disciplinas que te interesan.</p>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 overflow-y-auto flex-1">
+                                {% for discipline in disciplines %}
+                                <div class="form-check">
+                                    <input class="form-check-input h-3 w-3 text-[#6232FF] border-gray-300 rounded" 
+                                           type="checkbox" 
+                                           name="disciplines" 
+                                           value="{{ discipline }}" 
+                                           id="{{ discipline }}"
+                                           {% if normalize_discipline(discipline) in selected_disciplines %}checked{% endif %}>
+                                    <label class="form-check-label ml-1 text-xs text-gray-700" for="{{ discipline }}">
+                                        {{ discipline }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="mt-2">
+                                <button type="submit" 
+                                        class="bg-[#6232FF] text-white px-4 py-1 text-sm rounded-lg hover:bg-[#4925CC] transition-colors font-medium">
+                                    Guardar preferencias
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/3 bg-gray-50 p-2 flex items-center justify-center">
+                        <img src="{{ url_for('static', filename='public/disciplinas.png') }}" alt="Disciplinas" class="h-[100px] w-auto object-contain">
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Saved Opportunities Card -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
+            <div class="p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Oportunidades guardadas</h2>
+                <div class="results-table-container">
+                    <table class="results-table w-full table-fixed border-collapse">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="oportunidad-col">Oportunidad</th>
+                                <th scope="col" class="disciplina-col">Disciplina</th>
+                                <th scope="col" class="pais-col">País</th>
+                                <th scope="col" class="pago-col">$</th>
+                                <th scope="col" class="cierre-col">Cierre</th>
+                                <th scope="col" class="accion-col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="saved-opportunities-list">
+                            {% include "_saved_opportunities_list.html" %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination-container mt-4">
+                    <div class="pagination-info">
+                        Filas por página: 
+                        <select id="rows-per-page" class="border rounded px-2 py-1 ml-2">
+                            <option value="5" selected>5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                            <option value="20">20</option>
+                        </select>
+                    </div>
+                    
+                    <div class="pagination-controls">
+                        <button id="prev-page" class="pagination-button disabled">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        
+                        <span id="page-info">Página 1 de 1</span>
+                        
+                        <button id="next-page" class="pagination-button disabled">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-{% endblock %} 
+</main>
+
+<style>
+    /* Override body background color */
+    body {
+        background-color: #F9FAFB !important; /* gray-50 with !important to override any other styles */
+    }
+    
+    /* Override main element background */
+    main.w-full.flex.flex-col.max-sm\:rounded-lg {
+        background-color: #F9FAFB !important;
+    }
+    
+    /* Override flex-1 div background */
+    main.w-full.flex.flex-col.max-sm\:rounded-lg > div.flex-1 {
+        background-color: #F9FAFB !important;
+    }
+    
+    /* Style for the "Ver" button */
+    .preview-btn {
+        background-color: #EDE9FE;
+        color: #6232FF;
+        border-radius: 16px;
+        padding: 6px 16px;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+    
+    .preview-btn:hover {
+        background-color: #DDD6FE;
+    }
+    
+    /* Style for the delete button */
+    [hx-delete] {
+        background-color: #F3F4F6;
+        color: #111827; /* gray-900 */
+        border-radius: 16px;
+        padding: 6px 10px;
+        transition: all 0.2s;
+    }
+    
+    [hx-delete]:hover {
+        background-color: #E5E7EB;
+    }
+    
+    /* Pagination styles */
+    .pagination-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 1rem;
+    }
+    
+    .pagination-info {
+        display: flex;
+        align-items: center;
+        font-size: 0.875rem;
+        color: #4B5563;
+    }
+    
+    .pagination-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .pagination-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 0.375rem;
+        background-color: #F9FAFB;
+        color: #4B5563;
+        transition: all 0.2s;
+    }
+    
+    .pagination-button:hover:not(.disabled) {
+        background-color: #F3F4F6;
+        color: #111827;
+    }
+    
+    .pagination-button.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    /* Hide rows that don't belong to the current page */
+    .results-table tbody tr.hidden-row {
+        display: none;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize pagination
+        const rowsPerPage = document.getElementById('rows-per-page');
+        const prevPageBtn = document.getElementById('prev-page');
+        const nextPageBtn = document.getElementById('next-page');
+        const pageInfo = document.getElementById('page-info');
+        const tableRows = document.querySelectorAll('#saved-opportunities-list tr');
+        
+        let currentPage = 1;
+        let rowsPerPageValue = 5; // Default value
+        
+        // Function to update the table display based on pagination
+        function updateTableDisplay() {
+            const totalRows = tableRows.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPageValue);
+            
+            // Update page info
+            pageInfo.textContent = `Página ${currentPage} de ${totalPages || 1}`;
+            
+            // Enable/disable pagination buttons
+            prevPageBtn.classList.toggle('disabled', currentPage <= 1);
+            nextPageBtn.classList.toggle('disabled', currentPage >= totalPages || totalPages === 0);
+            
+            // Show/hide rows based on current page
+            tableRows.forEach((row, index) => {
+                const startIndex = (currentPage - 1) * rowsPerPageValue;
+                const endIndex = startIndex + rowsPerPageValue - 1;
+                
+                if (index >= startIndex && index <= endIndex) {
+                    row.classList.remove('hidden-row');
+                } else {
+                    row.classList.add('hidden-row');
+                }
+            });
+        }
+        
+        // Initialize the table display
+        updateTableDisplay();
+        
+        // Handle rows per page change
+        if (rowsPerPage) {
+            rowsPerPage.addEventListener('change', function() {
+                rowsPerPageValue = parseInt(this.value);
+                currentPage = 1; // Reset to first page when changing rows per page
+                updateTableDisplay();
+                
+                // Save preference in localStorage
+                localStorage.setItem('savedOpportunitiesRowsPerPage', rowsPerPageValue);
+            });
+            
+            // Load saved preference if available
+            const savedRowsPerPage = localStorage.getItem('savedOpportunitiesRowsPerPage');
+            if (savedRowsPerPage) {
+                rowsPerPage.value = savedRowsPerPage;
+                rowsPerPageValue = parseInt(savedRowsPerPage);
+                updateTableDisplay();
+            }
+        }
+        
+        // Handle pagination navigation
+        prevPageBtn.addEventListener('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                updateTableDisplay();
+            }
+        });
+        
+        nextPageBtn.addEventListener('click', function() {
+            const totalRows = tableRows.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPageValue);
+            
+            if (currentPage < totalPages) {
+                currentPage++;
+                updateTableDisplay();
+            }
+        });
+        
+        // Force background color to be gray-50
+        document.body.style.backgroundColor = '#F9FAFB';
+        document.querySelector('main.w-full.flex.flex-col').style.backgroundColor = '#F9FAFB';
+        document.querySelector('div.flex-1').style.backgroundColor = '#F9FAFB';
+    });
+</script>
+{% endblock %}
