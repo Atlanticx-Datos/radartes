@@ -23,35 +23,73 @@
 <main class="container mx-auto px-4 py-8 bg-gray-50">
     <div class="grid grid-cols-1 gap-8">
         <!-- Newsletter Subscription Card -->
-        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden h-[120px]" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden h-[415px]" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
             <div class="flex flex-col md:flex-row h-full">
-                <div class="w-full md:w-2/3 p-4 overflow-y-auto">
-                    <div class="flex items-center">
-                        <div class="flex-1">
-                            <h2 class="text-lg font-semibold text-gray-900">Newsletter (Opcional)</h2>
-                            <p class="text-sm text-gray-600">Recibe notificaciones sobre nuevas oportunidades.</p>
+                <div class="w-full md:w-2/3 p-8 overflow-y-auto">
+                    <div class="flex flex-col">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-6 h-6 text-[#6232FF] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                            <h2 class="newsletter-title">Suscripción al Newsletter</h2>
                         </div>
-                        <div class="w-1/2">
-                            <div class="relative">
-                                <input type="email" 
-                                       name="email" 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" 
-                                       placeholder="tucorreo@ejemplo.com"
-                                       value="{{ existing_email if existing_email }}"
-                                       form="preferences-form">
-                                {% if existing_email %}
-                                <span class="absolute right-3 top-1/2 -translate-y-1/2">
-                                    <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                </span>
-                                {% endif %}
+                        <p class="newsletter-text">Recibí las mejores oportunidades directamente en tu correo.</p>
+                        <p class="newsletter-text mb-5">👉 Ingresá tu email y elegí con qué frecuencia queres recibir novedades:</p>
+                        
+                        <div class="relative mb-6">
+                            <input type="email" 
+                                   name="email" 
+                                   class="w-2/3 px-4 py-3 border border-gray-300 rounded-full newsletter-text bg-white" 
+                                   placeholder="tucorreo@ejemplo.com"
+                                   value="{{ existing_email if existing_email }}"
+                                   form="preferences-form">
+                            {% if existing_email %}
+                            <span class="absolute top-1/2 -translate-y-1/2" style="right: calc(100% - 62%);">
+                                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-6">
+                            <p class="radio-header mb-3">Frecuencia de envío:</p>
+                            <div class="flex flex-col space-y-3">
+                                <div class="flex items-center">
+                                    <input type="radio" 
+                                           id="quincenal" 
+                                           name="suscripcion" 
+                                           value="Quincenal" 
+                                           class="radio-input"
+                                           form="preferences-form"
+                                           {% if suscripcion == "Quincenal" %}checked{% endif %}
+                                           checked>
+                                    <label for="quincenal" class="radio-label">quincenal</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" 
+                                           id="mensual" 
+                                           name="suscripcion" 
+                                           value="Mensual" 
+                                           class="radio-input"
+                                           form="preferences-form"
+                                           {% if suscripcion == "Mensual" %}checked{% endif %}>
+                                    <label for="mensual" class="radio-label">mensual</label>
+                                </div>
                             </div>
+                        </div>
+                        
+                        <div>
+                            <button type="submit" 
+                                    class="subscribe-button"
+                                    form="preferences-form">
+                                Suscribirme
+                            </button>
                         </div>
                     </div>
                 </div>
-                <div class="w-full md:w-1/3 bg-gray-50 p-2 flex items-center justify-center">
-                    <img src="{{ url_for('static', filename='public/suscripcion.png') }}" alt="Suscripción" class="h-[80px] w-auto object-contain">
+                <div class="w-full md:w-1/3 bg-white p-4 flex items-center justify-center">
+                    <img src="{{ url_for('static', filename='public/suscripcion.png') }}" alt="Suscripción" class="h-auto w-full max-w-[320px] object-contain">
                 </div>
             </div>
         </div>
@@ -59,39 +97,45 @@
         <!-- Disciplines Card -->
         <form id="preferences-form" method="POST" action="{{ url_for('mi_espacio') }}" class="space-y-6" data-form-type="mi-espacio">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden h-[160px]" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
+            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden h-[390px]" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
                 <div class="flex flex-col md:flex-row h-full">
-                    <div class="w-full md:w-2/3 p-4 overflow-y-auto">
+                    <div class="w-full md:w-2/3 p-8 overflow-y-auto">
                         <div class="flex flex-col h-full">
-                            <div class="mb-2">
-                                <h2 class="text-lg font-semibold text-gray-900">Disciplinas de interés</h2>
-                                <p class="text-sm text-gray-600">Selecciona las disciplinas que te interesan.</p>
+                            <div class="flex items-center mb-4">
+                                <svg class="w-6 h-6 text-[#6232FF] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                </svg>
+                                <h2 class="newsletter-title">Disciplinas de interés</h2>
                             </div>
-                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 overflow-y-auto flex-1">
+                            <p class="newsletter-text">Personaliza los resultados seleccionando las áreas que más te interesan.</p>
+                            <p class="newsletter-text mb-3">👉 Elegí tus disciplinas favoritas y recibí oportunidades a medida:</p>
+                            
+                            <div class="grid grid-cols-2 gap-4 mb-6">
                                 {% for discipline in disciplines %}
-                                <div class="form-check">
-                                    <input class="form-check-input h-3 w-3 text-[#6232FF] border-gray-300 rounded" 
+                                <div class="flex items-center">
+                                    <input class="discipline-checkbox" 
                                            type="checkbox" 
                                            name="disciplines" 
                                            value="{{ discipline }}" 
                                            id="{{ discipline }}"
                                            {% if normalize_discipline(discipline) in selected_disciplines %}checked{% endif %}>
-                                    <label class="form-check-label ml-1 text-xs text-gray-700" for="{{ discipline }}">
+                                    <label class="discipline-label" for="{{ discipline }}">
                                         {{ discipline }}
                                     </label>
                                 </div>
                                 {% endfor %}
                             </div>
-                            <div class="mt-2">
+                            
+                            <div>
                                 <button type="submit" 
-                                        class="bg-[#6232FF] text-white px-4 py-1 text-sm rounded-lg hover:bg-[#4925CC] transition-colors font-medium">
-                                    Guardar preferencias
+                                        class="discipline-button">
+                                    Guardar preferencias y volver al inicio
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div class="w-full md:w-1/3 bg-gray-50 p-2 flex items-center justify-center">
-                        <img src="{{ url_for('static', filename='public/disciplinas.png') }}" alt="Disciplinas" class="h-[100px] w-auto object-contain">
+                    <div class="w-full md:w-1/3 bg-white p-4 flex items-center justify-center">
+                        <img src="{{ url_for('static', filename='public/disciplinas.png') }}" alt="Disciplinas" class="h-auto w-full max-w-[305px] object-contain">
                     </div>
                 </div>
             </div>
@@ -123,7 +167,7 @@
                 <div class="pagination-container mt-4">
                     <div class="pagination-info">
                         Filas por página: 
-                        <select id="rows-per-page" class="border rounded px-2 py-1 ml-2">
+                        <select id="rows-per-page" class="border rounded px-2 py-1 ml-2 bg-white">
                             <option value="5" selected>5</option>
                             <option value="10">10</option>
                             <option value="15">15</option>
@@ -133,16 +177,16 @@
                     
                     <div class="pagination-controls">
                         <button id="prev-page" class="pagination-button disabled">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                             </svg>
                         </button>
                         
                         <span id="page-info">Página 1 de 1</span>
                         
                         <button id="next-page" class="pagination-button disabled">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                             </svg>
                         </button>
                     </div>
@@ -166,6 +210,129 @@
     /* Override flex-1 div background */
     main.w-full.flex.flex-col.max-sm\:rounded-lg > div.flex-1 {
         background-color: #F9FAFB !important;
+    }
+    
+    /* Newsletter card typography */
+    .newsletter-title {
+        font-family: Inter, sans-serif;
+        font-weight: 700;
+        font-size: 24px;
+        line-height: 130%;
+        letter-spacing: 0%;
+        vertical-align: middle;
+        color: #111827;
+    }
+    
+    .newsletter-text {
+        font-family: Inter, sans-serif;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 150%;
+        letter-spacing: 0%;
+        color: #4B5563;
+    }
+    
+    .radio-header {
+        font-family: Inter, sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        line-height: 150%;
+        letter-spacing: 0%;
+        vertical-align: middle;
+        color: #111827;
+    }
+    
+    .radio-input {
+        width: 20px;
+        height: 20px;
+        accent-color: #6232FF;
+        cursor: pointer;
+    }
+    
+    .radio-label {
+        font-family: Inter, sans-serif;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 150%;
+        letter-spacing: 0%;
+        margin-left: 12px;
+        color: #4B5563;
+    }
+    
+    .subscribe-button {
+        height: 40px;
+        padding: 0 24px;
+        background-color: #6232FF;
+        color: white;
+        font-family: Inter, sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        border-radius: 9999px;
+        transition: background-color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .subscribe-button:hover {
+        background-color: #4925CC;
+    }
+    
+    /* Discipline card styles */
+    .discipline-checkbox {
+        appearance: none;
+        width: 15px;
+        height: 15px;
+        border-radius: 4px;
+        background-color: #BBB7C5;
+        cursor: pointer;
+        position: relative;
+        margin-right: 12px;
+    }
+    
+    .discipline-checkbox:checked {
+        background-color: #6232FF;
+        border-color: #6232FF;
+    }
+    
+    .discipline-checkbox:checked::after {
+        content: '';
+        position: absolute;
+        left: 4px;
+        top: 1px;
+        width: 5px;
+        height: 9px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+    
+    .discipline-label {
+        font-family: Inter, sans-serif;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 150%;
+        letter-spacing: 0%;
+        color: #4B5563;
+    }
+    
+    .discipline-button {
+        height: 40px;
+        padding: 0 24px;
+        background-color: #6232FF;
+        color: white;
+        font-family: Inter, sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        border-radius: 9999px;
+        transition: background-color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .discipline-button:hover {
+        background-color: #4925CC;
     }
     
     /* Style for the "Ver" button */
@@ -209,24 +376,26 @@
         align-items: center;
         font-size: 0.875rem;
         color: #4B5563;
+        margin-right: 2rem;
     }
     
     .pagination-controls {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: 1rem;
     }
     
     .pagination-button {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 2rem;
-        height: 2rem;
+        width: 2.5rem;
+        height: 2.5rem;
         border-radius: 0.375rem;
         background-color: #F9FAFB;
         color: #4B5563;
         transition: all 0.2s;
+        border: 1px solid #E5E7EB;
     }
     
     .pagination-button:hover:not(.disabled) {
@@ -242,6 +411,15 @@
     /* Hide rows that don't belong to the current page */
     .results-table tbody tr.hidden-row {
         display: none;
+    }
+    
+    /* Table styles for gray background */
+    .results-table thead {
+        background-color: #6232FF !important;
+    }
+    
+    .results-table tbody tr {
+        background-color: white !important;
     }
 </style>
 

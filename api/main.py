@@ -1783,6 +1783,7 @@ def mi_espacio():
         if request.method == "POST":
             disciplines = request.form.getlist('disciplines')
             email = request.form.get('email', '').strip()
+            suscripcion = request.form.get('suscripcion')
             
             if not disciplines:
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -1790,7 +1791,7 @@ def mi_espacio():
                 flash("Debes seleccionar al menos una disciplina", "error")
                 return redirect(url_for('mi_espacio'))
             
-            save_user_preferences(user_id, disciplines, email)
+            save_user_preferences(user_id, disciplines, email, suscripcion)
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return jsonify({
@@ -1813,6 +1814,7 @@ def mi_espacio():
             disciplines=MAIN_DISCIPLINES,
             selected_disciplines=list(preferences.get('disciplines', set())),
             existing_email=preferences.get('email', ''),
+            suscripcion=preferences.get('suscripcion', 'Quincenal'),
             saved_opportunities=saved_opportunities
         )
 
@@ -1829,10 +1831,11 @@ def mi_espacio():
             disciplines=MAIN_DISCIPLINES,
             selected_disciplines=[],
             existing_email='',
+            suscripcion='Quincenal',
             saved_opportunities=[]
         )
 
-def save_user_preferences(user_id, disciplines, email):
+def save_user_preferences(user_id, disciplines, email, suscripcion=None):
     """Save to OPORTUNIDADES_ID with proper Notion property formats"""
     try:
         page_id = get_existing_preferences_page_id(user_id)
@@ -1856,6 +1859,12 @@ def save_user_preferences(user_id, disciplines, email):
                 }
             }
         }
+        
+        # Add subscription frequency if provided and email exists
+        if email and suscripcion:
+            data["properties"]["Suscripcion"] = {
+                "rich_text": [{"text": {"content": suscripcion}}]
+            }
         
         # If creating new page
         if not page_id:
@@ -1913,7 +1922,7 @@ def get_existing_preferences(user_id):
         
         if not result:
             app.logger.info(f"No preferences found for user {user_id}")
-            return {'disciplines': set(), 'email': ''}
+            return {'disciplines': set(), 'email': '', 'suscripcion': 'Quincenal'}
 
         properties = result[0].get('properties', {})
         
@@ -1929,6 +1938,17 @@ def get_existing_preferences(user_id):
         email_prop = properties.get('Contact Email', {})
         raw_email = email_prop.get('email', '')
         
+        # Extract subscription frequency
+        suscripcion_prop = properties.get('Suscripcion', {})
+        raw_suscripcion = ''
+        if suscripcion_prop.get('rich_text'):
+            if len(suscripcion_prop['rich_text']) > 0:
+                raw_suscripcion = suscripcion_prop['rich_text'][0].get('text', {}).get('content', '')
+        
+        # Default to Quincenal if not specified
+        if not raw_suscripcion:
+            raw_suscripcion = 'Quincenal'
+        
         normalized_disciplines = set()
         if raw_disciplines and raw_disciplines != "newsletter_subscriber":
             for d in raw_disciplines.split(','):
@@ -1943,13 +1963,14 @@ def get_existing_preferences(user_id):
         return {
             'disciplines': normalized_disciplines,
             'email': raw_email,
+            'suscripcion': raw_suscripcion,
             'page_id': result[0]['id']
         }
 
     except Exception as e:
         app.logger.error(f"Error in get_existing_preferences: {str(e)}")
         app.logger.error(f"Traceback: {traceback.format_exc()}")
-        return {'disciplines': set(), 'email': ''}
+        return {'disciplines': set(), 'email': '', 'suscripcion': 'Quincenal'}
 
 def get_existing_preferences_page_id(user_id):
     """Get existing preferences page ID with debug logging"""
@@ -2055,11 +2076,22 @@ def is_opportunity_saved():
 @app.route("/subscribe", methods=["POST"])
 def subscribe():
     try:
-        data = request.get_json()
-        email = data.get('email')
+        data = request.get_json() if request.is_json else None
+        
+        if data:
+            # Handle JSON request (API)
+            email = data.get('email')
+            suscripcion = data.get('suscripcion', 'Quincenal')
+        else:
+            # Handle form submission
+            email = request.form.get('email')
+            suscripcion = request.form.get('suscripcion', 'Quincenal')
         
         if not email:
-            return jsonify({"error": "Email is required"}), 400
+            if request.is_json:
+                return jsonify({"error": "Email is required"}), 400
+            flash("El email es requerido", "error")
+            return redirect(url_for('mi_espacio'))
 
         # Check if email already exists in database
         url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
@@ -2081,18 +2113,43 @@ def subscribe():
         response = requests.post(url, headers=headers, json=query)
         if response.status_code != 200:
             app.logger.error(f"Notion API Error during email check: {response.text}")
-            return jsonify({"error": "Failed to check subscription status"}), 500
+            if request.is_json:
+                return jsonify({"error": "Failed to check subscription status"}), 500
+            flash("Error al verificar el estado de suscripción", "error")
+            return redirect(url_for('mi_espacio'))
 
         existing_subscription = response.json().get("results", [])
         
         if existing_subscription:
+            # Email already subscribed, update subscription frequency
+            page_id = existing_subscription[0]['id']
+            url = f"https://api.notion.com/v1/pages/{page_id}"
+            payload = {
+                "properties": {
+                    "Suscripcion": {
+                        "rich_text": [{"text": {"content": suscripcion}}]
+                    }
+                }
+            }
+            
+            response = requests.patch(url, headers=headers, json=payload)
+            if response.status_code != 200:
+                app.logger.error(f"Notion API Error updating subscription: {response.text}")
+                if request.is_json:
+                    return jsonify({"error": "Failed to update subscription"}), 500
+                flash("Error al actualizar la suscripción", "error")
+                return redirect(url_for('mi_espacio'))
+                
             # Email already subscribed
-            app.logger.info(f"Email {email} already subscribed")
-            return jsonify({
-                "message": "Ya estás suscrito al newsletter",
-                "email": email,
-                "already_subscribed": True
-            }), 200
+            app.logger.info(f"Email {email} already subscribed, updated frequency to {suscripcion}")
+            if request.is_json:
+                return jsonify({
+                    "message": "Suscripción actualizada correctamente",
+                    "email": email,
+                    "already_subscribed": True
+                }), 200
+            flash("Suscripción actualizada correctamente", "success")
+            return redirect(url_for('mi_espacio'))
 
         # If we get here, email is not subscribed yet
         user_id = session.get('user', {}).get('sub')
@@ -2110,6 +2167,9 @@ def subscribe():
                         },
                         "Preferences": {
                             "rich_text": [{"text": {"content": "newsletter_subscriber"}}]
+                        },
+                        "Suscripcion": {
+                            "rich_text": [{"text": {"content": suscripcion}}]
                         }
                     }
                 }
@@ -2131,6 +2191,9 @@ def subscribe():
                         },
                         "Preferences": {
                             "rich_text": [{"text": {"content": "newsletter_subscriber"}}]
+                        },
+                        "Suscripcion": {
+                            "rich_text": [{"text": {"content": suscripcion}}]
                         }
                     }
                 }
@@ -2153,6 +2216,9 @@ def subscribe():
                     },
                     "Preferences": {
                         "rich_text": [{"text": {"content": "newsletter_subscriber"}}]
+                    },
+                    "Suscripcion": {
+                        "rich_text": [{"text": {"content": suscripcion}}]
                     }
                 }
             }
@@ -2167,22 +2233,28 @@ def subscribe():
         
         if response.status_code not in [200, 201]:
             app.logger.error(f"Notion API Error: {response.text}")
-            return jsonify({"error": "Failed to save subscription"}), 500
-
-        # Update session if user is logged in
-        if user_id:
-            session['user']['email'] = email
-            session.modified = True
-
-        return jsonify({
-            "message": "¡Gracias por suscribirte!",
-            "email": email,
-            "already_subscribed": False
-        }), 200
-
+            if request.is_json:
+                return jsonify({"error": "Failed to save subscription"}), 500
+            flash("Error al guardar la suscripción", "error")
+            return redirect(url_for('mi_espacio'))
+            
+        app.logger.info(f"Successfully subscribed {email} with frequency {suscripcion}")
+        
+        if request.is_json:
+            return jsonify({
+                "message": "Suscripción exitosa",
+                "email": email
+            }), 201
+        
+        flash("Te has suscrito exitosamente al newsletter", "success")
+        return redirect(url_for('mi_espacio'))
+        
     except Exception as e:
-        app.logger.error(f"Subscription error: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        app.logger.error(f"Subscribe error: {str(e)}")
+        if request.is_json:
+            return jsonify({"error": str(e)}), 500
+        flash("Error al procesar la suscripción", "error")
+        return redirect(url_for('mi_espacio'))
 
 @app.errorhandler(404)
 def page_not_found(e):
