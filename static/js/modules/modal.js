@@ -306,6 +306,27 @@ export const ModalModule = {
                         return 'Confirmar en bases';
                     }
                     
+                    // TIMEZONE FIX: For YYYY-MM-DD format, parse parts manually to avoid timezone issues
+                    if (normalizedDateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                        console.log('Using timezone-safe parsing for YYYY-MM-DD format');
+                        const [year, month, day] = normalizedDateStr.split('-').map(Number);
+                        
+                        // Create date using UTC to avoid timezone shifts
+                        // Month is 0-indexed in JavaScript Date
+                        const monthIndex = month - 1;
+                        
+                        const monthMap = {
+                            0: 'Ene', 1: 'Feb', 2: 'Mar', 3: 'Abr', 4: 'May', 5: 'Jun',
+                            6: 'Jul', 7: 'Ago', 8: 'Sep', 9: 'Oct', 10: 'Nov', 11: 'Dic'
+                        };
+                        
+                        // Format with day zero-padded
+                        const formattedDay = String(day).padStart(2, '0');
+                        const formattedDate = `${formattedDay}/${monthMap[monthIndex]}/${year}`;
+                        console.log('Timezone-safe formatted date:', formattedDate);
+                        return formattedDate;
+                    }
+                    
                     // First try parsing as is
                     let date = new Date(normalizedDateStr);
                     console.log('First parse attempt result:', date, 'isValid:', !isNaN(date.getTime()));

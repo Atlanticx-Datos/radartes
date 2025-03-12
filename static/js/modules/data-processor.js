@@ -210,6 +210,19 @@ function createDestacarCard(item) {
 function formatDate(dateString) {
     if (!dateString) return 'Sin fecha de cierre';
     
+    // TIMEZONE FIX: For YYYY-MM-DD format, parse parts manually to avoid timezone issues
+    if (typeof dateString === 'string' && dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        console.log('Using timezone-safe parsing for YYYY-MM-DD format in data-processor.js');
+        const [year, month, day] = dateString.split('-').map(Number);
+        
+        // Format using Spanish locale with manual date construction
+        // This avoids timezone issues by not using the Date object's getDate method
+        const options = { month: 'long' };
+        const monthName = new Intl.DateTimeFormat('es-ES', options).format(new Date(year, month - 1, 15)); // Use day 15 to avoid month boundary issues
+        
+        return `${day} de ${monthName}, ${year}`;
+    }
+    
     try {
         const date = new Date(dateString);
         if (isNaN(date.getTime())) return dateString;

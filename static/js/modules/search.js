@@ -821,6 +821,25 @@ export const SearchModule = {
             if (!dateStr || dateStr === '1900-01-01') {
                 return 'Confirmar en bases';
             }
+            
+            // TIMEZONE FIX: For YYYY-MM-DD format, parse parts manually to avoid timezone issues
+            if (typeof dateStr === 'string' && dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                console.log('Using timezone-safe parsing for YYYY-MM-DD format in search.js');
+                const [year, month, day] = dateStr.split('-').map(Number);
+                
+                // Month is 0-indexed in JavaScript Date
+                const monthIndex = month - 1;
+                
+                const monthMap = {
+                    0: 'Ene', 1: 'Feb', 2: 'Mar', 3: 'Abr', 4: 'May', 5: 'Jun',
+                    6: 'Jul', 7: 'Ago', 8: 'Sep', 9: 'Oct', 10: 'Nov', 11: 'Dic'
+                };
+                
+                // Format with day zero-padded
+                const formattedDay = String(day).padStart(2, '0');
+                return `${formattedDay}/${monthMap[monthIndex]}/${year}`;
+            }
+            
             try {
                 const date = new Date(dateStr);
                 const day = String(date.getDate()).padStart(2, '0');

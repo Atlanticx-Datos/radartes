@@ -140,6 +140,18 @@ export const TopModule = {
             return 'Confirmar en bases';
         }
         
+        // TIMEZONE FIX: For YYYY-MM-DD format, parse parts manually to avoid timezone issues
+        if (typeof dateStr === 'string' && dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            console.log('Using timezone-safe parsing for YYYY-MM-DD format in top.js');
+            const [year, month, day] = dateStr.split('-').map(Number);
+            
+            // Format as DD/MM/YYYY with zero-padding
+            const formattedDay = String(day).padStart(2, '0');
+            const formattedMonth = String(month).padStart(2, '0');
+            
+            return `${formattedDay}/${formattedMonth}/${year}`;
+        }
+        
         try {
             const date = new Date(dateStr);
             if (isNaN(date.getTime())) {
