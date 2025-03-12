@@ -55,20 +55,13 @@ export const TopModule = {
         
         // Extract category and name
         let category = currentPage.categoria || '';
-        let name = currentPage.nombre || '';
         
-        // If name contains category with a separator, extract it
-        if (name.includes('|')) {
-            const parts = name.split('|');
-            if (parts.length > 1 && !category) {
-                category = parts[0].trim();
-                name = parts[1].trim();
-            }
-        }
-
+        // Extract the title using our helper function
+        let name = this.extractTitle(currentPage);
+        
         container.innerHTML = `
-            <div class="top-opportunity-card">
-                <div class="top-opportunity-image">
+            <div class="top-opportunity-card" style="display: flex; max-width: 1440px; margin: 0 auto; min-height: 430px;">
+                <div class="top-opportunity-image" style="width: 746px; flex-shrink: 0;">
                     <div class="top-opportunity-badges">
                         <span class="top-opportunity-badge category">${Utils.escapeHTML(category)}</span>
                         <span class="top-opportunity-badge discipline-tag ${disciplineClass}">${Utils.escapeHTML(this.getMainDiscipline(currentPage.disciplina))}</span>
@@ -80,43 +73,49 @@ export const TopModule = {
                         </svg>
                     </div>
                     ` : ''}
-                    <img src="${currentPage.image_url || '/static/public/IsoAtx.png'}" alt="${Utils.escapeHTML(name)}" onerror="this.src='/static/public/IsoAtx.png'">
+                    <img src="/static/public/conejos.jpg" alt="${Utils.escapeHTML(name)}" onerror="this.src='/static/public/IsoAtx.png'" style="width: 100%; height: auto;">
                 </div>
-                <div class="top-opportunity-content">
-                    <div>
-                        <h3 class="top-opportunity-title">${Utils.escapeHTML(name)}</h3>
-                        <div class="top-opportunity-meta">
-                            <div class="top-opportunity-location">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                ${Utils.escapeHTML(currentPage.país)}
-                            </div>
-                            <div class="top-opportunity-discipline">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                                </svg>
-                                ${Utils.escapeHTML(this.getMainDiscipline(currentPage.disciplina))}
-                            </div>
-                            <div class="top-opportunity-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                ${formattedDate}
-                            </div>
+                <div class="top-opportunity-content" style="flex: 1; padding: 24px; display: flex; flex-direction: column;">
+                    <h3 class="top-opportunity-title" style="font-family: Inter; font-weight: 700; font-size: 24px; line-height: 130%; letter-spacing: 0%; vertical-align: middle; margin-bottom: 0px;">${Utils.escapeHTML(name)}</h3>
+                    
+                    <div class="top-opportunity-meta" style="display: flex; flex-direction: column; gap: 2px; margin-bottom: 0px;">
+                        <div class="top-opportunity-location" style="font-family: Inter; font-weight: 400; font-size: 14px; line-height: 150%; letter-spacing: 0%; display: flex; align-items: center; gap: 4px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 16px; height: 16px; min-width: 16px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span>${Utils.escapeHTML(currentPage.país)}</span>
                         </div>
-                        <div class="top-opportunity-description">
-                            ${currentPage.og_resumida ? 
-                                Utils.escapeHTML(currentPage.og_resumida.length > 150 ? 
-                                    currentPage.og_resumida.substring(0, 150) + '...' : 
-                                    currentPage.og_resumida) : 
-                                'Sin descripción disponible'}
+                        <div class="top-opportunity-inscription" style="font-family: Inter; font-weight: 400; font-size: 14px; line-height: 150%; letter-spacing: 0%; display: flex; align-items: center; gap: 4px; color: #666276;">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 16px; height: 16px; min-width: 16px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span>${Utils.escapeHTML(currentPage.inscripcion || 'No especificado')}</span>
+                        </div>
+                        <div class="top-opportunity-discipline" style="font-family: Inter; font-weight: 400; font-size: 14px; line-height: 150%; letter-spacing: 0%; display: flex; align-items: center; gap: 4px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 16px; height: 16px; min-width: 16px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                            </svg>
+                            <span>${Utils.escapeHTML(this.getMainDiscipline(currentPage.disciplina))}</span>
+                        </div>
+                        <div class="top-opportunity-date" style="font-family: Inter; font-weight: 400; font-size: 14px; line-height: 150%; letter-spacing: 0%; display: flex; align-items: center; gap: 4px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 16px; height: 16px; min-width: 16px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span>${formattedDate}</span>
                         </div>
                     </div>
+                    
+                    <div class="top-opportunity-description" style="font-family: Inter; font-weight: 400; font-size: 14px; line-height: 150%; margin-top: 0px; margin-bottom: 0px; display: block; -webkit-line-clamp: initial; -webkit-box-orient: initial; overflow: visible;">
+                        ${currentPage.og_resumida ? 
+                            Utils.escapeHTML(currentPage.og_resumida) : 
+                            'Sin descripción disponible'}
+                    </div>
+                    
                     <button 
                         type="button"
                         class="top-opportunity-button"
+                        style="margin-top: 24px; align-self: flex-start; margin-bottom: 16px;"
                         data-url="${Utils.escapeHTML(currentPage.url)}"
                         data-nombre="${Utils.escapeHTML(currentPage.nombre)}"
                         data-pais="${Utils.escapeHTML(currentPage.país)}"
@@ -191,6 +190,60 @@ export const TopModule = {
             mainDiscipline.includes('film')) return 'cine';
         
         return 'otros';
+    },
+
+    // Helper function to extract the title from nombre
+    extractTitle(page) {
+        let title = '';
+        
+        // Check if nombre exists and is a string
+        if (page.nombre && typeof page.nombre === 'string') {
+            // Define all possible separator characters
+            const separators = [
+                { char: '︱', name: 'PRESENTATION FORM FOR VERTICAL EM DASH', code: 0xFE31 },
+                { char: '⎮', name: 'INTEGRAL EXTENSION', code: 0x23AE },
+                { char: '|', name: 'VERTICAL LINE', code: 0x007C },
+                { char: '｜', name: 'FULLWIDTH VERTICAL LINE', code: 0xFF5C },
+                { char: '│', name: 'BOX DRAWINGS LIGHT VERTICAL', code: 0x2502 },
+                { char: '┃', name: 'BOX DRAWINGS HEAVY VERTICAL', code: 0x2503 },
+                { char: '┊', name: 'BOX DRAWINGS LIGHT QUADRUPLE DASH VERTICAL', code: 0x250A },
+                { char: '┋', name: 'BOX DRAWINGS HEAVY QUADRUPLE DASH VERTICAL', code: 0x250B }
+            ];
+            
+            // Find the first separator that exists in the string
+            let foundSeparator = null;
+            let separatorIndex = -1;
+            
+            for (const separator of separators) {
+                const index = page.nombre.indexOf(separator.char);
+                if (index !== -1) {
+                    foundSeparator = separator;
+                    separatorIndex = index;
+                    break;
+                }
+            }
+            
+            // If we found a separator, split the string
+            if (foundSeparator) {
+                // Get the parts before and after the separator
+                const category = page.nombre.substring(0, separatorIndex).trim();
+                const name = page.nombre.substring(separatorIndex + 1).trim();
+                
+                if (name) {
+                    title = name;
+                } else {
+                    title = 'Sin título';
+                }
+            } else {
+                // If no separator found, use the full nombre
+                title = page.nombre.trim();
+            }
+        } else {
+            // Fallback if nombre is not available
+            title = 'Sin título';
+        }
+        
+        return title;
     },
 
     attachNavigationListeners() {

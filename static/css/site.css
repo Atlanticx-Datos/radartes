@@ -1066,6 +1066,21 @@ table[id*="results"] th {
    Purpose: Align trash icon with "Ver" buttons
    Why custom: Specific vertical alignment needed
 ==================================== */
+#results-counter {
+    margin-bottom: 16px;
+}
+
+#results-counter > div {
+    height: 21px;
+    padding: 24px 0;
+    display: flex;
+    align-items: center;
+}
+
+#results-counter > div > div {
+    line-height: 21px;
+}
+
 #results-counter button {
     height: 31px; /* Match the Ver button height */
     display: flex;

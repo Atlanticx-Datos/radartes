@@ -475,7 +475,11 @@ export const FilterModule = {
             
             if (!results.length) {
                 container.innerHTML = '<p class="text-center text-gray-500 my-8">No se encontraron resultados.</p>';
-                counter.textContent = '0 resultados encontrados';
+                counter.innerHTML = `
+                    <div class="flex justify-between items-center w-full" style="height: 21px; padding: 24px 0;">
+                        <div style="line-height: 21px;">0 resultados encontrados</div>
+                    </div>
+                `;
                 return;
             }
             
@@ -501,7 +505,11 @@ export const FilterModule = {
                 </div>
             `).join('');
             
-            counter.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''}`;
+            counter.innerHTML = `
+                <div class="flex justify-between items-center w-full" style="height: 21px; padding: 24px 0;">
+                    <div style="line-height: 21px;">${results.length} resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''}</div>
+                </div>
+            `;
             
             // Scroll to results if requested
             if (shouldScroll && results.length > 0) {

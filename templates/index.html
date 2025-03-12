@@ -153,7 +153,7 @@
 
 {% block body %}
 <!-- Full width header section -->
-<header class="relative w-full h-[550px] overflow-visible">
+<header class="relative w-full h-[500px] overflow-visible">
     <!-- Background image with overlay -->
     <div class="absolute inset-0 z-0">
         <div class="absolute inset-0" style="height: calc(100% + 2rem);">
@@ -511,7 +511,7 @@
     <div class="container max-w-[1440px] mx-auto px-8">
         <div class="pt-10 relative z-20">
             <!-- Filter buttons section -->
-            <div class="mb-14">
+            <div class="mb-12">
                 <h2 class="text-2xl font-bold mb-6 text-design-gray-900">Oportunidades por disciplina</h2>
                 <div class="filter-container">
                     <button
@@ -579,7 +579,7 @@
             </div>
 
             <!-- Destacados Section -->
-            <div class="mb-14 destacados-section">
+            <div class="mb-12 destacados-section">
                 <h2 class="text-2xl font-bold mb-8 text-design-gray-900">Destacados de la semana 🔥</h2>
                 <div class="relative">
                     <!-- Previous button -->
@@ -661,18 +661,18 @@
             </div>
 
             <!-- Results Section -->
-            <div class="mb-14">
-                <h2 id="radar-header" class="text-2xl font-bold mb-8 text-design-gray-900">Radar de oportunidades 🌎</h2>
+            <div class="mb-0">
+                <h2 id="radar-header" class="text-2xl font-bold mb-0 text-design-gray-900">Radar de oportunidades 🌎</h2>
                 <!-- Results Counter -->
-                <div class="text-sm text-gray-600 mb-4" id="results-counter"></div>
+                <div class="text-sm text-gray-600" id="results-counter"></div>
 
                 <!-- Results Grid -->
                 <div id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             </div>
 
             <!-- New Top Opportunities Section -->
-            <div class="mb-14">
-                <h2 class="text-2xl font-bold mb-8 text-design-gray-900">Top convocatorias 🎯</h2>
+            <div class="mb-12">
+                <h2 class="text-3xl font-bold mb-8 text-design-gray-900">Top convocatorias 🎯</h2>
                 <div class="relative">
                     <!-- Previous button -->
                     <button onclick="prevTopPage()"
@@ -701,7 +701,7 @@
             </div>
 
             <!-- Newsletter Section -->
-            <div class="mb-16 bg-gray-600 rounded-lg overflow-hidden">
+            <div class="mb-16 bg-[#eae6fd] rounded-lg overflow-hidden">
                 <div class="container mx-auto px-6 py-10">
                     <div class="text-center">
                         {% if existing_email %}
@@ -719,8 +719,8 @@
                         </form>
                         {% else %}
                         <!-- Not subscribed -->
-                        <h2 class="text-3xl font-bold text-white mb-4">Suscribite a nuestro newsletter</h2>
-                        <p class="text-gray-200 mb-8 text-lg max-w-2xl mx-auto">
+                        <h2 class="text-3xl font-bold text-design-gray-900 mb-4">Suscribite a nuestro newsletter</h2>
+                        <p class="text-design-gray-700 mb-8 text-lg max-w-2xl mx-auto">
                             Recibí actualizaciones mensuales de fotografía, arte, literatura y mucho más.
                         </p>
                         <form id="subscribe-form" action="/subscribe" method="post" class="mt-6 flex justify-center max-w-lg mx-auto">
@@ -825,7 +825,11 @@
 
             if (!results.length) {
                 container.innerHTML = '<p>No se encontraron resultados.</p>';
-                counter.textContent = '0 resultados encontrados';
+                counter.innerHTML = `
+                    <div class="flex justify-between items-center w-full" style="height: 21px; padding: 24px 0;">
+                        <div style="line-height: 21px;">0 resultados encontrados</div>
+                    </div>
+                `;
                 return;
             }
 
@@ -850,7 +854,11 @@
                 </div>
             `).join('');
 
-            counter.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''}`;
+            counter.innerHTML = `
+                <div class="flex justify-between items-center w-full" style="height: 21px; padding: 24px 0;">
+                    <div style="line-height: 21px;">${results.length} resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''}</div>
+                </div>
+            `;
         }
     }
 

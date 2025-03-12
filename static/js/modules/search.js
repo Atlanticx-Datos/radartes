@@ -776,8 +776,8 @@ export const SearchModule = {
 
         // Update the counter with a trash icon for global clear
         counter.innerHTML = `
-            <div class="flex justify-between items-center w-full">
-                <div>
+            <div class="flex justify-between items-center w-full" style="height: 21px; padding: 24px 0;">
+                <div style="line-height: 21px;">
                     ${results.length === 0 
                         ? '0 resultados encontrados' 
                         : `Mostrando ${(this.pagination.currentPage - 1) * this.pagination.itemsPerPage + 1}-${Math.min(this.pagination.currentPage * this.pagination.itemsPerPage, results.length)} de ${results.length} resultado${results.length !== 1 ? 's' : ''}`
