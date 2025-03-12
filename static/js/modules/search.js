@@ -82,7 +82,7 @@ export const SearchModule = {
                 
                 // Add single event listener for preview buttons using event delegation
                 document.addEventListener('click', (e) => {
-                    const previewButton = e.target.closest('.preview-btn');
+                    const previewButton = e.target.closest('.preview-btn, .action-button');
                     if (!previewButton) return;
                     
                     e.preventDefault();
@@ -90,6 +90,11 @@ export const SearchModule = {
                     
                     const dataset = previewButton.dataset;
                     console.log('Preview button clicked, data:', dataset);
+                    console.log('Preview button element:', {
+                        element: previewButton,
+                        classList: previewButton.classList,
+                        dataset: previewButton.dataset
+                    });
                     
                     if (window.ModalModule && window.ModalModule.showPreviewModal) {
                         console.log('Search module preview button click data:', dataset);
@@ -929,7 +934,17 @@ export const SearchModule = {
                                     <button 
                                         class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
                                         style="background-color: #F0EBFF; color: #6232FF;"
-                                        onclick="window.ModalModule.showPreviewModal('${page.url || ''}', '${page.nombre_original || page.nombre || ''}', '${page.pais || page.país || ''}', '${page.og_resumida || ''}', '${page.id || ''}', '${page.categoria || ''}', null, '${page.requisitos || ''}', '${page.disciplina || ''}', '${page.fecha_de_cierre || ''}', '${page.inscripcion || ''}')"
+                                        data-url="${page.url || ''}"
+                                        data-nombre="${Utils.escapeHTML(page.nombre_original || page.nombre || '')}"
+                                        data-pais="${Utils.escapeHTML(page.pais || page.país || '')}"
+                                        data-og-resumida="${Utils.escapeHTML(page.og_resumida || '')}"
+                                        data-id="${page.id || ''}"
+                                        data-categoria="${Utils.escapeHTML(page.categoria || '')}"
+                                        data-requisitos="${Utils.escapeHTML(page.requisitos || '')}"
+                                        data-disciplina="${Utils.escapeHTML(page.disciplina || '')}"
+                                        data-fecha-cierre="${page.fecha_de_cierre || ''}"
+                                        data-inscripcion="${Utils.escapeHTML(page.inscripcion || '')}"
+                                        onclick="window.showOpportunityDetails(this)"
                                     >
                                         Ver
                                     </button>

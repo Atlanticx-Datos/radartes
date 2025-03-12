@@ -1356,7 +1356,53 @@ document.addEventListener('DOMContentLoaded', function() {
 <script type="module">
     import { processDestacarData } from "{{ url_for('static', filename='js/modules/data-processor.js') }}";
     
-    const rawData = JSON.parse('{{ destacar_pages| tojson | safe }}');
-    processDestacarData(rawData);
+    try {
+        // Sanitize the JSON data before parsing
+        let rawDataStr = '{{ destacar_pages| tojson | safe }}';
+        
+        // First replace special Unicode separators with standard pipe
+        rawDataStr = rawDataStr
+            .replace(/\uFE31/g, '|')  // Replace vertical em dash with regular pipe
+            .replace(/\u23AE/g, '|')  // Replace integral extension with regular pipe
+            .replace(/[\u0000-\u001F\u007F-\u009F]/g, ''); // Remove control characters
+        
+        // Fix any potential JSON syntax errors
+        // Look for unescaped quotes or backslashes that might break JSON parsing
+        rawDataStr = rawDataStr
+            .replace(/\\'/g, "'")  // Replace escaped single quotes with regular single quotes
+            .replace(/([^\\])"/g, '$1\\"')  // Escape unescaped double quotes
+            .replace(/([^\\])\\([^"\\\/bfnrtu])/g, '$1\\\\$2'); // Fix improperly escaped backslashes
+        
+        // Use a more robust approach with a temporary DOM parser
+        const tempParser = new DOMParser();
+        const unescapedStr = tempParser.parseFromString(rawDataStr, 'text/html').body.textContent;
+        
+        const rawData = JSON.parse(unescapedStr);
+        processDestacarData(rawData);
+    } catch (error) {
+        console.error('Error parsing destacar data:', error);
+        console.error('Error details:', error.message);
+        console.error('Error position:', error.message.match(/position (\d+)/)?.[1] || 'unknown');
+        
+        // Fallback: Try to get destacar data from prefiltered-data if available
+        try {
+            const prefilteredData = document.getElementById('prefiltered-data');
+            if (prefilteredData && prefilteredData.dataset.pages) {
+                console.log('Attempting fallback to prefiltered data for destacar section');
+                const tempParser = new DOMParser();
+                const pagesString = tempParser.parseFromString(prefilteredData.dataset.pages || '[]', 'text/html').body.textContent;
+                const pages = JSON.parse(pagesString);
+                
+                // Filter pages with destinatarios === 'Destacar'
+                const destacarPages = pages.filter(page => page.destinatarios === 'Destacar');
+                if (destacarPages.length > 0) {
+                    console.log('Found', destacarPages.length, 'destacar pages in prefiltered-data');
+                    processDestacarData(destacarPages);
+                }
+            }
+        } catch (fallbackError) {
+            console.error('Fallback also failed:', fallbackError);
+        }
+    }
 </script>
 {% endblock %}

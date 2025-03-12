@@ -1022,71 +1022,115 @@ document.body.addEventListener('htmx:afterProcessNode', function(evt) {
 
 // Global modal click handler
 const handleModalClick = (e) => {
-    const previewButton = e.target.closest('.preview-btn');
-    if (!previewButton) return;
-    
-    e.preventDefault();
-    e.stopPropagation();
+    try {
+        const previewButton = e.target.closest('.preview-btn, .action-button');
+        if (!previewButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
 
-    // Prevent multiple modals from being opened
-    const existingModal = document.querySelector('[id^="modal-"]');
-    if (existingModal) return;
-
-    if (window.ModalModule?.showPreviewModal) {
-        const dataset = previewButton.dataset;
-        
-        // CRITICAL: Try to get the date from the table cell if this is a table row button
-        let tableCellDate = '';
-        try {
-            // Check if this button is inside a table row
-            const row = previewButton.closest('tr');
-            if (row) {
-                // Find the date cell in this row (typically the 4th cell, index 3)
-                // But we'll search for a cell with class 'cierre-col' to be safe
-                const dateCell = row.querySelector('.cierre-col');
-                if (dateCell) {
-                    // Get the text content of the cell, excluding any hidden elements
-                    tableCellDate = dateCell.innerText.split('\n')[0].trim();
-                    console.log('Extracted table cell date:', tableCellDate);
-                }
-            }
-        } catch (e) {
-            console.error('Error extracting date from table cell:', e);
-        }
-        
-        // Check if we have a formatted date
-        const fechaCierre = tableCellDate || dataset.fechaCierreFormatted || dataset.fechaCierre || dataset.fecha_cierre;
-        
-        // Log the data being passed to the modal
-        console.log('Modal data from handleModalClick:', {
-            url: dataset.url,
-            nombre: dataset.nombre || dataset.name,
-            pais: dataset.pais || dataset.country,
-            og_resumida: dataset.og_resumida || dataset.summary,
-            id: dataset.id,
-            categoria: dataset.categoria || dataset.category,
-            base_url: dataset.baseUrl || dataset.base_url,
-            requisitos: dataset.requisitos,
-            disciplina: dataset.disciplina || dataset.disciplinas,
-            fecha_cierre: fechaCierre,
-            fecha_cierre_raw: dataset.fechaCierre || dataset.fecha_cierre,
-            tableCellDate: tableCellDate,
-            inscripcion: dataset.inscripcion
+        // Log the clicked button for debugging
+        console.log('GLOBAL HANDLER - Button clicked:', {
+            element: previewButton,
+            classList: previewButton.classList,
+            dataset: previewButton.dataset,
+            attributes: Array.from(previewButton.attributes).map(attr => ({ name: attr.name, value: attr.value }))
         });
 
-        ModalModule.showPreviewModal(
-            dataset.url,
-            dataset.nombre || dataset.name,
-            dataset.pais || dataset.country,
-            dataset.og_resumida || dataset.summary,
-            dataset.id,
-            dataset.categoria || dataset.category,
-            dataset.baseUrl || dataset.base_url,
-            dataset.requisitos,
-            dataset.disciplina || dataset.disciplinas,
-            fechaCierre,
-            dataset.inscripcion
-        );
+        // Prevent multiple modals from being opened
+        const existingModal = document.querySelector('[id^="modal-"]');
+        if (existingModal) {
+            console.log('Modal already open, not opening another one');
+            return;
+        }
+
+        if (window.ModalModule?.showPreviewModal) {
+            // Sanitize and normalize data from the button
+            const dataset = previewButton.dataset;
+            const sanitizedData = {};
+            
+            // Copy and sanitize all data attributes
+            for (const key in dataset) {
+                sanitizedData[key] = String(dataset[key] || '').trim();
+            }
+            
+            // CRITICAL: Try to get the date from the table cell if this is a table row button
+            let tableCellDate = '';
+            try {
+                // Check if this button is inside a table row
+                const row = previewButton.closest('tr');
+                if (row) {
+                    // Find the date cell in this row (typically the 4th cell, index 3)
+                    // But we'll search for a cell with class 'cierre-col' to be safe
+                    const dateCell = row.querySelector('.cierre-col');
+                    if (dateCell) {
+                        // Get the text content of the cell, excluding any hidden elements
+                        tableCellDate = dateCell.innerText.split('\n')[0].trim();
+                        console.log('Extracted table cell date:', tableCellDate);
+                    }
+                }
+            } catch (e) {
+                console.error('Error extracting date from table cell:', e);
+            }
+            
+            // Check if we have a formatted date
+            const fechaCierre = tableCellDate || 
+                               sanitizedData.fechaCierreFormatted || 
+                               sanitizedData.fechaCierre || 
+                               sanitizedData.fecha_cierre || 
+                               '';
+            
+            // Log the data being passed to the modal
+            console.log('Modal data from handleModalClick:', {
+                url: sanitizedData.url,
+                nombre: sanitizedData.nombre || sanitizedData.name,
+                pais: sanitizedData.pais || sanitizedData.country,
+                og_resumida: sanitizedData.og_resumida || sanitizedData.summary,
+                id: sanitizedData.id,
+                categoria: sanitizedData.categoria || sanitizedData.category,
+                base_url: sanitizedData.baseUrl || sanitizedData.base_url,
+                requisitos: sanitizedData.requisitos,
+                disciplina: sanitizedData.disciplina || sanitizedData.disciplinas,
+                fecha_cierre: fechaCierre,
+                fecha_cierre_raw: sanitizedData.fechaCierre || sanitizedData.fecha_cierre,
+                tableCellDate: tableCellDate,
+                inscripcion: sanitizedData.inscripcion
+            });
+
+            // Call the modal function with sanitized data
+            try {
+                ModalModule.showPreviewModal(
+                    sanitizedData.url,
+                    sanitizedData.nombre || sanitizedData.name,
+                    sanitizedData.pais || sanitizedData.country,
+                    sanitizedData.og_resumida || sanitizedData.summary,
+                    sanitizedData.id,
+                    sanitizedData.categoria || sanitizedData.category,
+                    sanitizedData.baseUrl || sanitizedData.base_url,
+                    sanitizedData.requisitos,
+                    sanitizedData.disciplina || sanitizedData.disciplinas,
+                    fechaCierre,
+                    sanitizedData.inscripcion
+                );
+                console.log('Modal successfully opened');
+            } catch (modalError) {
+                console.error('Error opening modal:', modalError);
+                // Fallback - open in new tab if modal fails
+                if (sanitizedData.url) {
+                    console.log('Opening URL in new tab as fallback:', sanitizedData.url);
+                    window.open(sanitizedData.url, '_blank');
+                }
+            }
+        } else {
+            console.error('ModalModule not found or showPreviewModal not available');
+            // Fallback - open in new tab
+            const url = previewButton.dataset.url;
+            if (url) {
+                window.open(url, '_blank');
+            }
+        }
+    } catch (e) {
+        console.error('Error in handleModalClick:', e);
     }
 };
 
@@ -1171,41 +1215,97 @@ function initDestacar() {
 
 // Make showOpportunityDetails function globally available
 window.showOpportunityDetails = function(button) {
-    // Get data from button attributes
-    const url = button.getAttribute('data-url');
-    const name = button.getAttribute('data-name');
-    const country = button.getAttribute('data-country');
-    const summary = button.getAttribute('data-summary');
-    const id = button.getAttribute('data-id');
-    const category = button.getAttribute('data-category');
-    const requisitos = button.getAttribute('data-requisitos');
-    const disciplina = button.getAttribute('data-disciplina');
-    const fecha_cierre = button.getAttribute('data-fecha-cierre');
-    const inscripcion = button.getAttribute('data-inscripcion');
-    
-    console.log('showOpportunityDetails data:', {
-        url, name, country, summary, id, category, requisitos,
-        disciplina, fecha_cierre, inscripcion
-    });
-    
-    // Call the modal function if it exists
-    if (window.ModalModule && window.ModalModule.showPreviewModal) {
-        window.ModalModule.showPreviewModal(
-            url,
-            name,
-            country,
-            summary,
-            id,
-            category,
-            null,  // base_url parameter
-            requisitos,
-            disciplina,
-            fecha_cierre,
-            inscripcion
-        );
-    } else {
-        // Fallback - open in new tab
-        window.open(url, '_blank');
+    try {
+        // Get data from button attributes with fallbacks for different naming conventions
+        const url = button.getAttribute('data-url') || button.dataset.url || '';
+        const name = button.getAttribute('data-name') || button.getAttribute('data-nombre') || button.dataset.name || button.dataset.nombre || '';
+        const country = button.getAttribute('data-country') || button.getAttribute('data-pais') || button.dataset.country || button.dataset.pais || '';
+        const summary = button.getAttribute('data-summary') || button.getAttribute('data-og-resumida') || button.getAttribute('data-og_resumida') || 
+                       button.dataset.summary || button.dataset.ogResumida || button.dataset.og_resumida || '';
+        const id = button.getAttribute('data-id') || button.dataset.id || '';
+        const category = button.getAttribute('data-category') || button.getAttribute('data-categoria') || button.dataset.category || button.dataset.categoria || '';
+        const requisitos = button.getAttribute('data-requisitos') || button.dataset.requisitos || '';
+        const disciplina = button.getAttribute('data-disciplina') || button.dataset.disciplina || '';
+        const fecha_cierre = button.getAttribute('data-fecha-cierre') || button.getAttribute('data-fecha_cierre') || 
+                            button.dataset.fechaCierre || button.dataset.fecha_cierre || '';
+        const inscripcion = button.getAttribute('data-inscripcion') || button.dataset.inscripcion || '';
+        
+        console.log('showOpportunityDetails called with button:', button);
+        console.log('Button data attributes:', {
+            url, name, country, summary, id, category, requisitos,
+            disciplina, fecha_cierre, inscripcion,
+            element: button,
+            classList: Array.from(button.classList),
+            dataset: {...button.dataset},
+            attributes: Array.from(button.attributes).map(attr => ({ name: attr.name, value: attr.value }))
+        });
+        
+        // Try to get the date from the table cell if this is in a table row
+        let tableCellDate = '';
+        try {
+            const row = button.closest('tr');
+            if (row) {
+                // The date cell is typically the 4th cell (index 3)
+                const dateCell = row.cells[3]; 
+                if (dateCell) {
+                    tableCellDate = dateCell.innerText.split('\n')[0].trim();
+                    console.log('Extracted table cell date:', tableCellDate);
+                }
+            }
+        } catch (e) {
+            console.error('Error extracting date from table cell:', e);
+        }
+        
+        // Call the modal function if it exists
+        if (window.ModalModule && typeof window.ModalModule.showPreviewModal === 'function') {
+            console.log('Calling ModalModule.showPreviewModal with:', {
+                url, name, country, summary, id, category, 
+                tableCellDate: tableCellDate || 'not found'
+            });
+            
+            window.ModalModule.showPreviewModal(
+                url,
+                name,
+                country,
+                summary,
+                id,
+                category,
+                null,  // base_url parameter
+                requisitos,
+                disciplina,
+                tableCellDate || fecha_cierre, // Use table cell date if available
+                inscripcion
+            );
+        } else {
+            console.error('ModalModule not found or showPreviewModal not available, falling back to opening URL in new tab');
+            // Fallback - open in new tab
+            window.open(url, '_blank');
+        }
+    } catch (error) {
+        console.error('Error in showOpportunityDetails:', error);
+        console.error('Error details:', {
+            errorName: error.name,
+            errorMessage: error.message,
+            errorStack: error.stack,
+            button: button
+        });
+        
+        // Try to show a user-friendly error message
+        if (window.Utils && window.Utils.showAlert) {
+            window.Utils.showAlert('Error al mostrar la oportunidad. Por favor, intenta de nuevo.', 'error');
+        } else {
+            alert('Error al mostrar la oportunidad. Por favor, intenta de nuevo.');
+        }
+        
+        // Fallback - try to open the URL directly if available
+        try {
+            const url = button.getAttribute('data-url') || button.dataset.url;
+            if (url) {
+                window.open(url, '_blank');
+            }
+        } catch (e) {
+            console.error('Failed to open URL as fallback:', e);
+        }
     }
 };
 

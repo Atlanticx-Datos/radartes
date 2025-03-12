@@ -23,8 +23,15 @@ export const Utils = {
 
     escapeHTML(str) {
         if (!str) return '';
+        
+        // First, replace any special Unicode characters that might cause issues
+        const sanitized = String(str)
+            .replace(/\uFE31/g, '|')  // Replace vertical em dash with regular pipe
+            .replace(/\u23AE/g, '|');  // Replace integral extension with regular pipe
+        
+        // Then do regular HTML escaping but preserve accented characters
         const div = document.createElement('div');
-        div.textContent = str;
+        div.textContent = sanitized;
         return div.innerHTML;
     },
 

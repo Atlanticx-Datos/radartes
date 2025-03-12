@@ -87,7 +87,7 @@
                 </td>
                 <td class="accion-col">
                     <button 
-                        class="action-button"
+                        class="action-button preview-btn"
                         data-url="{{ page.base_url if page.base_url else page.url }}"
                         data-name="{{ page.nombre }}"
                         data-country="{{ page.país }}"
@@ -151,16 +151,26 @@
 function showOpportunityDetails(button) {
     // Get data from button attributes
     const url = button.getAttribute('data-url');
-    const name = button.getAttribute('data-name');
-    const country = button.getAttribute('data-country');
-    const summary = button.getAttribute('data-summary');
+    const name = button.getAttribute('data-name') || button.getAttribute('data-nombre');
+    const country = button.getAttribute('data-country') || button.getAttribute('data-pais');
+    const summary = button.getAttribute('data-summary') || button.getAttribute('data-og_resumida');
     const id = button.getAttribute('data-id');
-    const category = button.getAttribute('data-category');
+    const category = button.getAttribute('data-category') || button.getAttribute('data-categoria');
     const requisitos = button.getAttribute('data-requisitos');
     const disciplina = button.getAttribute('data-disciplina');
     const fecha_cierre = button.getAttribute('data-fecha-cierre');
     const fecha_cierre_formatted = button.getAttribute('data-fecha-cierre-formatted');
     const inscripcion = button.getAttribute('data-inscripcion');
+    
+    // Log all button attributes for debugging
+    console.log('BUTTON DEBUG - All attributes:', {
+        url, name, country, summary, id, category, requisitos, 
+        disciplina, fecha_cierre, fecha_cierre_formatted, inscripcion,
+        element: button,
+        classList: button.classList,
+        dataset: button.dataset,
+        attributes: Array.from(button.attributes).map(attr => ({ name: attr.name, value: attr.value }))
+    });
     
     // CRITICAL: Get the date directly from the table cell
     let tableCellDate = '';
@@ -205,6 +215,7 @@ function showOpportunityDetails(button) {
             inscripcion
         );
     } else {
+        console.error('ModalModule not found or showPreviewModal not available');
         // Fallback - open in new tab
         window.open(url, '_blank');
     }

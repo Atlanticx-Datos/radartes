@@ -11,16 +11,47 @@ import { DestacarModule } from './destacar.js';
 export function processDestacarData(rawData) {
     console.log('Processing destacar data:', rawData);
     
-    // Ensure we have valid data
-    if (!rawData || !Array.isArray(rawData) || rawData.length === 0) {
-        console.warn('No valid data to process for destacar section');
+    if (!Array.isArray(rawData) || rawData.length === 0) {
+        console.warn('No data to process for destacar module');
         return;
     }
-    
-    // Pre-process the data to ensure all fields are properly formatted
+
+    // Process each page to ensure all required fields exist and handle special characters
     const processedData = rawData.map(page => {
-        // Make a copy to avoid modifying the original
-        const processedPage = { ...page };
+        // Create a deep copy to avoid modifying the original data
+        const processedPage = JSON.parse(JSON.stringify(page));
+        
+        // Ensure nombre and nombre_original exist and are strings
+        processedPage.nombre = processedPage.nombre || '';
+        processedPage.nombre_original = processedPage.nombre_original || processedPage.nombre || '';
+        
+        // Replace problematic Unicode characters with standard pipe
+        // This prevents issues when these characters are included in HTML attributes
+        if (processedPage.nombre) {
+            processedPage.nombre = processedPage.nombre
+                .replace(/\uFE31/g, '|')  // PRESENTATION FORM FOR VERTICAL EM DASH
+                .replace(/\u23AE/g, '|')  // INTEGRAL EXTENSION
+                .replace(/[\u0000-\u001F\u007F-\u009F]/g, ''); // Remove control characters
+        }
+        
+        if (processedPage.nombre_original) {
+            processedPage.nombre_original = processedPage.nombre_original
+                .replace(/\uFE31/g, '|')  // PRESENTATION FORM FOR VERTICAL EM DASH
+                .replace(/\u23AE/g, '|')  // INTEGRAL EXTENSION
+                .replace(/[\u0000-\u001F\u007F-\u009F]/g, ''); // Remove control characters
+        }
+        
+        // Find separator in nombre_original if it exists
+        const separators = [
+            '|',      // VERTICAL LINE
+            '\uFE31', // PRESENTATION FORM FOR VERTICAL EM DASH
+            '\u23AE', // INTEGRAL EXTENSION
+            '\uFF5C', // FULLWIDTH VERTICAL LINE
+            '\u2502', // BOX DRAWINGS LIGHT VERTICAL
+            '\u2503', // BOX DRAWINGS HEAVY VERTICAL
+            '\u250A', // BOX DRAWINGS LIGHT QUADRUPLE DASH VERTICAL
+            '\u250B'  // BOX DRAWINGS HEAVY QUADRUPLE DASH VERTICAL
+        ];
         
         // Debug the title field
         if (processedPage.nombre_original) {
@@ -64,6 +95,19 @@ export function processDestacarData(rawData) {
                     console.log('Extracted category:', processedPage.title_category);
                     console.log('Extracted title:', processedPage.title_name);
                 }
+            }
+            
+            // IMPORTANT: Replace the special character with a standard pipe for HTML attributes
+            // This prevents syntax errors in onclick attributes
+            processedPage.nombre_original = processedPage.nombre_original
+                .replace(/\uFE31/g, '|')  // Replace vertical em dash
+                .replace(/\u23AE/g, '|');  // Replace integral extension
+                
+            // Also update the nombre field if it exists
+            if (processedPage.nombre) {
+                processedPage.nombre = processedPage.nombre
+                    .replace(/\uFE31/g, '|')
+                    .replace(/\u23AE/g, '|');
             }
         }
         

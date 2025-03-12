@@ -124,6 +124,9 @@ export const TopModule = {
                         data-id="${Utils.escapeHTML(currentPage.id)}"
                         data-categoria="${Utils.escapeHTML(currentPage.categoria)}"
                         data-requisitos="${Utils.escapeHTML(currentPage.requisitos || '')}"
+                        data-disciplina="${Utils.escapeHTML(currentPage.disciplina || '')}"
+                        data-fecha-cierre="${Utils.escapeHTML(currentPage.fecha_de_cierre || '')}"
+                        data-inscripcion="${Utils.escapeHTML(currentPage.inscripcion || '')}"
                         onclick="showOpportunityDetails(this)">
                         Ver más
                     </button>

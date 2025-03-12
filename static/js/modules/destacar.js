@@ -347,23 +347,48 @@ export const DestacarModule = {
                 e.preventDefault();
                 const dataset = element.dataset;
                 
+                // Log the clicked element for debugging
+                console.log('Destacar module clicked element:', {
+                    element: element,
+                    classList: element.classList,
+                    dataset: dataset
+                });
+                
+                // Sanitize data to handle special characters
+                const sanitizedData = {};
+                for (const key in dataset) {
+                    sanitizedData[key] = String(dataset[key] || '').trim();
+                }
+                
                 if (window.ModalModule && window.ModalModule.showPreviewModal) {
-                    console.log('Destacar module click handler data:', dataset);
-                    window.ModalModule.showPreviewModal(
-                        dataset.url,
-                        dataset.nombre,
-                        dataset.country,
-                        dataset.summary,
-                        dataset.id,
-                        dataset.category,
-                        null,  // base_url parameter
-                        dataset.requisitos,
-                        dataset.disciplina,
-                        dataset.fechaCierre || dataset.fecha_cierre, // Try both kebab-case and camelCase
-                        dataset.inscripcion
-                    );
+                    console.log('Destacar module click handler data:', sanitizedData);
+                    
+                    // Use the global showOpportunityDetails function if available
+                    if (window.showOpportunityDetails && typeof window.showOpportunityDetails === 'function') {
+                        console.log('Using global showOpportunityDetails function');
+                        window.showOpportunityDetails(element);
+                    } else {
+                        // Fallback to direct call
+                        window.ModalModule.showPreviewModal(
+                            sanitizedData.url,
+                            sanitizedData.nombre,
+                            sanitizedData.country,
+                            sanitizedData.summary,
+                            sanitizedData.id,
+                            sanitizedData.category,
+                            null,  // base_url parameter
+                            sanitizedData.requisitos,
+                            sanitizedData.disciplina,
+                            sanitizedData.fechaCierre || sanitizedData.fecha_cierre, // Try both kebab-case and camelCase
+                            sanitizedData.inscripcion
+                        );
+                    }
                 } else {
                     console.error('ModalModule not found or showPreviewModal not available');
+                    // Fallback - open in new tab
+                    if (sanitizedData.url) {
+                        window.open(sanitizedData.url, '_blank');
+                    }
                 }
             });
             

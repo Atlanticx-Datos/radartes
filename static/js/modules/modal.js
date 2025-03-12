@@ -21,16 +21,23 @@ export const ModalModule = {
                 { char: '┋', name: 'BOX DRAWINGS HEAVY QUADRUPLE DASH VERTICAL', code: 0x250B }
             ];
             
+            // Log the nombre for debugging
+            console.log('extractTitle input:', {
+                nombre: nombre,
+                length: nombre.length,
+                chars: Array.from(nombre).map(c => c.charCodeAt(0).toString(16))
+            });
+            
             // Find the first separator that exists in the string
             let foundSeparator = null;
             let separatorIndex = -1;
             
             for (const separator of separators) {
                 const index = nombre.indexOf(separator.char);
-                if (index !== -1) {
+                if (index !== -1 && (separatorIndex === -1 || index < separatorIndex)) {
                     foundSeparator = separator;
                     separatorIndex = index;
-                    break;
+                    console.log(`Found separator: ${separator.name} at index ${index}`);
                 }
             }
             
@@ -38,7 +45,9 @@ export const ModalModule = {
             if (foundSeparator) {
                 // Get the parts before and after the separator
                 const category = nombre.substring(0, separatorIndex).trim();
-                const name = nombre.substring(separatorIndex + 1).trim();
+                const name = nombre.substring(separatorIndex + foundSeparator.char.length).trim();
+                
+                console.log('Split result:', { category, name });
                 
                 if (name) {
                     title = name;
@@ -56,8 +65,16 @@ export const ModalModule = {
                         // Try to extract a title after the category
                         const afterCategory = nombre.substring(category.length).trim();
                         if (afterCategory) {
-                            title = afterCategory;
+                            // Check if there's a space after the category name
+                            if (afterCategory.startsWith(' ') || 
+                                separators.some(sep => afterCategory.startsWith(sep.char))) {
+                                // Remove the first character (space or separator) and trim
+                                title = afterCategory.substring(1).trim();
+                            } else {
+                                title = afterCategory;
+                            }
                             foundCategory = true;
+                            console.log(`Found category: ${category}, extracted title: ${title}`);
                             break;
                         }
                     }
@@ -66,55 +83,110 @@ export const ModalModule = {
                 if (!foundCategory) {
                     // Use the original name as fallback
                     title = nombre.trim();
+                    console.log('No category found, using original name as title');
                 }
             }
         } else {
             // Fallback if nombre is not available
             title = 'Sin título';
+            console.log('No nombre provided, using fallback title');
         }
         
+        console.log('Final extracted title:', title);
         return title;
+    },
+
+    // Helper function to normalize nombre with different separators
+    normalizeNombre(str) {
+        if (!str) return '';
+        
+        const separators = [
+            '\uFE31', // PRESENTATION FORM FOR VERTICAL EM DASH
+            '\u23AE', // INTEGRAL EXTENSION
+            '|',      // VERTICAL LINE
+            '\uFF5C', // FULLWIDTH VERTICAL LINE
+            '\u2502', // BOX DRAWINGS LIGHT VERTICAL
+            '\u2503', // BOX DRAWINGS HEAVY VERTICAL
+            '\u250A', // BOX DRAWINGS LIGHT QUADRUPLE DASH VERTICAL
+            '\u250B'  // BOX DRAWINGS HEAVY QUADRUPLE DASH VERTICAL
+        ];
+        
+        // Find the first separator that exists in the string
+        let firstSeparatorIndex = -1;
+        let foundSeparator = null;
+        
+        for (const sep of separators) {
+            const index = str.indexOf(sep);
+            if (index !== -1 && (firstSeparatorIndex === -1 || index < firstSeparatorIndex)) {
+                firstSeparatorIndex = index;
+                foundSeparator = sep;
+            }
+        }
+        
+        // If we found a separator, split the string and join with a standard pipe
+        if (firstSeparatorIndex !== -1 && foundSeparator) {
+            const prefix = str.substring(0, firstSeparatorIndex);
+            const suffix = str.substring(firstSeparatorIndex + foundSeparator.length);
+            return prefix + '|' + suffix;
+        }
+        
+        // If no separator found, return the original string
+        return str;
     },
 
     showPreviewModal(url, nombre, pais, og_resumida, id, categoria, base_url, requisitos, disciplina_param, fecha_cierre_param, inscripcion_param) {
         try {
-            console.log('DETAILED DATE DEBUG - Modal Input:', {
-                fecha_cierre_param: fecha_cierre_param,
-                fecha_cierre_param_type: typeof fecha_cierre_param,
-                fecha_cierre_param_length: fecha_cierre_param ? fecha_cierre_param.length : 0,
-                fecha_cierre_param_chars: fecha_cierre_param ? Array.from(fecha_cierre_param).map(c => c.charCodeAt(0)) : []
+            console.log('ModalModule.showPreviewModal called with params:', {
+                url, nombre, pais, og_resumida, id, categoria, base_url, 
+                requisitos, disciplina_param, fecha_cierre_param, inscripcion_param
             });
             
-            // Clean up any existing modals first
-            const existingModals = document.querySelectorAll('[id^="modal-"]');
-            const existingOverlays = document.querySelectorAll('[id$="-overlay"]');
+            // Helper function to decode HTML entities
+            const decodeHTMLEntities = (text) => {
+                if (!text) return '';
+                const textarea = document.createElement('textarea');
+                textarea.innerHTML = text;
+                return textarea.value;
+            };
             
-            existingModals.forEach(modal => modal.remove());
-            existingOverlays.forEach(overlay => overlay.remove());
-
-            const modalId = "modal-" + Date.now();
-            const isMiEspacio = window.location.pathname === '/mi_espacio';
-
-            // Create an overlay element to darken the background and capture clicks
-            const overlay = document.createElement("div");
-            overlay.id = modalId + "-overlay";
+            // Decode all input parameters that might contain HTML entities
+            nombre = decodeHTMLEntities(nombre);
+            pais = decodeHTMLEntities(pais);
+            og_resumida = decodeHTMLEntities(og_resumida);
+            categoria = decodeHTMLEntities(categoria);
+            requisitos = requisitos ? decodeHTMLEntities(requisitos) : '';
+            disciplina_param = disciplina_param ? decodeHTMLEntities(disciplina_param) : '';
+            
+            // Create modal elements
+            const overlay = document.createElement('div');
+            const modalContent = document.createElement('div');
+            
+            // Store original nombre for reference
+            const originalNombre = nombre || '';
+            
+            // Normalize nombre for consistent processing
+            let normalizedNombre;
+            try {
+                normalizedNombre = this.normalizeNombre(nombre || '');
+            } catch (e) {
+                console.error('Error normalizing nombre:', e);
+                normalizedNombre = nombre || '';
+            }
+            
+            // Set overlay styles
             overlay.style.cssText = `
                 position: fixed;
                 top: 0;
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0,0,0,0.3);
-                backdrop-filter: blur(4px);
+                background-color: rgba(0, 0, 0, 0.5);
                 z-index: 50;
                 opacity: 0;
                 transition: opacity 300ms ease-out;
             `;
-
-            // Create the modal container with responsive styling
-            const modalContent = document.createElement("div");
-            modalContent.id = modalId;
-            modalContent.dataset.baseUrl = base_url || '';
+            
+            // Set modal content styles
             modalContent.style.cssText = `
                 position: fixed;
                 top: 50%;
@@ -134,26 +206,61 @@ export const ModalModule = {
             const csrfToken = csrfInput ? Utils.escapeHTML(csrfInput.value) : '';
             
             // Find the clicked element that triggered the modal
-            // Look for both opportunity-card and opportunity-preview classes, as well as preview-btn
-            let clickedElement = document.querySelector(`.opportunity-card[data-id="${id}"]`) || 
-                                document.querySelector(`.opportunity-preview[data-id="${id}"]`) ||
-                                document.querySelector(`.preview-btn[data-id="${id}"]`);
+            // Look for both opportunity-card and opportunity-preview classes, as well as preview-btn and action-button
+            let clickedElement = null;
             
-            // If we still can't find it, try to find the most recently clicked button with relevant data
+            // Try multiple selectors to find the element
+            const selectors = [
+                `.opportunity-card[data-id="${id}"]`,
+                `.opportunity-preview[data-id="${id}"]`,
+                `.preview-btn[data-id="${id}"]`,
+                `.action-button[data-id="${id}"]`,
+                `button[data-id="${id}"]`,
+                `[data-id="${id}"]`
+            ];
+            
+            for (const selector of selectors) {
+                const element = document.querySelector(selector);
+                if (element) {
+                    clickedElement = element;
+                    console.log(`Found element using selector: ${selector}`);
+                    break;
+                }
+            }
+            
+            // If still not found, try a more general approach
             if (!clickedElement) {
-                const previewButtons = document.querySelectorAll('.preview-btn, .opportunity-preview');
-                previewButtons.forEach(btn => {
-                    if (btn.dataset.id === id || btn.dataset.nombre === nombre || btn.dataset.name === nombre) {
+                const allButtons = document.querySelectorAll('.preview-btn, .opportunity-preview, .action-button, .top-opportunity-button, button[onclick*="showOpportunityDetails"]');
+                console.log(`Searching among ${allButtons.length} potential buttons`);
+                
+                allButtons.forEach(btn => {
+                    if (btn.dataset.id === id || 
+                        btn.dataset.nombre === originalNombre || 
+                        btn.dataset.name === originalNombre ||
+                        btn.dataset.nombre === normalizedNombre || 
+                        btn.dataset.name === normalizedNombre ||
+                        btn.getAttribute('data-id') === id ||
+                        btn.getAttribute('data-nombre') === originalNombre ||
+                        btn.getAttribute('data-name') === originalNombre) {
                         clickedElement = btn;
+                        console.log('Found matching button by dataset comparison');
                     }
                 });
+            }
+            
+            console.log('MODAL DEBUG - Clicked element found:', clickedElement ? true : false);
+            if (clickedElement) {
+                console.log('MODAL DEBUG - Clicked element data attributes:', clickedElement.dataset);
+            } else {
+                console.log('MODAL DEBUG - No clicked element found, proceeding with provided parameters only');
             }
             
             // Get additional data from the clicked element if available, or use provided parameters
             const inscripcion = inscripcion_param || clickedElement?.dataset?.inscripcion || '';
             
             // Extract the title using the same logic as in destacar.js
-            const displayTitle = this.extractTitle(nombre);
+            // Use the original nombre for title extraction, not the normalized one
+            const displayTitle = this.extractTitle(originalNombre);
             
             // Format date function with enhanced debugging
             const formatDate = (dateStr) => {
@@ -238,7 +345,7 @@ export const ModalModule = {
                     // If still invalid, return the original string or fallback
                     if (isNaN(date.getTime())) {
                         console.warn('All date parsing attempts failed for:', normalizedDateStr);
-                        return 'Confirmar en bases';
+                        return dateStr || 'Confirmar en bases';
                     }
                     
                     const day = String(date.getDate()).padStart(2, '0');
@@ -262,7 +369,7 @@ export const ModalModule = {
                     return formattedDate;
                 } catch (e) {
                     console.error('Error in formatDate:', e);
-                    return 'Confirmar en bases';
+                    return dateStr || 'Confirmar en bases';
                 }
             };
             
@@ -389,12 +496,27 @@ export const ModalModule = {
             
             const categoryClass = getCategoryClass(categoria);
             
+            // Create a decoder function to properly handle HTML entities
+            const decodeHTML = (html) => {
+                const textarea = document.createElement('textarea');
+                textarea.innerHTML = html;
+                return textarea.value;
+            };
+            
+            // Decode all text content before inserting into the modal
+            const decodedTitle = decodeHTML(displayTitle || nombre || '');
+            const decodedPais = decodeHTML(pais || '');
+            const decodedDisciplinas = disciplinasArray.map(d => decodeHTML(d));
+            const decodedOgResumida = decodeHTML(og_resumida || '');
+            const decodedRequisitos = requisitos ? decodeHTML(requisitos) : '';
+            const decodedCategoria = decodeHTML(categoria || '');
+            
             modalContent.innerHTML = `
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden" style="border-radius: 12px;">
                     <!-- Header Section with completely restructured icon layout -->
                     <div class="px-6 py-5 flex justify-between items-center">
                         <div class="flex items-center">
-                            <span class="text-sm font-medium text-white px-3 py-1 rounded-full" style="background-color: #6366F1;">${Utils.escapeHTML(categoria || '')}</span>
+                            <span class="text-sm font-medium text-white px-3 py-1 rounded-full" style="background-color: #6366F1;">${decodedCategoria}</span>
                         </div>
                         <div style="display: flex; align-items: center;">
                             ${window.isUserLoggedIn ? `
@@ -439,8 +561,8 @@ export const ModalModule = {
                     <!-- Title and Details Section - reduced spacing from header -->
                     <div class="px-6 pb-2" style="overflow-y: auto; width: 100%;">
                         <!-- Title -->
-                        <h3 style="font-family: Inter; font-weight: 700; font-size: 18px; line-height: 1.3; letter-spacing: 0%; color: #1F1B2D; margin-bottom: 10px; overflow: hidden; text-overflow: ellipsis; width: 100%;" title="${Utils.escapeHTML(displayTitle || nombre || '')}">
-                            ${Utils.escapeHTML(displayTitle || nombre || '')}
+                        <h3 style="font-family: Inter; font-weight: 700; font-size: 18px; line-height: 1.3; letter-spacing: 0%; color: #1F1B2D; margin-bottom: 10px; overflow: hidden; text-overflow: ellipsis; width: 100%;" title="${decodedTitle}">
+                            ${decodedTitle}
                         </h3>
                         
                         <!-- Inline Details: Location, Payment, Subdisciplines -->
@@ -451,7 +573,7 @@ export const ModalModule = {
                                     <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                                     </svg>
-                                    <span>${Utils.escapeHTML(pais || '')}</span>
+                                    <span>${decodedPais}</span>
                                 </div>
                                 
                                 <div class="flex items-center gap-1">
@@ -467,7 +589,7 @@ export const ModalModule = {
                                         <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
                                         <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
                                     </svg>
-                                    <span>${Utils.escapeHTML(disciplinasArray.join(', ') || '')}</span>
+                                    <span>${decodedDisciplinas.join(', ')}</span>
                                 </div>
                             </div>
                             
@@ -487,13 +609,13 @@ export const ModalModule = {
                     <div class="px-6 pt-4 pb-5" style="overflow-y: auto;">
                         <div class="border-t" style="border-color: #D5D2DC; padding-top: 16px; margin-top: 0;">
                             <h4 style="font-family: Inter; font-weight: 700; font-size: 16px; line-height: 1.3; letter-spacing: 0%; color: #666276; margin-bottom: 8px;">Resumen</h4>
-                            <p style="font-family: Inter; font-weight: 400; font-size: 14px; line-height: 1.4; letter-spacing: 0%; color: #666276;">${Utils.escapeHTML(og_resumida || '')}</p>
+                            <p style="font-family: Inter; font-weight: 400; font-size: 14px; line-height: 1.4; letter-spacing: 0%; color: #666276;">${decodedOgResumida}</p>
                             
                             <!-- Requisitos Section (if available) -->
                             ${requisitos ? `
                             <div style="border-top: 1px solid #D5D2DC; padding-top: 16px; margin-top: 16px;">
                                 <h4 style="font-family: Inter; font-weight: 700; font-size: 16px; line-height: 1.3; letter-spacing: 0%; color: #666276; margin-bottom: 8px;">Requisitos</h4>
-                                <p style="font-family: Inter; font-weight: 400; font-size: 14px; line-height: 1.4; letter-spacing: 0%; color: #666276;">${Utils.escapeHTML(requisitos)}</p>
+                                <p style="font-family: Inter; font-weight: 400; font-size: 14px; line-height: 1.4; letter-spacing: 0%; color: #666276;">${decodedRequisitos}</p>
                             </div>
                             ` : ''}
                         </div>
@@ -673,6 +795,22 @@ export const ModalModule = {
             }
         } catch (e) {
             console.error('Error in showPreviewModal:', e);
+            console.error('Error details:', {
+                errorName: e.name,
+                errorMessage: e.message,
+                errorStack: e.stack,
+                functionParams: {
+                    url, nombre, pais, og_resumida, id, categoria, base_url, 
+                    requisitos, disciplina_param, fecha_cierre_param, inscripcion_param
+                }
+            });
+            
+            // Try to show a user-friendly error message
+            if (window.Utils && window.Utils.showAlert) {
+                window.Utils.showAlert('Error al mostrar la oportunidad. Por favor, intenta de nuevo.', 'error');
+            } else {
+                alert('Error al mostrar la oportunidad. Por favor, intenta de nuevo.');
+            }
         }
     },
 
