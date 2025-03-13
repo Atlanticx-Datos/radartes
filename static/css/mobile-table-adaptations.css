@@ -67,6 +67,52 @@
         justify-content: center !important;
     }
     
+    /* Ensure trash button is fully justified to the end on mobile */
+    @media (max-width: 767px) {
+        #results-counter .flex > button {
+            position: absolute !important;
+            right: 0 !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            margin-right: 0 !important;
+            padding-right: 0 !important;
+        }
+        
+        /* Adjust the container to accommodate absolute positioning */
+        #results-counter .flex {
+            position: relative !important;
+        }
+    }
+    
+    /* Enhanced trash button styling for mobile */
+    @media (max-width: 767px) {
+        #results-counter .flex > button {
+            width: 36px !important;
+            height: 36px !important;
+            background-color: #f9fafb !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+            z-index: 5 !important;
+        }
+        
+        #results-counter .flex > button:hover {
+            background-color: #f3f4f6 !important;
+        }
+        
+        #results-counter .flex > button:active {
+            background-color: #e5e7eb !important;
+            transform: translateY(-50%) scale(0.98) !important;
+        }
+        
+        #results-counter .flex > button svg {
+            width: 20px !important;
+            height: 20px !important;
+        }
+    }
+    
     /* Column selector styling */
     .mobile-column-selector label {
         font-size: 14px;
@@ -163,6 +209,14 @@
     /* Add margin to the bottom of the results table container */
     .results-table-container {
         margin-bottom: 16px !important;
+    }
+    
+    /* Ensure mobile column selector doesn't overlap with trash button */
+    @media (max-width: 767px) {
+        .mobile-column-selector {
+            padding-right: 40px !important; /* Make room for the trash button */
+            width: calc(100% - 40px) !important;
+        }
     }
 }
 
