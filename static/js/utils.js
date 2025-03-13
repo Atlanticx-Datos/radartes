@@ -23,16 +23,12 @@ export const Utils = {
 
     escapeHTML(str) {
         if (!str) return '';
-        
-        // First, replace any special Unicode characters that might cause issues
-        const sanitized = String(str)
-            .replace(/\uFE31/g, '|')  // Replace vertical em dash with regular pipe
-            .replace(/\u23AE/g, '|');  // Replace integral extension with regular pipe
-        
-        // Then do regular HTML escaping but preserve accented characters
-        const div = document.createElement('div');
-        div.textContent = sanitized;
-        return div.innerHTML;
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     },
 
     showAlert(message, type = 'success') {
@@ -82,5 +78,48 @@ export const Utils = {
         if (spinner) {
             spinner.style.display = show ? 'block' : 'none';
         }
+    },
+
+    // Format title with vertical dash
+    formatTitleWithDash(title) {
+        if (!title) return '';
+        
+        // Define all possible separator characters
+        const separators = [
+            '︱', // PRESENTATION FORM FOR VERTICAL EM DASH
+            '⎮', // INTEGRAL EXTENSION
+            '|',  // VERTICAL LINE
+            '｜', // FULLWIDTH VERTICAL LINE
+            '│', // BOX DRAWINGS LIGHT VERTICAL
+            '┃', // BOX DRAWINGS HEAVY VERTICAL
+            '┊', // BOX DRAWINGS LIGHT QUADRUPLE DASH VERTICAL
+            '┋'  // BOX DRAWINGS HEAVY QUADRUPLE DASH VERTICAL
+        ];
+        
+        // Find the first separator that exists in the string
+        let separatorIndex = -1;
+        let foundSeparator = null;
+        
+        for (const separator of separators) {
+            const index = title.indexOf(separator);
+            if (index !== -1) {
+                separatorIndex = index;
+                foundSeparator = separator;
+                break;
+            }
+        }
+        
+        // If we found a separator, split the string and format
+        if (foundSeparator && separatorIndex > 0) {
+            // Trim both parts to remove any existing spaces
+            const category = this.escapeHTML(title.substring(0, separatorIndex).trim());
+            const name = this.escapeHTML(title.substring(separatorIndex + 1).trim());
+            
+            // Wrap the separator in a span with specific styling for consistent spacing
+            return `<span class="title-category" data-category="${category}">${category}</span><span class="separator-dash">${foundSeparator}</span> ${name}`;
+        }
+        
+        // If no separator found, return the original title
+        return this.escapeHTML(title);
     }
 }; 

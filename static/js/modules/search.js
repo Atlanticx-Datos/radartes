@@ -960,7 +960,7 @@ export const SearchModule = {
                                 data-inscripcion="${Utils.escapeHTML(page.inscripcion || '')}">
                                 <td class="px-4 py-4 whitespace-nowrap" style="border: none !important;">
                                     <div class="text-sm font-medium text-gray-900">
-                                        ${page.nombre || ''}
+                                        ${Utils.formatTitleWithDash(page.nombre || '')}
                                     </div>
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap" style="border: none !important;">
@@ -1410,5 +1410,45 @@ export const SearchModule = {
                 this.handleMobileColumnChange(this.mobileSelectedColumn);
             }, 100);
         }
+    },
+
+    formatTitleWithCategory(title) {
+        if (!title) return '';
+        
+        // Define all possible separator characters
+        const separators = [
+            '︱', // PRESENTATION FORM FOR VERTICAL EM DASH
+            '⎮', // INTEGRAL EXTENSION
+            '|',  // VERTICAL LINE
+            '｜', // FULLWIDTH VERTICAL LINE
+            '│', // BOX DRAWINGS LIGHT VERTICAL
+            '┃', // BOX DRAWINGS HEAVY VERTICAL
+            '┊', // BOX DRAWINGS LIGHT QUADRUPLE DASH VERTICAL
+            '┋'  // BOX DRAWINGS HEAVY QUADRUPLE DASH VERTICAL
+        ];
+        
+        // Find the first separator that exists in the string
+        let separatorIndex = -1;
+        let foundSeparator = null;
+        
+        for (const separator of separators) {
+            const index = title.indexOf(separator);
+            if (index !== -1) {
+                separatorIndex = index;
+                foundSeparator = separator;
+                break;
+            }
+        }
+        
+        // If we found a separator, split the string and format
+        if (foundSeparator && separatorIndex > 0) {
+            const category = Utils.escapeHTML(title.substring(0, separatorIndex).trim());
+            const name = Utils.escapeHTML(title.substring(separatorIndex + 1).trim());
+            
+            return `<span class="title-category">${category}</span>${foundSeparator} ${name}`;
+        }
+        
+        // If no separator found, return the original title
+        return Utils.escapeHTML(title);
     },
 }; 

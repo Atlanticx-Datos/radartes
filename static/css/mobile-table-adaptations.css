@@ -218,6 +218,19 @@
             width: calc(100% - 40px) !important;
         }
     }
+    
+    /* Make the portion of the title before the vertical dash font-semibold on mobile */
+    .results-table td:first-child .title-category {
+        font-weight: 600 !important; /* semibold */
+        display: inline !important;
+    }
+    
+    /* Ensure proper spacing around the vertical dash */
+    .results-table td:first-child .text-sm {
+        white-space: normal !important; /* Allow text to wrap */
+        word-spacing: 0.25em !important; /* Add consistent spacing between words */
+        line-height: 1.4 !important; /* Improve line height for readability */
+    }
 }
 
 /* Hide the mobile column selector on larger screens */
@@ -341,4 +354,26 @@
         min-width: 160px !important;
         margin-top: 24px !important; /* Significantly increase top margin */
     }
+}
+
+/* Make the portion of the title before the vertical dash font-semibold on mobile */
+@media (max-width: 767px) {
+    .results-table td:first-child .title-category {
+        font-weight: 600 !important; /* semibold */
+        display: inline !important;
+    }
+}
+
+/* Ensure proper spacing around the vertical dash */
+.results-table td:first-child .text-sm {
+    white-space: normal !important; /* Allow text to wrap */
+    word-spacing: 0.25em !important; /* Add consistent spacing between words */
+    line-height: 1.4 !important; /* Improve line height for readability */
+}
+
+/* Style the separator dash for consistent spacing */
+.separator-dash {
+    margin: 0 0.15em 0 0.15em !important; /* Add consistent spacing around the dash */
+    display: inline-block !important;
+    vertical-align: middle !important;
 } 
