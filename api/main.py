@@ -1815,7 +1815,8 @@ def mi_espacio():
             selected_disciplines=list(preferences.get('disciplines', set())),
             existing_email=preferences.get('email', ''),
             suscripcion=preferences.get('suscripcion', 'Quincenal'),
-            saved_opportunities=saved_opportunities
+            saved_opportunities=saved_opportunities,
+            user_name=session["user"].get("name")
         )
 
     except Exception as e:
