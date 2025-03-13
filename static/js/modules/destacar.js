@@ -5,6 +5,10 @@ export const DestacarModule = {
     currentIndex: 0,
     pages: [],
     cardsPerPage: 3, // Default, will be adjusted based on screen size
+    isMobile: false, // Flag to check if we're on mobile
+    longPressTimer: null, // Timer for long press
+    scrollDirection: null, // Direction to scroll when long pressing
+    isScrolling: false, // Flag to prevent multiple scroll operations
 
     init(pages) {
         console.log('DestacarModule.init called with pages:', pages);
@@ -20,16 +24,22 @@ export const DestacarModule = {
         this.pages = pages;
         console.log('First page in DestacarModule:', this.pages[0]);
         
+        // Check if we're on mobile
+        this.checkMobile();
+        
         // Set cards per page based on screen size
         this.setCardsPerPage();
         
         // Add resize listener to adjust cards per page when window size changes
         window.addEventListener('resize', () => {
             const oldCardsPerPage = this.cardsPerPage;
+            const wasMobile = this.isMobile;
+            
+            this.checkMobile();
             this.setCardsPerPage();
             
-            // Only update display if the number of cards per page has changed
-            if (oldCardsPerPage !== this.cardsPerPage) {
+            // Only update display if the number of cards per page has changed or mobile status changed
+            if (oldCardsPerPage !== this.cardsPerPage || wasMobile !== this.isMobile) {
                 // Adjust currentIndex to maintain position when resizing
                 this.currentIndex = Math.floor(this.currentIndex / oldCardsPerPage) * this.cardsPerPage;
                 this.updateDisplay();
@@ -38,6 +48,37 @@ export const DestacarModule = {
         
         this.updateDisplay();
         this.attachNavigationListeners();
+        
+        // Force a check after a short delay to ensure mobile view is properly applied
+        setTimeout(() => {
+            this.checkMobile();
+            this.updateDisplay();
+        }, 500);
+    },
+
+    // Check if we're on mobile
+    checkMobile() {
+        const width = window.innerWidth;
+        this.isMobile = width < 768;
+        console.log('Mobile check:', this.isMobile, 'Width:', width);
+        
+        // Update visibility of navigation buttons based on mobile status
+        const prevButton = document.querySelector('.destacar-prev');
+        const nextButton = document.querySelector('.destacar-next');
+        
+        if (prevButton) {
+            prevButton.style.display = this.isMobile ? 'none' : 'flex';
+        }
+        
+        if (nextButton) {
+            nextButton.style.display = this.isMobile ? 'none' : 'flex';
+        }
+        
+        // Update dots container visibility
+        const dotsContainer = document.querySelector('.destacar-dots-container');
+        if (dotsContainer) {
+            dotsContainer.style.display = this.isMobile ? 'flex' : 'none';
+        }
     },
 
     // Set the number of cards to display based on screen width
@@ -186,7 +227,7 @@ export const DestacarModule = {
     },
 
     updateDisplay() {
-        console.log('DestacarModule.updateDisplay called');
+        console.log('DestacarModule.updateDisplay called, isMobile:', this.isMobile);
         
         const container = document.querySelector('.featured-opportunities .flex');
         if (!container) {
@@ -199,7 +240,31 @@ export const DestacarModule = {
             return;
         }
         
-        console.log('Updating display with pages:', this.pages.slice(this.currentIndex, this.currentIndex + this.cardsPerPage));
+        // Update navigation buttons state (opacity) instead of visibility
+        const prevButton = document.querySelector('.destacar-prev');
+        const nextButton = document.querySelector('.destacar-next');
+        
+        if (prevButton && !this.isMobile) {
+            prevButton.style.opacity = this.currentIndex > 0 ? '1' : '0.5';
+            prevButton.style.cursor = this.currentIndex > 0 ? 'pointer' : 'default';
+            prevButton.setAttribute('aria-disabled', this.currentIndex === 0 ? 'true' : 'false');
+            prevButton.style.display = 'flex';
+        } else if (prevButton) {
+            prevButton.style.display = 'none';
+        }
+        
+        if (nextButton && !this.isMobile) {
+            nextButton.style.opacity = (this.currentIndex + this.cardsPerPage) < this.pages.length ? '1' : '0.5';
+            nextButton.style.cursor = (this.currentIndex + this.cardsPerPage) < this.pages.length ? 'pointer' : 'default';
+            nextButton.setAttribute('aria-disabled', (this.currentIndex + this.cardsPerPage) >= this.pages.length ? 'true' : 'false');
+            nextButton.style.display = 'flex';
+        } else if (nextButton) {
+            nextButton.style.display = 'none';
+        }
+
+        // On mobile, show all pages for horizontal scrolling
+        const pagesToShow = this.isMobile ? this.pages : this.pages.slice(this.currentIndex, this.currentIndex + this.cardsPerPage);
+        console.log('Pages to show:', pagesToShow.length, 'Mobile:', this.isMobile);
 
         // Function to format date
         const formatDate = (dateStr) => {
@@ -253,24 +318,7 @@ export const DestacarModule = {
             }
         };
 
-        // Update navigation buttons state (opacity) instead of visibility
-        const prevButton = document.querySelector('.destacar-prev');
-        const nextButton = document.querySelector('.destacar-next');
-        
-        if (prevButton) {
-            prevButton.style.opacity = this.currentIndex > 0 ? '1' : '0.5';
-            prevButton.style.cursor = this.currentIndex > 0 ? 'pointer' : 'default';
-            prevButton.setAttribute('aria-disabled', this.currentIndex === 0 ? 'true' : 'false');
-        }
-        
-        if (nextButton) {
-            nextButton.style.opacity = (this.currentIndex + this.cardsPerPage) < this.pages.length ? '1' : '0.5';
-            nextButton.style.cursor = (this.currentIndex + this.cardsPerPage) < this.pages.length ? 'pointer' : 'default';
-            nextButton.setAttribute('aria-disabled', (this.currentIndex + this.cardsPerPage) >= this.pages.length ? 'true' : 'false');
-        }
-
-        container.innerHTML = this.pages
-            .slice(this.currentIndex, this.currentIndex + this.cardsPerPage)
+        container.innerHTML = pagesToShow
             .map(page => {
                 // Extract the first discipline for the badge
                 const disciplines = page.disciplina ? page.disciplina.split(',').map(d => d.trim()).filter(Boolean) : [];
@@ -414,11 +462,21 @@ export const DestacarModule = {
                     }
                 }
             });
-            
-            // We're removing the separate event handler for the heart icon
-            // The heart icon will just be a visual indicator that the user is logged in
-            // The actual save functionality will be in the modal
         });
+        
+        // Update dots indicator for mobile
+        this.updateDotsIndicator();
+        
+        // If on mobile, scroll to the current card
+        if (this.isMobile) {
+            const featuredContainer = document.querySelector('.featured-opportunities');
+            const cards = container.querySelectorAll('.opportunity-preview');
+            if (featuredContainer && cards.length > 0 && cards[this.currentIndex]) {
+                setTimeout(() => {
+                    featuredContainer.scrollLeft = cards[this.currentIndex].offsetLeft - featuredContainer.offsetLeft;
+                }, 100);
+            }
+        }
     },
 
     attachNavigationListeners() {
@@ -430,6 +488,30 @@ export const DestacarModule = {
         }
         if (nextButton) {
             nextButton.addEventListener('click', () => this.nextPage());
+        }
+        
+        // Add scroll event listener for mobile to update dots
+        const container = document.querySelector('.featured-opportunities');
+        if (container) {
+            container.addEventListener('scroll', () => {
+                if (!this.isMobile || this.isScrolling) return;
+                
+                // Debounce the scroll event
+                clearTimeout(this.scrollTimer);
+                this.scrollTimer = setTimeout(() => {
+                    const cards = container.querySelectorAll('.opportunity-preview');
+                    if (!cards.length) return;
+                    
+                    const cardWidth = cards[0].offsetWidth;
+                    const scrollPosition = container.scrollLeft;
+                    const newIndex = Math.round(scrollPosition / cardWidth);
+                    
+                    if (newIndex !== this.currentIndex && newIndex >= 0 && newIndex < this.pages.length) {
+                        this.currentIndex = newIndex;
+                        this.updateDotsIndicator();
+                    }
+                }, 100);
+            });
         }
     },
 
@@ -455,5 +537,121 @@ export const DestacarModule = {
         }
         
         return 'discipline-default';
+    },
+
+    // Update the dots indicator
+    updateDotsIndicator() {
+        if (!this.isMobile) return;
+        
+        const dotsContainer = document.querySelector('.destacar-dots-container');
+        if (!dotsContainer) return;
+        
+        // Calculate the number of dots needed
+        const totalDots = Math.min(this.pages.length, 10); // Limit to 10 dots to prevent overflow
+        
+        // Clear existing dots
+        dotsContainer.innerHTML = '';
+        
+        // Create dots
+        for (let i = 0; i < totalDots; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'destacar-dot';
+            if (i === this.currentIndex) {
+                dot.classList.add('active');
+            }
+            
+            // Add data attribute for index
+            dot.dataset.index = i;
+            
+            // Add click event
+            dot.addEventListener('click', (e) => {
+                const index = parseInt(e.target.dataset.index);
+                this.currentIndex = index;
+                this.updateDisplay();
+                
+                // Scroll to the selected card
+                const container = document.querySelector('.featured-opportunities');
+                const cards = container.querySelectorAll('.opportunity-preview');
+                if (container && cards.length > 0 && cards[index]) {
+                    container.scrollLeft = cards[index].offsetLeft - container.offsetLeft;
+                }
+            });
+            
+            // Add long press events for scrolling
+            dot.addEventListener('mousedown', (e) => this.handleDotLongPress(e, i));
+            dot.addEventListener('touchstart', (e) => this.handleDotLongPress(e, i), { passive: true });
+            
+            // Add mouseup/touchend to stop scrolling
+            dot.addEventListener('mouseup', () => this.stopScrolling());
+            dot.addEventListener('touchend', () => this.stopScrolling());
+            dot.addEventListener('mouseleave', () => this.stopScrolling());
+            
+            dotsContainer.appendChild(dot);
+        }
+        
+        // Make the dots container visible
+        dotsContainer.style.display = 'flex';
+    },
+    
+    // Handle long press on dots
+    handleDotLongPress(e, dotIndex) {
+        const currentDotIndex = Math.floor(this.currentIndex / this.cardsPerPage);
+        
+        // Determine scroll direction
+        if (dotIndex < currentDotIndex) {
+            this.scrollDirection = 'left';
+        } else if (dotIndex > currentDotIndex) {
+            this.scrollDirection = 'right';
+        } else {
+            return; // No scrolling needed if clicking the current dot
+        }
+        
+        // Add pulse animation to the dot
+        const dot = e.target;
+        dot.classList.add('pulse');
+        
+        // Start scrolling after a short delay (long press)
+        this.longPressTimer = setTimeout(() => {
+            this.startScrolling();
+        }, 300);
+    },
+    
+    // Start scrolling in the specified direction
+    startScrolling() {
+        if (this.isScrolling) return;
+        this.isScrolling = true;
+        
+        const container = document.querySelector('.featured-opportunities');
+        if (!container) return;
+        
+        const scrollAmount = this.scrollDirection === 'left' ? -10 : 10;
+        
+        const scroll = () => {
+            if (!this.isScrolling) return;
+            container.scrollLeft += scrollAmount;
+            requestAnimationFrame(scroll);
+        };
+        
+        scroll();
+    },
+    
+    // Stop scrolling
+    stopScrolling() {
+        clearTimeout(this.longPressTimer);
+        this.isScrolling = false;
+        
+        // Remove pulse animation from all dots
+        document.querySelectorAll('.destacar-dot').forEach(dot => {
+            dot.classList.remove('pulse');
+        });
+        
+        // Update current index based on scroll position
+        const container = document.querySelector('.featured-opportunities');
+        if (container) {
+            const cardWidth = container.querySelector('.opportunity-preview')?.offsetWidth || 280;
+            const scrollPosition = container.scrollLeft;
+            this.currentIndex = Math.round(scrollPosition / cardWidth);
+            this.updateDotsIndicator();
+        }
     }
 }; 

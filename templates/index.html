@@ -2,6 +2,7 @@
 
 {% block head %}
 <script type="module" src="{{ url_for('static', filename='js/site.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-dots-indicator.css') }}">
 <style>
     /* Custom styles for multiple select dropdowns */
     select[multiple] {
@@ -648,6 +649,11 @@
                                 </div>
                             </template>
                         </div>
+                    </div>
+                    
+                    <!-- Mobile dots indicator -->
+                    <div class="destacar-dots-container" style="display: none;">
+                        <!-- Dots will be populated by JavaScript -->
                     </div>
 
                     <!-- Next button -->
