@@ -299,4 +299,61 @@
     .destacados-section {
         margin-bottom: 80px !important;
     }
+    
+    /* MOBILE LAYOUT FIXES */
+    
+    /* Fix for title being cut off at the bottom */
+    .featured-opportunities .font-medium.text-lg {
+        margin-bottom: 8px; /* Slightly reduced margin to prevent cut-off */
+        line-height: 1.4; /* Tighter line height to prevent cut-off */
+        padding-bottom: 2px; /* Add a small padding at the bottom */
+    }
+    
+    /* Make the card content area taller to accommodate wrapped disciplines */
+    .featured-opportunities .opportunity-preview {
+        height: auto; /* Allow height to adjust based on content */
+        min-height: 313px; /* Maintain minimum height */
+    }
+    
+    .featured-opportunities .p-2 {
+        height: auto; /* Allow height to adjust based on content */
+        min-height: 113px; /* Maintain minimum height */
+        padding: 14px 16px; /* Slightly reduced padding for mobile */
+    }
+    
+    /* Reduce horizontal spacing between icons and text */
+    .featured-opportunities .meta-row .flex.items-center.gap-1,
+    .featured-opportunities .date-row {
+        gap: 4px; /* Reduced from 6px */
+    }
+    
+    /* Make meta-row wrap on mobile */
+    .featured-opportunities .meta-row {
+        flex-wrap: wrap; /* Allow wrapping on mobile */
+        gap: 8px; /* Consistent vertical gap between items */
+    }
+    
+    /* Reduce gap with negative margin on date row */
+    .featured-opportunities .date-row {
+        margin-top: -8px; /* Pull the date line up closer to disciplines */
+    }
+    
+    /* Consistent spacing for metadata container */
+    .featured-opportunities .flex.flex-wrap.gap-4 {
+        gap: 8px; /* Reduced from 16px (gap-4) to 8px for mobile */
+    }
+    
+    /* Make subdisciplines wrap properly */
+    .featured-opportunities .subdisciplines-inline {
+        white-space: normal; /* Allow text to wrap */
+        width: 100%; /* Take full width when wrapped */
+        flex-basis: 100%; /* Force to new line */
+        order: 3; /* Place at the bottom of the meta-row */
+    }
+    
+    /* Ensure country and payment info stay on the same line */
+    .featured-opportunities .meta-row > div:nth-child(1),
+    .featured-opportunities .meta-row > div:nth-child(2) {
+        flex: 0 0 auto; /* Don't grow or shrink */
+    }
 } 
