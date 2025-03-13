@@ -13,7 +13,7 @@
             {% if user_name %}
                 Bienvenido <span class="text-[#6232FF]">{{ user_name|title }}</span> a tu cuenta
             {% else %}
-                ¡Bienvenido a <span class="text-[#6232FF]">tu cuenta</span>!
+                ¡Bienvenido a tu cuenta!
             {% endif %}
         </h1>
     </div>
@@ -23,7 +23,7 @@
 <main class="container mx-auto px-4 py-8 bg-gray-50 max-w-[966px]">
     <div class="grid grid-cols-1 gap-8">
         <!-- Newsletter Subscription Card -->
-        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden h-[415px]" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden sm:h-[415px]" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
             <div class="flex flex-col md:flex-row h-full">
                 <div class="w-full md:w-2/3 p-8 overflow-y-auto">
                     <div class="flex flex-col">
@@ -41,9 +41,9 @@
                                    name="email" 
                                    class="w-2/3 px-4 py-3 border border-gray-300 rounded-full newsletter-text bg-white" 
                                    placeholder="tucorreo@ejemplo.com"
-                                   value="{{ existing_email if existing_email }}"
+                                   value="{{ existing_email if existing_email is defined else '' }}"
                                    form="preferences-form">
-                            {% if existing_email %}
+                            {% if existing_email is defined and existing_email %}
                             <span class="absolute top-1/2 -translate-y-1/2" style="right: calc(100% - 62%);">
                                 <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -62,8 +62,8 @@
                                            value="Quincenal" 
                                            class="radio-input"
                                            form="preferences-form"
-                                           {% if suscripcion == "Quincenal" %}checked{% endif %}
-                                           checked>
+                                           {% if suscripcion is defined and suscripcion == "Quincenal" %}checked{% endif %}
+                                           {% if suscripcion is not defined %}checked{% endif %}>
                                     <label for="quincenal" class="radio-label">quincenal</label>
                                 </div>
                                 <div class="flex items-center">
@@ -73,7 +73,7 @@
                                            value="Mensual" 
                                            class="radio-input"
                                            form="preferences-form"
-                                           {% if suscripcion == "Mensual" %}checked{% endif %}>
+                                           {% if suscripcion is defined and suscripcion == "Mensual" %}checked{% endif %}>
                                     <label for="mensual" class="radio-label">mensual</label>
                                 </div>
                             </div>
@@ -88,7 +88,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="w-full md:w-1/3 bg-white p-4 flex items-center justify-center">
+                <div class="w-full md:w-1/3 bg-white p-4 flex items-center justify-center sm:flex">
                     <img src="{{ url_for('static', filename='public/suscripcion.png') }}" alt="Suscripción" class="h-auto w-full max-w-[320px] object-contain">
                 </div>
             </div>
@@ -97,7 +97,7 @@
         <!-- Disciplines Card -->
         <form id="preferences-form" method="POST" action="{{ url_for('mi_espacio') }}" class="space-y-6" data-form-type="mi-espacio">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden h-[390px]" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
+            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden sm:h-[390px]" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
                 <div class="flex flex-col md:flex-row h-full">
                     <div class="w-full md:w-2/3 p-8 overflow-y-auto">
                         <div class="flex flex-col h-full">
@@ -118,7 +118,7 @@
                                            name="disciplines" 
                                            value="{{ discipline }}" 
                                            id="{{ discipline }}"
-                                           {% if normalize_discipline(discipline) in selected_disciplines %}checked{% endif %}>
+                                           {% if selected_disciplines and (normalize_discipline is defined and normalize_discipline(discipline) in selected_disciplines or discipline in selected_disciplines) %}checked{% endif %}>
                                     <label class="discipline-label" for="{{ discipline }}">
                                         {{ discipline }}
                                     </label>
@@ -129,12 +129,12 @@
                             <div>
                                 <button type="submit" 
                                         class="discipline-button">
-                                    Guardar preferencias y volver al inicio
+                                    <span class="sm:inline">Guardar preferencias y volver al inicio</span>
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div class="w-full md:w-1/3 bg-white p-4 flex items-center justify-center">
+                    <div class="w-full md:w-1/3 bg-white p-4 flex items-center justify-center sm:flex">
                         <img src="{{ url_for('static', filename='public/disciplinas.png') }}" alt="Disciplinas" class="h-auto w-full max-w-[305px] object-contain">
                     </div>
                 </div>
@@ -142,7 +142,7 @@
         </form>
 
         <!-- Saved Opportunities Card -->
-        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden mt-5 mb-5" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
             <div class="p-6">
                 <h2 class="text-xl font-semibold text-gray-900 mb-4">Oportunidades guardadas</h2>
                 <div class="results-table-container">
@@ -150,7 +150,7 @@
                         <thead>
                             <tr>
                                 <th scope="col" class="oportunidad-col">Oportunidad</th>
-                                <th scope="col" class="cierre-col">Cierre</th>
+                                <th scope="col" class="cierre-col hidden sm:table-cell">Cierre</th>
                                 <th scope="col" class="accion-col">Acciones</th>
                             </tr>
                         </thead>
@@ -193,6 +193,9 @@
     </div>
 </main>
 
+<!-- Include the footer partial -->
+{% include '_footer.html' %}
+
 <style>
     /* Override body background color */
     body {
@@ -229,6 +232,128 @@
         color: #4B5563;
     }
     
+    /* Mobile responsive styles */
+    @media (max-width: 640px) {
+        /* Reduce margin between header and cards */
+        header.bg-gray-50.h-\[180px\] {
+            height: 150px !important;
+        }
+        
+        /* Adjust main container padding to reduce space after header */
+        main.container.mx-auto.px-4.py-8 {
+            padding-top: 1rem !important;
+        }
+        
+        /* Reduce gap between cards on mobile */
+        main .grid.grid-cols-1.gap-8 {
+            gap: 1rem;
+        }
+        
+        /* Increase card padding for mobile */
+        .w-full.md\:w-2\/3.p-8 {
+            padding: 20px 16px !important;
+        }
+        
+        /* Add more vertical padding to card containers */
+        .bg-white.rounded-lg.border.border-gray-200.overflow-hidden .flex.flex-col.md\:flex-row {
+            padding: 12px 0;
+        }
+        
+        /* Adjust padding for the saved opportunities card */
+        .bg-white.rounded-lg.border.border-gray-200.overflow-hidden .p-6 {
+            padding: 20px 16px !important;
+        }
+        
+        .newsletter-title {
+            font-size: 20px;
+        }
+        
+        .newsletter-text {
+            font-size: 14px;
+        }
+        
+        .results-table th, 
+        .results-table td {
+            padding: 8px 4px;
+        }
+        
+        .results-table .oportunidad-col {
+            width: 70%;
+        }
+        
+        .results-table .accion-col {
+            width: 30%;
+        }
+        
+        /* Hide the cierre column on mobile */
+        .results-table .cierre-col,
+        .results-table td.hidden.sm\:table-cell {
+            display: none;
+        }
+        
+        /* Ensure the table has only two columns on mobile */
+        .results-table colgroup col:nth-child(2) {
+            display: none;
+        }
+        
+        .pagination-container {
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .pagination-info, 
+        .pagination-controls {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        /* Adjust button text size for mobile */
+        .subscribe-button, .discipline-button {
+            font-size: 14px;
+            padding: 0 16px;
+            white-space: nowrap;
+        }
+        
+        /* Adjust grid for disciplines on mobile */
+        .grid.grid-cols-2.gap-4 {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+        
+        /* Ensure proper spacing on mobile */
+        .container.mx-auto.px-4.py-8 {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+        
+        /* Hide images on mobile */
+        .w-full.md\:w-1\/3.bg-white.p-4.flex.items-center.justify-center.sm\:flex {
+            display: none;
+        }
+    }
+    
+    /* Ensure cierre column is visible on larger screens */
+    @media (min-width: 641px) {
+        .results-table .cierre-col,
+        .results-table td.hidden.sm\:table-cell {
+            display: table-cell;
+        }
+        
+        /* Column widths for larger screens */
+        .results-table .oportunidad-col {
+            width: 50%;
+        }
+        
+        .results-table .cierre-col {
+            width: 25%;
+        }
+        
+        .results-table .accion-col {
+            width: 25%;
+        }
+    }
+    
+    /* Radio button styles */
     .radio-header {
         font-family: Inter, sans-serif;
         font-weight: 700;
@@ -418,10 +543,46 @@
     .results-table tbody tr {
         background-color: white !important;
     }
+    
+    /* Fix for Tailwind's hidden sm:table-cell */
+    @media (min-width: 640px) {
+        .hidden.sm\:table-cell {
+            display: table-cell !important;
+        }
+    }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Form submission handling with error prevention
+        const preferencesForm = document.getElementById('preferences-form');
+        if (preferencesForm) {
+            preferencesForm.addEventListener('submit', function(e) {
+                // Ensure at least one discipline is selected if disciplines exist
+                const disciplines = document.querySelectorAll('input[name="disciplines"]');
+                if (disciplines.length > 0) {
+                    const hasChecked = Array.from(disciplines).some(checkbox => checkbox.checked);
+                    if (!hasChecked) {
+                        // Prevent form submission if no disciplines are selected
+                        e.preventDefault();
+                        alert('Por favor, selecciona al menos una disciplina de interés.');
+                        return false;
+                    }
+                }
+                
+                // Validate email if email field exists
+                const emailField = document.querySelector('input[name="email"]');
+                if (emailField && emailField.value.trim() !== '') {
+                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailPattern.test(emailField.value)) {
+                        e.preventDefault();
+                        alert('Por favor, ingresa un correo electrónico válido.');
+                        return false;
+                    }
+                }
+            });
+        }
+        
         // Initialize pagination
         const rowsPerPage = document.getElementById('rows-per-page');
         const prevPageBtn = document.getElementById('prev-page');
@@ -438,11 +599,17 @@
             const totalPages = Math.ceil(totalRows / rowsPerPageValue);
             
             // Update page info
-            pageInfo.textContent = `Página ${currentPage} de ${totalPages || 1}`;
+            if (pageInfo) {
+                pageInfo.textContent = `Página ${currentPage} de ${totalPages || 1}`;
+            }
             
             // Enable/disable pagination buttons
-            prevPageBtn.classList.toggle('disabled', currentPage <= 1);
-            nextPageBtn.classList.toggle('disabled', currentPage >= totalPages || totalPages === 0);
+            if (prevPageBtn) {
+                prevPageBtn.classList.toggle('disabled', currentPage <= 1);
+            }
+            if (nextPageBtn) {
+                nextPageBtn.classList.toggle('disabled', currentPage >= totalPages || totalPages === 0);
+            }
             
             // Show/hide rows based on current page
             tableRows.forEach((row, index) => {
@@ -458,7 +625,9 @@
         }
         
         // Initialize the table display
-        updateTableDisplay();
+        if (tableRows.length > 0) {
+            updateTableDisplay();
+        }
         
         // Handle rows per page change
         if (rowsPerPage) {
@@ -481,27 +650,76 @@
         }
         
         // Handle pagination navigation
-        prevPageBtn.addEventListener('click', function() {
-            if (currentPage > 1) {
-                currentPage--;
-                updateTableDisplay();
-            }
-        });
+        if (prevPageBtn) {
+            prevPageBtn.addEventListener('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    updateTableDisplay();
+                }
+            });
+        }
         
-        nextPageBtn.addEventListener('click', function() {
-            const totalRows = tableRows.length;
-            const totalPages = Math.ceil(totalRows / rowsPerPageValue);
-            
-            if (currentPage < totalPages) {
-                currentPage++;
-                updateTableDisplay();
-            }
+        if (nextPageBtn) {
+            nextPageBtn.addEventListener('click', function() {
+                const totalRows = tableRows.length;
+                const totalPages = Math.ceil(totalRows / rowsPerPageValue);
+                
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    updateTableDisplay();
+                }
+            });
+        }
+        
+        // Make opportunity rows clickable to trigger modal
+        document.querySelectorAll('.opportunity-row').forEach(row => {
+            row.addEventListener('click', function() {
+                // Get data attributes from the row
+                const url = this.getAttribute('data-url');
+                const nombre = this.getAttribute('data-nombre');
+                const pais = this.getAttribute('data-pais');
+                const ogResumida = this.getAttribute('data-og_resumida');
+                const id = this.getAttribute('data-id');
+                const categoria = this.getAttribute('data-categoria');
+                const inscripcion = this.getAttribute('data-inscripcion');
+                
+                // Trigger the same action as the "Ver" button
+                // This assumes there's an existing modal functionality that the "Ver" button uses
+                // If there's a specific function that handles the modal, call it here
+                const previewEvent = new CustomEvent('preview-opportunity', {
+                    detail: {
+                        url,
+                        nombre,
+                        pais,
+                        ogResumida,
+                        id,
+                        categoria,
+                        inscripcion
+                    }
+                });
+                document.dispatchEvent(previewEvent);
+                
+                // Alternative: find and click the "Ver" button in this row
+                const previewBtn = this.querySelector('.preview-btn');
+                if (previewBtn) {
+                    previewBtn.click();
+                }
+            });
         });
         
         // Force background color to be gray-50
         document.body.style.backgroundColor = '#F9FAFB';
-        document.querySelector('main.w-full.flex.flex-col').style.backgroundColor = '#F9FAFB';
-        document.querySelector('div.flex-1').style.backgroundColor = '#F9FAFB';
+        
+        // Safely select elements that might not exist
+        const mainElement = document.querySelector('main.w-full.flex.flex-col');
+        if (mainElement) {
+            mainElement.style.backgroundColor = '#F9FAFB';
+        }
+        
+        const flexElement = document.querySelector('div.flex-1');
+        if (flexElement) {
+            flexElement.style.backgroundColor = '#F9FAFB';
+        }
     });
 </script>
 {% endblock %}

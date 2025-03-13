@@ -680,6 +680,9 @@ video {
 .table {
   display: table;
 }
+.table-cell {
+  display: table-cell;
+}
 .grid {
   display: grid;
 }
@@ -719,14 +722,8 @@ video {
 .h-\[272px\] {
   height: 272px;
 }
-.h-\[390px\] {
-  height: 390px;
-}
 .h-\[400px\] {
   height: 400px;
-}
-.h-\[415px\] {
-  height: 415px;
 }
 .h-\[44px\] {
   height: 44px;
@@ -758,6 +755,9 @@ video {
 .min-h-screen {
   min-height: 100vh;
 }
+.w-1 {
+  width: 0.25rem;
+}
 .w-1\/2 {
   width: 50%;
 }
@@ -766,6 +766,9 @@ video {
 }
 .w-10 {
   width: 2.5rem;
+}
+.w-2 {
+  width: 0.5rem;
 }
 .w-2\/3 {
   width: 66.666667%;
@@ -1791,8 +1794,23 @@ video {
   .sm\:mt-6 {
     margin-top: 1.5rem;
   }
+  .sm\:inline {
+    display: inline;
+  }
+  .sm\:flex {
+    display: flex;
+  }
+  .sm\:table-cell {
+    display: table-cell;
+  }
   .sm\:h-\[240px\] {
     height: 240px;
+  }
+  .sm\:h-\[390px\] {
+    height: 390px;
+  }
+  .sm\:h-\[415px\] {
+    height: 415px;
   }
   .sm\:h-screen {
     height: 100vh;

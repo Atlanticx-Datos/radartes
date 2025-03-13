@@ -1,11 +1,18 @@
-{% if saved_opportunities %}
+{% if saved_opportunities is defined and saved_opportunities %}
     {% for opportunity in saved_opportunities %}
-    <tr class="hover:bg-gray-50 transition-colors">
+    <tr class="hover:bg-gray-50 transition-colors opportunity-row cursor-pointer"
+        data-url="{{ opportunity.url }}"
+        data-nombre="{{ opportunity.nombre_original }}"
+        data-pais="{{ opportunity.país }}"
+        data-og_resumida="{{ opportunity.og_resumida }}"
+        data-id="{{ opportunity.id }}"
+        data-categoria="{{ opportunity.categoría }}"
+        data-inscripcion="{{ opportunity.inscripcion }}">
         <td class="px-4 py-3 text-sm text-gray-900">
             {{ opportunity.nombre_original }}
         </td>
-        <td class="px-4 py-3 text-sm text-gray-600">
-            {{ opportunity.fecha_de_cierre | format_date('%d/%m/%Y') }}
+        <td class="px-4 py-3 text-sm text-gray-600 hidden sm:table-cell">
+            {{ opportunity.fecha_de_cierre }}
         </td>
         <td class="px-4 py-3 text-sm text-gray-600">
             <div class="flex items-center justify-center gap-2">
@@ -25,7 +32,8 @@
                         hx-target="#saved-opportunities-list"
                         hx-swap="outerHTML"
                         class="text-red-500 hover:text-red-700 transition-colors"
-                        title="Eliminar de mi espacio">
+                        title="Eliminar de mi espacio"
+                        onclick="event.stopPropagation()">
                     ✕
                 </button>
             </div>
