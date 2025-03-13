@@ -1191,4 +1191,133 @@ table[id*="results"] th {
     }
 }
 
+/* Search input container and placeholder styles */
+.relative.w-full.max-w-2xl {
+    position: relative;
+    width: 100%;
+    max-width: 42rem;
+}
+
+.relative.flex.items-center {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Search input styles */
+#open-search {
+    width: 100%;
+    padding: 16px 48px; /* Equal padding on both sides */
+    border-radius: 9999px;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0px 4px 12px 0px rgba(31, 27, 45, 0.08), 0px 2px 2px -2px rgba(31, 27, 45, 0.08);
+    font-family: Inter;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #9691A4;
+}
+
+/* Search icon styles */
+.search-icon {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9691A4;
+    width: 1.4rem;
+    height: 1.4rem;
+    z-index: 20;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+/* Hide search icon when input has content */
+#open-search:not(:placeholder-shown) ~ .search-icon,
+#open-search:focus ~ .search-icon {
+    opacity: 0;
+}
+
+/* Ensure placeholder text is visible */
+#open-search::placeholder {
+    color: #9691A4;
+    opacity: 1;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-family: Inter;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    padding-left: 4px;
+    transition: opacity 0.2s ease;
+}
+
+/* Hide placeholder when input has content or is focused */
+#open-search:focus::placeholder {
+    opacity: 0;
+}
+
+/* Position the filter button with higher z-index */
+#filter-dropdown-trigger {
+    position: absolute;
+    right: 16px; /* Default position */
+    padding: 0.5rem;
+    color: #9691A4;
+    transition: all 0.2s ease;
+    z-index: 20;
+    background-color: transparent;
+}
+
+/* Move filter button to the left when clear button is visible */
+#filter-dropdown-trigger.right-12 {
+    right: 48px; /* Make room for the clear button */
+}
+
+/* Clear search button positioning */
+#clear-search {
+    position: absolute;
+    right: 16px;
+    padding: 0.5rem;
+    color: #9691A4;
+    z-index: 20;
+    background-color: transparent;
+    display: none; /* Hidden by default, shown via JS */
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+    #open-search {
+        font-size: 16px;
+        padding: 16px 44px;
+    }
+    
+    #open-search::placeholder {
+        font-size: 16px;
+    }
+    
+    .search-icon {
+        left: 16px;
+        width: 1.4rem;
+        height: 1.4rem;
+    }
+    
+    #filter-dropdown-trigger {
+        right: 16px;
+    }
+    
+    #filter-dropdown-trigger.right-12 {
+        right: 48px; /* Consistent with desktop */
+    }
+    
+    #clear-search {
+        right: 16px;
+    }
+}
+
 

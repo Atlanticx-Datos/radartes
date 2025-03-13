@@ -185,14 +185,13 @@
             <div class="relative w-full max-w-2xl">
                 <!-- Search input and buttons -->
                 <div class="relative flex items-center">
-                    <!-- Search icon on the left -->
-                    <div class="absolute left-4 text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
                     <input type="text" id="open-search" placeholder="¿Qué estás buscando?"
                         class="w-full p-4 pl-12 pr-28 border rounded-full shadow-xl bg-white/95 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">
+                    
+                    <!-- Search icon - moved after input for CSS selector to work -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="search-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                    </svg>
 
                     <!-- Filter trigger button -->
                     <button id="filter-dropdown-trigger" class="absolute right-4 p-2 text-[#454056] transition-all duration-200">
