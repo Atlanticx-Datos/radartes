@@ -30,6 +30,9 @@ export const DestacarModule = {
         // Set cards per page based on screen size
         this.setCardsPerPage();
         
+        // Preload images for better performance
+        this.preloadImages();
+        
         // Add resize listener to adjust cards per page when window size changes
         window.addEventListener('resize', () => {
             const oldCardsPerPage = this.cardsPerPage;
@@ -54,6 +57,46 @@ export const DestacarModule = {
             this.checkMobile();
             this.updateDisplay();
         }, 500);
+    },
+
+    /**
+     * Preload images for better performance
+     */
+    preloadImages() {
+        // Only preload the first few pages to avoid excessive network requests
+        const pagesToPreload = this.pages.slice(0, Math.min(9, this.pages.length));
+        
+        // Create a set to track unique image URLs
+        const imageUrls = new Set();
+        
+        // Collect image URLs for preloading
+        pagesToPreload.forEach(page => {
+            if (!page) return;
+            
+            // Get discipline info
+            const disciplines = page.disciplina ? page.disciplina.split(',').map(d => d.trim()).filter(Boolean) : [];
+            const mainDiscipline = disciplines.length > 0 ? disciplines[0] : 'General';
+            
+            // Normalize discipline
+            const normalizedDiscipline = mainDiscipline.toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/\s+/g, '');
+                
+            // Get image URL
+            const imageUrl = this.getImageForDiscipline(normalizedDiscipline, page.categoria);
+            imageUrls.add(imageUrl);
+        });
+        
+        // Add placeholder image
+        imageUrls.add('/static/public/destacarCardsImages/placeholder.jpg');
+        
+        // Preload images
+        imageUrls.forEach(url => {
+            const img = new Image();
+            img.src = url;
+        });
+        
+        console.log(`Preloaded ${imageUrls.size} images for destacar cards`);
     },
 
     // Check if we're on mobile
@@ -352,7 +395,10 @@ export const DestacarModule = {
                      data-fecha-cierre="${Utils.escapeHTML(page.fecha_de_cierre || '')}"
                      data-fecha-cierre-raw="${page.fecha_de_cierre || ''}">
                     <div class="relative h-48 bg-gray-200">
-                        <img src="/static/public/IsoAtx.png" alt="Atlantic x Logo" class="w-full h-full object-contain">
+                        <img src="${this.getImageForDiscipline(normalizedDiscipline, page.categoria)}" 
+                             alt="${Utils.escapeHTML(mainDiscipline)} ${Utils.escapeHTML(page.categoria || '')}" 
+                             class="w-full h-full object-cover"
+                             onerror="this.onerror=null; this.src='/static/public/destacarCardsImages/placeholder.jpg';">
                         <span class="absolute top-3 left-3 text-sm">
                             ${Utils.escapeHTML(page.categoria || '')}
                         </span>
@@ -537,6 +583,120 @@ export const DestacarModule = {
         }
         
         return 'discipline-default';
+    },
+
+    /**
+     * Get the appropriate image URL for a discipline
+     * @param {string} normalizedDiscipline - The normalized discipline name
+     * @param {string} category - The category of the opportunity
+     * @return {string} - The URL of the image to use
+     */
+    getImageForDiscipline(normalizedDiscipline, category) {
+        // Base path for destacar card images
+        const basePath = '/static/public/destacarCardsImages/';
+        
+        // Normalize the category (lowercase, remove accents, remove spaces)
+        const normalizedCategory = category ? category.toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s+/g, '') : '';
+        
+        // Map of disciplines to normalized values
+        const disciplineMap = {
+            'visuales': 'visuales',
+            'musica': 'musica',
+            'escenicas': 'escenicas',
+            'literatura': 'literatura',
+            'diseno': 'diseno',
+            'cine': 'cine',
+            'audiovisual': 'cine', // Map audiovisual to cine
+            'otras': 'otras'
+        };
+        
+        // Map of categories to normalized values
+        const categoryMap = {
+            'beca': 'beca',
+            'residencia': 'residencia',
+            'premio': 'premio',
+            'concurso': 'concurso',
+            'convocatoria': 'convocatoria',
+            'oportunidad': 'oportunidad',
+            'fondos': 'fondos',
+            'apoyo': 'apoyo'
+        };
+        
+        // Get the discipline key if it exists in our map
+        let disciplineKey = null;
+        for (const [key, value] of Object.entries(disciplineMap)) {
+            if (normalizedDiscipline.includes(key)) {
+                disciplineKey = value;
+                break;
+            }
+        }
+        
+        // Get the category key if it exists in our map
+        let categoryKey = null;
+        for (const [key, value] of Object.entries(categoryMap)) {
+            if (normalizedCategory.includes(key)) {
+                categoryKey = value;
+                break;
+            }
+        }
+        
+        // Since both category and discipline are always available, we'll focus on pairs
+        if (categoryKey && disciplineKey) {
+            // Try the specific pair first
+            const pairPath = `${basePath}pairs/${categoryKey}-${disciplineKey}.jpg`;
+            
+            // Check if we have this specific pair image
+            if (this.isPairImageAvailable(categoryKey, disciplineKey)) {
+                return pairPath;
+            }
+        }
+        
+        // If we don't have a specific pair image, use a discipline-based image
+        if (disciplineKey) {
+            return `${basePath}${disciplineKey}.jpg`;
+        }
+        
+        // Final fallback
+        return `${basePath}placeholder.jpg`;
+    },
+    
+    /**
+     * Check if a specific category-discipline pair image is available
+     * This is a simplified version that uses a predefined list of available pairs
+     * In a production environment, you might want to use a more dynamic approach
+     */
+    isPairImageAvailable(category, discipline) {
+        // List of available pair images
+        // This could be loaded from a configuration file or generated dynamically
+        const availablePairs = [
+            // Scholarship (Beca) pairs
+            'beca-visuales', 'beca-musica', 'beca-escenicas', 'beca-literatura', 'beca-diseno', 'beca-cine', 'beca-otras',
+            
+            // Residency (Residencia) pairs
+            'residencia-visuales', 'residencia-musica', 'residencia-escenicas', 'residencia-literatura', 'residencia-diseno', 'residencia-cine', 'residencia-otras',
+            
+            // Award (Premio) pairs
+            'premio-visuales', 'premio-musica', 'premio-escenicas', 'premio-literatura', 'premio-diseno', 'premio-cine', 'premio-otras',
+            
+            // Contest (Concurso) pairs
+            'concurso-visuales', 'concurso-musica', 'concurso-escenicas', 'concurso-literatura', 'concurso-diseno', 'concurso-cine', 'concurso-otras',
+            
+            // Call (Convocatoria) pairs
+            'convocatoria-visuales', 'convocatoria-musica', 'convocatoria-escenicas', 'convocatoria-literatura', 'convocatoria-diseno', 'convocatoria-cine', 'convocatoria-otras',
+            
+            // Opportunity (Oportunidad) pairs
+            'oportunidad-visuales', 'oportunidad-musica', 'oportunidad-escenicas', 'oportunidad-literatura', 'oportunidad-diseno', 'oportunidad-cine', 'oportunidad-otras',
+            
+            // Funds (Fondos) pairs
+            'fondos-visuales', 'fondos-musica', 'fondos-escenicas', 'fondos-literatura', 'fondos-diseno', 'fondos-cine', 'fondos-otras',
+            
+            // Support (Apoyo) pairs
+            'apoyo-visuales', 'apoyo-musica', 'apoyo-escenicas', 'apoyo-literatura', 'apoyo-diseno', 'apoyo-cine', 'apoyo-otras'
+        ];
+        
+        return availablePairs.includes(`${category}-${discipline}`);
     },
 
     // Update the dots indicator
