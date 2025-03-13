@@ -26,6 +26,7 @@ export const SearchModule = {
         active: false
     },
     isFiltered: false,
+    mobileSelectedColumn: 'disciplina', // Default selected column for mobile view
 
     init() {
         console.log('SearchModule initialized');
@@ -52,6 +53,14 @@ export const SearchModule = {
         setTimeout(() => {
             this.applyTableBorders();
         }, 300);
+
+        // Add window resize event listener for mobile adaptations
+        window.addEventListener('resize', this.handleWindowResize.bind(this));
+        
+        // Initialize mobile column visibility
+        setTimeout(() => {
+            this.handleWindowResize();
+        }, 500);
 
         // Initialize with data from the page
         const preFilteredData = document.getElementById('prefiltered-data');
@@ -783,6 +792,18 @@ export const SearchModule = {
                         : `Mostrando ${(this.pagination.currentPage - 1) * this.pagination.itemsPerPage + 1}-${Math.min(this.pagination.currentPage * this.pagination.itemsPerPage, results.length)} de ${results.length} resultado${results.length !== 1 ? 's' : ''}`
                     }
                 </div>
+                
+                <!-- Mobile Column Selector -->
+                <div class="mobile-column-selector">
+                    <label for="mobile-column-select">Mostrar columna:</label>
+                    <select id="mobile-column-select" onchange="SearchModule.handleMobileColumnChange(this.value)">
+                        <option value="disciplina" ${this.mobileSelectedColumn === 'disciplina' ? 'selected' : ''}>Disciplina</option>
+                        <option value="pais" ${this.mobileSelectedColumn === 'pais' ? 'selected' : ''}>País</option>
+                        <option value="pago" ${this.mobileSelectedColumn === 'pago' ? 'selected' : ''}>Pago</option>
+                        <option value="cierre" ${this.mobileSelectedColumn === 'cierre' ? 'selected' : ''}>Cierre</option>
+                    </select>
+                </div>
+                
                 <button 
                     type="button" 
                     class="text-gray-500 hover:text-gray-700 transition-colors mr-1 flex items-center" 
@@ -925,7 +946,18 @@ export const SearchModule = {
                             const colors = disciplineColors[normalizedDiscipline] || disciplineColors['otros'];
                             
                             return `
-                            <tr style="border-bottom: 1px solid #6232FF !important; background-color: ${index % 2 === 0 ? 'white' : '#f9fafb'};">
+                            <tr style="border-bottom: 1px solid #6232FF !important; background-color: ${index % 2 === 0 ? 'white' : '#f9fafb'}; cursor: pointer;" 
+                                onclick="showOpportunityDetails(this)" 
+                                data-url="${Utils.escapeHTML(page.url || '')}"
+                                data-nombre="${Utils.escapeHTML(page.nombre || '')}"
+                                data-pais="${Utils.escapeHTML(page.pais || page.país || '')}"
+                                data-og-resumida="${Utils.escapeHTML(page.og_resumida || '')}"
+                                data-id="${Utils.escapeHTML(page.id || '')}"
+                                data-categoria="${Utils.escapeHTML(page.categoria || '')}"
+                                data-requisitos="${Utils.escapeHTML(page.requisitos || '')}"
+                                data-disciplina="${Utils.escapeHTML(page.disciplina || '')}"
+                                data-fecha-cierre="${Utils.escapeHTML(page.fecha_de_cierre || '')}"
+                                data-inscripcion="${Utils.escapeHTML(page.inscripcion || '')}">
                                 <td class="px-4 py-4 whitespace-nowrap" style="border: none !important;">
                                     <div class="text-sm font-medium text-gray-900">
                                         ${page.nombre || ''}
@@ -983,24 +1015,27 @@ export const SearchModule = {
 
             ${this.pagination.totalPages > 1 ? `
                 <div class="pagination-container mt-0 flex items-center justify-end">
-                    <!-- Results per page dropdown with label -->
-                    <div class="flex items-center mr-4">
-                        <span class="pagination-label mr-2">Filas por página:</span>
-                        <select id="results-per-page" class="form-select-clean" onchange="SearchModule.changeResultsPerPage(this.value)">
-                            <option value="10" ${this.pagination.itemsPerPage === 10 ? 'selected' : ''}>10</option>
-                            <option value="20" ${this.pagination.itemsPerPage === 20 ? 'selected' : ''}>20</option>
-                            <option value="50" ${this.pagination.itemsPerPage === 50 ? 'selected' : ''}>50</option>
-                            <option value="100" ${this.pagination.itemsPerPage === 100 ? 'selected' : ''}>100</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Page counter -->
-                    <div class="pagination-counter mr-4">
-                        Página ${this.pagination.currentPage} de ${this.pagination.totalPages}
+                    <!-- Combined rows per page and page counter -->
+                    <div class="flex items-center justify-center pagination-info-container">
+                        <!-- Results per page dropdown with label -->
+                        <div class="flex items-center">
+                            <span class="pagination-label mr-2">Filas por página:</span>
+                            <select id="results-per-page" class="form-select-clean" onchange="SearchModule.changeResultsPerPage(this.value)">
+                                <option value="10" ${this.pagination.itemsPerPage === 10 ? 'selected' : ''}>10</option>
+                                <option value="20" ${this.pagination.itemsPerPage === 20 ? 'selected' : ''}>20</option>
+                                <option value="50" ${this.pagination.itemsPerPage === 50 ? 'selected' : ''}>50</option>
+                                <option value="100" ${this.pagination.itemsPerPage === 100 ? 'selected' : ''}>100</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Page counter -->
+                        <div class="pagination-counter">
+                            Página ${this.pagination.currentPage} de ${this.pagination.totalPages}
+                        </div>
                     </div>
                     
                     <!-- Navigation buttons -->
-                    <div class="flex items-center">
+                    <div class="flex items-center pagination-nav-container">
                         <!-- Previous page button -->
                         <button 
                             class="pagination-nav flex items-center justify-center ${this.pagination.currentPage === 1 ? 'disabled' : ''}"
@@ -1074,6 +1109,11 @@ export const SearchModule = {
         setTimeout(() => {
             this.applyTableBorders();
         }, 100);
+
+        // After rendering the table, apply mobile column visibility
+        setTimeout(() => {
+            this.handleMobileColumnChange(this.mobileSelectedColumn);
+        }, 200);
     },
 
     goToPage(page) {
@@ -1313,5 +1353,62 @@ export const SearchModule = {
                 header.style.borderBottom = '1px solid #6232FF';
             }
         });
+    },
+
+    // Handle mobile column selection change
+    handleMobileColumnChange(columnName) {
+        console.log('Mobile column changed to:', columnName);
+        this.mobileSelectedColumn = columnName;
+        
+        // Remove mobile-visible class from all columns
+        const allColumns = document.querySelectorAll('.results-table th:not(:first-child), .results-table td:not(:first-child)');
+        allColumns.forEach(col => {
+            col.classList.remove('mobile-visible');
+        });
+        
+        // Add mobile-visible class to the selected column
+        const selectedHeaderIndex = this.getColumnIndex(columnName);
+        if (selectedHeaderIndex > 0) { // Skip first column (always visible)
+            const headers = document.querySelectorAll('.results-table th');
+            const selectedHeader = headers[selectedHeaderIndex];
+            if (selectedHeader) {
+                selectedHeader.classList.add('mobile-visible');
+                
+                // Also add the class to all cells in that column
+                const rows = document.querySelectorAll('.results-table tbody tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length > selectedHeaderIndex) {
+                        cells[selectedHeaderIndex].classList.add('mobile-visible');
+                    }
+                });
+            }
+        }
+    },
+    
+    // Helper to get column index by name
+    getColumnIndex(columnName) {
+        const columnMap = {
+            'disciplina': 1,
+            'pais': 2,
+            'pago': 3,
+            'cierre': 4
+        };
+        return columnMap[columnName] || 0;
+    },
+
+    // Handle window resize for mobile adaptations
+    handleWindowResize() {
+        // Only apply mobile column visibility if we're on a mobile device
+        if (window.innerWidth <= 767) {
+            // If the previously selected column was 'accion', default to 'disciplina'
+            if (this.mobileSelectedColumn === 'accion') {
+                this.mobileSelectedColumn = 'disciplina';
+            }
+            
+            setTimeout(() => {
+                this.handleMobileColumnChange(this.mobileSelectedColumn);
+            }, 100);
+        }
     },
 }; 

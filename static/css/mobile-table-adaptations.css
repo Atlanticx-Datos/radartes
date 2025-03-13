@@ -1,0 +1,209 @@
+/**
+ * Mobile adaptations for the "Radar de oportunidades" section
+ * Focusing on the table display and column selection
+ */
+
+/* Mobile adaptations for the results table */
+@media (max-width: 767px) {
+    /* Hide all columns except the first one by default */
+    .results-table th:not(:first-child):not(.mobile-visible),
+    .results-table td:not(:first-child):not(.mobile-visible) {
+        display: none !important;
+    }
+    
+    /* Always show the first column (Oportunidad) and one selected column */
+    .results-table th:first-child,
+    .results-table td:first-child,
+    .results-table th.mobile-visible,
+    .results-table td.mobile-visible {
+        display: table-cell !important;
+    }
+    
+    /* Adjust width for the two visible columns */
+    .results-table th:first-child,
+    .results-table td:first-child {
+        width: 60% !important;
+    }
+    
+    .results-table th.mobile-visible,
+    .results-table td.mobile-visible {
+        width: 40% !important;
+    }
+    
+    /* Results counter layout for mobile */
+    #results-counter .flex {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 12px 0 !important;
+        height: auto !important;
+        width: 100% !important;
+    }
+    
+    /* Hide the results text on mobile */
+    #results-counter .flex > div:first-child {
+        display: none !important;
+    }
+    
+    /* Position the mobile column selector to the left */
+    .mobile-column-selector {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        flex: 1 !important;
+    }
+    
+    /* Position the trash button to the right */
+    #results-counter .flex > button {
+        margin-left: auto !important;
+        margin-right: 0 !important;
+        padding-right: 0 !important;
+        height: 31px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* Column selector styling */
+    .mobile-column-selector label {
+        font-size: 14px;
+        font-weight: 500;
+        margin-right: 8px;
+        color: #4B5563;
+        white-space: nowrap;
+    }
+    
+    .mobile-column-selector select {
+        appearance: none;
+        background-color: white;
+        border: 1px solid #D1D5DB;
+        border-radius: 6px;
+        padding: 6px 28px 6px 12px;
+        font-size: 14px;
+        color: #111827;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 8px center;
+        background-repeat: no-repeat;
+        background-size: 16px 16px;
+        max-width: 120px;
+    }
+    
+    .mobile-column-selector select:focus {
+        outline: none;
+        border-color: #6232FF;
+        box-shadow: 0 0 0 2px rgba(98, 50, 255, 0.2);
+    }
+    
+    /* Results counter adjustments */
+    #results-counter {
+        margin-bottom: 16px !important;
+    }
+    
+    /* Hide the trash button on very small screens */
+    @media (max-width: 360px) {
+        #results-counter .flex > button {
+            display: none !important;
+        }
+    }
+    
+    /* Reposition the pagination controls */
+    .pagination-container {
+        flex-direction: column !important;
+        align-items: center !important;
+        margin-top: 16px !important;
+        gap: 4px !important;
+        margin-bottom: 32px !important;
+    }
+    
+    .pagination-container > div {
+        margin-right: 0 !important;
+    }
+    
+    /* Make the rows-per-page and page counter display inline with less gap */
+    .pagination-container > div:first-child {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        gap: 12px !important;
+    }
+    
+    .pagination-counter {
+        margin-bottom: 0 !important;
+    }
+    
+    /* Center the pagination navigation buttons with less top margin */
+    .pagination-nav-container {
+        display: flex !important;
+        justify-content: center !important;
+        width: 100% !important;
+        margin-top: 2px !important;
+    }
+    
+    /* Make the pagination buttons more touch-friendly */
+    .pagination-nav {
+        width: 40px !important;
+        height: 40px !important;
+        margin: 0 8px !important;
+    }
+    
+    /* Hide the "Ver" button on mobile since the entire row is clickable */
+    .results-table td:last-child .action-button {
+        display: none !important;
+    }
+    
+    /* Add margin to the bottom of the results container */
+    #results-container {
+        margin-bottom: 16px !important;
+    }
+    
+    /* Add margin to the bottom of the results table container */
+    .results-table-container {
+        margin-bottom: 16px !important;
+    }
+}
+
+/* Hide the mobile column selector on larger screens */
+@media (min-width: 768px) {
+    .mobile-column-selector {
+        display: none !important;
+    }
+}
+
+/* Make rows more obviously clickable */
+.results-table tbody tr {
+    transition: background-color 0.2s ease, transform 0.1s ease !important;
+}
+
+.results-table tbody tr:hover {
+    background-color: #f3f4f6 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Add active state for touch feedback */
+.results-table tbody tr:active {
+    background-color: #e5e7eb !important;
+    transform: translateY(0) !important;
+}
+
+/* Pagination info container styling */
+.pagination-info-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+@media (max-width: 360px) {
+    /* For very small screens, stack the pagination info with less gap */
+    .pagination-info-container {
+        flex-direction: column;
+        gap: 4px;
+    }
+} 
