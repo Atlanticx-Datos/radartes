@@ -383,9 +383,29 @@ function setupFilterDropdown() {
                 // Show dropdown: remove hidden and reposition it fixed relative to the trigger
                 filterDropdown.classList.remove('hidden');
                 const triggerRect = filterTrigger.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+                
                 filterDropdown.style.position = 'fixed';
                 filterDropdown.style.top = (triggerRect.bottom + 5) + 'px';
-                filterDropdown.style.left = triggerRect.left + 'px';
+                
+                // For mobile screens (width < 768px), center the dropdown
+                if (viewportWidth < 768) {
+                    // Wait for the next frame to ensure the dropdown has its new width
+                    requestAnimationFrame(() => {
+                        const dropdownWidth = Math.min(viewportWidth - 32, 400); // Account for padding and max-width
+                        const leftPosition = Math.max(16, (viewportWidth - dropdownWidth) / 2);
+                        filterDropdown.style.left = leftPosition + 'px';
+                        
+                        // Ensure the dropdown doesn't go off-screen on the right
+                        const rightEdge = leftPosition + dropdownWidth;
+                        if (rightEdge > viewportWidth - 16) {
+                            filterDropdown.style.left = (viewportWidth - dropdownWidth - 16) + 'px';
+                        }
+                    });
+                } else {
+                    // For desktop, position slightly to the left of the trigger
+                    filterDropdown.style.left = (triggerRect.left - 20) + 'px';
+                }
                 
                 // Reparent the dropdown to document.body, if not already there
                 if (filterDropdown.parentElement !== document.body) {

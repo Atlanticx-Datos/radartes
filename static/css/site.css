@@ -755,8 +755,49 @@ html {
 /* Add new styles for the structured filters dropdown */
 #structured-filters {
     position: absolute !important;
-    z-index: 1000000 !important;  /* Updated highest z-index to ensure dropdown is on top */
+    z-index: 1000000 !important;
     background: white !important;
+    border-radius: 12px !important;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+@media (max-width: 767px) {
+    #structured-filters {
+        width: calc(100vw - 32px) !important; /* Leave 16px padding on each side */
+        max-width: 400px !important; /* Maximum width on mobile */
+        margin: 0 auto !important;
+    }
+    
+    /* Adjust internal padding for mobile */
+    #structured-filters .filter-section {
+        padding: 12px !important;
+    }
+    
+    /* Make checkboxes and radio buttons more touch-friendly */
+    #structured-filters input[type="checkbox"],
+    #structured-filters input[type="radio"] {
+        width: 20px !important;
+        height: 20px !important;
+        margin-right: 8px !important;
+    }
+    
+    /* Adjust dropdown section spacing */
+    #structured-filters .filter-dropdown-content {
+        margin-top: 8px !important;
+    }
+    
+    /* Make the dropdown options more touch-friendly */
+    #structured-filters select {
+        height: 40px !important;
+        padding: 8px 12px !important;
+    }
+}
+
+/* Ensure proper width on desktop */
+@media (min-width: 768px) {
+    #structured-filters {
+        width: 320px !important;
+    }
 }
 
 /* Destacados container */
