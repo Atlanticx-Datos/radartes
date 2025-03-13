@@ -149,6 +149,13 @@
     .form-checkbox:hover, .form-radio:hover {
         border-color: #6232FF;
     }
+    
+    /* Custom text shadow for mobile screens */
+    @media (max-width: 767px) {
+        .mobile-text-shadow {
+            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
+        }
+    }
 </style>
 {% endblock %}
 
@@ -706,7 +713,7 @@
             </div>
 
             <!-- Newsletter Section -->
-            <div class="mb-16 bg-[#eae6fd] rounded-lg overflow-hidden h-[272px] sm:h-[240px]">
+            <div class="mb-16 bg-[#eae6fd] rounded-lg overflow-visible h-[272px] sm:h-[240px]">
                 <div class="container mx-auto px-6 py-10">
                     <div class="text-center">
                         {% if existing_email %}
@@ -724,7 +731,7 @@
                         </form>
                         {% else %}
                         <!-- Not subscribed -->
-                        <h2 class="text-3xl font-bold text-design-gray-900 mb-4 md:drop-shadow-none drop-shadow-2xl">Suscribite a nuestro newsletter</h2>
+                        <h2 class="text-3xl font-bold text-design-gray-900 mb-4 relative z-10" style="text-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);">Suscribite a nuestro newsletter</h2>
                         <p class="text-design-gray-700 mb-6 sm:mb-8 text-lg max-w-2xl mx-auto">
                             Recibí actualizaciones mensuales de fotografía, arte, literatura y mucho más.
                         </p>
