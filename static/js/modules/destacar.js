@@ -437,7 +437,7 @@ export const DestacarModule = {
                     // Use the global showOpportunityDetails function if available
                     if (window.showOpportunityDetails && typeof window.showOpportunityDetails === 'function') {
                         console.log('Using global showOpportunityDetails function');
-                        window.showOpportunityDetails(element);
+                        window.showOpportunityDetails(element, e);
                     } else {
                         // Fallback to direct call
                         window.ModalModule.showPreviewModal(

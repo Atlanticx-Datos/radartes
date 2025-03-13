@@ -96,10 +96,10 @@
                         data-category="{{ page.categoria }}"
                         data-requisitos="{{ page.requisitos }}"
                         data-disciplina="{{ page.disciplina }}"
-                        data-fecha-cierre="{{ page.fecha_de_cierre }}"
+                        data-fecha-cierre="{{ page.fecha_de_cierre | default('') }}"
                         data-fecha-cierre-formatted="{{ page.fecha_de_cierre | default('') | format_date }}"
                         data-inscripcion="{{ page.inscripcion }}"
-                        onclick="showOpportunityDetails(this)">
+                        onclick="showOpportunityDetails(this, event)">
                         Ver
                     </button>
                 </td>
@@ -148,7 +148,13 @@
 </div>
 
 <script>
-function showOpportunityDetails(button) {
+function showOpportunityDetails(button, event) {
+    // Prevent event propagation to avoid double modal
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
     // Get data from button attributes
     const url = button.getAttribute('data-url');
     const name = button.getAttribute('data-name') || button.getAttribute('data-nombre');

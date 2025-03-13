@@ -947,7 +947,7 @@ export const SearchModule = {
                             
                             return `
                             <tr style="border-bottom: 1px solid #6232FF !important; background-color: ${index % 2 === 0 ? 'white' : '#f9fafb'}; cursor: pointer;" 
-                                onclick="showOpportunityDetails(this)" 
+                                onclick="showOpportunityDetails(this, event)" 
                                 data-url="${Utils.escapeHTML(page.url || '')}"
                                 data-nombre="${Utils.escapeHTML(page.nombre || '')}"
                                 data-pais="${Utils.escapeHTML(page.pais || page.país || '')}"
@@ -995,7 +995,7 @@ export const SearchModule = {
                                         data-disciplina="${Utils.escapeHTML(page.disciplina || '')}"
                                         data-fecha-cierre="${page.fecha_de_cierre || ''}"
                                         data-inscripcion="${Utils.escapeHTML(page.inscripcion || '')}"
-                                        onclick="window.showOpportunityDetails(this)"
+                                        onclick="window.showOpportunityDetails(this, event)"
                                     >
                                         Ver
                                     </button>

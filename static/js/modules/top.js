@@ -130,7 +130,7 @@ export const TopModule = {
                         data-disciplina="${Utils.escapeHTML(currentPage.disciplina || '')}"
                         data-fecha-cierre="${Utils.escapeHTML(currentPage.fecha_de_cierre || '')}"
                         data-inscripcion="${Utils.escapeHTML(currentPage.inscripcion || '')}"
-                        onclick="showOpportunityDetails(this)">
+                        onclick="showOpportunityDetails(this, event)">
                         Ver más
                     </button>
                 </div>

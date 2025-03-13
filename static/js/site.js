@@ -1023,8 +1023,20 @@ document.body.addEventListener('htmx:afterProcessNode', function(evt) {
 // Global modal click handler
 const handleModalClick = (e) => {
     try {
+        // Check if this event was already handled by an inline onclick handler
+        if (e.defaultPrevented) {
+            console.log('Click event was already handled by an inline handler, skipping global handler');
+            return;
+        }
+
         const previewButton = e.target.closest('.preview-btn, .action-button');
         if (!previewButton) return;
+        
+        // If the button has an onclick attribute, let that handler take care of it
+        if (previewButton.hasAttribute('onclick')) {
+            console.log('Button has inline onclick handler, skipping global handler');
+            return;
+        }
         
         e.preventDefault();
         e.stopPropagation();
@@ -1214,8 +1226,14 @@ function initDestacar() {
 }
 
 // Make showOpportunityDetails function globally available
-window.showOpportunityDetails = function(button) {
+window.showOpportunityDetails = function(button, event) {
     try {
+        // Mark the event as handled to prevent double modal opening
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
         // Get data from button attributes with fallbacks for different naming conventions
         const url = button.getAttribute('data-url') || button.dataset.url || '';
         const name = button.getAttribute('data-name') || button.getAttribute('data-nombre') || button.dataset.name || button.dataset.nombre || '';
