@@ -1,0 +1,85 @@
+/**
+ * Mobile adaptations for the site
+ * Focusing on the "Radar de oportunidades" section
+ */
+
+/* Mobile adaptations for the Radar de oportunidades section */
+@media (max-width: 767px) {
+    /* Change the grid to a horizontal scrollable container on mobile */
+    #results-container {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        gap: 16px !important;
+        padding-bottom: 24px !important;
+        margin-bottom: 16px !important;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        scrollbar-width: none; /* Hide scrollbar on Firefox */
+        -ms-overflow-style: none; /* Hide scrollbar on IE/Edge */
+    }
+    
+    /* Hide scrollbar on Chrome/Safari */
+    #results-container::-webkit-scrollbar {
+        display: none;
+    }
+    
+    /* Set a fixed width for the cards on mobile to ensure proper scrolling */
+    #results-container > div.opportunity-card {
+        min-width: 280px !important;
+        max-width: 280px !important;
+        flex: 0 0 auto !important;
+        margin-right: 0 !important;
+    }
+    
+    /* Add a subtle shadow to indicate there's more content to scroll */
+    .radar-opportunities-container {
+        position: relative;
+    }
+    
+    .radar-opportunities-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 40px;
+        background: linear-gradient(to right, rgba(249, 250, 251, 0), rgba(249, 250, 251, 0.8));
+        pointer-events: none;
+        z-index: 10;
+    }
+    
+    /* Scroll indicator styling */
+    .scroll-indicator {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 16px;
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 20;
+    }
+    
+    .scroll-indicator-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #D1D5DB; /* Light gray */
+        transition: background-color 0.3s ease;
+    }
+    
+    .scroll-indicator-dot:first-child {
+        background-color: #6232FF; /* Primary color for the active dot */
+    }
+    
+    /* Add animation to indicate scrolling is possible */
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.7; }
+        50% { transform: scale(1.1); opacity: 1; }
+        100% { transform: scale(1); opacity: 0.7; }
+    }
+    
+    .scroll-indicator-dot:last-child {
+        animation: pulse 1.5s infinite;
+    }
+} 

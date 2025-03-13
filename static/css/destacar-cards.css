@@ -272,4 +272,31 @@
     .destacar-next {
         right: 0 !important;
     }
+}
+
+/* Mobile navigation controls - position below cards */
+@media (max-width: 767px) {
+    /* Move navigation buttons below the cards */
+    .destacar-prev, .destacar-next {
+        top: auto !important;
+        bottom: -50px !important;
+        transform: none !important;
+    }
+    
+    /* Position the prev button on the left */
+    .destacar-prev {
+        left: 25% !important;
+        right: auto !important;
+    }
+    
+    /* Position the next button on the right */
+    .destacar-next {
+        right: 25% !important;
+        left: auto !important;
+    }
+    
+    /* Add bottom margin to the section to make room for the buttons */
+    .destacados-section {
+        margin-bottom: 80px !important;
+    }
 } 
