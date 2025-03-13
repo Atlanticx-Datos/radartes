@@ -206,4 +206,85 @@
         flex-direction: column;
         gap: 4px;
     }
+}
+
+/* Newsletter subscription mobile adaptations */
+@media (max-width: 767px) {
+    /* Increase container height for consistent vertical spacing */
+    .bg-\[\#eae6fd\].h-\[250px\] {
+        height: auto !important;
+        min-height: 280px !important;
+        padding-top: 24px !important;
+        padding-bottom: 24px !important;
+    }
+    
+    /* Hide the subheader text on mobile */
+    .bg-\[\#eae6fd\] .text-design-gray-700 {
+        display: none !important;
+    }
+    
+    /* Update title typography and color */
+    .bg-\[\#eae6fd\] h2.text-3xl.text-design-gray-900 {
+        color: white !important;
+        font-family: Inter, sans-serif !important;
+        font-weight: 700 !important;
+        font-size: 24px !important;
+        line-height: 130% !important;
+        letter-spacing: 0% !important;
+        text-align: center !important;
+        margin-bottom: 24px !important; /* Increase margin below the title */
+        text-shadow: 0px 4px 12px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14 !important; /* Apply shadow to text */
+    }
+    
+    /* Stack the form elements on mobile */
+    #subscribe-form {
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 12px !important;
+    }
+    
+    /* Make the input container take full width */
+    #subscribe-form .relative.w-full {
+        width: 100% !important;
+        max-width: 90% !important;
+        margin-bottom: 60px !important; /* Significantly increase spacing between input and button */
+        position: relative !important;
+    }
+    
+    /* Hide the email icon on mobile */
+    #subscribe-form .absolute.left-4.top-1\/2 {
+        display: none !important;
+    }
+    
+    /* Update placeholder typography */
+    #subscribe-form input[type="email"] {
+        font-family: Inter, sans-serif !important;
+        font-weight: 400 !important;
+        font-size: 12px !important;
+        line-height: 150% !important;
+        letter-spacing: 0% !important;
+        padding: 0 16px !important; /* Equal padding on both sides since icon is hidden */
+        width: 100% !important;
+        vertical-align: middle !important;
+        height: 48px !important;
+        box-sizing: border-box !important;
+        text-align: center !important; /* Center the placeholder text */
+    }
+    
+    /* Remove the absolute positioning of the button container */
+    #subscribe-form .absolute.right-2.top-1\/2 {
+        position: static !important;
+        transform: none !important;
+        display: flex !important;
+        justify-content: center !important;
+        width: 100% !important;
+        margin-top: 24px !important; /* Increase top margin */
+    }
+    
+    /* Center the button */
+    #subscribe-form button[type="submit"] {
+        width: auto !important;
+        min-width: 160px !important;
+        margin-top: 24px !important; /* Significantly increase top margin */
+    }
 } 
