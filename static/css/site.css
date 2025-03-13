@@ -5,6 +5,12 @@
    Purpose: Hide scrollbars while maintaining scroll functionality
    Why custom: Requires vendor prefixes and !important overrides
 ==================================== */
+
+/* Font Inter class */
+.font-inter {
+    font-family: 'Inter', sans-serif !important;
+}
+
 .custom-scrollbar {
     scrollbar-width: none;
 }

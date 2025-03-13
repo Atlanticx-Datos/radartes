@@ -35,17 +35,56 @@
                 </button>
 
                 <!-- Dropdown Panel -->
-                <div id="user-menu" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg z-50">
-                    <div class="p-4 border-b">
-                        <p class="font-semibold">{{ session.user.name }}</p>
-                        <p class="text-sm text-design-gray-600">{{ session.user.email }}</p>
-                        <p class="text-xs text-design-gray-500 mt-1">{{ session.user.user_type }}</p>
+                <div id="user-menu" class="hidden absolute right-1 mt-2 w-[278px] bg-white rounded-[12px] shadow-lg z-50 flex flex-col overflow-hidden" style="box-shadow: 0px 4px 12px 0px rgba(31, 27, 45, 0.08), 0px 2px 2px -2px rgba(31, 27, 45, 0.08);">
+                    <!-- User info section -->
+                    <div class="px-4 py-3 bg-white">
+                        <div class="flex items-center">
+                            <!-- Avatar - using same approach as trigger button -->
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden mr-3">
+                                {% if session.user.get('picture') and 'http' in session.user.picture %}
+                                    <img src="{{ session.user.picture }}" alt="{{ session.user.name }}" class="w-full h-full object-cover">
+                                {% elif session.user.get('name') %}
+                                    <div class="w-full h-full bg-design-primary text-white flex items-center justify-center font-medium">
+                                        {{ session.user.name[:1].upper() }}{{ session.user.name.split(' ')[1][:1].upper() if ' ' in session.user.name else '' }}
+                                    </div>
+                                {% else %}
+                                    <div class="w-full h-full bg-design-gray-600 text-white flex items-center justify-center">
+                                        {{ session.user.email[:1].upper() }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- User info on the right -->
+                            <div class="flex flex-col">
+                                <p class="font-bold text-base leading-tight text-gray-900 font-inter">{{ session.user.name }}</p>
+                                <p class="text-[10px] text-gray-500 font-inter">{{ session.user.email }}</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="p-2">
-                        <a href="{{ url_for('mi_espacio') }}" class="block px-4 py-2 text-sm text-design-gray-700 hover:bg-design-gray-100 rounded-lg">
-                            Mi espacio
+                    
+                    <!-- First divider with padding -->
+                    <div class="px-4 py-0 bg-white">
+                        <div class="border-t border-gray-200"></div>
+                    </div>
+                    
+                    <!-- Menu items -->
+                    <div class="flex-1 flex flex-col bg-white">
+                        <!-- Mi cuenta link -->
+                        <a href="{{ url_for('mi_espacio') }}" class="flex items-center px-4 py-3 text-[14px] font-normal text-[#6232FF] hover:bg-gray-100 font-inter bg-white">
+                            <svg class="w-4 h-4 mr-3 text-[#6232FF]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Mi cuenta
                         </a>
-                        <a href="{{ url_for('logout') }}" class="block px-4 py-2 text-sm text-design-gray-700 hover:bg-design-gray-100 rounded-lg">
+                        
+                        <!-- Second divider with padding -->
+                        <div class="px-4 py-0 bg-white">
+                            <div class="border-t border-gray-200"></div>
+                        </div>
+                        
+                        <!-- Cerrar sesión link -->
+                        <a href="{{ url_for('logout') }}" class="flex items-center px-4 py-3 text-[14px] font-normal text-gray-700 hover:bg-gray-100 font-inter bg-white">
                             Cerrar sesión
                         </a>
                     </div>

@@ -11,16 +11,16 @@
         </nav>
         <h1 class="text-[28px] text-gray-900 text-center">
             {% if user_name %}
-                Bienvenido <span class="text-[#6232FF]">{{ user_name|title }}</span> a tu espacio
+                Bienvenido <span class="text-[#6232FF]">{{ user_name|title }}</span> a tu cuenta
             {% else %}
-                ¡Bienvenido a <span class="text-[#6232FF]">tu espacio</span>!
+                ¡Bienvenido a <span class="text-[#6232FF]">tu cuenta</span>!
             {% endif %}
         </h1>
     </div>
 </header>
 
 <!-- Main content -->
-<main class="container mx-auto px-4 py-8 bg-gray-50">
+<main class="container mx-auto px-4 py-8 bg-gray-50 max-w-[966px]">
     <div class="grid grid-cols-1 gap-8">
         <!-- Newsletter Subscription Card -->
         <div class="bg-white rounded-lg border border-gray-200 overflow-hidden h-[415px]" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
