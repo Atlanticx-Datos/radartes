@@ -1,6 +1,9 @@
 # Virtual Environment
 myenv/
 .vercel
+venv/
+ENV/
+env/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -71,6 +74,7 @@ dmypy.json
 # dotenv
 .env
 .env.*
+!.env.example
 
 # virtualenv
 venv/
@@ -104,3 +108,28 @@ dist/
 
 # Session files
 flask_session/
+
+# Local development files
+*.local
+*.dev
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
