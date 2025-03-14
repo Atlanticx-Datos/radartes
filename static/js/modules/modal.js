@@ -837,32 +837,85 @@ export const ModalModule = {
 
     handleShare(platform, url, title) {
         // Create opportunity object with available data from the modal
-        const modalElement = document.querySelector('[id^="modal-"]');
-        if (!modalElement) {
-            console.error('Modal element not found for sharing');
+        const modalContent = document.querySelector('.bg-white.rounded-lg.shadow-lg');
+        if (!modalContent) {
+            console.error('Modal content element not found for sharing');
             return;
         }
         
-        // Try to extract data from the modal content
-        const countryElement = modalElement.querySelector('.flex.items-center svg[viewBox="0 0 20 20"] + *');
-        const disciplinaElement = modalElement.querySelector('.flex.items-center svg[viewBox="0 0 20 20"] ~ .text-gray-600');
+        // Extract data from the modal content using more reliable selectors
+        // Get country from the first item with location icon
+        let country = '';
+        const locationElements = modalContent.querySelectorAll('.flex.items-center.gap-1');
+        for (const el of locationElements) {
+            if (el.querySelector('svg[viewBox="0 0 20 20"]') && 
+                el.querySelector('svg[viewBox="0 0 20 20"]').innerHTML.includes('path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"')) {
+                country = el.querySelector('span').textContent.trim();
+                break;
+            }
+        }
         
-        // Check if we have a base_url from the modal element or from the clicked element
-        const baseUrl = modalElement.dataset.baseUrl || '';
+        // Get disciplines from the element with document icon
+        let disciplines = '';
+        for (const el of locationElements) {
+            if (el.querySelector('svg[viewBox="0 0 20 20"]') && 
+                el.querySelector('svg[viewBox="0 0 20 20"]').innerHTML.includes('path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"')) {
+                disciplines = el.querySelector('span').textContent.trim();
+                break;
+            }
+        }
+        
+        // Get closing date from the element with calendar icon
+        let closingDate = '';
+        const dateElements = modalContent.querySelectorAll('.flex.items-center.gap-1');
+        for (const el of dateElements) {
+            if (el.querySelector('svg[viewBox="0 0 20 20"][fill="#6232FF"]')) {
+                const dateText = el.querySelector('span').textContent.trim();
+                // Extract just the date part, removing "Cierre: " prefix
+                closingDate = dateText.replace('Cierre: ', '');
+                break;
+            }
+        }
+        
+        // Get registration type (free or paid)
+        let registration = 'Sin cargo'; // Default to free
+        const moneyElements = modalContent.querySelectorAll('.flex.items-center.gap-1');
+        for (const el of moneyElements) {
+            if (el.querySelector('svg[viewBox="0 0 24 24"]')) {
+                // If there's a strike-through line, it's free
+                registration = el.querySelector('.absolute') ? 'Sin cargo' : 'Con cargo';
+                break;
+            }
+        }
+        
+        // Get opportunity ID from hidden input
+        const idInput = modalContent.querySelector('input[name="selected_pages"]');
+        const id = idInput ? idInput.value : 'unknown';
+        
+        // Get opportunity title from h3
+        const titleElement = modalContent.querySelector('h3');
+        const opportunityTitle = titleElement ? titleElement.textContent.trim() : title;
+        
+        // Get opportunity description from the resumen section
+        const descriptionElement = modalContent.querySelector('p');
+        const description = descriptionElement ? descriptionElement.textContent.trim() : '';
+        
+        // Check if we have a base_url from the modal element
+        const baseUrl = modalContent.dataset.baseUrl || '';
         
         // Use base_url if present, otherwise use the provided url
         const shareUrl = baseUrl || url;
         
         // Create opportunity object with available data
         const opportunity = {
-            id: modalElement.querySelector('input[name="selected_pages"]')?.value || 'unknown',
-            nombre: title,
+            id: id,
+            nombre: opportunityTitle,
             url: shareUrl,
-            país: countryElement ? countryElement.textContent.trim() : '',
-            disciplina: disciplinaElement ? disciplinaElement.textContent.trim() : '',
-            fecha_de_cierre: '', // Not available in modal
-            inscripcion: modalElement.querySelector('.flex.items-center svg.w-5.h-5') ? 
-                (modalElement.querySelector('.flex.items-center svg.w-5.h-5 + svg.absolute') ? 'Sin cargo' : 'Con cargo') : ''
+            país: country,
+            disciplina: disciplines,
+            fecha_de_cierre: closingDate,
+            inscripcion: registration,
+            descripcion: description
         };
         
         console.log('Sharing opportunity:', opportunity, 'via platform:', platform);
@@ -874,6 +927,7 @@ export const ModalModule = {
             // Legacy fallback
             switch (platform) {
                 case 'copy':
+                    // For copy, just copy the URL
                     navigator.clipboard.writeText(shareUrl).then(() => {
                         Utils.showAlert('URL copiada al portapapeles');
                     }).catch(err => {
@@ -883,15 +937,26 @@ export const ModalModule = {
                     break;
 
                 case 'whatsapp':
-                    window.open(`https://wa.me/?text=${encodeURIComponent(title + ' ' + shareUrl)}`, '_blank');
+                    // For WhatsApp, create a simple message with the title and URL
+                    const whatsappText = `${opportunityTitle}\n\nPaís: ${country}\nDisciplina: ${disciplines}\nCierre: ${closingDate || 'Confirmar en bases'}\nInscripción: ${registration}\n\n${shareUrl}\n\nCompartido desde Radartes`;
+                    window.open(`https://wa.me/?text=${encodeURIComponent(whatsappText)}`, '_blank');
                     break;
 
                 case 'linkedin':
-                    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank');
+                    // For LinkedIn, include title and summary if possible
+                    const summary = `${country} | ${disciplines} | Cierre: ${closingDate || 'Confirmar en bases'}`;
+                    let linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+                    if (opportunityTitle) {
+                        linkedInUrl += `&title=${encodeURIComponent(opportunityTitle)}`;
+                    }
+                    if (summary) {
+                        linkedInUrl += `&summary=${encodeURIComponent(summary)}`;
+                    }
+                    window.open(linkedInUrl, '_blank');
                     break;
 
                 case 'email':
-                    window.open(`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(title + '\n\n' + shareUrl)}`, '_blank');
+                    window.open(`mailto:?subject=${encodeURIComponent(opportunityTitle)}&body=${encodeURIComponent(opportunityTitle + '\n\n' + shareUrl)}`, '_blank');
                     break;
                     
                 default:

@@ -1,98 +1,75 @@
-# Oportunidades
+# 100 Oportunidades
 
-A web application for discovering and sharing cultural opportunities, developed as part of an NGO's effort to positively impact the cultural sector.
+A platform for artists to discover global opportunities, grants, and resources.
 
-## 🌟 Overview
+## About the Project
 
-Oportunidades is an open-source platform designed to connect artists, cultural workers, and organizations with opportunities in the cultural sector. The platform aggregates opportunities from various sources and presents them in a user-friendly interface, making it easier for users to discover relevant opportunities based on their interests, location, and disciplines.
+100 Oportunidades is a web application that helps artists find and apply for opportunities worldwide. The platform aggregates information about grants, residencies, open calls, and other resources for artists across different disciplines.
 
-## 🚀 Features
+## Features
 
-- **Opportunity Discovery**: Browse and search for cultural opportunities
-- **Filtering System**: Filter opportunities by discipline, location, dates, and more
-- **User Preferences**: Authenticated users can save preferences for personalized results
-- **Sharing Functionality**: Share opportunities via WhatsApp, email, LinkedIn, or copy to clipboard
-- **Responsive Design**: Works on desktop and mobile devices
-- **Caching System**: Redis-based caching for improved performance
+- Browse opportunities by discipline, country, and deadline
+- Save favorite opportunities to your profile
+- Share opportunities via WhatsApp, LinkedIn, email, or copy link
+- Filter opportunities by various criteria
+- User authentication and profile management
 
-## 🛠️ Tech Stack
+## Getting Started
 
-- **Backend**: Flask (Python)
-- **Frontend**: HTML, JavaScript, Tailwind CSS
-- **Authentication**: Auth0
-- **Database**: Notion API
-- **Caching**: Redis/Upstash
-- **Deployment**: Vercel
-
-## 📋 Prerequisites
+### Prerequisites
 
 - Python 3.8+
-- Node.js and npm
-- Redis (optional for local development)
+- Node.js 14+
+- Redis
 
-## 🔧 Installation
+### Installation
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-organization/oportunidades.git
-   cd oportunidades
-   ```
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/100-oportunidades.git
+cd 100-oportunidades
+```
 
-2. Create and activate a virtual environment:
-   ```bash
-   python -m venv myenv
-   source myenv/bin/activate  # On Windows: myenv\Scripts\activate
-   ```
+2. Create and activate a virtual environment
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-3. Install Python dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+3. Install Python dependencies
+```bash
+pip install -r requirements.txt
+```
 
-4. Install Node.js dependencies:
-   ```bash
-   npm install
-   ```
+4. Install Node.js dependencies
+```bash
+npm install
+```
 
-5. Create a `.env` file based on the `.env.example` template and fill in your credentials.
+5. Build the CSS
+```bash
+npm run build
+```
 
-6. Build the CSS:
-   ```bash
-   npm run build
-   ```
+6. Start the development server
+```bash
+npm run start
+```
 
-7. Run the application:
-   ```bash
-   npm start
-   ```
+## Contributing
 
-8. Open your browser and navigate to `http://localhost:5001`
+We welcome contributions to 100 Oportunidades! Please check out our [contribution guidelines](CONTRIBUTING.md) for details on how to get started.
 
-## 🧪 Testing
+### Current Issues
 
-The application includes a testing environment for the sharing functionality. See [SHARING_TESTING.md](SHARING_TESTING.md) for details.
+Check out our [GitHub Issues](https://github.com/yourusername/100-oportunidades/issues) to see what we're currently working on. Our first issue is fixing the sharing functionality in the opportunity modal.
 
-## 🔄 Data Flow
+## License
 
-The application fetches data from Notion, processes it, and stores it in Redis for efficient access. See [Preview-flow.md](Preview-flow.md) for a visual representation of the data flow.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🤝 Contributing
+## Contact
 
-We welcome contributions from the community! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute to this project.
+Miguel Galperin - [@yourusername](https://twitter.com/yourusername) - email@example.com
 
-## 📝 Known Issues
-
-- See the [Issues](https://github.com/your-organization/oportunidades/issues) tab for current issues and feature requests.
-
-## 📜 License
-
-This project is licensed under the [MIT License](LICENSE) - see the LICENSE file for details.
-
-## 🙏 Acknowledgements
-
-- Thanks to all contributors who have helped make this project possible
-- Special thanks to the cultural organizations that have supported this initiative
-
-## 📞 Contact
-
-For questions or support, please open an issue or contact us at [your-email@example.com]. 
+Project Link: [https://github.com/yourusername/100-oportunidades](https://github.com/yourusername/100-oportunidades) 
