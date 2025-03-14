@@ -2298,3 +2298,19 @@ def add_cors_headers(response):
         response.headers['Access-Control-Allow-Credentials'] = 'true'
     return response
 
+@app.route("/debug/destacar")
+def debug_destacar():
+    try:
+        cached_content = get_cached_database_content()
+        if not cached_content:
+            return jsonify({"error": "No cached content available"})
+        
+        destacar_pages = cached_content.get('destacar_pages', [])
+        return jsonify({
+            "count": len(destacar_pages),
+            "data": destacar_pages,
+            "cache_timestamp": cached_content.get('timestamp', 'unknown')
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
