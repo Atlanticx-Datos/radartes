@@ -39,6 +39,39 @@ function exposeModules() {
     window.TopModule = TopModule;
     window.SharingModule = SharingModule;
     
+    // Add a debug function to help troubleshoot sharing issues
+    window.debugSharing = function() {
+        console.log('Debugging sharing functionality...');
+        
+        // Check if modules are available
+        console.log('SharingModule available:', window.SharingModule ? true : false);
+        console.log('ModalModule available:', window.ModalModule ? true : false);
+        
+        // Try to use the ModalModule's debug function if available
+        if (window.ModalModule && typeof window.ModalModule.debugSharing === 'function') {
+            return window.ModalModule.debugSharing();
+        } else {
+            console.log('ModalModule.debugSharing not available');
+            
+            // Fallback debug info
+            const shareButtons = document.querySelectorAll('.share-toggle-btn');
+            console.log('Share buttons found:', shareButtons.length);
+            
+            const shareDropdowns = document.querySelectorAll('.share-dropdown');
+            console.log('Share dropdowns found:', shareDropdowns.length);
+            
+            return {
+                toggleDropdown: () => {
+                    if (shareDropdowns.length > 0) {
+                        shareDropdowns[0].classList.toggle('hidden');
+                        return 'Toggled dropdown visibility';
+                    }
+                    return 'No dropdown found';
+                }
+            };
+        }
+    };
+    
     // Add global functions for destacar navigation
     window.nextDestacarPage = function() {
         if (window.DestacarModule) {

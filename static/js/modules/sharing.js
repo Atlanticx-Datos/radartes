@@ -93,9 +93,11 @@ export const SharingModule = {
     shareOpportunity(opportunity, platform) {
         // Validate inputs
         if (!opportunity || !platform) {
-            console.error('Missing required parameters for sharing');
+            console.error('Missing required parameters for sharing:', { opportunity, platform });
             return false;
         }
+        
+        console.log(`Attempting to share opportunity via ${platform}`, opportunity);
         
         // Format the opportunity details
         const formattedText = this.formatOpportunityDetails(opportunity);
@@ -104,30 +106,35 @@ export const SharingModule = {
         this.trackShare(platform, opportunity.id);
         
         // Share based on platform
-        switch (platform.toLowerCase()) {
-            case 'whatsapp':
-                return this.shareToWhatsApp(formattedText);
-                
-            case 'twitter':
-            case 'x':
-                return this.shareToTwitter(opportunity.nombre, opportunity.url);
-                
-            case 'linkedin':
-                return this.shareToLinkedIn(opportunity.url);
-                
-            case 'facebook':
-                return this.shareToFacebook(opportunity.url);
-                
-            case 'email':
-            case 'gmail':
-                return this.shareViaEmail(opportunity.nombre, formattedText);
-                
-            case 'copy':
-                return this.copyToClipboard(formattedText);
-                
-            default:
-                console.error(`Unsupported sharing platform: ${platform}`);
-                return false;
+        try {
+            switch (platform.toLowerCase()) {
+                case 'whatsapp':
+                    return this.shareToWhatsApp(formattedText);
+                    
+                case 'twitter':
+                case 'x':
+                    return this.shareToTwitter(opportunity.nombre, opportunity.url);
+                    
+                case 'linkedin':
+                    return this.shareToLinkedIn(opportunity.url);
+                    
+                case 'facebook':
+                    return this.shareToFacebook(opportunity.url);
+                    
+                case 'email':
+                case 'gmail':
+                    return this.shareViaEmail(opportunity.nombre, formattedText);
+                    
+                case 'copy':
+                    return this.copyToClipboard(formattedText);
+                    
+                default:
+                    console.error(`Unsupported sharing platform: ${platform}`);
+                    return false;
+            }
+        } catch (error) {
+            console.error(`Error sharing to ${platform}:`, error);
+            return false;
         }
     },
 

@@ -460,6 +460,9 @@ video {
     max-width: 1336px;
   }
 }
+.pointer-events-none {
+  pointer-events: none;
+}
 .visible {
   visibility: visible;
 }
