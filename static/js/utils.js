@@ -80,7 +80,7 @@ export const Utils = {
         }
     },
 
-    // Format title with vertical dash
+    // Format title with vertical dash - completely revised version
     formatTitleWithDash(title) {
         if (!title) return '';
         
@@ -96,30 +96,36 @@ export const Utils = {
             '┋'  // BOX DRAWINGS HEAVY QUADRUPLE DASH VERTICAL
         ];
         
-        // Find the first separator that exists in the string
-        let separatorIndex = -1;
-        let foundSeparator = null;
+        // Create a regex pattern that matches any of the separators with optional spaces around them
+        const separatorPattern = new RegExp(`(.*?)\\s*([${separators.map(s => this.escapeRegExp(s)).join('')}])\\s*(.*)`);
         
-        for (const separator of separators) {
-            const index = title.indexOf(separator);
-            if (index !== -1) {
-                separatorIndex = index;
-                foundSeparator = separator;
-                break;
-            }
-        }
+        // Check if the title contains any of the separators
+        const match = title.match(separatorPattern);
         
-        // If we found a separator, split the string and format
-        if (foundSeparator && separatorIndex > 0) {
-            // Trim both parts to remove any existing spaces
-            const category = this.escapeHTML(title.substring(0, separatorIndex).trim());
-            const name = this.escapeHTML(title.substring(separatorIndex + 1).trim());
+        if (match) {
+            // Extract the parts and the specific separator used
+            const beforeSeparator = match[1].trim();
+            // We don't use the actual separator found, but instead use a standardized one
+            const afterSeparator = match[3].trim();
             
-            // Wrap the separator in a span with specific styling for consistent spacing
-            return `<span class="title-category" data-category="${category}">${category}</span><span class="separator-dash">${foundSeparator}</span> ${name}`;
+            // Escape HTML in both parts
+            const category = this.escapeHTML(beforeSeparator);
+            const name = this.escapeHTML(afterSeparator);
+            
+            // Always use the presentation form for vertical bar "︱" instead of any other separator
+            // This ensures consistent spacing regardless of which separator was in the original text
+            const standardizedSeparator = '︱';
+            
+            // Create a standardized format with consistent spacing
+            return `<span class="title-category" data-category="${category}">${category}</span><span class="separator-dash">${standardizedSeparator}</span><span class="separator-space">&nbsp;</span>${name}`;
         }
         
         // If no separator found, return the original title
         return this.escapeHTML(title);
+    },
+    
+    // Helper function to escape special characters in a string for use in a RegExp
+    escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 }; 

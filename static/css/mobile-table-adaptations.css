@@ -373,7 +373,26 @@
 
 /* Style the separator dash for consistent spacing */
 .separator-dash {
-    margin: 0 0.15em 0 0.15em !important; /* Add consistent spacing around the dash */
+    margin: 0 !important; /* Remove margin to control spacing precisely in the HTML */
+    padding: 0 !important;
     display: inline-block !important;
     vertical-align: middle !important;
+    position: relative !important;
+    top: -0.05em !important; /* Slight vertical adjustment for better alignment */
+}
+
+/* Style the space after the separator */
+.separator-space {
+    display: inline-block !important;
+    width: 0.14rem !important; /* Fine-tuned from 0.15rem to 0.14rem for optimal spacing */
+}
+
+/* Make the portion of the title before the vertical dash font-semibold on mobile */
+@media (max-width: 767px) {
+    .results-table td:first-child .title-category {
+        font-weight: 600 !important; /* semibold */
+        display: inline-block !important;
+        margin-right: 0 !important; /* Ensure no margin after the category */
+        padding-right: 0 !important; /* Ensure no padding after the category */
+    }
 } 

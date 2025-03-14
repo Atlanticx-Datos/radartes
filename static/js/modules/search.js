@@ -960,7 +960,7 @@ export const SearchModule = {
                                 data-inscripcion="${Utils.escapeHTML(page.inscripcion || '')}">
                                 <td class="px-4 py-4 whitespace-nowrap" style="border: none !important;">
                                     <div class="text-sm font-medium text-gray-900">
-                                        ${Utils.formatTitleWithDash(page.nombre || '')}
+                                        ${this.formatTitleWithCategory(page.nombre || '')}
                                     </div>
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap" style="border: none !important;">
@@ -1445,7 +1445,12 @@ export const SearchModule = {
             const category = Utils.escapeHTML(title.substring(0, separatorIndex).trim());
             const name = Utils.escapeHTML(title.substring(separatorIndex + 1).trim());
             
-            return `<span class="title-category">${category}</span>${foundSeparator} ${name}`;
+            // Always use the presentation form for vertical bar "︱" instead of any other separator
+            // This ensures consistent spacing regardless of which separator was in the original text
+            const standardizedSeparator = '︱';
+            
+            // Use CSS classes for consistent spacing
+            return `<span class="title-category" data-category="${category}">${category}</span><span class="separator-dash">${standardizedSeparator}</span><span class="separator-space">&nbsp;</span>${name}`;
         }
         
         // If no separator found, return the original title
