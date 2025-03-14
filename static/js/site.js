@@ -104,6 +104,9 @@ document.addEventListener('DOMContentLoaded', function() {
     SubscribeModule.init();
     SharingModule.init();
     
+    // Flag to track if SearchModule was initialized with data
+    let searchModuleInitialized = false;
+    
     // Get prefiltered data for module initialization
     const preFilteredData = document.getElementById('prefiltered-data');
     console.log('Checking prefiltered-data element:', preFilteredData);
@@ -198,6 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (window.SearchModule && typeof window.SearchModule.updateResults === 'function') {
                     console.log('Initializing SearchModule with ALL pages:', pages.length);
                     window.SearchModule.updateResults(pages);
+                    searchModuleInitialized = true;
                 } else {
                     console.warn('SearchModule not available for initialization');
                 }
@@ -235,6 +239,30 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     } else {
         console.warn('prefiltered-data element not found');
+    }
+    
+    // If SearchModule wasn't initialized with data, make a direct API call to get the data
+    if (!searchModuleInitialized && window.SearchModule && typeof window.SearchModule.updateResults === 'function') {
+        console.log('SearchModule not initialized with prefiltered data, making direct API call');
+        
+        // Make an API call to get the data
+        fetch('/api/opportunities')
+            .then(response => response.json())
+            .then(data => {
+                if (data && Array.isArray(data) && data.length > 0) {
+                    console.log('Received data from API, initializing SearchModule with', data.length, 'items');
+                    window.SearchModule.updateResults(data);
+                } else {
+                    console.warn('API returned empty or invalid data');
+                    // Initialize with empty array as fallback
+                    window.SearchModule.updateResults([]);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data from API:', error);
+                // Initialize with empty array as fallback
+                window.SearchModule.updateResults([]);
+            });
     }
     
     // Setup user menu functionality

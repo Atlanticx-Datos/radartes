@@ -931,6 +931,24 @@ def index():
                              DISCIPLINE_GROUPS=DISCIPLINE_GROUPS,
                              og_data=get_default_og_data())
 
+# New API endpoint to return all opportunities as JSON
+@app.route("/api/opportunities")
+def api_opportunities():
+    try:
+        cached_content = get_cached_database_content()
+        if not cached_content:
+            app.logger.error("No cached content available for API")
+            return jsonify([]), 200
+
+        pages = cached_content.get('pages', [])
+        app.logger.info(f"API opportunities - Total pages: {len(pages)}")
+        
+        # Return all pages as JSON
+        return jsonify(pages), 200
+    except Exception as e:
+        app.logger.error(f"Error in API opportunities: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/_legacy_admin")
 def legacy_admin():
     print("Current Session Data at Legacy Admin:", session.get("user"))
