@@ -1393,11 +1393,11 @@ video {
 .text-\[28px\] {
   font-size: 28px;
 }
+.text-\[32px\] {
+  font-size: 32px;
+}
 .text-\[4\.2rem\] {
   font-size: 4.2rem;
-}
-.text-\[40px\] {
-  font-size: 40px;
 }
 .text-base {
   font-size: 1rem;
@@ -1936,9 +1936,16 @@ video {
   .md\:pl-0 {
     padding-left: 0px;
   }
+  .md\:text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
   .md\:text-5xl {
     font-size: 3rem;
     line-height: 1;
+  }
+  .md\:text-\[40px\] {
+    font-size: 40px;
   }
   .md\:text-base {
     font-size: 1rem;
