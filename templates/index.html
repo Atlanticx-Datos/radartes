@@ -713,7 +713,7 @@
             </div>
 
             <!-- Newsletter Section -->
-            <div class="mb-16 bg-[#eae6fd] rounded-lg overflow-visible h-[272px] sm:h-[240px]">
+            <div class="mb-16 bg-[#eae6fd] rounded-lg overflow-visible min-h-[272px] sm:h-[240px]">
                 <div class="container mx-auto px-6 py-10">
                     <div class="text-center">
                         {% if existing_email %}
@@ -737,15 +737,22 @@
                         </p>
                         <form id="subscribe-form" action="/subscribe" method="post" class="mt-4 sm:mt-6 flex justify-center max-w-lg mx-auto">
                             <div class="relative w-full">
-                                <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                                    </svg>
+                                <!-- New approach: Use a flex container for the input and icon -->
+                                <div class="relative flex items-center w-full">
+                                    <!-- Email icon as a direct child of the flex container -->
+                                    <div class="absolute left-4 z-10 pointer-events-none" style="top: 50%; transform: translateY(-50%);">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                                        </svg>
+                                    </div>
+                                    <!-- Input with padding to accommodate the icon -->
+                                    <input type="email" id="subscribe-email" name="email" placeholder="Ingresá tu email"
+                                        class="w-full px-6 py-3 pl-12 rounded-full pr-40 focus:outline-none focus:ring-2 focus:ring-white/50 text-lg shadow-lg"
+                                        style="height: 52px; padding-left: 42px;"
+                                        required>
                                 </div>
-                                <input type="email" id="subscribe-email" name="email" placeholder="Ingresá tu correo electrónico"
-                                    class="w-full px-6 py-3 pl-12 rounded-full pr-40 focus:outline-none focus:ring-2 focus:ring-white/50 text-lg shadow-lg"
-                                    required>
+                                <!-- Button container -->
                                 <div class="absolute inset-x-0 sm:right-2 sm:left-auto text-center sm:text-left top-[150%] sm:top-1/2 transform -translate-y-[40%] sm:-translate-y-1/2">
                                     <button type="submit"
                                         class="bg-[#6232FF] text-white px-6 py-2 rounded-full font-medium hover:bg-[#5128d8] transition-colors text-lg shadow-lg">

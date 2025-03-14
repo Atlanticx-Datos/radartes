@@ -5,7 +5,10 @@
     width: 100%;
     overflow-x: auto;
     border-radius: 8px;
-    border: 2px solid #6232FF !important; /* Primary color border, slightly wider */
+    border-top: 2px solid #6232FF !important;
+    border-left: 2px solid #6232FF !important;
+    border-right: 2px solid #6232FF !important;
+    border-bottom: 6px solid #6232FF !important; /* Bottom border is now 6px wide */
     box-shadow: none !important; /* Remove box shadow */
 }
 

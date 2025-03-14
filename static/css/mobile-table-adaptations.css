@@ -278,11 +278,11 @@
 /* Newsletter subscription mobile adaptations */
 @media (max-width: 767px) {
     /* Increase container height for consistent vertical spacing */
-    .bg-\[\#eae6fd\].h-\[250px\] {
+    .bg-\[\#eae6fd\] {
         height: auto !important;
-        min-height: 280px !important;
+        min-height: 360px !important; /* Increased to accommodate the stacked layout */
         padding-top: 24px !important;
-        padding-bottom: 24px !important;
+        padding-bottom: 32px !important; /* Increased bottom padding */
     }
     
     /* Hide the subheader text on mobile */
@@ -308,51 +308,82 @@
         flex-direction: column !important;
         align-items: center !important;
         gap: 12px !important;
+        padding-bottom: 20px !important; /* Add padding to ensure enough space */
     }
     
     /* Make the input container take full width */
     #subscribe-form .relative.w-full {
         width: 100% !important;
         max-width: 90% !important;
-        margin-bottom: 60px !important; /* Significantly increase spacing between input and button */
+        margin-bottom: 0 !important; /* Remove bottom margin to let natural stacking occur */
         position: relative !important;
     }
     
-    /* Hide the email icon on mobile */
-    #subscribe-form .absolute.left-4.top-1\/2 {
-        display: none !important;
+    /* Email icon styling for mobile */
+    #subscribe-form .absolute.left-4 {
+        left: 12px !important; /* Reduced left position to match reduced padding */
+        z-index: 10 !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    #subscribe-form .absolute.left-4 svg {
+        width: 16px !important;
+        height: 16px !important;
+        color: #9CA3AF !important; /* A medium gray color for better visibility */
     }
     
     /* Update placeholder typography */
     #subscribe-form input[type="email"] {
         font-family: Inter, sans-serif !important;
         font-weight: 400 !important;
-        font-size: 12px !important;
-        line-height: 150% !important;
-        letter-spacing: 0% !important;
-        padding: 0 16px !important; /* Equal padding on both sides since icon is hidden */
+        font-size: 12px !important; /* Smaller font size to fit the placeholder text */
+        line-height: 48px !important; /* Match the height for text centering */
+        letter-spacing: -0.01em !important; /* Slightly tighter letter spacing */
+        padding-left: 36px !important; /* Reduced left padding to make more room for text */
+        padding-right: 12px !important; /* Reduced right padding */
         width: 100% !important;
-        vertical-align: middle !important;
-        height: 48px !important;
+        height: 48px !important; /* Mobile-specific height */
         box-sizing: border-box !important;
-        text-align: center !important; /* Center the placeholder text */
+        text-align: left !important; /* Left align the text to match icon */
+        white-space: nowrap !important; /* Prevent text wrapping */
+        overflow: hidden !important; /* Hide overflow */
+        text-overflow: ellipsis !important; /* Add ellipsis for overflow */
     }
     
-    /* Remove the absolute positioning of the button container */
-    #subscribe-form .absolute.right-2.top-1\/2 {
+    /* Style the placeholder text specifically */
+    #subscribe-form input[type="email"]::placeholder {
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        color: #9CA3AF !important;
+    }
+    
+    /* Remove the absolute positioning of the button container - using multiple selectors to ensure we catch it */
+    #subscribe-form .absolute.inset-x-0.sm\:right-2.sm\:left-auto.text-center.sm\:text-left.top-\[150\%\].sm\:top-1\/2.transform.-translate-y-\[40\%\].sm\:-translate-y-1\/2,
+    #subscribe-form .absolute.inset-x-0,
+    #subscribe-form div.absolute[class*="inset-x-0"][class*="top-"] {
         position: static !important;
         transform: none !important;
         display: flex !important;
         justify-content: center !important;
         width: 100% !important;
-        margin-top: 24px !important; /* Increase top margin */
+        margin-top: 16px !important; /* Add space between input and button */
     }
     
     /* Center the button */
     #subscribe-form button[type="submit"] {
         width: auto !important;
         min-width: 160px !important;
-        margin-top: 24px !important; /* Significantly increase top margin */
+        height: 37px !important; /* Match desktop button height */
+        margin: 0 auto !important; /* Center the button */
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin-top: 8px !important; /* Add additional top margin */
     }
 }
 
@@ -394,5 +425,24 @@
         display: inline-block !important;
         margin-right: 0 !important; /* Ensure no margin after the category */
         padding-right: 0 !important; /* Ensure no padding after the category */
+    }
+}
+
+/* Style the flex container for the input and icon */
+#subscribe-form .relative.flex.items-center.w-full {
+    position: relative !important;
+    width: 100% !important;
+}
+
+/* Adjust placeholder text for different screen sizes */
+@media (max-width: 360px) {
+    #subscribe-email::placeholder {
+        font-size: 11px !important;
+    }
+}
+
+@media (min-width: 361px) and (max-width: 480px) {
+    #subscribe-email::placeholder {
+        font-size: 12px !important;
     }
 } 

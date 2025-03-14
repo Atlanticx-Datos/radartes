@@ -1,0 +1,34 @@
+/* ====================================
+   NEWSLETTER FORM STYLES
+   Used in: index.html newsletter section
+   Purpose: Style the newsletter subscription form
+   Why custom: Specific height and alignment requirements
+==================================== */
+
+/* Desktop styles */
+#subscribe-email {
+    height: 52px !important; /* Set height for desktop */
+    box-sizing: border-box !important;
+    padding-left: 42px !important; /* Ensure consistent padding for the icon */
+}
+
+#subscribe-form button[type="submit"] {
+    height: 37px !important; /* Explicitly set button height */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Ensure proper vertical alignment of the button */
+#subscribe-form .absolute.inset-x-0.sm\:right-2.sm\:left-auto {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+}
+
+/* Email icon styling */
+#subscribe-form .absolute.left-4 svg {
+    width: 20px !important;
+    height: 20px !important;
+}
+
+/* Mobile styles are handled in mobile-table-adaptations.css */ 
