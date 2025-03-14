@@ -8,7 +8,7 @@ import { CONSTANTS } from '../constants.js';
 export const SharingModule = {
     // App branding information - can be updated from server config
     brandInfo: {
-        name: "100 ︱ Oportunidades",
+        name: "Radartes",
         tagline: "Convocatorias, Becas y Recursos Globales para Artistas",
         url: window.location.origin,
         imageUrl: `${window.location.origin}/static/public/Logo_100_mediano.png`
@@ -42,35 +42,49 @@ export const SharingModule = {
     /**
      * Format opportunity details for sharing
      * @param {Object} opportunity - The opportunity data
+     * @param {String} platform - The platform to share on
      * @returns {String} - Formatted text for sharing
      */
-    formatOpportunityDetails(opportunity) {
+    formatOpportunityDetails(opportunity, platform = '') {
         let details = [];
+        
+        // For WhatsApp, use simpler format with plain text instead of emojis
+        const isWhatsApp = platform.toLowerCase() === 'whatsapp';
         
         // Add opportunity name
         if (opportunity.nombre) {
-            details.push(`📢 ${opportunity.nombre}`);
+            details.push(isWhatsApp ? `${opportunity.nombre}` : `📢 ${opportunity.nombre}`);
         }
         
         // Add bullet points for key details
         if (opportunity.país) {
-            details.push(`📍 ${opportunity.país}`);
+            details.push(isWhatsApp ? `País: ${opportunity.país}` : `📍 ${opportunity.país}`);
         }
         
         if (opportunity.disciplina) {
-            details.push(`🎨 ${opportunity.disciplina}`);
+            details.push(isWhatsApp ? `Disciplina: ${opportunity.disciplina}` : `🎨 ${opportunity.disciplina}`);
         }
         
         if (opportunity.fecha_de_cierre) {
-            const formattedDate = opportunity.fecha_de_cierre === '1900-01-01' 
+            const formattedDate = opportunity.fecha_de_cierre === '1900-01-01' || opportunity.fecha_de_cierre === 'Confirmar en bases'
                 ? 'Confirmar en bases' 
                 : opportunity.fecha_de_cierre;
-            details.push(`📅 Cierre: ${formattedDate}`);
+            details.push(isWhatsApp ? `Cierre: ${formattedDate}` : `📅 Cierre: ${formattedDate}`);
         }
         
         if (opportunity.inscripcion) {
             const inscripcionIcon = opportunity.inscripcion === 'Sin cargo' ? '✅' : '💰';
-            details.push(`${inscripcionIcon} ${opportunity.inscripcion}`);
+            details.push(isWhatsApp ? `Inscripción: ${opportunity.inscripcion}` : `${inscripcionIcon} ${opportunity.inscripcion}`);
+        }
+        
+        // Add a brief description if available
+        if (opportunity.descripcion && opportunity.descripcion.length > 0) {
+            // Truncate description if it's too long
+            const maxLength = 100;
+            const truncatedDescription = opportunity.descripcion.length > maxLength 
+                ? opportunity.descripcion.substring(0, maxLength) + '...' 
+                : opportunity.descripcion;
+            details.push(`\n${truncatedDescription}`);
         }
         
         // Add URL
@@ -97,33 +111,37 @@ export const SharingModule = {
             return false;
         }
         
-        // Format the opportunity details
-        const formattedText = this.formatOpportunityDetails(opportunity);
-        
         // Track the share attempt for analytics
         this.trackShare(platform, opportunity.id);
         
         // Share based on platform
         switch (platform.toLowerCase()) {
             case 'whatsapp':
-                return this.shareToWhatsApp(formattedText);
+                // Format the opportunity details specifically for WhatsApp
+                const whatsappText = this.formatOpportunityDetails(opportunity, 'whatsapp');
+                return this.shareToWhatsApp(whatsappText);
                 
             case 'twitter':
             case 'x':
                 return this.shareToTwitter(opportunity.nombre, opportunity.url);
                 
             case 'linkedin':
-                return this.shareToLinkedIn(opportunity.url);
+                // Create a summary for LinkedIn
+                const summary = `${opportunity.país} | ${opportunity.disciplina} | Cierre: ${opportunity.fecha_de_cierre || 'Confirmar en bases'}`;
+                return this.shareToLinkedIn(opportunity.url, opportunity.nombre, summary);
                 
             case 'facebook':
                 return this.shareToFacebook(opportunity.url);
                 
             case 'email':
             case 'gmail':
-                return this.shareViaEmail(opportunity.nombre, formattedText);
+                // Format the opportunity details for email
+                const emailText = this.formatOpportunityDetails(opportunity, 'email');
+                return this.shareViaEmail(opportunity.nombre, emailText);
                 
             case 'copy':
-                return this.copyToClipboard(formattedText);
+                // For copy, just copy the URL instead of the formatted text
+                return this.copyToClipboard(opportunity.url);
                 
             default:
                 console.error(`Unsupported sharing platform: ${platform}`);
@@ -138,6 +156,7 @@ export const SharingModule = {
      */
     shareToWhatsApp(text) {
         try {
+            // Use a simpler approach for WhatsApp sharing
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
             return true;
         } catch (error) {
@@ -166,11 +185,25 @@ export const SharingModule = {
     /**
      * Share to LinkedIn
      * @param {String} url - The URL to share
+     * @param {String} title - The title/text to share
+     * @param {String} summary - The summary text to share
      * @returns {Boolean} - Whether the share was initiated
      */
-    shareToLinkedIn(url) {
+    shareToLinkedIn(url, title = '', summary = '') {
         try {
-            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
+            // LinkedIn sharing API allows for title and summary parameters
+            let linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+            
+            // Add title and summary if provided
+            if (title) {
+                linkedInUrl += `&title=${encodeURIComponent(title)}`;
+            }
+            
+            if (summary) {
+                linkedInUrl += `&summary=${encodeURIComponent(summary)}`;
+            }
+            
+            window.open(linkedInUrl, '_blank');
             return true;
         } catch (error) {
             console.error('Error sharing to LinkedIn:', error);
@@ -292,7 +325,19 @@ export const SharingModule = {
 
     /**
      * Test sharing functionality
-     * This can be called from the console to test sharing features
+     * This can be called from the browser console to test all sharing methods
+     * 
+     * Usage:
+     * 1. Open browser console (F12 or Ctrl+Shift+I)
+     * 2. Type: SharingModule.testSharing()
+     * 3. Use the returned object to test specific sharing methods, e.g.:
+     *    - SharingModule.testSharing().shareToWhatsApp()
+     *    - SharingModule.testSharing().shareToTwitter()
+     *    - SharingModule.testSharing().shareToLinkedIn()
+     *    - SharingModule.testSharing().shareViaEmail()
+     *    - SharingModule.testSharing().copyToClipboard()
+     * 
+     * @returns {Object} - Object with test methods for each sharing platform
      */
     testSharing() {
         const testOpportunity = {
@@ -302,20 +347,23 @@ export const SharingModule = {
             disciplina: 'Visual Arts, Music',
             fecha_de_cierre: '2023-12-31',
             inscripcion: 'Sin cargo',
-            url: 'https://example.com/test-opportunity'
+            url: 'https://example.com/test-opportunity',
+            descripcion: 'This is a test opportunity to verify sharing functionality.'
         };
         
         console.log('Test opportunity:', testOpportunity);
         console.log('Formatted text:', this.formatOpportunityDetails(testOpportunity));
+        console.log('WhatsApp formatted text:', this.formatOpportunityDetails(testOpportunity, 'whatsapp'));
         
         return {
             opportunity: testOpportunity,
             formattedText: this.formatOpportunityDetails(testOpportunity),
-            shareToWhatsApp: () => this.shareToWhatsApp(this.formatOpportunityDetails(testOpportunity)),
+            whatsappText: this.formatOpportunityDetails(testOpportunity, 'whatsapp'),
+            shareToWhatsApp: () => this.shareToWhatsApp(this.formatOpportunityDetails(testOpportunity, 'whatsapp')),
             shareToTwitter: () => this.shareToTwitter(testOpportunity.nombre, testOpportunity.url),
-            shareToLinkedIn: () => this.shareToLinkedIn(testOpportunity.url),
-            shareViaEmail: () => this.shareViaEmail(testOpportunity.nombre, this.formatOpportunityDetails(testOpportunity)),
-            copyToClipboard: () => this.copyToClipboard(this.formatOpportunityDetails(testOpportunity))
+            shareToLinkedIn: () => this.shareToLinkedIn(testOpportunity.url, testOpportunity.nombre, `${testOpportunity.país} | ${testOpportunity.disciplina} | Cierre: ${testOpportunity.fecha_de_cierre}`),
+            shareViaEmail: () => this.shareViaEmail(testOpportunity.nombre, this.formatOpportunityDetails(testOpportunity, 'email')),
+            copyToClipboard: () => this.copyToClipboard(testOpportunity.url)
         };
     }
 }; 

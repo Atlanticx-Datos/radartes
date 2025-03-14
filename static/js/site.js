@@ -13,7 +13,6 @@ import { Utils } from './utils.js';
 import { TopModule } from './modules/top.js';
 import { SubscribeModule } from './modules/subscribe.js';
 import { SharingModule } from './modules/sharing.js';
-import { SharingTestModule } from './modules/sharing-test.js';
 import { processDestacarData } from './modules/data-processor.js';
 import { CONSTANTS } from './constants.js';
 
@@ -70,13 +69,6 @@ function exposeModules() {
         }
     });
     
-    // Initialize sharing test module in development environments
-    if (window.location.hostname === 'localhost' || 
-        window.location.hostname === '127.0.0.1' || 
-        window.location.search.includes('test=true')) {
-        SharingTestModule.init();
-    }
-    
     // Expose pagination functions
     window.goToPage = SearchModule.goToPage.bind(SearchModule);
     console.log('Modules exposed to window:', {
@@ -107,6 +99,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize core modules
     FilterModule.init();
     SearchModule.init();
+    DestacarModule.init();
+    TopModule.init();
+    SubscribeModule.init();
+    SharingModule.init();
     
     // Get prefiltered data for module initialization
     const preFilteredData = document.getElementById('prefiltered-data');
@@ -314,9 +310,6 @@ document.addEventListener('DOMContentLoaded', function() {
             window.TopModule.prevPage();
         }
     };
-
-    // Initialize SubscribeModule
-    SubscribeModule.init();
 
     // Populate filter dropdowns
     populateSubdisciplinasDropdown();
