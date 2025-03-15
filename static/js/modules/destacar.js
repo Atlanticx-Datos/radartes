@@ -63,6 +63,11 @@ export const DestacarModule = {
      * Preload images for better performance
      */
     preloadImages() {
+        // First, preload the placeholder image to ensure it's available immediately
+        const placeholderUrl = '/static/public/destacarCardsImages/placeholder.jpg';
+        const placeholderImg = new Image();
+        placeholderImg.src = placeholderUrl;
+        
         // Only preload the first few pages to avoid excessive network requests
         const pagesToPreload = this.pages.slice(0, Math.min(9, this.pages.length));
         
@@ -87,16 +92,18 @@ export const DestacarModule = {
             imageUrls.add(imageUrl);
         });
         
-        // Add placeholder image
-        imageUrls.add('/static/public/destacarCardsImages/placeholder.jpg');
+        // Remove placeholder from the set since we've already preloaded it
+        imageUrls.delete(placeholderUrl);
         
-        // Preload images
-        imageUrls.forEach(url => {
-            const img = new Image();
-            img.src = url;
-        });
-        
-        console.log(`Preloaded ${imageUrls.size} images for destacar cards`);
+        // Preload remaining images with a slight delay to prioritize visible content
+        setTimeout(() => {
+            imageUrls.forEach(url => {
+                const img = new Image();
+                img.src = url;
+            });
+            
+            console.log(`Preloaded ${imageUrls.size + 1} images for destacar cards (including placeholder)`);
+        }, 300);
     },
 
     // Check if we're on mobile
@@ -398,7 +405,9 @@ export const DestacarModule = {
                         <img src="${this.getImageForDiscipline(normalizedDiscipline, page.categoria)}" 
                              alt="${Utils.escapeHTML(mainDiscipline)} ${Utils.escapeHTML(page.categoria || '')}" 
                              class="w-full h-full object-cover"
+                             loading="lazy"
                              onerror="this.onerror=null; this.src='/static/public/destacarCardsImages/placeholder.jpg';">
+                        <div class="absolute inset-0 bg-gray-200 animate-pulse image-placeholder"></div>
                         <span class="absolute top-3 left-3 text-sm">
                             ${Utils.escapeHTML(page.categoria || '')}
                         </span>
@@ -505,6 +514,25 @@ export const DestacarModule = {
                         window.open(sanitizedData.url, '_blank');
                     }
                 }
+            });
+        });
+        
+        // Add event listeners for image loading
+        container.querySelectorAll('.opportunity-preview img').forEach(img => {
+            // If image is already loaded or cached
+            if (img.complete) {
+                img.classList.add('loaded');
+            } else {
+                // Add load event listener
+                img.addEventListener('load', () => {
+                    img.classList.add('loaded');
+                });
+            }
+            
+            // Add error event listener to ensure placeholder is shown
+            img.addEventListener('error', () => {
+                img.src = '/static/public/destacarCardsImages/placeholder.jpg';
+                img.classList.add('loaded');
             });
         });
         

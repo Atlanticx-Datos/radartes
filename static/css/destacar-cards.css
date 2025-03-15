@@ -138,6 +138,20 @@
     overflow: hidden;
 }
 
+/* Image placeholder animation */
+@keyframes placeholderPulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 0.8; }
+    100% { opacity: 0.6; }
+}
+
+.featured-opportunities .image-placeholder {
+    animation: placeholderPulse 1.5s ease-in-out infinite;
+    background-image: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 50%, #f3f4f6 100%);
+    background-size: 200% 100%;
+    background-position: 0% 0%;
+}
+
 /* Image styling */
 .featured-opportunities .relative.h-48 img {
     width: 100%;

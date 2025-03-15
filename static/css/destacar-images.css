@@ -2,9 +2,24 @@
  * Enhanced image styling for destacar cards
  */
 
+/* Image placeholder styling */
+.featured-opportunities .image-placeholder {
+    z-index: 1;
+    transition: opacity 0.3s ease;
+}
+
+/* Hide placeholder when image is loaded */
+.featured-opportunities .relative.h-48 img:not([loading]) ~ .image-placeholder,
+.featured-opportunities .relative.h-48 img.loaded ~ .image-placeholder {
+    opacity: 0;
+    pointer-events: none;
+}
+
 /* Image transition effect */
 .featured-opportunities .relative.h-48 img {
     transition: transform 0.3s ease;
+    position: relative;
+    z-index: 2;
 }
 
 /* Hover effect for images */
