@@ -1444,6 +1444,96 @@ function debugFilterState() {
     console.log('==== END DEBUG ====');
 }
 
+// Function to save an opportunity
+window.saveOpportunity = function(event, button) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    // If user is not logged in, show message
+    if (!window.isUserLoggedIn) {
+        if (window.Utils && window.Utils.showAlert) {
+            window.Utils.showAlert('Necesitas ingresar para guardar favoritos', 'error');
+        } else {
+            alert('Necesitas ingresar para guardar favoritos');
+        }
+        return;
+    }
+    
+    // If user is logged in, proceed with normal save functionality
+    const opportunityId = button.getAttribute('data-id');
+    const opportunityName = button.getAttribute('data-nombre');
+    const opportunityUrl = button.getAttribute('data-url');
+    
+    if (!opportunityId) {
+        console.error('No opportunity ID found for favorite button');
+        return;
+    }
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+    if (!csrfToken) {
+        console.error('No CSRF token found');
+        return;
+    }
+    
+    // Create form data
+    const formData = new FormData();
+    formData.append('page_id', opportunityId);
+    formData.append('csrf_token', csrfToken);
+    
+    // Show loading state
+    button.disabled = true;
+    const originalSvg = button.innerHTML;
+    button.innerHTML = '<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+    
+    // Send save request
+    fetch('/save_opportunity', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        // Reset button state
+        button.disabled = false;
+        button.innerHTML = originalSvg;
+        
+        if (response.ok) {
+            // Show success message
+            if (window.Utils && window.Utils.showAlert) {
+                window.Utils.showAlert('Oportunidad guardada exitosamente', 'success');
+            } else {
+                alert('Oportunidad guardada exitosamente');
+            }
+            
+            // Change the button color to indicate it's saved
+            button.setAttribute('data-saved', 'true');
+            button.classList.add('saved');
+            button.querySelector('svg').setAttribute('fill', 'currentColor');
+            
+            // Refresh saved opportunities if the function exists
+            if (window.ModalModule && window.ModalModule.refreshSavedOpportunities) {
+                window.ModalModule.refreshSavedOpportunities();
+            }
+        } else {
+            throw new Error('Error saving opportunity');
+        }
+    })
+    .catch(error => {
+        // Reset button state
+        button.disabled = false;
+        button.innerHTML = originalSvg;
+        
+        console.error('Error saving opportunity:', error);
+        if (window.Utils && window.Utils.showAlert) {
+            window.Utils.showAlert('Error al guardar la oportunidad', 'error');
+        } else {
+            alert('Error al guardar la oportunidad');
+        }
+    });
+};
+
 // Export any functions that need to be accessed from outside
 export {
     initDestacar

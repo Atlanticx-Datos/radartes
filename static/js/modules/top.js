@@ -184,7 +184,6 @@ export const TopModule = {
                         <span class="top-opportunity-badge category">${Utils.escapeHTML(category)}</span>
                         <span class="top-opportunity-badge discipline-tag ${disciplineClass}">${Utils.escapeHTML(this.getMainDiscipline(page.disciplina))}</span>
                     </div>
-                    ${window.isUserLoggedIn ? `
                     <div class="top-opportunity-favorite save-opportunity-btn" 
                         data-id="${Utils.escapeHTML(page.id)}" 
                         data-nombre="${Utils.escapeHTML(page.nombre)}" 
@@ -195,7 +194,6 @@ export const TopModule = {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
                     </div>
-                    ` : ''}
                     <img src="/static/public/conejos.jpg" alt="${Utils.escapeHTML(name)}" onerror="this.src='/static/public/IsoAtx.png'">
                 </div>
                 <div class="top-opportunity-content">
@@ -258,21 +256,22 @@ export const TopModule = {
 
     // Check if an opportunity is saved
     checkIfOpportunitySaved(opportunityId) {
-        if (!window.isUserLoggedIn) return;
-        
-        fetch(`/is_opportunity_saved?opportunity_id=${opportunityId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.is_saved) {
-                    const favoriteBtns = document.querySelectorAll(`.top-opportunity-favorite[data-id="${opportunityId}"]`);
-                    favoriteBtns.forEach(btn => {
-                        btn.setAttribute('data-saved', 'true');
-                        btn.classList.add('saved');
-                        btn.querySelector('svg').setAttribute('fill', 'currentColor');
-                    });
-                }
-            })
-            .catch(error => console.error('Error checking if opportunity is saved:', error));
+        // Only check saved status if user is logged in
+        if (window.isUserLoggedIn) {
+            fetch(`/is_opportunity_saved?opportunity_id=${opportunityId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.is_saved) {
+                        const favoriteBtns = document.querySelectorAll(`.top-opportunity-favorite[data-id="${opportunityId}"]`);
+                        favoriteBtns.forEach(btn => {
+                            btn.setAttribute('data-saved', 'true');
+                            btn.classList.add('saved');
+                            btn.querySelector('svg').setAttribute('fill', 'currentColor');
+                        });
+                    }
+                })
+                .catch(error => console.error('Error checking if opportunity is saved:', error));
+        }
     },
 
     // Update the dots indicator

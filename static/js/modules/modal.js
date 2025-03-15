@@ -540,7 +540,6 @@ export const ModalModule = {
                             <span class="text-sm font-medium text-white px-3 py-1 rounded-full" style="background-color: #6366F1;">${decodedCategoria}</span>
                         </div>
                         <div style="display: flex; align-items: center;">
-                            ${window.isUserLoggedIn ? `
                             <div style="margin-right: 36px;">
                                 <button type="button" id="save-opportunity-btn" class="flex items-center justify-center rounded-full" 
                                        style="width: 32px; height: 32px; background-color: rgba(98, 50, 255, 0.2); transition: all 0.25s ease-in-out;"
@@ -551,7 +550,6 @@ export const ModalModule = {
                                     </svg>
                                 </button>
                             </div>
-                            ` : ''}
                             <div style="">
                                 <button type="button" class="share-toggle-btn flex items-center justify-center rounded-full mt-1" 
                                        style="width: 32px; height: 32px; background-color: rgba(98, 50, 255, 0.2); transition: all 0.25s ease-in-out;"
@@ -751,29 +749,41 @@ export const ModalModule = {
             
             // Add event handler for the save button if it exists
             const saveButton = modalContent.querySelector('#save-opportunity-btn');
-            if (saveButton && window.isUserLoggedIn) {
-                // Check if the opportunity is already saved
-                fetch(`/is_opportunity_saved?page_id=${id}`, {
-                    method: 'GET',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.is_saved) {
-                        // Update the button to show it's already saved
-                        saveButton.querySelector('svg').setAttribute('fill', '#6232FF');
-                        saveButton.querySelector('svg').setAttribute('stroke', 'white');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error checking if opportunity is saved:', error);
-                });
+            if (saveButton) {
+                // If user is logged in, check if the opportunity is already saved
+                if (window.isUserLoggedIn) {
+                    fetch(`/is_opportunity_saved?page_id=${id}`, {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.is_saved) {
+                            // Update the button to show it's already saved
+                            saveButton.querySelector('svg').setAttribute('fill', '#6232FF');
+                            saveButton.querySelector('svg').setAttribute('stroke', 'white');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking if opportunity is saved:', error);
+                    });
+                }
                 
                 saveButton.addEventListener('click', (e) => {
                     e.stopPropagation();
                     e.preventDefault();
+                    
+                    // If user is not logged in, show message and return
+                    if (!window.isUserLoggedIn) {
+                        if (window.Utils && window.Utils.showAlert) {
+                            window.Utils.showAlert('Necesitas ingresar para guardar favoritos', 'error');
+                        } else {
+                            alert('Necesitas ingresar para guardar favoritos');
+                        }
+                        return;
+                    }
                     
                     // Get CSRF token
                     const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
