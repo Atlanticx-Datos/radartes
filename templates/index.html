@@ -165,9 +165,20 @@
     <!-- Background image with overlay -->
     <div class="absolute inset-0 z-0">
         <div class="absolute inset-0" style="height: calc(100% + 2rem);">
-            <img src="{{ url_for('static', filename='public/mirada.png') }}" 
-                 alt="Background" 
-                 class="w-full h-full object-cover">
+            <picture>
+                <!-- Mobile image -->
+                <source media="(max-width: 767px)" srcset="{{ url_for('static', filename='public/optimized/mirada-1200.jpg') }}">
+                <!-- Desktop image -->
+                <source media="(min-width: 768px)" srcset="{{ url_for('static', filename='public/optimized/mirada.jpg') }}">
+                <!-- Fallback image -->
+                <img src="{{ url_for('static', filename='public/optimized/mirada.jpg') }}" 
+                     alt="Background" 
+                     class="w-full h-full object-cover"
+                     width="1920" 
+                     height="1080" 
+                     loading="eager"
+                     fetchpriority="high">
+            </picture>
             <div class="absolute inset-0 bg-gradient-to-b from-[#CEFF1C]/20 to-[#6232FF]/75 mix-blend-multiply"></div>
         </div>
     </div>

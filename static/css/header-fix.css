@@ -1,0 +1,73 @@
+/* Header Layout Shift Fix
+   This file contains targeted fixes for the header section to prevent layout shifts
+   during image loading, improving the Cumulative Layout Shift (CLS) score.
+*/
+
+/* Set fixed dimensions for the header to prevent layout shifts */
+header.relative.w-full.h-\[500px\] {
+    height: 500px; /* Explicit height to match the inline style */
+    position: relative;
+    width: 100%;
+    overflow: visible;
+    contain: layout paint; /* Improve performance */
+}
+
+/* Ensure the background image container maintains its dimensions */
+header .absolute.inset-0.z-0 {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+}
+
+/* Fix the image container dimensions */
+header .absolute.inset-0 {
+    position: absolute;
+    inset: 0;
+    height: calc(100% + 2rem); /* Match the inline style */
+    width: 100%;
+}
+
+/* Optimize image loading */
+header img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Add image dimensions to help browser allocate space before loading */
+    aspect-ratio: 16/9;
+}
+
+/* Ensure the content container doesn't shift */
+header .container {
+    position: relative;
+    z-index: 10;
+    height: 100%;
+}
+
+/* Ensure the slot machine doesn't cause layout shifts */
+.slot-machine {
+    min-height: 52px;
+    min-width: 280px;
+    position: relative;
+    overflow: hidden;
+}
+
+.slot-machine-words {
+    position: relative;
+    min-height: 52px;
+}
+
+.slot-word {
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Preload the header image */
+@media (min-width: 768px) {
+    head::after {
+        content: url('/static/public/optimized/mirada.jpg');
+        display: none;
+    }
+} 
