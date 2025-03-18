@@ -188,6 +188,7 @@ export const TopModule = {
                         data-id="${Utils.escapeHTML(page.id)}" 
                         data-nombre="${Utils.escapeHTML(page.nombre)}" 
                         data-url="${Utils.escapeHTML(page.url)}"
+                        data-base-url="${Utils.escapeHTML(page.base_url || '')}"
                         data-saved="false"
                         onclick="saveOpportunity(event, this)">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -237,6 +238,7 @@ export const TopModule = {
                         type="button"
                         class="top-opportunity-button"
                         data-url="${Utils.escapeHTML(page.url)}"
+                        data-base-url="${Utils.escapeHTML(page.base_url || '')}"
                         data-nombre="${Utils.escapeHTML(page.nombre)}"
                         data-pais="${Utils.escapeHTML(page.país)}"
                         data-og-resumida="${Utils.escapeHTML(page.og_resumida)}"

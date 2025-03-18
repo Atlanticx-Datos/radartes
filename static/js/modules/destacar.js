@@ -391,6 +391,7 @@ export const DestacarModule = {
                 return `
                 <div class="bg-white rounded-lg shadow-md overflow-hidden relative cursor-pointer opportunity-preview"
                      data-url="${Utils.escapeHTML(page.url)}"
+                     data-base-url="${Utils.escapeHTML(page.base_url || '')}"
                      data-nombre="${Utils.escapeHTML(page.nombre_original || '')}"
                      data-country="${Utils.escapeHTML(page.país || '')}"
                      data-summary="${Utils.escapeHTML(page.og_resumida || '')}"
@@ -500,7 +501,7 @@ export const DestacarModule = {
                             sanitizedData.summary,
                             sanitizedData.id,
                             sanitizedData.category,
-                            null,  // base_url parameter
+                            sanitizedData.baseUrl || sanitizedData.base_url || (sanitizedData.url && sanitizedData.url.startsWith('http') ? sanitizedData.url : null), // Use base_url if available, fall back to url if it's a valid URL
                             sanitizedData.requisitos,
                             sanitizedData.disciplina,
                             sanitizedData.fechaCierre || sanitizedData.fecha_cierre, // Try both kebab-case and camelCase

@@ -493,6 +493,7 @@ export const FilterModule = {
                         <button 
                             class="preview-btn text-blue-600 hover:underline text-sm"
                             data-url="${this.escapeHTML(page.url || '')}"
+                            data-base-url="${this.escapeHTML(page.base_url || '')}"
                             data-name="${this.escapeHTML(page.nombre || '')}"
                             data-country="${this.escapeHTML(page.pais || '')}"
                             data-summary="${this.escapeHTML(page.og_resumida || '')}"

@@ -3,7 +3,7 @@
 {% block body %}
 <!-- Header section with background and breadcrumb -->
 <header class="bg-gray-50 h-[130px] w-full flex items-center">
-    <div class="container mx-auto px-4">
+    <div class="container mx-auto px-4 mt-4">
         <nav class="text-sm mb-4">
             <a href="/" class="text-gray-600 hover:text-gray-900">Home</a>
             <span class="mx-2 text-gray-400">&rsaquo;</span>
@@ -675,36 +675,48 @@
         
         // Make opportunity rows clickable to trigger modal
         document.querySelectorAll('.opportunity-row').forEach(row => {
-            row.addEventListener('click', function() {
-                // Get data attributes from the row
-                const url = this.getAttribute('data-url');
-                const nombre = this.getAttribute('data-nombre');
-                const pais = this.getAttribute('data-pais');
-                const ogResumida = this.getAttribute('data-og_resumida');
-                const id = this.getAttribute('data-id');
-                const categoria = this.getAttribute('data-categoria');
-                const inscripcion = this.getAttribute('data-inscripcion');
+            row.addEventListener('click', function(event) {
+                // Don't trigger the modal if the delete button was clicked
+                if (event.target.closest('button[hx-delete]')) {
+                    return;
+                }
                 
-                // Trigger the same action as the "Ver" button
-                // This assumes there's an existing modal functionality that the "Ver" button uses
-                // If there's a specific function that handles the modal, call it here
-                const previewEvent = new CustomEvent('preview-opportunity', {
-                    detail: {
-                        url,
-                        nombre,
-                        pais,
-                        ogResumida,
-                        id,
-                        categoria,
-                        inscripcion
+                // Use the showOpportunityDetails function if available
+                if (window.showOpportunityDetails) {
+                    // Pass the row element and the event
+                    window.showOpportunityDetails(this, event);
+                } else {
+                    // Fallback to the previous implementation
+                    // Get data attributes from the row
+                    const url = this.getAttribute('data-url');
+                    const baseUrl = this.getAttribute('data-base-url');
+                    const nombre = this.getAttribute('data-nombre');
+                    const pais = this.getAttribute('data-pais');
+                    const ogResumida = this.getAttribute('data-og_resumida');
+                    const id = this.getAttribute('data-id');
+                    const categoria = this.getAttribute('data-categoria');
+                    const inscripcion = this.getAttribute('data-inscripcion');
+                    
+                    // Find and click the "Ver" button in this row
+                    const previewBtn = this.querySelector('.preview-btn');
+                    if (previewBtn) {
+                        previewBtn.click();
+                    } else if (window.ModalModule && window.ModalModule.showPreviewModal) {
+                        // If no button found but ModalModule is available, call it directly
+                        window.ModalModule.showPreviewModal(
+                            url,
+                            nombre,
+                            pais,
+                            ogResumida,
+                            id,
+                            categoria,
+                            baseUrl,
+                            null, // requisitos
+                            null, // disciplina
+                            null, // fecha_cierre
+                            inscripcion
+                        );
                     }
-                });
-                document.dispatchEvent(previewEvent);
-                
-                // Alternative: find and click the "Ver" button in this row
-                const previewBtn = this.querySelector('.preview-btn');
-                if (previewBtn) {
-                    previewBtn.click();
                 }
             });
         });

@@ -1289,6 +1289,8 @@ window.showOpportunityDetails = function(button, event) {
         
         // Get data from button attributes with fallbacks for different naming conventions
         const url = button.getAttribute('data-url') || button.dataset.url || '';
+        const base_url = button.getAttribute('data-base-url') || button.getAttribute('data-base_url') || 
+                        button.dataset.baseUrl || button.dataset.base_url || '';
         const name = button.getAttribute('data-name') || button.getAttribute('data-nombre') || button.dataset.name || button.dataset.nombre || '';
         const country = button.getAttribute('data-country') || button.getAttribute('data-pais') || button.dataset.country || button.dataset.pais || '';
         const summary = button.getAttribute('data-summary') || button.getAttribute('data-og-resumida') || button.getAttribute('data-og_resumida') || 
@@ -1303,7 +1305,7 @@ window.showOpportunityDetails = function(button, event) {
         
         console.log('showOpportunityDetails called with button:', button);
         console.log('Button data attributes:', {
-            url, name, country, summary, id, category, requisitos,
+            url, base_url, name, country, summary, id, category, requisitos,
             disciplina, fecha_cierre, inscripcion,
             element: button,
             classList: Array.from(button.classList),
@@ -1330,7 +1332,7 @@ window.showOpportunityDetails = function(button, event) {
         // Call the modal function if it exists
         if (window.ModalModule && typeof window.ModalModule.showPreviewModal === 'function') {
             console.log('Calling ModalModule.showPreviewModal with:', {
-                url, name, country, summary, id, category, 
+                url, base_url, name, country, summary, id, category, 
                 tableCellDate: tableCellDate || 'not found'
             });
             
@@ -1341,7 +1343,7 @@ window.showOpportunityDetails = function(button, event) {
                 summary,
                 id,
                 category,
-                null,  // base_url parameter
+                base_url || (url && url.startsWith('http') ? url : null),  // Use base_url if available, fall back to url if it's a valid URL
                 requisitos,
                 disciplina,
                 tableCellDate || fecha_cierre, // Use table cell date if available
@@ -1350,7 +1352,7 @@ window.showOpportunityDetails = function(button, event) {
         } else {
             console.error('ModalModule not found or showPreviewModal not available, falling back to opening URL in new tab');
             // Fallback - open in new tab
-            window.open(url, '_blank');
+            window.open(base_url || url, '_blank');
         }
     } catch (error) {
         console.error('Error in showOpportunityDetails:', error);

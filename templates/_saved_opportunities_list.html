@@ -2,6 +2,7 @@
     {% for opportunity in saved_opportunities %}
     <tr class="hover:bg-gray-50 transition-colors opportunity-row cursor-pointer"
         data-url="{{ opportunity.url }}"
+        data-base-url="{{ opportunity.base_url }}"
         data-nombre="{{ opportunity.nombre_original }}"
         data-pais="{{ opportunity.país }}"
         data-og_resumida="{{ opportunity.og_resumida }}"
@@ -19,12 +20,14 @@
                 <button 
                     class="preview-btn px-3 py-1 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100"
                     data-url="{{ opportunity.url }}"
+                    data-base-url="{{ opportunity.base_url }}"
                     data-nombre="{{ opportunity.nombre_original }}"
                     data-pais="{{ opportunity.país }}"
                     data-og_resumida="{{ opportunity.og_resumida }}"
                     data-id="{{ opportunity.id }}"
                     data-categoria="{{ opportunity.categoría }}"
                     data-inscripcion="{{ opportunity.inscripcion }}"
+                    onclick="if(window.showOpportunityDetails) { event.stopPropagation(); window.showOpportunityDetails(this, event); }"
                 >
                     Ver
                 </button>

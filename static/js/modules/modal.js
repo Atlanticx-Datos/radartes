@@ -141,6 +141,9 @@ export const ModalModule = {
                 requisitos, disciplina_param, fecha_cierre_param, inscripcion_param
             });
             
+            // Store the base_url for sharing functionality
+            window.currentOpportunityBaseUrl = base_url;
+            
             // Helper function to decode HTML entities
             const decodeHTMLEntities = (text) => {
                 if (!text) return '';
@@ -200,6 +203,9 @@ export const ModalModule = {
                 max-height: 90vh;
                 overflow-y: auto;
             `;
+
+            // Add base_url to modalContent dataset for sharing functionality
+            modalContent.dataset.baseUrl = base_url || '';
 
             // Get CSRF token safely
             const csrfInput = document.querySelector('input[name="csrf_token"]');
@@ -655,7 +661,7 @@ export const ModalModule = {
                     <!-- CTA Section - increased spacing from resumen section -->
                     <div class="px-6 pt-3 pb-5" style="min-height: 100px;">
                         <div class="border-t" style="border-color: #D5D2DC; padding-top: 20px; margin-top: 0; display: flex; justify-content: flex-start; align-items: center;">
-                            <a href="${Utils.escapeHTML(url)}" 
+                            <a href="${Utils.escapeHTML(base_url || url)}" 
                                target="_blank" 
                                class="text-center rounded-full flex items-center justify-center"
                                style="height: 44px; width: 176px; background-color: white; color: black; border: 1px solid black; transition: all 0.25s ease-in-out;"
@@ -887,7 +893,9 @@ export const ModalModule = {
         const modalTitle = titleElement ? titleElement.textContent.trim() : title;
         
         // Use base_url if present, otherwise use the provided url
-        const shareUrl = url;
+        // Get base_url from the data attribute on the modal or from window context
+        const baseUrl = modalElement.dataset?.baseUrl || window.currentOpportunityBaseUrl;
+        const shareUrl = baseUrl || url;
         
         // Create opportunity object with available data
         const opportunity = {

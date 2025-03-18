@@ -114,7 +114,7 @@ export const SearchModule = {
                             dataset.og_resumida || dataset.summary,
                             dataset.id,
                             dataset.categoria || dataset.category,
-                            null, // base_url parameter
+                            dataset.baseUrl || dataset.base_url || (dataset.url && dataset.url.startsWith('http') ? dataset.url : null),
                             dataset.requisitos,
                             dataset.disciplina,
                             dataset.fecha_cierre || dataset.fechaCierre,
@@ -949,6 +949,7 @@ export const SearchModule = {
                             <tr style="border-bottom: 1px solid #6232FF !important; background-color: ${index % 2 === 0 ? 'white' : '#f9fafb'}; cursor: pointer;" 
                                 onclick="showOpportunityDetails(this, event)" 
                                 data-url="${Utils.escapeHTML(page.url || '')}"
+                                data-base-url="${Utils.escapeHTML(page.base_url || '')}"
                                 data-nombre="${Utils.escapeHTML(page.nombre || '')}"
                                 data-pais="${Utils.escapeHTML(page.pais || page.país || '')}"
                                 data-og-resumida="${Utils.escapeHTML(page.og_resumida || '')}"
@@ -986,6 +987,7 @@ export const SearchModule = {
                                         class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
                                         style="background-color: #F0EBFF; color: #6232FF;"
                                         data-url="${page.url || ''}"
+                                        data-base-url="${Utils.escapeHTML(page.base_url || '')}"
                                         data-nombre="${Utils.escapeHTML(page.nombre_original || page.nombre || '')}"
                                         data-pais="${Utils.escapeHTML(page.pais || page.país || '')}"
                                         data-og-resumida="${Utils.escapeHTML(page.og_resumida || '')}"
