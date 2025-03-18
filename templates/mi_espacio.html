@@ -83,7 +83,7 @@
                             <button type="submit" 
                                     class="subscribe-button"
                                     form="preferences-form">
-                                Suscribirme y volver al inicio
+                                Suscribirme
                             </button>
                         </div>
                     </div>
@@ -129,7 +129,7 @@
                             <div>
                                 <button type="submit" 
                                         class="discipline-button">
-                                    <span class="sm:inline">Guardar preferencias y volver al inicio</span>
+                                    <span class="sm:inline">Guardar preferencias</span>
                                 </button>
                             </div>
                         </div>
@@ -556,18 +556,23 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Form submission handling with error prevention
+        // Form submission handling with AJAX
         const preferencesForm = document.getElementById('preferences-form');
         if (preferencesForm) {
             preferencesForm.addEventListener('submit', function(e) {
+                // Prevent default form submission
+                e.preventDefault();
+                
                 // Ensure at least one discipline is selected if disciplines exist
                 const disciplines = document.querySelectorAll('input[name="disciplines"]');
                 if (disciplines.length > 0) {
                     const hasChecked = Array.from(disciplines).some(checkbox => checkbox.checked);
                     if (!hasChecked) {
-                        // Prevent form submission if no disciplines are selected
-                        e.preventDefault();
-                        alert('Por favor, selecciona al menos una disciplina de interés.');
+                        if (window.Utils && window.Utils.showAlert) {
+                            window.Utils.showAlert('Por favor, selecciona al menos una disciplina de interés.', 'error');
+                        } else {
+                            alert('Por favor, selecciona al menos una disciplina de interés.');
+                        }
                         return false;
                     }
                 }
@@ -577,10 +582,69 @@
                 if (emailField && emailField.value.trim() !== '') {
                     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                     if (!emailPattern.test(emailField.value)) {
-                        e.preventDefault();
-                        alert('Por favor, ingresa un correo electrónico válido.');
+                        if (window.Utils && window.Utils.showAlert) {
+                            window.Utils.showAlert('Por favor, ingresa un correo electrónico válido.', 'error');
+                        } else {
+                            alert('Por favor, ingresa un correo electrónico válido.');
+                        }
                         return false;
                     }
+                }
+                
+                // Get the submit button to show loading state
+                const submitButton = document.activeElement;
+                if (submitButton && (submitButton.classList.contains('subscribe-button') || submitButton.classList.contains('discipline-button'))) {
+                    const originalText = submitButton.innerHTML;
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<svg class="animate-spin h-5 w-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+                
+                    // Create form data
+                    const formData = new FormData(preferencesForm);
+                    
+                    // Submit via fetch API
+                    fetch(preferencesForm.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => {
+                        // Reset button state
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = originalText;
+                        
+                        if (response.ok) {
+                            // Show success message
+                            if (window.Utils && window.Utils.showAlert) {
+                                const successMessage = submitButton.classList.contains('subscribe-button') 
+                                    ? 'Te has suscrito exitosamente al newsletter' 
+                                    : 'Tus preferencias han sido guardadas exitosamente';
+                                window.Utils.showAlert(successMessage, 'success');
+                            } else {
+                                const successMessage = submitButton.classList.contains('subscribe-button') 
+                                    ? 'Te has suscrito exitosamente al newsletter' 
+                                    : 'Tus preferencias han sido guardadas exitosamente';
+                                alert(successMessage);
+                            }
+                            
+                            return response.json();
+                        } else {
+                            throw new Error('Error al guardar preferencias');
+                        }
+                    })
+                    .catch(error => {
+                        // Reset button state
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = originalText;
+                        
+                        console.error('Error:', error);
+                        if (window.Utils && window.Utils.showAlert) {
+                            window.Utils.showAlert('Error al guardar preferencias. Por favor intenta nuevamente.', 'error');
+                        } else {
+                            alert('Error al guardar preferencias. Por favor intenta nuevamente.');
+                        }
+                    });
                 }
             });
         }
@@ -674,51 +738,38 @@
         }
         
         // Make opportunity rows clickable to trigger modal
-        document.querySelectorAll('.opportunity-row').forEach(row => {
-            row.addEventListener('click', function(event) {
-                // Don't trigger the modal if the delete button was clicked
-                if (event.target.closest('button[hx-delete]')) {
-                    return;
-                }
+        document.querySelector('table').addEventListener('click', function(event) {
+            // Find the closest opportunity row
+            const row = event.target.closest('.opportunity-row');
+            if (!row) return; // If we didn't click on a row, ignore
+            
+            // Don't trigger the modal if the delete button was clicked
+            if (event.target.closest('button[hx-delete]')) {
+                return;
+            }
+            
+            // Use the showOpportunityDetails function if available
+            if (window.showOpportunityDetails) {
+                // Pass the row element and the event
+                window.showOpportunityDetails(row, event);
+            } else {
+                // Fallback to the previous implementation
+                // Get data attributes from the row
+                const url = row.getAttribute('data-url');
+                const baseUrl = row.getAttribute('data-base-url');
+                const nombre = row.getAttribute('data-nombre');
+                const pais = row.getAttribute('data-pais');
+                const ogResumida = row.getAttribute('data-og_resumida');
+                const id = row.getAttribute('data-id');
+                const categoria = row.getAttribute('data-categoria');
+                const inscripcion = row.getAttribute('data-inscripcion');
                 
-                // Use the showOpportunityDetails function if available
-                if (window.showOpportunityDetails) {
-                    // Pass the row element and the event
-                    window.showOpportunityDetails(this, event);
-                } else {
-                    // Fallback to the previous implementation
-                    // Get data attributes from the row
-                    const url = this.getAttribute('data-url');
-                    const baseUrl = this.getAttribute('data-base-url');
-                    const nombre = this.getAttribute('data-nombre');
-                    const pais = this.getAttribute('data-pais');
-                    const ogResumida = this.getAttribute('data-og_resumida');
-                    const id = this.getAttribute('data-id');
-                    const categoria = this.getAttribute('data-categoria');
-                    const inscripcion = this.getAttribute('data-inscripcion');
-                    
-                    // Find and click the "Ver" button in this row
-                    const previewBtn = this.querySelector('.preview-btn');
-                    if (previewBtn) {
-                        previewBtn.click();
-                    } else if (window.ModalModule && window.ModalModule.showPreviewModal) {
-                        // If no button found but ModalModule is available, call it directly
-                        window.ModalModule.showPreviewModal(
-                            url,
-                            nombre,
-                            pais,
-                            ogResumida,
-                            id,
-                            categoria,
-                            baseUrl,
-                            null, // requisitos
-                            null, // disciplina
-                            null, // fecha_cierre
-                            inscripcion
-                        );
-                    }
+                // Find and click the "Ver" button in this row
+                const previewBtn = row.querySelector('.preview-btn');
+                if (previewBtn) {
+                    previewBtn.click();
                 }
-            });
+            }
         });
         
         // Force background color to be gray-50
@@ -734,6 +785,16 @@
         if (flexElement) {
             flexElement.style.backgroundColor = '#F9FAFB';
         }
+
+        // Listen for HTMX content swaps
+        document.addEventListener('htmx:afterSwap', function(event) {
+            // Check if the swap target was our saved opportunities list
+            if(event.detail.target.id === 'saved-opportunities-list') {
+                // Re-initialize pagination if needed
+                updateTableDisplay();
+                console.log('HTMX swap completed - opportunities list updated');
+            }
+        });
     });
 </script>
 {% endblock %}

@@ -1707,6 +1707,7 @@ def get_saved_opportunities(user_id):
                     "categoría": get_prop_value(props.get("Categoría", {})),
                     "fecha_de_cierre": get_date_value(props.get("Fecha de cierre", {})),
                     "url": props.get("URL", {}).get("url", ""),
+                    "base_url": get_prop_value(props.get("Base URL", {})),
                     "inscripcion": inscripcion_value
                 })
                 
