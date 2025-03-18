@@ -21,8 +21,21 @@ export const DestacarModule = {
             return;
         }
         
-        this.pages = pages;
-        console.log('First page in DestacarModule:', this.pages[0]);
+        // Sort pages by fecha_de_cierre (closing date)
+        this.pages = pages.sort((a, b) => {
+            // Handle missing dates by pushing them to the end
+            if (!a.fecha_de_cierre) return 1;
+            if (!b.fecha_de_cierre) return -1;
+            
+            // Handle placeholder dates (1900-01-01) by pushing them to the end
+            if (a.fecha_de_cierre === '1900-01-01') return 1;
+            if (b.fecha_de_cierre === '1900-01-01') return -1;
+            
+            // Sort by fecha_de_cierre
+            return new Date(a.fecha_de_cierre) - new Date(b.fecha_de_cierre);
+        });
+        
+        console.log('First page in DestacarModule after sorting:', this.pages[0]);
         
         // Check if we're on mobile
         this.checkMobile();
