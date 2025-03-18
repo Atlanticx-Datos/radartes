@@ -96,7 +96,7 @@ function exposeModules() {
     // Initialize sharing module
     SharingModule.init({
         brandInfo: {
-            name: document.querySelector('meta[name="app-name"]')?.content || "100 ︱ Oportunidades",
+            name: document.querySelector('meta[name="app-name"]')?.content || "Radartes",
             tagline: document.querySelector('meta[name="description"]')?.content || "Convocatorias, Becas y Recursos Globales para Artistas",
             url: window.location.origin,
             imageUrl: `${window.location.origin}/static/public/Logo_100_mediano.png`

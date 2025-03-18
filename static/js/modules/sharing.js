@@ -8,7 +8,7 @@ import { CONSTANTS } from '../constants.js';
 export const SharingModule = {
     // App branding information - can be updated from server config
     brandInfo: {
-        name: "100 ︱ Oportunidades",
+        name: "Radartes",
         tagline: "Convocatorias, Becas y Recursos Globales para Artistas",
         url: window.location.origin,
         imageUrl: `${window.location.origin}/static/public/Logo_100_mediano.png`

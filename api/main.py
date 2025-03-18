@@ -581,7 +581,7 @@ def list_saved_opportunities():
 
 def get_default_og_data():
     return {
-        "title": "100 ︱ Oportunidades",
+        "title": "Radartes",
         "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
         "url": request.url,
         "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
@@ -816,7 +816,7 @@ def find_similar_opportunities():
 
 @app.context_processor
 def inject_og_data():
-    def get_og_data(title="100 ︱ Oportunidades", description="Convocatorias, Becas y Recursos Globales para Artistas.", url="http://oportunidades-vercel.vercel.app", image="http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"):
+    def get_og_data(title="Radartes", description="Convocatorias, Becas y Recursos Globales para Artistas.", url="http://oportunidades-vercel.vercel.app", image="http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"):
         return {
             "title": title,
             "description": description,

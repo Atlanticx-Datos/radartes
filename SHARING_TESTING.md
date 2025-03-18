@@ -44,7 +44,7 @@ The testing panel appears as a "Test Sharing" button in the bottom right corner 
    - Closing date with 📅 emoji
    - Registration fee with ✅ or 💰 emoji
    - URL
-   - Brand signature ("Compartido desde 100 ︱ Oportunidades")
+   - Brand signature ("Compartido desde Radartes")
 
 ### Email
 
