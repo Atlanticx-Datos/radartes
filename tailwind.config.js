@@ -24,6 +24,7 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
+        syne: ['Syne', 'sans-serif'],
       },
       borderWidth: {
         DEFAULT: '1px',

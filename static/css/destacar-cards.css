@@ -96,8 +96,10 @@
     display: flex;
     flex-direction: column;
     background-color: white;
-    /* Subtle top shadow with light from above */
-    box-shadow: 0 2px 12px rgba(31, 27, 45, 0.02);
+    /* Enhanced background with subtle gradient for brightness */
+    background-image: linear-gradient(to bottom, #ffffff, #fcfcff);
+    /* Improved shadow for better depth and brightness */
+    box-shadow: 0 4px 16px rgba(31, 27, 45, 0.05), 0 1px 3px rgba(31, 27, 45, 0.02), 0 0 0 1px rgba(255, 255, 255, 0.2);
     /* Add a pseudo-element for additional shadow control */
     position: relative;
     isolation: isolate; /* Ensures "Behind transparent areas: TRUE" works correctly */
@@ -114,19 +116,21 @@
     height: 60%;
     border-radius: 0 0 12px 12px;
     /* Stronger bottom shadow to simulate light from above */
-    box-shadow: 0 6px 14px rgba(31, 27, 45, 0.03);
+    box-shadow: 0 8px 20px rgba(31, 27, 45, 0.04);
     transition: box-shadow 0.2s ease;
 }
 
 .featured-opportunities .opportunity-preview:hover {
     transform: translateY(-2px);
-    /* Enhanced top shadow on hover */
-    box-shadow: 0 3px 16px rgba(31, 27, 45, 0.03);
+    /* Enhanced top shadow on hover with more brightness */
+    box-shadow: 0 6px 22px rgba(31, 27, 45, 0.06), 0 1px 5px rgba(31, 27, 45, 0.03), 0 0 0 1px rgba(255, 255, 255, 0.3);
+    /* Subtle inner glow on hover */
+    background-image: linear-gradient(to bottom, #ffffff, #f8f9ff);
 }
 
 .featured-opportunities .opportunity-preview:hover::after {
     /* Enhanced bottom shadow on hover */
-    box-shadow: 0 10px 18px rgba(31, 27, 45, 0.04);
+    box-shadow: 0 14px 24px rgba(31, 27, 45, 0.05);
 }
 
 /* Image container - updated to exactly 200px */
@@ -187,6 +191,10 @@
     flex-grow: 0; /* Don't allow content to grow */
     flex-shrink: 0; /* Don't allow content to shrink */
     height: 113px; /* Exact height: 313px total - 200px image */
+    /* Enhanced brightness through subtle color */
+    background-image: linear-gradient(to bottom, #ffffff, #fdfeff);
+    /* Add a subtle highlight at the top of the content area */
+    border-top: 1px solid rgba(255, 255, 255, 0.8);
 }
 
 /* Content inner container for even spacing */

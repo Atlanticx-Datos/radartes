@@ -2,9 +2,9 @@
     <!-- Logo Section -->
     <div class="flex items-center">
         <a href="{{ url_for('index') }}" class="flex items-center hover:opacity-90 transition-opacity py-2">
-            <img src="{{ url_for('static', filename='public/Logo7.svg') }}" 
-                 alt="RAD/AR/TES Logo" 
-                 class="h-8 sm:h-9 w-auto max-w-[220px]">
+            <img src="{{ url_for('static', filename='public/nuevoLogo.svg') }}" 
+                 alt="Radartes Logo" 
+                 class="md:h-6 sm:h-9 w-auto">
         </a>
     </div>
 
@@ -94,7 +94,7 @@
             </div>
         {% else %}
             <!-- Login Button (Only visible when not logged in) -->
-            <a href="{{ url_for('login') }}" class="bg-design-primary text-white px-4 py-2 rounded-full text-sm font-bold hover:bg-opacity-90 transition-colors">
+            <a href="{{ url_for('login') }}" class="bg-design-primary text-white px-4 py-2 rounded-full text-sm font-bold tracking-wide hover:bg-opacity-90 transition-colors">
                 Iniciar sesión
             </a>
         {% endif %}
@@ -109,7 +109,7 @@
             logoImg.onerror = function() {
                 console.error('Error loading logo image');
                 // Fallback to text
-                this.parentNode.innerHTML = '<span class="text-2xl font-bold tracking-tight text-design-gray-900 ml-1">RAD/AR/TES</span>';
+                this.parentNode.innerHTML = '<span class="text-2xl font-bold tracking-tight text-design-gray-900 ml-1">Radartes</span>';
             };
         }
     });

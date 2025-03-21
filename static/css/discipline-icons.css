@@ -1,0 +1,168 @@
+/* Discipline Icons CSS */
+
+/* Update the filter button container to better handle the new icons */
+.filter-btn {
+    position: relative;
+    overflow: visible;
+    background-color: white !important;
+    border: 1px solid #E5E7EB;
+    transition: all 0.3s ease;
+    margin: 2px;  /* Add margin to prevent outline from being cut off */
+}
+
+/* Add padding to the filter container to ensure outlines are visible */
+.filter-container {
+    padding: 2px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;  /* Reduce gap since we added margin to buttons */
+}
+
+/* General text styling for filter buttons - make selector more specific */
+body .filter-btn span {
+    font-size: 14px;
+    font-weight: 700 !important; /* Regular weight per Figma design with !important */
+    color: #1F1B2D;
+}
+
+/* Hover state - outline instead of background */
+.filter-btn:hover {
+    border-color: #1FC9D0;
+    box-shadow: 0 0 0 1px rgba(31, 201, 208, 0.5);
+}
+
+/* Active state - stronger outline instead of background */
+.filter-btn[data-active="true"] {
+    border-color: #1FC9D0;
+    box-shadow: 0 0 0 2px rgba(31, 201, 208, 0.5);
+    z-index: 2;
+}
+
+/* Remove the background element since we're using border instead */
+.filter-btn .icon-bg {
+    display: none;
+}
+
+/* Style the icon container to show the icon SVG */
+.filter-btn .icon-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    margin-right: 10px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    z-index: 1;
+    box-sizing: border-box;
+}
+
+/* Define discipline-specific background colors for the icon containers */
+.filter-btn[data-discipline-filter="todos"] .icon-container {
+    background-color: rgba(31, 201, 208, 0.2);
+}
+
+.filter-btn[data-discipline-filter="Visuales"] .icon-container {
+    background-color: #E92E4A33;
+}
+
+.filter-btn[data-discipline-filter="Música"] .icon-container {
+    background-color: #FF702233;
+}
+
+.filter-btn[data-discipline-filter="Escénicas"] .icon-container {
+    background-color: #F3CE3A33;
+}
+
+.filter-btn[data-discipline-filter="Literatura"] .icon-container {
+    background-color: #2ED0FF33;
+}
+
+.filter-btn[data-discipline-filter="Diseño"] .icon-container {
+    background-color: #17A39833;
+}
+
+.filter-btn[data-discipline-filter="Cine"] .icon-container {
+    background-color: #64113F33;
+}
+
+.filter-btn[data-discipline-filter="Otras"] .icon-container {
+    background-color: #F15BB533;
+}
+
+/* Hide the default SVG icons */
+.filter-btn .icon-container svg {
+    display: none;
+}
+
+/* Define the discipline icons as background images */
+.filter-btn[data-discipline-filter="todos"] .icon-container {
+    background-image: url('/static/public/discipline-icons/todas-icon.svg');
+    background-position: center;
+    background-size: 60%;
+    background-repeat: no-repeat;
+}
+
+.filter-btn[data-discipline-filter="Visuales"] .icon-container {
+    background-image: url('/static/public/discipline-icons/visuales-icon.svg');
+    background-position: center;
+    background-size: 60%;
+    background-repeat: no-repeat;
+}
+
+.filter-btn[data-discipline-filter="Música"] .icon-container {
+    background-image: url('/static/public/discipline-icons/musica-icon.svg');
+    background-position: center;
+    background-size: 60%;
+    background-repeat: no-repeat;
+}
+
+.filter-btn[data-discipline-filter="Escénicas"] .icon-container {
+    background-image: url('/static/public/discipline-icons/escenicas-icon.svg');
+    background-position: center;
+    background-size: 60%;
+    background-repeat: no-repeat;
+}
+
+.filter-btn[data-discipline-filter="Literatura"] .icon-container {
+    background-image: url('/static/public/discipline-icons/literatura-icon.svg');
+    background-position: center;
+    background-size: 60%;
+    background-repeat: no-repeat;
+}
+
+.filter-btn[data-discipline-filter="Diseño"] .icon-container {
+    background-image: url('/static/public/discipline-icons/diseno-icon.svg');
+    background-position: center;
+    background-size: 60%;
+    background-repeat: no-repeat;
+}
+
+.filter-btn[data-discipline-filter="Cine"] .icon-container {
+    background-image: url('/static/public/discipline-icons/cine-icon.svg');
+    background-position: center;
+    background-size: 60%;
+    background-repeat: no-repeat;
+}
+
+.filter-btn[data-discipline-filter="Otras"] .icon-container {
+    background-image: url('/static/public/discipline-icons/otras-icon.svg');
+    background-position: center;
+    background-size: 60%;
+    background-repeat: no-repeat;
+}
+
+/* Adjust text color for active state - make selector more specific */
+body .filter-btn[data-active="true"] span {
+    font-weight: 600 !important; /* Semi-bold for active state with !important */
+    color: #1F1B2D;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 640px) {
+    .filter-btn .icon-container {
+        width: 24px;
+        height: 24px;
+    }
+} 

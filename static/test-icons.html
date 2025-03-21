@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discipline Icons Test</title>
+    <link href="css/discipline-icons.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Helvetica', sans-serif;
+            margin: 0;
+            padding: 30px;
+            background-color: #F8F9FC;
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            color: #1F1B2D;
+        }
+        
+        .controls {
+            margin-bottom: 30px;
+        }
+        
+        .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+        
+        /* These styles will be overridden by discipline-icons.css */
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 100px;
+            background-color: white;
+            border: 1px solid #E5E7EB;
+            font-size: 14px;
+            line-height: 20px;
+            color: #1F1B2D;
+            box-shadow: 0px 4px 12px 0px rgba(31, 27, 45, 0.08), 0px 2px 2px -2px rgba(31, 27, 45, 0.08);
+            position: relative;
+            isolation: isolate;
+            cursor: pointer;
+        }
+        
+        .filter-btn span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            text-align: center;
+            margin-left: -10px;
+            color: #1F1B2D;
+            /* Removed font-weight: 600 to use the value from discipline-icons.css */
+        }
+        
+        button {
+            padding: 8px 16px;
+            background-color: #1FC9D0;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #1AB9C0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Discipline Icons Test</h1>
+    
+    <div class="controls">
+        <button onclick="setActiveState(true)">Set All Active</button>
+        <button onclick="setActiveState(false)">Set All Inactive</button>
+        <button onclick="toggleRandom()">Toggle Random</button>
+    </div>
+    
+    <div class="filter-container">
+        <button class="filter-btn" data-discipline-filter="todos" data-active="true">
+            <div class="icon-bg"></div>
+            <div class="icon-container">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </div>
+            <span>Todas</span>
+        </button>
+        
+        <button class="filter-btn" data-discipline-filter="Visuales" data-active="false">
+            <div class="icon-bg"></div>
+            <div class="icon-container">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <span>Visuales</span>
+        </button>
+        
+        <button class="filter-btn" data-discipline-filter="Música" data-active="false">
+            <div class="icon-bg"></div>
+            <div class="icon-container">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                </svg>
+            </div>
+            <span>Música</span>
+        </button>
+        
+        <button class="filter-btn" data-discipline-filter="Escénicas" data-active="false">
+            <div class="icon-bg"></div>
+            <div class="icon-container">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+            </div>
+            <span>Escénicas</span>
+        </button>
+        
+        <button class="filter-btn" data-discipline-filter="Literatura" data-active="false">
+            <div class="icon-bg"></div>
+            <div class="icon-container">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </div>
+            <span>Literatura</span>
+        </button>
+        
+        <button class="filter-btn" data-discipline-filter="Diseño" data-active="false">
+            <div class="icon-bg"></div>
+            <div class="icon-container">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                </svg>
+            </div>
+            <span>Diseño</span>
+        </button>
+        
+        <button class="filter-btn" data-discipline-filter="Cine" data-active="false">
+            <div class="icon-bg"></div>
+            <div class="icon-container">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                </svg>
+            </div>
+            <span>Cine</span>
+        </button>
+        
+        <button class="filter-btn" data-discipline-filter="Otras" data-active="false">
+            <div class="icon-bg"></div>
+            <div class="icon-container">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+            </div>
+            <span>Otras</span>
+        </button>
+    </div>
+    
+    <script>
+        function setActiveState(active) {
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(button => {
+                button.setAttribute('data-active', active.toString());
+            });
+        }
+        
+        function toggleRandom() {
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(button => {
+                // Generate a random boolean
+                const isActive = Math.random() > 0.5;
+                button.setAttribute('data-active', isActive.toString());
+            });
+        }
+        
+        // Allow clicking on buttons to toggle their active state
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const isActive = this.getAttribute('data-active') === 'true';
+                this.setAttribute('data-active', (!isActive).toString());
+            });
+        });
+    </script>
+</body>
+</html> 
