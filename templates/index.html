@@ -204,7 +204,7 @@
                 <!-- Search input and buttons -->
                 <div class="relative flex items-center">
                     <input type="text" id="open-search" placeholder="¿Qué estás buscando?"
-                        class="w-full p-4 pl-12 pr-28 border rounded-full shadow-xl bg-white/95 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">
+                        class="w-full p-4 pl-12 pr-28 border rounded-full shadow-md bg-white/95 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">
                     
                     <!-- Search icon - moved after input for CSS selector to work -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="search-icon" viewBox="0 0 20 20" fill="currentColor">
@@ -230,7 +230,7 @@
 
                     <!-- Structured filters dropdown -->
                     <div id="structured-filters"
-                        class="hidden absolute right-0 mt-2 w-96 bg-white rounded-[12px] shadow-2xl border border-gray-200 p-4"
+                        class="hidden absolute right-0 mt-2 w-96 bg-white rounded-[12px] shadow-lg border border-gray-200 p-4"
                         style="top: 100%; z-index: 999999;">
                         <!-- Header with Filtros and X icon -->
                         <div class="flex justify-between items-center mb-4 border-b h-[44px] bg-[#F9F8FA] -m-4 px-4 rounded-t-[12px]">
@@ -604,7 +604,7 @@
                 <div class="relative">
                     <!-- Previous button -->
                     <button onclick="prevDestacarPage()"
-                        class="destacar-prev absolute left-0 top-1/2 -translate-y-1/2 -ml-4 sm:-ml-8 lg:-ml-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200"
+                        class="destacar-prev absolute left-0 top-1/2 -translate-y-1/2 -ml-4 sm:-ml-8 lg:-ml-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-sm hover:bg-gray-50 focus:outline-none transition-opacity duration-200"
                         aria-disabled="true">
                         <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -677,7 +677,7 @@
 
                     <!-- Next button -->
                     <button onclick="nextDestacarPage()"
-                        class="destacar-next absolute right-0 top-1/2 -translate-y-1/2 -mr-4 sm:-mr-8 lg:-mr-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200">
+                        class="destacar-next absolute right-0 top-1/2 -translate-y-1/2 -mr-4 sm:-mr-8 lg:-mr-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-sm hover:bg-gray-50 focus:outline-none transition-opacity duration-200">
                         <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
@@ -701,7 +701,7 @@
                 <div class="relative">
                     <!-- Previous button -->
                     <button onclick="prevTopPage()"
-                        class="top-prev absolute left-0 top-1/2 -translate-y-1/2 -ml-4 sm:-ml-8 lg:-ml-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200"
+                        class="top-prev absolute left-0 top-1/2 -translate-y-1/2 -ml-4 sm:-ml-8 lg:-ml-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-sm hover:bg-gray-50 focus:outline-none transition-opacity duration-200"
                         aria-disabled="true">
                         <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -717,7 +717,7 @@
 
                     <!-- Next button -->
                     <button onclick="nextTopPage()"
-                        class="top-next absolute right-0 top-1/2 -translate-y-1/2 -mr-4 sm:-mr-8 lg:-mr-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 focus:outline-none transition-opacity duration-200">
+                        class="top-next absolute right-0 top-1/2 -translate-y-1/2 -mr-4 sm:-mr-8 lg:-mr-14 w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-sm hover:bg-gray-50 focus:outline-none transition-opacity duration-200">
                         <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
@@ -738,7 +738,7 @@
                         <form action="/unsubscribe" method="post" class="mt-4 sm:mt-6">
                             <input type="hidden" name="email" value="{{ existing_email }}">
                             <button type="submit"
-                                class="bg-[#6232FF] text-white px-8 py-3 rounded-full font-medium hover:bg-[#5128d8] transition-colors text-lg shadow-lg">
+                                class="bg-[#6232FF] text-white px-8 py-3 rounded-full font-medium hover:bg-[#5128d8] transition-colors text-lg shadow-sm">
                                 Cancelar suscripción
                             </button>
                         </form>
@@ -761,14 +761,14 @@
                                     </div>
                                     <!-- Input with padding to accommodate the icon -->
                                     <input type="email" id="subscribe-email" name="email" placeholder="Ingresá tu email"
-                                        class="w-full px-6 py-3 pl-12 rounded-full pr-40 focus:outline-none focus:ring-2 focus:ring-[#6232FF]/50 text-lg shadow-lg"
+                                        class="w-full px-6 py-3 pl-12 rounded-full pr-40 focus:outline-none focus:ring-2 focus:ring-[#6232FF]/50 text-lg shadow-sm"
                                         style="height: 52px; padding-left: 42px;"
                                         required>
                                 </div>
                                 <!-- Button container -->
                                 <div class="absolute inset-x-0 sm:right-2 sm:left-auto text-center sm:text-left top-[150%] sm:top-1/2 transform -translate-y-[40%] sm:-translate-y-1/2">
                                     <button type="submit"
-                                        class="bg-[#6232FF] text-white px-6 py-2 rounded-full font-medium hover:bg-[#5128d8] transition-colors text-lg shadow-lg">
+                                        class="bg-[#6232FF] text-white px-6 py-2 rounded-full font-medium hover:bg-[#5128d8] transition-colors text-lg shadow-sm">
                                         Suscribirme
                                     </button>
                                 </div>

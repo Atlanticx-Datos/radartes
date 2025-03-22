@@ -1434,6 +1434,107 @@ table[id*="results"] th {
     }
 }
 
+/* Standard Box Shadows from Figma */
+.shadow-xs {
+    box-shadow: 0px 2px 4px 0px rgba(31, 27, 45, 0.06), 0px 1px 1px -1px rgba(31, 27, 45, 0.06) !important;
+}
+
+.shadow-sm {
+    box-shadow: 0px 4px 12px 0px rgba(31, 27, 45, 0.08), 0px 2px 2px -2px rgba(31, 27, 45, 0.08) !important;
+}
+
+.shadow-md {
+    box-shadow: 0px 6px 16px 0px rgba(31, 27, 45, 0.1), 0px 2px 4px -2px rgba(31, 27, 45, 0.1) !important;
+}
+
+.shadow-lg {
+    box-shadow: 0px 4px 16px 0px rgba(31, 27, 45, 0.12), 0px 2px 8px -4px rgba(31, 27, 45, 0.12) !important;
+}
+
+.shadow-xl {
+    box-shadow: 0px 8px 16px 0px rgba(31, 27, 45, 0.12), 0px 4px 4px -2px rgba(31, 27, 45, 0.1) !important;
+}
+
+.shadow-hover {
+    box-shadow: 0px 8px 20px 0px rgba(31, 27, 45, 0.12), 0px 3px 6px -2px rgba(31, 27, 45, 0.1) !important;
+}
+
+.shadow-focus {
+    box-shadow: 0 0 0 3px rgba(98, 50, 255, 0.3) !important;
+}
+
+.shadow-inner {
+    box-shadow: inset 0 2px 4px 0 rgba(31, 27, 45, 0.06) !important;
+}
+
+.shadow-none {
+    box-shadow: none !important;
+}
+
+/* Update existing shadow styles to use the new standard */
+
+/* Form elements focus state */
+.form-select:focus, 
+.form-input:focus, 
+.form-textarea:focus, 
+.form-multiselect:focus, 
+.form-checkbox:focus, 
+.form-radio:focus {
+    box-shadow: 0 0 0 2px rgba(98, 50, 255, 0.2) !important;
+}
+
+.form-select[aria-invalid=true], 
+.form-input[aria-invalid=true], 
+.form-textarea[aria-invalid=true], 
+.form-multiselect[aria-invalid=true], 
+.form-checkbox[aria-invalid=true], 
+.form-radio[aria-invalid=true] {
+    box-shadow: 0 4px 6px -1px rgba(98, 50, 255, 0.1), 0 2px 4px -1px rgba(98, 50, 255, 0.06) !important;
+}
+
+.form-select[disabled], 
+.form-input[disabled], 
+.form-textarea[disabled], 
+.form-multiselect[disabled], 
+.form-checkbox[disabled], 
+.form-radio[disabled] {
+    box-shadow: 0 0 0 3px rgba(98, 50, 255, 0.3) !important;
+}
+
+/* Update card and container shadows */
+.opportunity-card,
+.card,
+.content-card {
+    box-shadow: 0px 4px 12px 0px rgba(31, 27, 45, 0.08), 0px 2px 2px -2px rgba(31, 27, 45, 0.08) !important;
+}
+
+.opportunity-card:hover,
+.card:hover,
+.content-card:hover {
+    box-shadow: 0px 6px 16px 0px rgba(31, 27, 45, 0.1), 0px 2px 4px -2px rgba(31, 27, 45, 0.1) !important;
+}
+
+/* Update specific components from Figma */
+.dropdown-menu,
+.user-menu,
+.filters-dropdown {
+    box-shadow: 0px 4px 12px 0px rgba(31, 27, 45, 0.08), 0px 2px 2px -2px rgba(31, 27, 45, 0.08) !important;
+}
+
+.modal-container,
+.popover {
+    box-shadow: 0px 4px 16px 0px rgba(31, 27, 45, 0.12), 0px 2px 8px -4px rgba(31, 27, 45, 0.12) !important;
+}
+
+.badge {
+    box-shadow: 0px 2px 4px 0px rgba(31, 27, 45, 0.06), 0px 1px 1px -1px rgba(31, 27, 45, 0.06) !important;
+}
+
+.button-primary:focus,
+.button-secondary:focus {
+    box-shadow: 0 0 0 3px rgba(98, 50, 255, 0.3) !important;
+}
+
 
 
 
