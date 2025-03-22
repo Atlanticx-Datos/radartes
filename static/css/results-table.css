@@ -4,12 +4,19 @@
 .results-table-container {
     width: 100%;
     overflow-x: auto;
-    border-radius: 8px;
-    border-top: 2px solid #6232FF !important;
-    border-left: 2px solid #6232FF !important;
-    border-right: 2px solid #6232FF !important;
-    border-bottom: 6px solid #6232FF !important; /* Bottom border is now 6px wide */
+    /* Update border-radius to 12px */
+    border-radius: 12px;
+    /* Use a more precise border definition with different widths */
+    border: none !important; /* Reset border to avoid conflicts */
     box-shadow: none !important; /* Remove box shadow */
+    /* Set individual borders with specific widths */
+    border-top: 1px solid #6232FF !important;
+    border-left: 0.5px solid #6232FF !important;
+    border-right: 0.5px solid #6232FF !important;
+    border-bottom: 0.5px solid #6232FF !important;
+    /* Ensure proper corner rendering */
+    overflow: hidden !important; /* This helps with rounded corner rendering */
+    position: relative; /* Ensure proper stacking context */
 }
 
 /* Main table styling */
@@ -48,12 +55,8 @@
 /* Table body */
 .results-table tbody tr {
     background-color: white;
-    border-bottom: 1px solid #6232FF !important; /* Primary color for row separators, thinner */
+    border-bottom: 0.5px solid #6232FF !important;
     transition: background-color 0.2s;
-}
-
-.results-table tbody tr:last-child {
-    border-bottom: 1px solid #6232FF !important; /* Keep bottom border for last row */
 }
 
 .results-table tbody tr:hover {
@@ -74,33 +77,13 @@ table, th, td, tr {
     border-color: #6232FF !important;
 }
 
-/* Force all dividers to be primary color */
-.divide-y > * {
-    border-top-color: #6232FF !important;
-    border-bottom-color: #6232FF !important;
+/* Ensure the last row has no bottom border */
+.results-table tbody tr:last-child {
+    border-bottom: none !important;
 }
 
-/* Target any table in the results container */
-#results-container table {
-    border-collapse: collapse !important;
-}
-
-#results-container table tr {
-    border-bottom: 1px solid #6232FF !important;
-}
-
-/* Target any dynamically generated tables */
-[id*="results"] table,
-.results-table,
-.min-w-full {
-    border-collapse: collapse !important;
-}
-
-[id*="results"] tr,
-.results-table tr,
-.min-w-full tr {
-    border-bottom: 1px solid #6232FF !important;
-}
+/* Remove all other specific border rules that could cause conflicts */
+/* Keep only the essential rules for the table */
 
 /* Opportunity column */
 .results-table td:first-child {
@@ -204,6 +187,31 @@ table, th, td, tr {
 
 .action-button:hover {
     background-color: #DDD6FE;
+}
+
+/* Trash icon styling */
+.trash-icon-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #EFECF3;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    padding: 0; /* Remove padding to ensure perfect circle */
+}
+
+.trash-icon-container:hover {
+    background-color: #E4E0E9;
+}
+
+.trash-icon {
+    width: 18px;
+    height: 18px;
+    color: #454056;
+    min-width: 18px; /* Ensure the icon maintains its size */
 }
 
 /* Pagination */
