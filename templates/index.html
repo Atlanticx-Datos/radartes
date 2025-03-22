@@ -611,65 +611,66 @@
                         </svg>
                     </button>
 
-                    <!-- Featured opportunities grid - full width with flex container -->
-                    <div class="featured-opportunities w-full overflow-hidden">
+                    <!-- Opportunities Container -->
+                    <div class="featured-opportunities w-full overflow-visible pb-4">
                         <div class="flex flex-wrap gap-6">
-                            <!-- Content will be populated by JavaScript, but we can add a template for reference -->
-                            <!-- This template won't be displayed, it's just for reference -->
-                            <template id="destacar-card-template">
-                                <div class="bg-white rounded-lg shadow-md overflow-hidden relative cursor-pointer opportunity-preview">
-                                    <div class="relative h-48 bg-gray-200">
-                                        <img src="/static/public/IsoAtx.png" alt="Atlantic x Logo" class="w-full h-full object-contain">
-                                        <span class="absolute top-3 left-3 text-sm">Categoría</span>
-                                        <span class="discipline-badge discipline-default">Disciplina</span>
-                                        <button class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <!-- Card Details Section-->
-                                    <div class="p-2">
-                                        <h3 class="font-medium text-lg">Título de la oportunidad</h3>
-                                        
-                                        <div class="flex flex-wrap gap-4 text-sm text-gray-600">
-                                            <div class="meta-row">
-                                                <div class="flex items-center gap-1">
-                                                    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-                                                    </svg>
-                                                    <span>País</span>
-                                                </div>
-                                                
-                                                <div class="flex items-center gap-1">
-                                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                                        <circle cx="12" cy="12" r="10"/>
-                                                        <path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/>
-                                                    </svg>
-                                                </div>
-                                                
-                                                <div class="flex items-center gap-1 subdisciplines-inline">
-                                                    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
-                                                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
-                                                    </svg>
-                                                    <span>Subdisciplinas</span>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="flex items-center gap-1 date-row">
-                                                <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
-                                                </svg>
-                                                <span>Cierre: 01/Ene/2023</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
+                            <!-- Content will be populated by JavaScript -->
                         </div>
                     </div>
-                    
+
+                    <!-- Template for cards -->
+                    <template id="destacar-card-template">
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden relative cursor-pointer opportunity-preview">
+                            <div class="relative h-48 bg-gray-200">
+                                <img src="/static/public/IsoAtx.png" alt="Atlantic x Logo" class="w-full h-full object-contain">
+                                <span class="absolute top-3 left-3 text-sm">Categoría</span>
+                                <span class="discipline-badge discipline-default">Disciplina</span>
+                                <button class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <!-- Card Details Section-->
+                            <div class="p-2">
+                                <h3 class="font-medium text-lg">Título de la oportunidad</h3>
+                                
+                                <div class="flex flex-wrap gap-4 text-sm text-gray-600">
+                                    <div class="meta-row">
+                                        <div class="flex items-center gap-1">
+                                            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span>País</span>
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-1">
+                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                <circle cx="12" cy="12" r="10"/>
+                                                <path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/>
+                                            </svg>
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-1 subdisciplines-inline">
+                                            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span>Subdisciplinas</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center gap-1 date-row">
+                                        <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span>Cierre: 01/Ene/2023</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
                     <!-- Mobile dots indicator -->
                     <div class="destacar-dots-container" style="display: none;">
                         <!-- Dots will be populated by JavaScript -->
@@ -709,7 +710,7 @@
                     </button>
 
                     <!-- Top opportunities grid -->
-                    <div class="top-opportunities-container overflow-hidden">
+                    <div class="top-opportunities-container overflow-visible pb-4">
                         <div class="grid grid-cols-1 gap-6">
                             <!-- Content will be populated by JavaScript -->
                         </div>

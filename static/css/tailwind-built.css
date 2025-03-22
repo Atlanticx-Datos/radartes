@@ -1340,6 +1340,9 @@ video {
 .pb-3 {
   padding-bottom: 0.75rem;
 }
+.pb-4 {
+  padding-bottom: 1rem;
+}
 .pl-12 {
   padding-left: 3rem;
 }

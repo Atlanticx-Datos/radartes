@@ -2,7 +2,7 @@
 .top-opportunities-container {
     width: 100%;
     position: relative;
-    overflow: hidden;
+    overflow: visible; /* Changed from hidden to visible to prevent shadow cutoff */
     border-radius: 0.5rem;
     margin-top: 0.5rem; /* Add a small top margin for spacing from the header */
 }
@@ -17,7 +17,8 @@
     background-color: white;
     border-radius: 0.5rem;
     overflow: hidden;
-    box-shadow: 0px 4px 12px 0px rgba(31, 27, 45, 0.08), 0px 2px 2px -2px rgba(31, 27, 45, 0.08); /* This matches shadow-sm in site.css */
+    /* Updated shadow to exactly match Figma specs (effect_CY3DFO) */
+    box-shadow: 0px 4px 12px 0px rgba(31, 27, 45, 0.08), 0px 2px 2px -2px rgba(31, 27, 45, 0.08);
     isolation: isolate;
     position: relative;
     height: 350px; /* Set a fixed height to match the image */
@@ -29,7 +30,8 @@
 
 .top-opportunity-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0px 6px 16px 0px rgba(31, 27, 45, 0.1), 0px 2px 4px -2px rgba(31, 27, 45, 0.1); /* This matches shadow-md in site.css */
+    /* Updated hover shadow to exactly match Figma specs (effect_RCUP2O) */
+    box-shadow: 0px 4px 16px 0px rgba(31, 27, 45, 0.12), 0px 2px 8px -4px rgba(31, 27, 45, 0.12);
 }
 
 .top-opportunity-image {

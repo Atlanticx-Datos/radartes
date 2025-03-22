@@ -13,6 +13,7 @@
     /* Make the top opportunities container scrollable horizontally */
     .top-opportunities-container {
         overflow-x: auto !important;
+        overflow-y: visible !important; /* Allow shadows to be visible */
         scroll-snap-type: x mandatory;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none; /* Firefox */
