@@ -21,11 +21,10 @@
     box-shadow: 0px 4px 12px 0px rgba(31, 27, 45, 0.08), 0px 2px 2px -2px rgba(31, 27, 45, 0.08);
     isolation: isolate;
     position: relative;
-    height: 350px; /* Set a fixed height to match the image */
+    height: 380px; /* Fixed height of 380px exactly */
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     max-width: 100%; /* Take full width of container */
     margin: 0 auto;
-    min-height: 410px;
 }
 
 .top-opportunity-card:hover {
@@ -42,6 +41,7 @@
     flex-shrink: 0;
     flex-basis: 57.4%; /* Use percentage instead of fixed pixels */
     min-width: 57.4%; /* Use percentage instead of fixed pixels */
+    align-self: stretch; /* Make the image stretch to match the card's height */
 }
 
 .top-opportunity-image img {
@@ -55,6 +55,15 @@
     display: flex;
     flex-direction: column;
     flex: 1;
+    overflow: hidden; /* Prevent content from overflowing */
+    justify-content: space-between; /* Distribute space evenly */
+}
+
+.top-opportunity-content > div:first-child {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
 }
 
 .top-opportunity-title {
@@ -164,6 +173,27 @@
     filter: invert(41%) sepia(11%) saturate(409%) hue-rotate(215deg) brightness(90%) contrast(89%); /* Precise #666276 color */
 }
 
+/* Add styling for the expand button - make it inline with text */
+.expand-description-btn {
+    display: inline;
+    margin: 0;
+    padding: 0 4px; /* Add some padding to make it more clickable */
+    color: #6232FF;
+    font-family: Inter, sans-serif;
+    font-weight: 500; /* Make it slightly bolder */
+    font-size: inherit;
+    line-height: inherit;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline; /* Always underlined for better visibility */
+}
+
+.expand-description-btn:hover {
+    color: #5128d8; /* Darker color on hover */
+}
+
+/* Adjust the description to properly handle inline button */
 .top-opportunity-description {
     font-family: Inter, sans-serif;
     font-weight: 400;
@@ -171,9 +201,31 @@
     line-height: 150%;
     margin-top: 12px;
     margin-bottom: 0px;
-    display: block;
-    overflow: visible;
+    display: -webkit-box;
+    overflow: hidden;
     color: #666276; /* Design-gray-700 from your Tailwind config */
+    -webkit-line-clamp: 4; /* Limit to 4 lines by default */
+    -webkit-box-orient: vertical;
+    max-height: calc(1.5em * 4); /* Approximately 4 lines of text */
+    position: relative; /* Ensure proper positioning context */
+    /* Add horizontal padding to make spacing consistent when the text breaks to multiple lines */
+    padding-right: 4px;
+}
+
+/* Add a class for expanded descriptions */
+.top-opportunity-description.expanded {
+    -webkit-line-clamp: unset;
+    max-height: none;
+    overflow: visible;
+    margin-bottom: 8px; /* Add margin to separate from button when expanded */
+    white-space: normal; /* Ensure text wraps properly when expanded */
+    position: absolute;
+    background-color: white;
+    z-index: 20;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 16px 0px rgba(31, 27, 45, 0.12);
+    width: calc(100% - 48px); /* Full width minus padding */
 }
 
 .top-opportunity-badges {
@@ -251,6 +303,7 @@
     color: #6232FF;
 }
 
+/* Ensure the CTA button has proper spacing regardless of description expansion */
 .top-opportunity-button {
     display: inline-flex;
     align-items: center;
@@ -265,8 +318,8 @@
     border: none;
     cursor: pointer;
     align-self: flex-start;
-    margin-top: 32px;
-    margin-bottom: 16px;
+    margin-top: 16px; /* Reduced margin to fit in fixed height */
+    margin-bottom: 0;
     height: 36px;
 }
 
@@ -293,7 +346,7 @@
 @media (max-width: 1200px) {
     .top-opportunity-card {
         max-width: 100%;
-        min-height: 380px;
+        height: 380px; /* Maintain fixed height */
     }
     .top-opportunity-image {
         flex-basis: 57.4%; /* Keep the same proportion */
@@ -303,48 +356,71 @@
         padding: 20px;
     }
     .top-opportunity-description {
-        -webkit-line-clamp: 6;
+        -webkit-line-clamp: 4; /* Reduce to 4 lines for this breakpoint */
+        max-height: calc(1.5em * 4); /* Approximately 4 lines of text */
     }
 }
 
 @media (max-width: 992px) {
     .top-opportunity-card {
-        min-height: 360px;
+        height: 380px; /* Maintain fixed height */
     }
     .top-opportunity-title {
         font-size: 20px;
     }
     .top-opportunity-description {
-        -webkit-line-clamp: 4;
+        -webkit-line-clamp: 3; /* Reduce to 3 lines for this breakpoint */
+        max-height: calc(1.5em * 3); /* Approximately 3 lines of text */
     }
 }
 
 @media (max-width: 768px) {
     .top-opportunity-card {
         flex-direction: column;
-        min-height: auto;
-        height: auto;
+        height: auto; /* Allow height to adjust on mobile */
+        min-height: 380px; /* Minimum height of 380px on mobile */
     }
+    
     .top-opportunity-image {
         width: 100%;
         min-width: 100%;
-        height: 200px; /* Fixed height for mobile */
+        height: 180px; /* Reduced height for mobile image */
+        flex-basis: auto; /* Reset flex-basis for column layout */
     }
+    
     .top-opportunity-content {
-        min-height: 200px;
+        min-height: 200px; /* Ensure content area is at least 200px on mobile */
+        padding: 16px;
     }
+    
+    .top-opportunity-content > div:first-child {
+        min-height: 140px; /* Ensure content container has minimum height */
+    }
+    
     .top-opportunity-title {
         font-size: 18px;
     }
+    
     .top-opportunity-meta {
         margin-top: 8px;
     }
+    
     .top-opportunity-description {
         margin-top: 8px;
+        -webkit-line-clamp: 3; /* 3 lines for mobile */
+        max-height: calc(1.5em * 3); /* Approximately 3 lines of text */
     }
+    
+    .top-opportunity-description.expanded {
+        width: calc(100% - 32px); /* Full width minus mobile padding */
+        padding: 12px;
+        left: 0;
+    }
+    
     .top-opportunity-button {
         margin-top: 12px;
     }
+    
     .top-opportunity-inscription img[src*="cash.svg"],
     .top-opportunity-inscription img[src*="money_on.svg"],
     .top-opportunity-inscription img[src*="money_off.svg"] {
@@ -358,14 +434,21 @@
     .top-opportunity-card {
         flex-direction: column;
         height: auto;
+        min-height: 380px; /* Keep minimum height */
     }
     
     .top-opportunity-image {
-        height: 160px;
+        height: 150px;
+        min-width: 100%;
     }
     
     .top-opportunity-content {
         padding: 12px;
+        min-height: 230px; /* Ensure content area is at least 230px on small mobile */
+    }
+    
+    .top-opportunity-content > div:first-child {
+        min-height: 180px; /* Ensure content container has minimum height */
     }
     
     .top-opportunity-badges {
@@ -411,7 +494,8 @@
     
     .top-opportunity-description {
         font-size: 12px;
-        -webkit-line-clamp: 2;
+        -webkit-line-clamp: 2; /* Only 2 lines for small screens */
+        max-height: calc(1.5em * 2); /* Approximately 2 lines of text */
         margin-top: 6px;
     }
     
@@ -430,6 +514,13 @@
         height: 12px;
         min-width: 12px;
         /* Keep the color filters intact */
+    }
+
+    /* Expand button inherits font size from parent description */
+
+    .top-opportunity-description.expanded {
+        width: calc(100% - 24px); /* Full width minus small mobile padding */
+        padding: 10px;
     }
 }
 
