@@ -1,16 +1,30 @@
+<!-- Footer -->
 <footer class="bg-[#6232FF] text-white py-12">
     <div class="container mx-auto px-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Container 1: Logo and Location -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
+            <div class="flex items-center mb-6 md:mb-0">
+                <img src="/static/public/nuevoLogo 1.svg" alt="100 Oportunidades" class="h-7 mr-4">
+            </div>
+            <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 36 41" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M18 13.9995C15.7908 13.9995 14 15.7904 14 17.9995C14 20.2086 15.7908 21.9995 18 21.9995C20.2091 21.9995 22 20.2086 22 17.9995C22 15.7904 20.2091 13.9995 18 13.9995ZM9.99996 17.9995C9.99996 13.5812 13.5817 9.99949 18 9.99949C22.4182 9.99949 26 13.5812 26 17.9995C26 22.4178 22.4182 25.9995 18 25.9995C13.5817 25.9995 9.99996 22.4178 9.99996 17.9995Z" fill="currentColor"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M18 4C15.2311 4 12.5244 4.82107 10.2221 6.35938C7.91983 7.89768 6.12541 10.0841 5.06576 12.6423C4.00612 15.2004 3.72883 18.0153 4.26896 20.731C4.8091 23.4467 6.14239 25.9413 8.10026 27.8992L16.5875 36.3845C16.9625 36.7591 17.4709 36.9696 18.001 36.9696C18.5311 36.9696 19.0395 36.7591 19.4145 36.3845L27.8998 27.8992C29.8576 25.9413 31.1909 23.4467 31.7311 20.731C32.2712 18.0153 31.9939 15.2004 30.9343 12.6423C29.8746 10.0841 28.0802 7.89768 25.7779 6.35938C23.4756 4.82107 20.7689 4 18 4ZM30.7283 30.7276C33.2455 28.2102 34.9598 25.0029 35.6542 21.5113C36.3487 18.0196 35.9922 14.4005 34.6297 11.1115C33.2673 7.82247 30.9602 5.01131 28.0002 3.03348C25.0401 1.05566 21.56 0 18 0C14.44 0 10.9599 1.05566 7.99984 3.03348C5.03978 5.01131 2.73267 7.82247 1.37027 11.1115C0.00786066 14.4005 -0.348654 18.0196 0.345805 21.5113C1.04026 25.0029 2.75451 28.2102 5.27176 30.7276L13.76 39.2138C14.885 40.3377 16.4108 40.9696 18.001 40.9696C19.5913 40.9696 21.1165 40.3382 22.2415 39.2143L30.7283 30.7276Z" fill="currentColor"/>
+                </svg>
+                <span class="font-inter text-[14px] font-normal leading-[150%] align-middle">Buenos Aires, Argentina</span>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-700 my-8"></div>
+
+        <!-- Container 2: Four columns -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-10">
             <!-- Description and social links -->
-            <div>
-                <p class="text-gray-200 mb-4">Convocatorias, Becas y Recursos Globales para Artistas.</p>
+            <div class="md:col-span-6">
+                <p class="text-white font-bold mb-6 text-xl">Convocatorias, Becas y Recursos Globales para Artistas.</p>
                 <div class="flex space-x-4">
-                    <a href="https://twitter.com/radartes" target="_blank" rel="noopener noreferrer" class="text-gray-200 hover:text-white">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
-                        </svg>
-                    </a>
-                    <a href="https://instagram.com/radartes" target="_blank" rel="noopener noreferrer" class="text-gray-200 hover:text-white">
+                    <a href="https://instagram.com/radartes" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd"></path>
                         </svg>
@@ -18,30 +32,40 @@
                 </div>
             </div>
             
-            <!-- Quick links -->
-            <div>
-                <h3 class="text-lg font-semibold mb-4">Enlaces rápidos</h3>
-                <ul class="space-y-2">
-                    <li><a href="/" class="text-gray-200 hover:text-white">Inicio</a></li>
-                    <li><a href="/database" class="text-gray-200 hover:text-white">Base de datos</a></li>
-                    <li><a href="/saved_opportunities" class="text-gray-200 hover:text-white">Guardados</a></li>
-                    <li><a href="/about" class="text-gray-200 hover:text-white">Sobre nosotros</a></li>
+            <!-- Acciones -->
+            <div class="md:col-span-2">
+                <h3 class="text-[16px] font-semibold mb-4">Acciones</h3>
+                <ul class="space-y-3">
+                    <li><a href="https://atlanticxx.notion.site/1509dd874b3a80a5ac8bce88f0d1bde3?pvs=105" class="font-inter text-[14px] font-normal leading-[150%] text-gray-300 hover:text-white align-middle" target="_blank" rel="noopener noreferrer">Postular oportunidad</a></li>
                 </ul>
             </div>
             
-            <!-- Contact -->
-            <div>
-                <h3 class="text-lg font-semibold mb-4">Contacto</h3>
-                <p class="text-gray-200 mb-2">¿Preguntas o sugerencias?</p>
-                <a href="mailto:info@oportunidades.lat" class="text-gray-200 hover:text-white">info@oportunidades.lat</a>
+            <!-- Apoyá el proyecto -->
+            <div class="md:col-span-2">
+                <h3 class="text-[16px] font-semibold mb-4">Apoyá el proyecto</h3>
+                <ul class="space-y-3">
+                    <li><a href="https://github.com/oportunidades" class="font-inter text-[14px] font-normal leading-[150%] text-gray-300 hover:text-white align-middle" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                    <li><a href="/donaciones" class="font-inter text-[14px] font-normal leading-[150%] text-gray-300 hover:text-white align-middle">Donaciones</a></li>
+                </ul>
+            </div>
+            
+            <!-- Contacto -->
+            <div class="md:col-span-2">
+                <h3 class="text-[16px] font-semibold mb-4">Contacto</h3>
+                <p class="font-inter text-[14px] font-normal leading-[150%] text-gray-300 mb-3 align-middle">¿Preguntas/sugerencias?</p>
+                <a href="mailto:info@oportunidades.lat" class="font-inter text-[14px] font-normal leading-[150%] text-gray-300 hover:text-white mb-3 block align-middle">info@oportunidades.lat</a>
             </div>
         </div>
         
-        <div class="border-t border-[#7F5BFF] mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p class="text-gray-200 text-sm mb-4 md:mb-0">© 2025 Radartes. Todos los derechos reservados.</p>
+        <!-- Divider -->
+        <div class="border-t border-gray-700 my-8"></div>
+        
+        <!-- Container 3: Copyright and legal links -->
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <p class="text-white text-sm mb-4 md:mb-0">© 2025 | Atlanticx. Todos los derechos reservados.</p>
             <div class="flex space-x-6">
-                <a href="/privacy" class="text-gray-200 hover:text-white text-sm">Política de privacidad</a>
-                <a href="/terms" class="text-gray-200 hover:text-white text-sm">Términos de uso</a>
+                <a href="/terminos" class="font-inter text-[14px] font-normal leading-[150%] text-gray-300 hover:text-white align-middle">Términos de uso</a>
+                <a href="/privacidad" class="font-inter text-[14px] font-normal leading-[150%] text-gray-300 hover:text-white align-middle">Política de privacidad</a>
             </div>
         </div>
     </div>

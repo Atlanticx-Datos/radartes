@@ -225,8 +225,8 @@ export const TopModule = {
                     <img src="/static/public/conejos.jpg" alt="${Utils.escapeHTML(name)}" onerror="this.src='/static/public/IsoAtx.png'">
                 </div>
                 <div class="top-opportunity-content">
-                    <div>
-                        <h3 class="top-opportunity-title">${Utils.escapeHTML(name)}</h3>
+                    <div class="space-y-4">
+                        <h3 class="top-opportunity-title text-design-gray-900">${Utils.escapeHTML(name)}</h3>
                         
                         <div class="top-opportunity-meta">
                             <div class="top-opportunity-location">
@@ -256,7 +256,7 @@ export const TopModule = {
                             </div>
                         </div>
                         
-                        <div class="top-opportunity-description" data-full-length="${page.og_resumida ? page.og_resumida.length : 0}">
+                        <div class="top-opportunity-description mt-6" data-full-length="${page.og_resumida ? page.og_resumida.length : 0}">
                             ${page.og_resumida ? 
                                 Utils.escapeHTML(page.og_resumida) : 
                                 'Sin descripción disponible'}
@@ -265,7 +265,7 @@ export const TopModule = {
                     
                     <button 
                         type="button"
-                        class="top-opportunity-button"
+                        class="top-opportunity-button relative bottom-3"
                         data-url="${Utils.escapeHTML(page.url)}"
                         data-base-url="${Utils.escapeHTML(page.base_url || '')}"
                         data-nombre="${Utils.escapeHTML(page.nombre)}"
