@@ -799,8 +799,8 @@ export const SearchModule = {
                     <select id="mobile-column-select" onchange="SearchModule.handleMobileColumnChange(this.value)">
                         <option value="disciplina" ${this.mobileSelectedColumn === 'disciplina' ? 'selected' : ''}>Disciplina</option>
                         <option value="pais" ${this.mobileSelectedColumn === 'pais' ? 'selected' : ''}>País</option>
-                        <option value="pago" ${this.mobileSelectedColumn === 'pago' ? 'selected' : ''}>Pago</option>
                         <option value="cierre" ${this.mobileSelectedColumn === 'cierre' ? 'selected' : ''}>Cierre</option>
+                        <option value="pago" ${this.mobileSelectedColumn === 'pago' ? 'selected' : ''}>Pago</option>
                     </select>
                 </div>
                 
@@ -890,31 +890,31 @@ export const SearchModule = {
                 <table class="results-table min-w-full" style="border-collapse: collapse !important;">
                     <thead style="background-color: #6232FF !important; color: white !important; border-bottom: 1px solid #6232FF !important;">
                         <tr>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('nombre')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
+                            <th scope="col" class="oportunidad-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('nombre')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
                                 <div class="flex items-center">
                                     OPORTUNIDAD
                                     ${this.getSortIcon('nombre')}
                                 </div>
                             </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('disciplina')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
+                            <th scope="col" class="disciplina-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('disciplina')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
                                 <div class="flex items-center">
                                     DISCIPLINA
                                     ${this.getSortIcon('disciplina')}
                                 </div>
                             </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('pais')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
+                            <th scope="col" class="pais-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('pais')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
                                 <div class="flex items-center">
                                     PAÍS
                                     ${this.getSortIcon('pais')}
                                 </div>
                             </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
-                                PAGO
-                            </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
+                            <th scope="col" class="cierre-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
                                 CIERRE
                             </th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
+                            <th scope="col" class="pago-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
+                                PAGO
+                            </th>
+                            <th scope="col" class="accion-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
                                 ACCIÓN
                             </th>
                         </tr>
@@ -958,30 +958,30 @@ export const SearchModule = {
                                 data-disciplina="${Utils.escapeHTML(page.disciplina || '')}"
                                 data-fecha-cierre="${Utils.escapeHTML(page.fecha_de_cierre || '')}"
                                 data-inscripcion="${Utils.escapeHTML(page.inscripcion || '')}">
-                                <td class="px-4 py-4 whitespace-nowrap" style="border: none !important;">
+                                <td class="oportunidad-col px-4 py-4 whitespace-nowrap" style="border: none !important;">
                                     <div class="text-sm font-medium text-gray-900">
                                         ${this.formatTitleWithCategory(page.nombre || '')}
                                     </div>
                                 </td>
-                                <td class="px-4 py-4 whitespace-nowrap" style="border: none !important;">
+                                <td class="disciplina-col px-4 py-4 whitespace-nowrap" style="border: none !important;">
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm" 
                                           style="background-color: ${colors.bg}; color: ${colors.text}; font-weight: 500;">
                                         ${mainDiscipline.charAt(0).toUpperCase() + mainDiscipline.slice(1)}
                                     </span>
                                 </td>
-                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900" style="border: none !important;">
+                                <td class="pais-col px-4 py-4 whitespace-nowrap text-sm text-gray-900" style="border: none !important;">
                                     ${page.pais || page.país || ''}
                                 </td>
-                                <td class="px-4 py-4 whitespace-nowrap" style="border: none !important;">
-                                    ${page.inscripcion === 'Sin cargo' || !page.inscripcion ? 
-                                        '<div class="relative inline-block"><img src="/static/public/icons/money_off.svg" alt="No payment required" class="w-4 h-4" style="color: #1F1B2D;" /></div>' : 
-                                        '<img src="/static/public/icons/money_on.svg" alt="Payment required" class="w-4 h-4" style="color: #1F1B2D;" />'
-                                    }
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900" style="border: none !important;">
+                                <td class="cierre-col px-4 py-4 whitespace-nowrap text-sm text-gray-900" style="border: none !important;">
                                     ${formatDate(page.fecha_de_cierre)}
                                 </td>
-                                <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium" style="border: none !important;">
+                                <td class="pago-col px-4 py-4 whitespace-nowrap" style="border: none !important;">
+                                    ${page.inscripcion === 'Sin cargo' || !page.inscripcion ? 
+                                        '<div class="flex justify-center"><img src="/static/public/icons/money_off.svg" alt="No payment required" class="w-4 h-4" style="color: #1F1B2D;" /></div>' : 
+                                        '<div class="flex justify-center"><img src="/static/public/icons/money_on.svg" alt="Payment required" class="w-4 h-4" style="color: #1F1B2D;" /></div>'
+                                    }
+                                </td>
+                                <td class="accion-col px-4 py-4 whitespace-nowrap text-right text-sm font-medium" style="border: none !important;">
                                     <button 
                                         class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
                                         style="background-color: #F0EBFF; color: #6232FF;"
@@ -1392,8 +1392,8 @@ export const SearchModule = {
         const columnMap = {
             'disciplina': 1,
             'pais': 2,
-            'pago': 3,
-            'cierre': 4
+            'cierre': 3,
+            'pago': 4
         };
         return columnMap[columnName] || 0;
     },

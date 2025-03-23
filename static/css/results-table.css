@@ -92,38 +92,93 @@ table, th, td, tr {
     line-height: 1.4;
 }
 
-/* Column widths */
+/* Column widths - Updated to match Figma design */
 .results-table th.oportunidad-col,
 .results-table td.oportunidad-col {
-    width: 40%;
+    width: 416px; /* ~42% of table width */
 }
 
 .results-table th.disciplina-col,
 .results-table td.disciplina-col {
-    width: 15%;
+    width: 196px; /* ~20% of table width */
 }
 
 .results-table th.pais-col,
 .results-table td.pais-col {
-    width: 15%;
+    width: 196px; /* ~20% of table width */
 }
 
 .results-table th.cierre-col,
 .results-table td.cierre-col {
-    width: 15%;
-    text-align: center;
+    width: 196px; /* ~20% of table width */
+    text-align: left; /* Changed from center to left to match header alignment */
 }
 
 .results-table th.pago-col,
 .results-table td.pago-col {
-    width: 5%;
+    width: 75px; /* Reduced from 85px to 75px to match Figma */
     text-align: center;
+    padding-left: 4px; /* Fine-tuned padding for alignment */
+    padding-right: 4px; /* Reduced padding */
 }
 
 .results-table th.accion-col,
 .results-table td.accion-col {
-    width: 10%;
-    text-align: center;
+    width: 86px; /* ~9% of table width */
+    /* Text alignment and padding are now defined in specific rules below */
+}
+
+/* Improve column spacing for Figma design match */
+.results-table tr th:nth-last-child(2),
+.results-table tr td:nth-last-child(2) {
+    /* Padding is now defined in specific rules for pago-col */
+}
+
+.results-table tr th:last-child,
+.results-table tr td:last-child {
+    /* Padding is now defined in specific rules for accion-col */
+}
+
+/* Ensure the payment icon is perfectly centered */
+.results-table td.pago-col img,
+.results-table td.pago-col .relative {
+    margin: 0 auto;
+    display: block;
+}
+
+/* Better align the payment icon with its column header */
+.results-table td.pago-col {
+    /* Padding is now defined in the column width section */
+}
+
+.results-table th.pago-col {
+    text-align: center; /* Ensure header text is centered */
+}
+
+/* Adjust the flex container for the payment icon */
+.results-table td.pago-col .flex.justify-center {
+    margin-left: -4px; /* Fine-tuned left shift to perfectly align with header */
+    width: 100%;
+}
+
+/* Better align the Ver button with its column header */
+.results-table td.accion-col {
+    text-align: center; /* Center alignment */
+    padding-left: 0; /* Remove left padding */
+    padding-right: 0; /* Remove right padding */
+}
+
+.results-table th.accion-col {
+    text-align: center; /* Ensure header text is centered */
+    padding-left: 0; /* Remove left padding */
+    padding-right: 8px; /* Keep some right padding */
+}
+
+/* Shift the Ver button slightly to the left for better alignment */
+.results-table td.accion-col button {
+    margin-left: -6px; /* Adjusted shift slightly left for perfect alignment */
+    padding-left: 10px; /* Adjust internal padding */
+    padding-right: 10px; /* Adjust internal padding */
 }
 
 /* Discipline tags */
