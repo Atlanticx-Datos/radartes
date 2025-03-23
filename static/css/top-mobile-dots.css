@@ -1,5 +1,46 @@
 /* Mobile dots indicator for the "Top convocatorias" section */
 
+/* Base styles for navigation controls */
+.top-prev, .top-next {
+    z-index: 20; /* Ensure they're above cards */
+    cursor: pointer;
+    position: absolute;
+    pointer-events: auto; /* Ensure clicks are captured by the buttons */
+    background-color: white;
+}
+
+/* Add media query for laptop screens up to 1440px */
+@media (min-width: 1101px) and (max-width: 1440px) {
+    /* Ensure the container doesn't interfere with navigation */
+    .top-opportunities-container {
+        position: relative;
+        z-index: 10; /* Lower than navigation controls */
+        overflow: visible !important; /* Ensure controls are visible */
+    }
+    
+    .top-prev {
+        margin-left: -24px !important; /* Adjusted negative margin */
+        z-index: 20 !important; /* Ensure it's above cards */
+        position: absolute !important; /* Ensure proper positioning */
+        background-color: white !important; /* Solid background */
+        width: 40px !important; /* Slightly larger for better click target */
+        height: 40px !important;
+        border: 1px solid #E5E7EB !important; /* Light gray border */
+        box-shadow: none !important; /* Remove shadow */
+    }
+    
+    .top-next {
+        margin-right: -24px !important; /* Adjusted negative margin */
+        z-index: 20 !important; /* Ensure it's above cards */
+        position: absolute !important; /* Ensure proper positioning */
+        background-color: white !important; /* Solid background */
+        width: 40px !important; /* Slightly larger for better click target */
+        height: 40px !important;
+        border: 1px solid #E5E7EB !important; /* Light gray border */
+        box-shadow: none !important; /* Remove shadow */
+    }
+}
+
 @media (max-width: 767px) {
     /* Hide the regular navigation buttons on mobile */
     .top-prev, 

@@ -356,7 +356,61 @@
     }
 }
 
-/* Ensure navigation buttons don't overlap with content on smaller screens */
+/* Add media query for laptop screens up to 1440px */
+@media (min-width: 1101px) and (max-width: 1440px) {
+    /* Ensure the card containers don't interfere with navigation */
+    .featured-opportunities, .top-opportunities-container {
+        pointer-events: auto;
+        position: relative;
+        z-index: 10; /* Lower than navigation controls */
+        overflow: visible !important; /* Ensure controls are visible */
+    }
+    
+    .destacar-prev {
+        margin-left: -24px !important; /* Adjusted negative margin */
+        z-index: 20 !important; /* Ensure it's above cards */
+        position: absolute !important; /* Ensure proper positioning */
+        background-color: white !important; /* Solid background */
+        width: 40px !important; /* Slightly larger for better click target */
+        height: 40px !important;
+        border: 1px solid #E5E7EB !important; /* Light gray border */
+        box-shadow: none !important; /* Remove shadow */
+    }
+    
+    .destacar-next {
+        margin-right: -24px !important; /* Adjusted negative margin */
+        z-index: 20 !important; /* Ensure it's above cards */
+        position: absolute !important; /* Ensure proper positioning */
+        background-color: white !important; /* Solid background */
+        width: 40px !important; /* Slightly larger for better click target */
+        height: 40px !important;
+        border: 1px solid #E5E7EB !important; /* Light gray border */
+        box-shadow: none !important; /* Remove shadow */
+    }
+    
+    .top-prev {
+        margin-left: -24px !important; /* Adjusted negative margin */
+        z-index: 20 !important; /* Ensure it's above cards */
+        position: absolute !important; /* Ensure proper positioning */
+        background-color: white !important; /* Solid background */
+        width: 40px !important; /* Slightly larger for better click target */
+        height: 40px !important;
+        border: 1px solid #E5E7EB !important; /* Light gray border */
+        box-shadow: none !important; /* Remove shadow */
+    }
+    
+    .top-next {
+        margin-right: -24px !important; /* Adjusted negative margin */
+        z-index: 20 !important; /* Ensure it's above cards */
+        position: absolute !important; /* Ensure proper positioning */
+        background-color: white !important; /* Solid background */
+        width: 40px !important; /* Slightly larger for better click target */
+        height: 40px !important;
+        border: 1px solid #E5E7EB !important; /* Light gray border */
+        box-shadow: none !important; /* Remove shadow */
+    }
+}
+
 @media (max-width: 1100px) {
     .destacar-prev, .destacar-next {
         top: -40px !important;
@@ -490,4 +544,26 @@
     filter: invert(30%) sepia(75%) saturate(4736%) hue-rotate(247deg) brightness(95%) contrast(107%); /* Applies #6232FF to the SVG */
     width: 14px;
     height: 14px;
+}
+
+/* Ensure navigation controls are properly clickable */
+.destacar-prev, .destacar-next, .top-prev, .top-next {
+    z-index: 20; /* Ensure they're above cards */
+    cursor: pointer;
+    position: absolute;
+    pointer-events: auto; /* Ensure clicks are captured by the buttons */
+    background-color: white;
+}
+
+/* Add a transparent layer behind the button for better click area */
+.destacar-prev::before, .destacar-next::before, .top-prev::before, .top-next::before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 50%;
+    z-index: -1;
+    pointer-events: auto;
 } 
