@@ -23,7 +23,7 @@
     position: relative;
     height: 350px; /* Set a fixed height to match the image */
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    max-width: 1440px;
+    max-width: 100%; /* Take full width of container */
     margin: 0 auto;
     min-height: 410px;
 }
@@ -36,11 +36,12 @@
 
 .top-opportunity-image {
     position: relative;
-    width: 57%; /* 746px out of 1300px = ~57% */
+    width: 57.4%; /* Exactly 746px relative to 1300px = 57.4% */
     overflow: hidden;
     background-color: #f3f4f6;
     flex-shrink: 0;
-    width: 746px;
+    flex-basis: 57.4%; /* Use percentage instead of fixed pixels */
+    min-width: 57.4%; /* Use percentage instead of fixed pixels */
 }
 
 .top-opportunity-image img {
@@ -103,6 +104,20 @@
     width: 16px;
     height: 16px;
     min-width: 16px;
+    color: #9691A4; /* Update icon color to #9691A4 */
+}
+
+/* Specifically target the location pin icon */
+.top-opportunity-location svg {
+    color: #9691A4 !important; /* Force pin icon color to be #9691A4 */
+    fill: #9691A4 !important; /* Ensure SVG fill is also applied */
+}
+
+/* Target paths inside the SVG to ensure fill works properly */
+.top-opportunity-location svg path {
+    color: #9691A4 !important;
+    fill: #9691A4 !important;
+    stroke: #9691A4 !important;
 }
 
 /* Disciplines SVG icon coloring */
@@ -277,83 +292,65 @@
 /* Responsive adjustments */
 @media (max-width: 1200px) {
     .top-opportunity-card {
-        min-height: 360px;
-        height: auto;
+        max-width: 100%;
+        min-height: 380px;
     }
-    
     .top-opportunity-image {
-        width: 50%;
+        flex-basis: 57.4%; /* Keep the same proportion */
+        min-width: 57.4%; /* Keep the same proportion */
     }
-    
     .top-opportunity-content {
-        width: 50%;
+        padding: 20px;
     }
-    
     .top-opportunity-description {
-        display: -webkit-box;
-        -webkit-line-clamp: 4;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+        -webkit-line-clamp: 6;
     }
 }
 
 @media (max-width: 992px) {
     .top-opportunity-card {
-        min-height: 350px;
+        min-height: 360px;
     }
-    
     .top-opportunity-title {
         font-size: 20px;
     }
-    
     .top-opportunity-description {
-        -webkit-line-clamp: 3;
+        -webkit-line-clamp: 4;
     }
 }
 
 @media (max-width: 768px) {
     .top-opportunity-card {
         flex-direction: column;
-        height: auto;
         min-height: auto;
+        height: auto;
     }
-    
     .top-opportunity-image {
         width: 100%;
-        height: 200px;
+        min-width: 100%;
+        height: 200px; /* Fixed height for mobile */
     }
-    
     .top-opportunity-content {
-        width: 100%;
-        padding: 16px;
+        min-height: 200px;
     }
-    
     .top-opportunity-title {
         font-size: 18px;
     }
-    
     .top-opportunity-meta {
         margin-top: 8px;
-        gap: 4px;
     }
-    
     .top-opportunity-description {
         margin-top: 8px;
-        -webkit-line-clamp: 3;
     }
-    
     .top-opportunity-button {
-        margin-top: 24px;
-        margin-bottom: 8px;
+        margin-top: 12px;
     }
-
     .top-opportunity-inscription img[src*="cash.svg"],
     .top-opportunity-inscription img[src*="money_on.svg"],
     .top-opportunity-inscription img[src*="money_off.svg"] {
         width: 14px;
         height: 14px;
         min-width: 14px;
-        /* Keep the color filters intact */
     }
 }
 
