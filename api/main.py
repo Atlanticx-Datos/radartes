@@ -610,8 +610,16 @@ def is_opportunity_already_saved(user_id, page_id):
     return bool(data["results"])
 
 def get_saved_opportunity_ids(user_id):
-    """Your existing implementation"""
+    """Get saved opportunity IDs for a user"""
     url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
+    
+    # Define headers locally to avoid relying on global variable
+    headers = {
+        "Authorization": "Bearer " + NOTION_TOKEN,
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+    }
+    
     json_body = {
         "filter": {
             "and": [
@@ -2067,9 +2075,30 @@ def is_opportunity_saved():
         
         if not page_id:
             return jsonify({"error": "Missing opportunity ID"}), 400
-            
-        is_saved = is_opportunity_already_saved(user_id, page_id)
-        return jsonify({"is_saved": is_saved}), 200
+        
+        # Define headers here to avoid relying on global variable    
+        headers = {
+            "Authorization": "Bearer " + NOTION_TOKEN,
+            "Content-Type": "application/json",
+            "Notion-Version": "2022-06-28",
+        }
+        
+        # Query Notion directly here instead of calling is_opportunity_already_saved
+        url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
+        json_body = {
+            "filter": {
+                "and": [
+                    {"property": "User ID", "title": {"equals": user_id}},
+                    {"property": "Opportunity ID", "rich_text": {"equals": page_id}},
+                ]
+            }
+        }
+
+        response = requests.post(url, headers=headers, json=json_body)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        data = response.json()
+        
+        return jsonify({"is_saved": bool(data["results"])}), 200
         
     except Exception as e:
         app.logger.error(f"Error in is_opportunity_saved: {str(e)}")
