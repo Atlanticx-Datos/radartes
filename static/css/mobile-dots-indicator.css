@@ -60,6 +60,10 @@
         -ms-overflow-style: none; /* IE and Edge */
         padding-bottom: 16px;
         margin-bottom: 24px;
+        padding-right: 16px !important; /* Add padding to ensure right edge is visible */
+        padding-left: 16px !important; /* Add left padding for consistent spacing */
+        margin-left: -16px !important; /* Offset the padding to maintain alignment */
+        width: calc(100% + 32px) !important; /* Increase width to account for paddings */
     }
     
     /* Hide scrollbar */
@@ -73,6 +77,7 @@
         gap: 16px !important;
         width: auto !important;
         display: flex !important;
+        padding-right: 8px !important; /* Extra padding on the right for the last card */
     }
     
     /* Make each card snap to the container and ensure proper width */
@@ -82,13 +87,33 @@
         max-width: 85vw !important;
         width: 85vw !important;
         flex: 0 0 auto !important;
-        margin-right: 8px;
+        margin-right: 16px; /* Increased to provide more space */
         height: auto !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        box-shadow: 0px 4px 12px 0px rgba(31, 27, 45, 0.08), 0px 2px 2px -2px rgba(31, 27, 45, 0.08) !important;
+        position: relative !important;
+        z-index: 1 !important;
+    }
+    
+    /* Ensure all child content respects the border-radius */
+    .featured-opportunities .opportunity-preview > * {
+        overflow: hidden !important;
     }
     
     /* Ensure the image section has proper height */
     .featured-opportunities .opportunity-preview .relative.h-48 {
         height: 180px !important;
+        border-top-left-radius: 12px !important;
+        border-top-right-radius: 12px !important;
+        overflow: hidden !important;
+    }
+    
+    /* Ensure the bottom portion of the card has proper border-radius */
+    .featured-opportunities .opportunity-preview .p-2 {
+        border-bottom-left-radius: 12px !important;
+        border-bottom-right-radius: 12px !important;
+        overflow: hidden !important;
     }
     
     /* Dots indicator container */
@@ -141,5 +166,10 @@
     /* Ensure the container has proper spacing */
     .destacados-section .relative {
         overflow: visible;
+    }
+    
+    /* Make the last card fully visible */
+    .featured-opportunities .flex > div:last-child {
+        margin-right: 24px !important; /* Extra space for the last card */
     }
 } 

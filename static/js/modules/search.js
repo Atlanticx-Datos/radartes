@@ -1235,13 +1235,10 @@ export const SearchModule = {
 
     // Function to get sort icon
     getSortIcon(column) {
-        // Always use the arrows icon, but change color if active
+        // Always use the arrows icon, but change opacity if active
         const isActive = this.sortColumn === column && this.sortActive;
-        const iconColor = isActive ? '#FFFFFF' : '#BBBBBB';
-        
-        return `<svg class="w-4 h-4 ml-1" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-        </svg>`;
+        // Use the external SVG file which is now white
+        return `<img src="/static/public/icons/arrows-sort.svg" class="w-4 h-4 ml-1" style="opacity: ${isActive ? '1' : '0.7'}">`;
     },
 
     // Function to render page numbers with ellipsis for many pages
