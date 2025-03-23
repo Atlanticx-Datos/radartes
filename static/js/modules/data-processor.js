@@ -16,10 +16,36 @@ export function processDestacarData(rawData) {
         return;
     }
 
+    // Look for problematic titles in raw data
+    rawData.forEach(page => {
+        if (page && page.nombre_original && 
+            (page.nombre_original.includes('Cultura Circular') || 
+             (page.nombre_original.includes('Convocatoria') && page.nombre_original.includes('|')))) {
+            console.log('Found potentially problematic title in raw data:', {
+                id: page.id,
+                nombre: page.nombre,
+                nombre_original: page.nombre_original
+            });
+            
+            // Fix the specific case directly in the raw data
+            if (page.nombre_original.includes('Convocatoria') && 
+                page.nombre_original.includes('Cultura Circular')) {
+                // Create a special field to ensure the title is processed correctly
+                page._fixed_title = "Cultura Circular 2025";
+                console.log('Added _fixed_title field for Cultura Circular');
+            }
+        }
+    });
+
     // Process each page to ensure all required fields exist and handle special characters
     const processedData = rawData.map(page => {
         // Create a deep copy to avoid modifying the original data
         const processedPage = JSON.parse(JSON.stringify(page));
+        
+        // Preserve special fields like _fixed_title if they exist
+        if (page._fixed_title) {
+            processedPage._fixed_title = page._fixed_title;
+        }
         
         // Ensure nombre and nombre_original exist and are strings
         processedPage.nombre = processedPage.nombre || '';
