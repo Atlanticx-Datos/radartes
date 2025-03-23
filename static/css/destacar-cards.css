@@ -181,6 +181,19 @@
     height: 20px;
 }
 
+/* Saved state styling */
+.featured-opportunities .absolute.top-3.right-3.saved {
+    background-color: #f9f5ff;
+}
+
+.featured-opportunities .absolute.top-3.right-3.saved svg {
+    color: #6232FF;
+}
+
+.featured-opportunities .absolute.top-3.right-3.saved svg path {
+    fill: #6232FF !important;
+}
+
 /* Content container - updated to exactly 113px (313px - 200px) */
 .featured-opportunities .p-2 {
     padding: 16px 20px; /* Adjusted based on the image */

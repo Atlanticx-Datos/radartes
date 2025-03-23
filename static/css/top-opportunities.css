@@ -303,6 +303,10 @@
     color: #6232FF;
 }
 
+.top-opportunity-favorite.saved svg path {
+    fill: #6232FF !important;
+}
+
 /* Ensure the CTA button has proper spacing regardless of description expansion */
 .top-opportunity-button {
     display: inline-flex;

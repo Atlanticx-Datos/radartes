@@ -289,7 +289,7 @@ export const TopModule = {
     checkIfOpportunitySaved(opportunityId) {
         // Only check saved status if user is logged in
         if (window.isUserLoggedIn) {
-            fetch(`/is_opportunity_saved?opportunity_id=${opportunityId}`)
+            fetch(`/is_opportunity_saved?page_id=${opportunityId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.is_saved) {
@@ -297,7 +297,16 @@ export const TopModule = {
                         favoriteBtns.forEach(btn => {
                             btn.setAttribute('data-saved', 'true');
                             btn.classList.add('saved');
-                            btn.querySelector('svg').setAttribute('fill', 'currentColor');
+                            
+                            // Set fill on SVG
+                            const svg = btn.querySelector('svg');
+                            svg.setAttribute('fill', 'currentColor');
+                            
+                            // Also set fill on SVG path for the new icon structure
+                            const svgPath = svg.querySelector('path');
+                            if (svgPath) {
+                                svgPath.setAttribute('fill', '#6232FF');
+                            }
                         });
                     }
                 })

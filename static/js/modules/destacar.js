@@ -11,12 +11,7 @@ export const DestacarModule = {
     isScrolling: false, // Flag to prevent multiple scroll operations
 
     init(pages) {
-        console.log('DestacarModule.init called with pages:', pages);
-        console.log('Pages type:', typeof pages);
-        console.log('Pages length:', Array.isArray(pages) ? pages.length : 'not an array');
-        
         if (!pages || !Array.isArray(pages) || pages.length === 0) {
-            console.warn('DestacarModule initialized with empty or invalid pages array');
             this.pages = [];
             return;
         }
@@ -34,8 +29,6 @@ export const DestacarModule = {
             // Sort by fecha_de_cierre
             return new Date(a.fecha_de_cierre) - new Date(b.fecha_de_cierre);
         });
-        
-        console.log('First page in DestacarModule after sorting:', this.pages[0]);
         
         // Check if we're on mobile
         this.checkMobile();
@@ -114,8 +107,6 @@ export const DestacarModule = {
                 const img = new Image();
                 img.src = url;
             });
-            
-            console.log(`Preloaded ${imageUrls.size + 1} images for destacar cards (including placeholder)`);
         }, 300);
     },
 
@@ -123,7 +114,6 @@ export const DestacarModule = {
     checkMobile() {
         const width = window.innerWidth;
         this.isMobile = width < 768;
-        console.log('Mobile check:', this.isMobile, 'Width:', width);
         
         // Update visibility of navigation buttons based on mobile status
         const prevButton = document.querySelector('.destacar-prev');
@@ -157,29 +147,16 @@ export const DestacarModule = {
     },
 
     nextPage() {
-        console.log('DestacarModule.nextPage called');
-        console.log('Current index:', this.currentIndex);
-        console.log('Pages length:', this.pages.length);
-        
         if (this.currentIndex + this.cardsPerPage < this.pages.length) {
             this.currentIndex += this.cardsPerPage;
-            console.log('New index:', this.currentIndex);
             this.updateDisplay();
-        } else {
-            console.log('Already at the last page');
         }
     },
 
     prevPage() {
-        console.log('DestacarModule.prevPage called');
-        console.log('Current index:', this.currentIndex);
-        
         if (this.currentIndex > 0) {
             this.currentIndex -= this.cardsPerPage;
-            console.log('New index:', this.currentIndex);
             this.updateDisplay();
-        } else {
-            console.log('Already at the first page');
         }
     },
 
@@ -290,16 +267,12 @@ export const DestacarModule = {
     },
 
     updateDisplay() {
-        console.log('DestacarModule.updateDisplay called, isMobile:', this.isMobile);
-        
         const container = document.querySelector('.featured-opportunities .flex');
         if (!container) {
-            console.error('Featured opportunities container not found');
             return;
         }
         
         if (!this.pages || !this.pages.length) {
-            console.warn('No pages available to display');
             return;
         }
         
@@ -327,7 +300,6 @@ export const DestacarModule = {
 
         // On mobile, show all pages for horizontal scrolling
         const pagesToShow = this.isMobile ? this.pages : this.pages.slice(this.currentIndex, this.currentIndex + this.cardsPerPage);
-        console.log('Pages to show:', pagesToShow.length, 'Mobile:', this.isMobile);
 
         // Function to format date
         const formatDate = (dateStr) => {
@@ -337,7 +309,6 @@ export const DestacarModule = {
             
             // TIMEZONE FIX: For YYYY-MM-DD format, parse parts manually to avoid timezone issues
             if (typeof dateStr === 'string' && dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                console.log('Using timezone-safe parsing for YYYY-MM-DD format in destacar.js');
                 const [year, month, day] = dateStr.split('-').map(Number);
                 
                 // Month is 0-indexed in JavaScript Date
@@ -429,8 +400,8 @@ export const DestacarModule = {
                             ${Utils.escapeHTML(mainDiscipline)}
                         </span>
                         <button class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 favorite-btn" data-id="${Utils.escapeHTML(page.id || '')}">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M8.42145 6.02255C7.87269 5.96402 7.31775 6.01973 6.79158 6.18616C6.26542 6.35259 5.77944 6.62614 5.36423 6.98957C4.94902 7.353 4.61359 7.79843 4.37905 8.29782C4.1445 8.7972 4.01592 9.33972 4.00139 9.89121C3.98686 10.4427 4.08669 10.9912 4.29462 11.5023C4.50254 12.0133 4.81405 12.4758 5.20954 12.8605L5.21586 12.8667L12.0083 19.5927L18.7873 12.8801C18.8071 12.8555 18.8317 12.8246 18.8602 12.7886C18.9408 12.6863 19.0504 12.5443 19.1668 12.3846C19.4201 12.0371 19.6336 11.7027 19.7105 11.512C19.916 11.0019 20.014 10.4548 19.9984 9.90508C19.9827 9.35534 19.8538 8.81474 19.6196 8.31711C19.3853 7.81947 19.0509 7.37552 18.6371 7.01304C18.2234 6.65056 17.7392 6.37735 17.215 6.21053C16.6908 6.04371 16.1377 5.98687 15.5905 6.04357C15.0433 6.10027 14.5137 6.26928 14.0348 6.54003C13.5559 6.81078 13.1381 7.17743 12.8075 7.61702C12.618 7.86899 12.3208 8.01684 12.0055 8.01597C11.6903 8.01509 11.3939 7.86558 11.2058 7.61256C10.8766 7.16976 10.4593 6.79988 9.9801 6.52622C9.5009 6.25257 8.97021 6.08108 8.42145 6.02255ZM20.2721 14.2183C20.275 14.2206 20.2751 14.2205 20.2751 14.2205L20.2791 14.2157L20.2881 14.2048L20.3198 14.1658C20.3467 14.1326 20.3846 14.0853 20.4307 14.0269C20.5225 13.9105 20.648 13.7478 20.7829 13.5628C21.0321 13.2209 21.3854 12.7066 21.5655 12.2595C21.874 11.494 22.021 10.6731 21.9976 9.8482C21.9741 9.02327 21.7806 8.21207 21.4291 7.46537C21.0777 6.71868 20.5758 6.05256 19.9551 5.5087C19.3343 4.96485 18.608 4.55497 17.8215 4.3047C17.035 4.05443 16.2053 3.96916 15.3844 4.05422C14.5635 4.13928 13.7689 4.39284 13.0505 4.79904C12.678 5.00961 12.3302 5.25886 12.0124 5.54199C11.6944 5.25539 11.3457 5.00292 10.9719 4.78947C10.253 4.37891 9.4568 4.12163 8.63355 4.03383C7.8103 3.94603 6.97778 4.0296 6.18841 4.27928C5.39905 4.52897 4.66993 4.93937 4.04697 5.48464C3.42401 6.02991 2.92071 6.69825 2.56877 7.44758C2.21683 8.1969 2.02388 9.01098 2.00208 9.83854C1.98028 10.6661 2.13009 11.4892 2.44209 12.256C2.75351 13.0214 3.21978 13.7142 3.81161 14.2909L11.3039 21.7098L11.3047 21.7105C11.6944 22.0964 12.3222 22.0965 12.7119 21.7106L20.1381 14.3571C20.1871 14.3169 20.2332 14.2712 20.2751 14.2205L20.2721 14.2183Z" fill="currentColor"/>
                             </svg>
                         </button>
                     </div>
@@ -481,13 +452,6 @@ export const DestacarModule = {
                 e.preventDefault();
                 const dataset = element.dataset;
                 
-                // Log the clicked element for debugging
-                console.log('Destacar module clicked element:', {
-                    element: element,
-                    classList: element.classList,
-                    dataset: dataset
-                });
-                
                 // Sanitize data to handle special characters
                 const sanitizedData = {};
                 for (const key in dataset) {
@@ -495,34 +459,19 @@ export const DestacarModule = {
                 }
                 
                 if (window.ModalModule && window.ModalModule.showPreviewModal) {
-                    console.log('Destacar module click handler data:', sanitizedData);
-                    
-                    // Use the global showOpportunityDetails function if available
-                    if (window.showOpportunityDetails && typeof window.showOpportunityDetails === 'function') {
-                        console.log('Using global showOpportunityDetails function');
-                        window.showOpportunityDetails(element, e);
-                    } else {
-                        // Fallback to direct call
-                        window.ModalModule.showPreviewModal(
-                            sanitizedData.url,
-                            sanitizedData.nombre,
-                            sanitizedData.country,
-                            sanitizedData.summary,
-                            sanitizedData.id,
-                            sanitizedData.category,
-                            sanitizedData.baseUrl || sanitizedData.base_url || (sanitizedData.url && sanitizedData.url.startsWith('http') ? sanitizedData.url : null), // Use base_url if available, fall back to url if it's a valid URL
-                            sanitizedData.requisitos,
-                            sanitizedData.disciplina,
-                            sanitizedData.fechaCierre || sanitizedData.fecha_cierre, // Try both kebab-case and camelCase
-                            sanitizedData.inscripcion
-                        );
-                    }
-                } else {
-                    console.error('ModalModule not found or showPreviewModal not available');
-                    // Fallback - open in new tab
-                    if (sanitizedData.url) {
-                        window.open(sanitizedData.url, '_blank');
-                    }
+                    window.ModalModule.showPreviewModal(
+                        sanitizedData.url,
+                        sanitizedData.nombre,
+                        sanitizedData.country,
+                        sanitizedData.summary,
+                        sanitizedData.id,
+                        sanitizedData.category,
+                        sanitizedData.baseUrl || sanitizedData.base_url || (sanitizedData.url && sanitizedData.url.startsWith('http') ? sanitizedData.url : null), // Use base_url if available, fall back to url if it's a valid URL
+                        sanitizedData.requisitos,
+                        sanitizedData.disciplina,
+                        sanitizedData.fechaCierre || sanitizedData.fecha_cierre, // Try both kebab-case and camelCase
+                        sanitizedData.inscripcion
+                    );
                 }
             });
         });
@@ -548,6 +497,29 @@ export const DestacarModule = {
         
         // Add click handlers for favorite buttons
         container.querySelectorAll('.favorite-btn').forEach(button => {
+            // Check if this opportunity is already saved
+            const opportunityId = button.getAttribute('data-id');
+            if (opportunityId && window.isUserLoggedIn) {
+                fetch(`/is_opportunity_saved?page_id=${opportunityId}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.is_saved) {
+                        button.classList.add('saved');
+                        button.style.backgroundColor = '#f9f5ff';
+                        const svgPath = button.querySelector('svg path');
+                        if (svgPath) {
+                            svgPath.setAttribute('fill', '#6232FF');
+                        }
+                    }
+                })
+                .catch(error => {
+                });
+            }
+            
             button.addEventListener('click', (e) => {
                 e.stopPropagation(); // Prevent the card click event
                 e.preventDefault();
@@ -565,14 +537,12 @@ export const DestacarModule = {
                 // If user is logged in, proceed with normal save functionality
                 const opportunityId = button.getAttribute('data-id');
                 if (!opportunityId) {
-                    console.error('No opportunity ID found for favorite button');
                     return;
                 }
                 
                 // Get CSRF token
                 const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
                 if (!csrfToken) {
-                    console.error('No CSRF token found');
                     return;
                 }
                 
@@ -608,8 +578,15 @@ export const DestacarModule = {
                         }
                         
                         // Change the button color to indicate it's saved
-                        button.querySelector('svg').setAttribute('fill', '#6232FF');
-                        button.querySelector('svg').setAttribute('stroke', 'white');
+                        button.classList.add('saved');
+                        button.style.color = '#6232FF';
+                        button.style.backgroundColor = '#f9f5ff';
+                        
+                        // Explicitly set the SVG path fill color to ensure it's visible
+                        const svgPath = button.querySelector('svg path');
+                        if (svgPath) {
+                            svgPath.setAttribute('fill', '#6232FF');
+                        }
                         
                         // Refresh saved opportunities if the function exists
                         if (window.ModalModule && window.ModalModule.refreshSavedOpportunities) {
@@ -624,7 +601,6 @@ export const DestacarModule = {
                     button.disabled = false;
                     button.innerHTML = originalSvg;
                     
-                    console.error('Error saving opportunity:', error);
                     if (window.Utils && window.Utils.showAlert) {
                         window.Utils.showAlert('Error al guardar la oportunidad', 'error');
                     } else {

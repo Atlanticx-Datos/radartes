@@ -857,7 +857,7 @@ export const SearchModule = {
                 
                 // Format with day zero-padded
                 const formattedDay = String(day).padStart(2, '0');
-                return `${formattedDay}/${monthMap[monthIndex]}/${year}`;
+                return `${formattedDay} ${monthMap[monthIndex]} ${year}`;
             }
             
             try {
@@ -878,7 +878,7 @@ export const SearchModule = {
                     10: 'Nov',
                     11: 'Dic'
                 };
-                return `${day}/${monthMap[date.getMonth()]}/${year}`;
+                return `${day} ${monthMap[date.getMonth()]} ${year}`;
             } catch (e) {
                 return dateStr;
             }
@@ -974,8 +974,8 @@ export const SearchModule = {
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap" style="border: none !important;">
                                     ${page.inscripcion === 'Sin cargo' || !page.inscripcion ? 
-                                        '<div class="relative inline-block"><svg class="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg><svg class="absolute top-0 left-0 w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="5" y1="5" x2="19" y2="19"/></svg></div>' : 
-                                        '<svg class="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg>'
+                                        '<div class="relative inline-block"><img src="/static/public/icons/money_off.svg" alt="No payment required" class="w-4 h-4" style="color: #1F1B2D;" /></div>' : 
+                                        '<img src="/static/public/icons/money_on.svg" alt="Payment required" class="w-4 h-4" style="color: #1F1B2D;" />'
                                     }
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900" style="border: none !important;">
@@ -1457,4 +1457,4 @@ export const SearchModule = {
         // If no separator found, return the original title
         return Utils.escapeHTML(title);
     },
-}; 
+};
