@@ -78,11 +78,12 @@
                     <span class="hidden">Raw date: {{ page.fecha_de_cierre }}</span>
                 </td>
                 <td class="pago-col">
-                    <div class="payment-status {% if page.inscripcion == 'Sin cargo' or not page.inscripcion %}free{% else %}paid{% endif %}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/>
-                        </svg>
+                    <div class="payment-status {{ 'free' if (page.inscripcion == 'Sin cargo' or not page.inscripcion) else 'paid' }}">
+                        {% if page.inscripcion == 'Sin cargo' or not page.inscripcion %}
+                            <img src="/static/public/icons/money_off.svg" alt="No payment required" />
+                        {% else %}
+                            <img src="/static/public/icons/cash.svg" alt="Payment required" />
+                        {% endif %}
                     </div>
                 </td>
                 <td class="accion-col">

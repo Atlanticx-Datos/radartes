@@ -453,24 +453,19 @@ export const DestacarModule = {
                                     
                                     <div class="flex items-center gap-1">
                                         ${page.inscripcion === 'Sin cargo' || !page.inscripcion ? 
-                                            '<div class="relative inline-block"><svg class="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg><svg class="absolute top-0 left-0 w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="5" y1="5" x2="19" y2="19"/></svg></div>' : 
-                                            '<svg class="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5C15 8.7 14.3 8 13.5 8h-3C9.7 8 9 8.7 9 9.5S9.7 11 10.5 11h3c0.8 0 1.5 0.7 1.5 1.5v0c0 0.8-0.7 1.5-1.5 1.5h-3C9.7 14 9 14.7 9 15.5"/></svg>'
+                                            '<div class="flex items-center gap-1"><img src="/static/public/icons/cash.svg" alt="Payment" class="w-4 h-4" /><img src="/static/public/icons/money_off.svg" alt="Free" class="w-4 h-4" /></div>' : 
+                                            '<div class="flex items-center gap-1"><img src="/static/public/icons/cash.svg" alt="Payment" class="w-4 h-4" /><img src="/static/public/icons/money_on.svg" alt="Paid" class="w-4 h-4" /></div>'
                                         }
                                     </div>
                                     
                                     <div class="flex items-center gap-1 subdisciplines-inline">
-                                        <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
-                                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
-                                        </svg>
+                                        <img src="/static/public/icons/disciplines.svg" alt="Disciplines" class="w-4 h-4" />
                                         <span title="${Utils.escapeHTML(subdisciplines)}">${Utils.escapeHTML(subdisciplines || 'Sin subdisciplinas')}</span>
                                     </div>
                                 </div>
                                 
                                 <div class="flex items-center gap-1 date-row">
-                                    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
-                                    </svg>
+                                    <img src="/static/public/icons/calendar.svg" alt="Calendar" class="w-4 h-4" />
                                     <span>${formatDate(page.fecha_de_cierre)}</span>
                                 </div>
                             </div>

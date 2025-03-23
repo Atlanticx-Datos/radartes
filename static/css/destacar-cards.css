@@ -67,7 +67,6 @@
 /* Date styling - Updated with primary color for icon */
 .featured-opportunities .date-row {
     width: 100%;
-    color: #666276; /* Text color as specified */
     font-family: 'Inter', sans-serif;
     font-weight: 700;
     font-size: 12px;
@@ -79,7 +78,7 @@
 }
 
 .featured-opportunities .date-row svg {
-    color: #6232FF; /* Primary color for the icon */
+    color: #9691A4 !important; /* Lighter color for icon */
     width: 14px;
     height: 14px;
     flex-shrink: 0;
@@ -246,7 +245,44 @@
     font-size: 12px;
     line-height: 150%;
     letter-spacing: 0;
-    color: #9691A4; /* Updated to match the image */
+}
+
+/* Icon colors should be lighter */
+.featured-opportunities .meta-row svg,
+.featured-opportunities .subdisciplines-inline svg {
+    color: #9691A4 !important; /* Lighter color for icons */
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+/* Text values should be darker */
+.featured-opportunities .meta-row .flex.items-center.gap-1 span,
+.featured-opportunities .subdisciplines-inline span,
+.featured-opportunities .date-row span {
+    color: #666276; /* Darker color for text values */
+}
+
+/* Payment icons styling */
+.featured-opportunities .meta-row .flex.items-center.gap-1 img {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    object-fit: contain;
+    vertical-align: middle;
+}
+
+/* Cash icon gets lighter color */
+.featured-opportunities .meta-row img[src*="cash.svg"] {
+    max-width: 14px;
+    max-height: 14px;
+    filter: invert(65%) sepia(11%) saturate(316%) hue-rotate(219deg) brightness(88%) contrast(84%); /* Applies #9691A4 to the SVGs */
+}
+
+/* Money icons get darker color */
+.featured-opportunities .meta-row img[src*="money_on.svg"],
+.featured-opportunities .meta-row img[src*="money_off.svg"] {
+    filter: invert(41%) sepia(11%) saturate(409%) hue-rotate(215deg) brightness(90%) contrast(89%); /* Precise #666276 color */
 }
 
 /* Inline subdisciplines */
@@ -261,6 +297,13 @@
 /* Subdisciplines icon */
 .featured-opportunities .subdisciplines-inline svg {
     color: #9691A4 !important; /* Updated to match design spec */
+    width: 14px;
+    height: 14px;
+}
+
+/* Disciplines SVG icon coloring */
+.featured-opportunities .subdisciplines-inline img[src*="disciplines.svg"] {
+    filter: invert(65%) sepia(11%) saturate(316%) hue-rotate(219deg) brightness(88%) contrast(84%); /* Applies #9691A4 to the SVG */
     width: 14px;
     height: 14px;
 }
@@ -376,6 +419,34 @@
         gap: 8px; /* Consistent vertical gap between items */
     }
     
+    /* Adjust payment icons layout for mobile */
+    .featured-opportunities .meta-row .flex.items-center.gap-1 img {
+        width: 12px;
+        height: 12px;
+    }
+
+    /* Cash icon gets lighter color on mobile */
+    .featured-opportunities .meta-row img[src*="cash.svg"] {
+        width: 12px;
+        height: 12px;
+        /* Keep the lighter color filter intact */
+        filter: invert(65%) sepia(11%) saturate(316%) hue-rotate(219deg) brightness(88%) contrast(84%);
+    }
+
+    /* Money icons get darker color on mobile */
+    .featured-opportunities .meta-row img[src*="money_on.svg"],
+    .featured-opportunities .meta-row img[src*="money_off.svg"] {
+        width: 12px;
+        height: 12px;
+        /* Keep the darker color filter intact */
+        filter: invert(41%) sepia(11%) saturate(409%) hue-rotate(215deg) brightness(90%) contrast(89%);
+    }
+    
+    /* Reduce gap between payment icons on mobile */
+    .featured-opportunities .meta-row .flex.items-center.gap-1 {
+        gap: 2px; /* Tighter spacing between icons */
+    }
+    
     /* Reduce gap with negative margin on date row */
     .featured-opportunities .date-row {
         margin-top: -8px; /* Pull the date line up closer to disciplines */
@@ -399,4 +470,11 @@
     .featured-opportunities .meta-row > div:nth-child(2) {
         flex: 0 0 auto; /* Don't grow or shrink */
     }
+}
+
+/* Calendar SVG icon coloring - Purple (#6232FF) */
+.featured-opportunities .date-row img[src*="calendar.svg"] {
+    filter: invert(30%) sepia(75%) saturate(4736%) hue-rotate(247deg) brightness(95%) contrast(107%); /* Applies #6232FF to the SVG */
+    width: 14px;
+    height: 14px;
 } 

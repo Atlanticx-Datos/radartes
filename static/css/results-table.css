@@ -154,21 +154,9 @@ table, th, td, tr {
     position: relative; /* Added to ensure the ::after pseudo-element is positioned correctly */
 }
 
-.payment-status.free svg {
-    color: #111827;
-}
-
-.payment-status.paid svg {
-    color: #111827;
-}
-
-.payment-status.free::after {
-    content: "";
-    position: absolute;
+.payment-status img {
     width: 20px;
-    height: 2px;
-    background-color: #EF4444;
-    transform: rotate(-45deg);
+    height: 20px;
 }
 
 /* Action button */

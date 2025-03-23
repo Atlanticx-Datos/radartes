@@ -965,21 +965,9 @@ html {
     position: relative !important;
 }
 
-.payment-status.free svg {
-    color: #111827 !important;
-}
-
-.payment-status.paid svg {
-    color: #111827 !important;
-}
-
-.payment-status.free::after {
-    content: "" !important;
-    position: absolute !important;
+.payment-status img {
     width: 20px !important;
-    height: 2px !important;
-    background-color: #EF4444 !important;
-    transform: rotate(-45deg) !important;
+    height: 20px !important;
 }
 
 /* Action Button */

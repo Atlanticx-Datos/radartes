@@ -86,17 +86,67 @@
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+/* Text values should be darker */
+.top-opportunity-location span, 
+.top-opportunity-inscription span,
+.top-opportunity-discipline span, 
+.top-opportunity-date span {
     color: #666276; /* Design-gray-700 from your Tailwind config */
 }
 
+/* Regular SVG icons should be lighter */
 .top-opportunity-location svg,
-.top-opportunity-inscription svg,
 .top-opportunity-discipline svg,
 .top-opportunity-date svg {
     width: 16px;
     height: 16px;
     min-width: 16px;
-    color: #BBB7C5; /* Design-gray-500 from your Tailwind config */
+}
+
+/* Disciplines SVG icon coloring */
+.top-opportunity-discipline img[src*="disciplines.svg"] {
+    filter: invert(65%) sepia(11%) saturate(316%) hue-rotate(219deg) brightness(88%) contrast(84%); /* Applies #9691A4 to the SVG */
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+}
+
+/* Payment icons styling */
+.top-opportunity-inscription {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Space between icon group and text */
+}
+
+.top-opportunity-inscription .flex {
+    display: flex;
+    align-items: center;
+    gap: 4px; /* Space between the two icons */
+}
+
+.top-opportunity-inscription span {
+    margin-left: 0; /* Remove any default margin */
+}
+
+/* Apply the lighter color to the cash icon only */
+.top-opportunity-inscription img[src*="cash.svg"] {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    object-fit: contain;
+    filter: invert(65%) sepia(11%) saturate(316%) hue-rotate(219deg) brightness(88%) contrast(84%); /* Applies #9691A4 to the SVGs */
+}
+
+/* Apply the darker color to money_on/money_off icons */
+.top-opportunity-inscription img[src*="money_on.svg"],
+.top-opportunity-inscription img[src*="money_off.svg"] {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    object-fit: contain;
+    filter: invert(41%) sepia(11%) saturate(409%) hue-rotate(215deg) brightness(90%) contrast(89%); /* Precise #666276 color */
 }
 
 .top-opportunity-description {
@@ -296,6 +346,15 @@
         margin-top: 24px;
         margin-bottom: 8px;
     }
+
+    .top-opportunity-inscription img[src*="cash.svg"],
+    .top-opportunity-inscription img[src*="money_on.svg"],
+    .top-opportunity-inscription img[src*="money_off.svg"] {
+        width: 14px;
+        height: 14px;
+        min-width: 14px;
+        /* Keep the color filters intact */
+    }
 }
 
 @media (max-width: 640px) {
@@ -366,6 +425,15 @@
         margin-bottom: 4px;
         height: 32px;
     }
+
+    .top-opportunity-inscription img[src*="cash.svg"],
+    .top-opportunity-inscription img[src*="money_on.svg"],
+    .top-opportunity-inscription img[src*="money_off.svg"] {
+        width: 12px;
+        height: 12px;
+        min-width: 12px;
+        /* Keep the color filters intact */
+    }
 }
 
 /* Small phones */
@@ -401,4 +469,12 @@
         margin-top: 16px;
         height: 28px;
     }
+}
+
+/* Calendar SVG icon coloring - Purple (#6232FF) */
+.top-opportunity-date img[src*="calendar.svg"] {
+    filter: invert(30%) sepia(75%) saturate(4736%) hue-rotate(247deg) brightness(95%) contrast(107%); /* Applies #6232FF to the SVG */
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
 } 

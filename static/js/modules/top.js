@@ -209,21 +209,21 @@ export const TopModule = {
                             <span>${Utils.escapeHTML(page.país)}</span>
                         </div>
                         <div class="top-opportunity-inscription">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
+                            <div class="flex items-center gap-1">
+                                <img src="/static/public/icons/cash.svg" alt="Payment" class="payment-icon" />
+                                ${page.inscripcion === 'Sin cargo' || !page.inscripcion ? 
+                                    '<img src="/static/public/icons/money_off.svg" alt="Free" class="payment-icon" />' : 
+                                    '<img src="/static/public/icons/money_on.svg" alt="Paid" class="payment-icon" />'
+                                }
+                            </div>
                             <span>${Utils.escapeHTML(page.inscripcion || 'No especificado')}</span>
                         </div>
                         <div class="top-opportunity-discipline">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                            </svg>
+                            <img src="/static/public/icons/disciplines.svg" alt="Disciplines" class="w-4 h-4" />
                             <span>${Utils.escapeHTML(this.getMainDiscipline(page.disciplina))}</span>
                         </div>
                         <div class="top-opportunity-date">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
+                            <img src="/static/public/icons/calendar.svg" alt="Calendar" class="w-4 h-4" />
                             <span>${formattedDate}</span>
                         </div>
                     </div>
