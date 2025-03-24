@@ -156,11 +156,19 @@ class RedisWrapper:
 
 # Initialize Redis with Upstash credentials
 try:
-    original_redis = Redis(url=os.environ.get('KV_REST_API_URL'),
-                           token=os.environ.get('KV_REST_API_TOKEN'))
-    redis = RedisWrapper(original_redis)
-    redis.set('test', 'test')  # Test connection
-    print("Redis connection successful")
+    # Check if we're in development mode
+    is_dev = os.getenv("FLASK_ENV") != "production" and os.environ.get("RENDER") != "1"
+    
+    # Skip Redis in development mode if environment variable is set
+    if is_dev and os.environ.get("SKIP_REDIS", "false").lower() == "true":
+        print("Skipping Redis in development mode")
+        redis = None
+    else:
+        original_redis = Redis(url=os.environ.get('KV_REST_API_URL'),
+                               token=os.environ.get('KV_REST_API_TOKEN'))
+        redis = RedisWrapper(original_redis)
+        redis.set('test', 'test')  # Test connection
+        print("Redis connection successful")
 except Exception as e:
     print(f"Redis connection error: {str(e)}")
     redis = None  # Set to None so we can check if Redis is available
@@ -185,6 +193,27 @@ limiter = Limiter(
 # Determine if the app is in production
 is_production = os.getenv("FLASK_ENV") == "production" or os.environ.get("RENDER") == "1"
 app.logger.info(f"Is Production: {is_production}")
+
+# Configure session depending on Redis availability
+if redis is None:
+    # Use filesystem session if Redis is not available
+    app.config.update(
+        SESSION_TYPE="filesystem",
+        SESSION_FILE_DIR=os.path.join(os.getcwd(), "flask_session"),
+        SESSION_PERMANENT=False,
+        SESSION_USE_SIGNER=True,
+    )
+    if not os.path.exists(os.path.join(os.getcwd(), "flask_session")):
+        os.makedirs(os.path.join(os.getcwd(), "flask_session"))
+    app.logger.info("Using filesystem sessions (Redis not available)")
+else:
+    app.config.update(
+        SESSION_TYPE="redis",
+        SESSION_REDIS=redis,
+        SESSION_PERMANENT=False,
+        SESSION_USE_SIGNER=True,
+    )
+    app.logger.info("Using Redis sessions")
 
 # Environment-specific configuration
 if is_production:
@@ -1091,6 +1120,10 @@ def update_total_nuevas():
         }), 500
 
 def get_cached_database_content():
+    if redis is None:
+        app.logger.warning("Redis is not available for caching")
+        return None
+        
     cached = redis.get('database_content')
     if cached:
         try:
@@ -1380,6 +1413,9 @@ def refresh_database_cache():
             -datetime.fromisoformat(page["created_time"].replace('Z', '+00:00')).timestamp()  # Finally by creation time (newest first)
         ))
 
+        # LIMIT destacar_pages to a maximum of 6
+        destacar_pages = destacar_pages[:6]
+        
         # Store the processed data in Redis
         cache_data = {
             'pages': sorted_pages,

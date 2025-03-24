@@ -9,6 +9,8 @@ export const DestacarModule = {
     longPressTimer: null, // Timer for long press
     scrollDirection: null, // Direction to scroll when long pressing
     isScrolling: false, // Flag to prevent multiple scroll operations
+    cachedPlaceholderDataUrl: null,
+    placeholderImageCached: false,
 
     init(pages) {
         if (!pages || !Array.isArray(pages) || pages.length === 0) {
@@ -30,13 +32,28 @@ export const DestacarModule = {
             return new Date(a.fecha_de_cierre) - new Date(b.fecha_de_cierre);
         });
         
+        // Limit to maximum 6 pages
+        if (this.pages.length > 6) {
+            this.pages = this.pages.slice(0, 6);
+        }
+        
+        // Set the cachedPlaceholderDataUrl to use imagen_1.jpg
+        this.cachedPlaceholderDataUrl = '/static/public/destacar/imagen_1.jpg';
+        
+        // Remove any old localStorage entries to prevent using outdated placeholders
+        try {
+            localStorage.removeItem('destacar_placeholder_image');
+        } catch (e) {
+            console.warn('Failed to clean localStorage:', e);
+        }
+        
         // Check if we're on mobile
         this.checkMobile();
         
         // Set cards per page based on screen size
         this.setCardsPerPage();
         
-        // Preload images for better performance
+        // Preload all 6 images for better performance
         this.preloadImages();
         
         // Add resize listener to adjust cards per page when window size changes
@@ -66,48 +83,14 @@ export const DestacarModule = {
     },
 
     /**
-     * Preload images for better performance
+     * Preload images for better performance - simplified version
      */
     preloadImages() {
-        // First, preload the placeholder image to ensure it's available immediately
-        const placeholderUrl = '/static/public/destacarCardsImages/placeholder.jpg';
-        const placeholderImg = new Image();
-        placeholderImg.src = placeholderUrl;
-        
-        // Only preload the first few pages to avoid excessive network requests
-        const pagesToPreload = this.pages.slice(0, Math.min(9, this.pages.length));
-        
-        // Create a set to track unique image URLs
-        const imageUrls = new Set();
-        
-        // Collect image URLs for preloading
-        pagesToPreload.forEach(page => {
-            if (!page) return;
-            
-            // Get discipline info
-            const disciplines = page.disciplina ? page.disciplina.split(',').map(d => d.trim()).filter(Boolean) : [];
-            const mainDiscipline = disciplines.length > 0 ? disciplines[0] : 'General';
-            
-            // Normalize discipline
-            const normalizedDiscipline = mainDiscipline.toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/\s+/g, '');
-                
-            // Get image URL
-            const imageUrl = this.getImageForDiscipline(normalizedDiscipline, page.categoria);
-            imageUrls.add(imageUrl);
-        });
-        
-        // Remove placeholder from the set since we've already preloaded it
-        imageUrls.delete(placeholderUrl);
-        
-        // Preload remaining images with a slight delay to prioritize visible content
-        setTimeout(() => {
-            imageUrls.forEach(url => {
-                const img = new Image();
-                img.src = url;
-            });
-        }, 300);
+        // Preload all 6 fixed images
+        for (let i = 1; i <= 6; i++) {
+            const img = new Image();
+            img.src = `/static/public/destacar/imagen_${i}.jpg`;
+        }
     },
 
     // Check if we're on mobile
@@ -484,8 +467,11 @@ export const DestacarModule = {
             nextButton.style.display = 'none';
         }
 
-        // On mobile, show all pages for horizontal scrolling
-        const pagesToShow = this.isMobile ? this.pages : this.pages.slice(this.currentIndex, this.currentIndex + this.cardsPerPage);
+        // On mobile, LIMIT the number of pages shown instead of showing all
+        // This prevents excessive image requests
+        const pagesToShow = this.isMobile 
+            ? this.pages.slice(0, Math.min(3, this.pages.length)) 
+            : this.pages.slice(this.currentIndex, this.currentIndex + this.cardsPerPage);
 
         // Function to format date
         const formatDate = (dateStr) => {
@@ -539,7 +525,7 @@ export const DestacarModule = {
         };
 
         container.innerHTML = pagesToShow
-            .map(page => {
+            .map((page, index) => {
                 // Extract the first discipline for the badge
                 const disciplines = page.disciplina ? page.disciplina.split(',').map(d => d.trim()).filter(Boolean) : [];
                 const mainDiscipline = disciplines.length > 0 ? disciplines[0] : 'General';
@@ -569,6 +555,11 @@ export const DestacarModule = {
                 // Get subdisciplines (everything after the first discipline)
                 const subdisciplines = disciplines.slice(1).join(', ');
                 
+                // Calculate the absolute index by adding the current page offset
+                const absoluteIndex = this.currentIndex + index;
+                // Determine image number (1-6) based on the absolute index
+                const imageIndex = (absoluteIndex % 6) + 1;
+                
                 return `
                 <div class="bg-white rounded-lg shadow-md overflow-hidden relative cursor-pointer opportunity-preview"
                      data-url="${Utils.escapeHTML(page.url)}"
@@ -584,11 +575,21 @@ export const DestacarModule = {
                      data-fecha-cierre="${Utils.escapeHTML(page.fecha_de_cierre || '')}"
                      data-fecha-cierre-raw="${page.fecha_de_cierre || ''}">
                     <div class="relative h-48 bg-gray-200">
-                        <img src="${this.getImageForDiscipline(normalizedDiscipline, page.categoria)}" 
+                        <img src="/static/public/destacar/imagen_${imageIndex}.jpg" 
                              alt="${Utils.escapeHTML(mainDiscipline)} ${Utils.escapeHTML(page.categoria || '')}" 
                              class="w-full h-full object-cover"
                              loading="lazy"
-                             onerror="this.onerror=null; this.src='/static/public/destacarCardsImages/placeholder.jpg';">
+                             fetchpriority="${this.currentIndex === 0 ? 'high' : 'auto'}"
+                             decoding="async"
+                             data-discipline="${normalizedDiscipline || ''}"
+                             data-category="${page.categoria ? page.categoria.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '') : ''}"
+                             style="opacity: 0; transition: opacity 0.3s ease;"
+                             onload="this.style.opacity = 1;"
+                             onerror="
+                                // Simple error handling - just use imagen_1.jpg as fallback
+                                this.src = '/static/public/destacar/imagen_1.jpg';
+                                this.style.opacity = 1;
+                             ">
                         <div class="absolute inset-0 bg-gray-200 animate-pulse image-placeholder"></div>
                         <span class="absolute top-3 left-3 text-sm">
                             ${Utils.escapeHTML(page.categoria || '')}
@@ -675,21 +676,26 @@ export const DestacarModule = {
         
         // Add event listeners for image loading
         container.querySelectorAll('.opportunity-preview img').forEach(img => {
-            // If image is already loaded or cached
+            // Handle already cached images
             if (img.complete) {
-                img.classList.add('loaded');
+                img.style.opacity = 1;
+                const placeholder = img.closest('.opportunity-preview').querySelector('.image-placeholder');
+                if (placeholder) {
+                    placeholder.style.display = 'none';
+                }
             } else {
                 // Add load event listener
                 img.addEventListener('load', () => {
-                    img.classList.add('loaded');
+                    img.style.opacity = 1;
+                    const placeholder = img.closest('.opportunity-preview').querySelector('.image-placeholder');
+                    if (placeholder) {
+                        placeholder.style.opacity = 0;
+                        setTimeout(() => {
+                            placeholder.style.display = 'none';
+                        }, 300);
+                    }
                 });
             }
-            
-            // Add error event listener to ensure placeholder is shown
-            img.addEventListener('error', () => {
-                img.src = '/static/public/destacarCardsImages/placeholder.jpg';
-                img.classList.add('loaded');
-            });
         });
         
         // Add click handlers for favorite buttons
@@ -889,113 +895,22 @@ export const DestacarModule = {
      * @return {string} - The URL of the image to use
      */
     getImageForDiscipline(normalizedDiscipline, category) {
-        // Base path for destacar card images
-        const basePath = '/static/public/destacarCardsImages/';
-        
-        // Normalize the category (lowercase, remove accents, remove spaces)
-        const normalizedCategory = category ? category.toLowerCase()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-            .replace(/\s+/g, '') : '';
-        
-        // Map of disciplines to normalized values
-        const disciplineMap = {
-            'visuales': 'visuales',
-            'musica': 'musica',
-            'escenicas': 'escenicas',
-            'literatura': 'literatura',
-            'diseno': 'diseno',
-            'cine': 'cine',
-            'audiovisual': 'cine', // Map audiovisual to cine
-            'otras': 'otras'
-        };
-        
-        // Map of categories to normalized values
-        const categoryMap = {
-            'beca': 'beca',
-            'residencia': 'residencia',
-            'premio': 'premio',
-            'concurso': 'concurso',
-            'convocatoria': 'convocatoria',
-            'oportunidad': 'oportunidad',
-            'fondos': 'fondos',
-            'apoyo': 'apoyo'
-        };
-        
-        // Get the discipline key if it exists in our map
-        let disciplineKey = null;
-        for (const [key, value] of Object.entries(disciplineMap)) {
-            if (normalizedDiscipline.includes(key)) {
-                disciplineKey = value;
-                break;
-            }
-        }
-        
-        // Get the category key if it exists in our map
-        let categoryKey = null;
-        for (const [key, value] of Object.entries(categoryMap)) {
-            if (normalizedCategory.includes(key)) {
-                categoryKey = value;
-                break;
-            }
-        }
-        
-        // Since both category and discipline are always available, we'll focus on pairs
-        if (categoryKey && disciplineKey) {
-            // Try the specific pair first
-            const pairPath = `${basePath}pairs/${categoryKey}-${disciplineKey}.jpg`;
+        // Simplified function that returns a fixed image based on index
+        // Find the index of the current item in the pages array
+        const index = this.pages.findIndex(page => {
+            const pageDiscipline = page.disciplina ? page.disciplina.toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/\s+/g, '') : '';
             
-            // Check if we have this specific pair image
-            if (this.isPairImageAvailable(categoryKey, disciplineKey)) {
-                return pairPath;
-            }
-        }
+            return pageDiscipline === normalizedDiscipline;
+        });
         
-        // If we don't have a specific pair image, use a discipline-based image
-        if (disciplineKey) {
-            return `${basePath}${disciplineKey}.jpg`;
-        }
-        
-        // Final fallback
-        return `${basePath}placeholder.jpg`;
+        // Use the absolute index from the data array to ensure unique images
+        // across all visible cards, capped to the available images (1-6)
+        const imageIndex = (index >= 0) ? (index % 6) + 1 : 1;
+        return `/static/public/destacar/imagen_${imageIndex}.jpg`;
     },
     
-    /**
-     * Check if a specific category-discipline pair image is available
-     * This is a simplified version that uses a predefined list of available pairs
-     * In a production environment, you might want to use a more dynamic approach
-     */
-    isPairImageAvailable(category, discipline) {
-        // List of available pair images
-        // This could be loaded from a configuration file or generated dynamically
-        const availablePairs = [
-            // Scholarship (Beca) pairs
-            'beca-visuales', 'beca-musica', 'beca-escenicas', 'beca-literatura', 'beca-diseno', 'beca-cine', 'beca-otras',
-            
-            // Residency (Residencia) pairs
-            'residencia-visuales', 'residencia-musica', 'residencia-escenicas', 'residencia-literatura', 'residencia-diseno', 'residencia-cine', 'residencia-otras',
-            
-            // Award (Premio) pairs
-            'premio-visuales', 'premio-musica', 'premio-escenicas', 'premio-literatura', 'premio-diseno', 'premio-cine', 'premio-otras',
-            
-            // Contest (Concurso) pairs
-            'concurso-visuales', 'concurso-musica', 'concurso-escenicas', 'concurso-literatura', 'concurso-diseno', 'concurso-cine', 'concurso-otras',
-            
-            // Call (Convocatoria) pairs
-            'convocatoria-visuales', 'convocatoria-musica', 'convocatoria-escenicas', 'convocatoria-literatura', 'convocatoria-diseno', 'convocatoria-cine', 'convocatoria-otras',
-            
-            // Opportunity (Oportunidad) pairs
-            'oportunidad-visuales', 'oportunidad-musica', 'oportunidad-escenicas', 'oportunidad-literatura', 'oportunidad-diseno', 'oportunidad-cine', 'oportunidad-otras',
-            
-            // Funds (Fondos) pairs
-            'fondos-visuales', 'fondos-musica', 'fondos-escenicas', 'fondos-literatura', 'fondos-diseno', 'fondos-cine', 'fondos-otras',
-            
-            // Support (Apoyo) pairs
-            'apoyo-visuales', 'apoyo-musica', 'apoyo-escenicas', 'apoyo-literatura', 'apoyo-diseno', 'apoyo-cine', 'apoyo-otras'
-        ];
-        
-        return availablePairs.includes(`${category}-${discipline}`);
-    },
-
     // Update the dots indicator
     updateDotsIndicator() {
         if (!this.isMobile) return;
