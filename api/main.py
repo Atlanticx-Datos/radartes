@@ -244,7 +244,24 @@ def get_current_domain():
     if not is_production:
         return "localhost:5001"
     
-    # For production, always use the main domain
+    # Check if the request is coming from a specific domain
+    if request and request.headers.get('Host'):
+        host = request.headers.get('Host')
+        app.logger.info(f"Current request host: {host}")
+        
+        # List of supported domains
+        supported_domains = ['oportunidades.lat', 'www.oportunidades.lat', 'radartes.org', 'www.radartes.org']
+        
+        # Extract the base domain from the host
+        base_domain = host.split(':')[0]  # Remove port if present
+        
+        # If it's one of our supported domains, return it
+        for domain in supported_domains:
+            if base_domain == domain or base_domain.endswith('.' + domain):
+                app.logger.info(f"Detected supported domain: {base_domain}")
+                return base_domain
+    
+    # For production, default to the main domain if unable to determine
     return "oportunidades.lat"
 
 # Update URLs based on environment
@@ -257,8 +274,15 @@ else:
     current_domain = get_current_domain()
     AUTH0_CALLBACK_URL = f"https://{current_domain}/callback"
     BASE_URL = f"https://{current_domain}"
-    SESSION_COOKIE_DOMAIN = ".oportunidades.lat"  # Allow subdomains
+    
+    # Set the cookie domain based on the current domain
+    if 'radartes.org' in current_domain:
+        SESSION_COOKIE_DOMAIN = ".radartes.org"  # Allow radartes.org subdomains
+    else:
+        SESSION_COOKIE_DOMAIN = ".oportunidades.lat"  # Allow oportunidades.lat subdomains
+    
     app.logger.info(f"Using production URLs with domain: {current_domain}")
+    app.logger.info(f"Using session cookie domain: {SESSION_COOKIE_DOMAIN}")
 
 app.logger.info(f"Configured callback URL: {AUTH0_CALLBACK_URL}")
 
@@ -279,7 +303,14 @@ app.config.update(
 def before_request():
     session.permanent = True
     if is_production:
-        session.cookie_domain = ".oportunidades.lat"  # Match the main domain config
+        current_domain = get_current_domain()
+        
+        # Set cookie domain based on the current request
+        if 'radartes.org' in current_domain:
+            session.cookie_domain = ".radartes.org"
+        else:
+            session.cookie_domain = ".oportunidades.lat"
+            
         app.logger.info(f"Setting cookie domain to: {session.cookie_domain}")
 
 # Initialize the Session extension
@@ -359,10 +390,11 @@ if not is_production:
     AUTH0_TENANT_DOMAIN = "dev-3klm8ed6qtx4zj6v.us.auth0.com"
     app.logger.info(f"Using development Auth0 domain: {AUTH0_CUSTOM_DOMAIN}")
 else:
-    # Production configuration using custom domain
-    AUTH0_CUSTOM_DOMAIN = "login.oportunidades.lat"
-    AUTH0_TENANT_DOMAIN = AUTH0_CUSTOM_DOMAIN  # Use same domain for tenant
+    # Production configuration using custom domain from env or default
+    AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN", "login.oportunidades.lat")
+    AUTH0_TENANT_DOMAIN = os.environ.get("AUTH0_TENANT_DOMAIN", "dev-3klm8ed6qtx4zj6v.us.auth0.com")
     app.logger.info(f"Using production Auth0 domain: {AUTH0_CUSTOM_DOMAIN}")
+    app.logger.info(f"Using Auth0 tenant domain: {AUTH0_TENANT_DOMAIN}")
 
 oauth = OAuth(app)
 
@@ -501,9 +533,18 @@ def logout():
     # Use the Auth0 tenant domain instead of custom domain for logout
     auth0_logout_url = f"https://{AUTH0_TENANT_DOMAIN}/v2/logout?"
     
+    # Get the current domain for returnTo URL
+    current_domain = get_current_domain()
+    return_to_url = f"https://www.{current_domain}/"
+    
+    if current_domain == "localhost:5001":
+        return_to_url = "http://localhost:5001/"
+    
+    app.logger.info(f"Logout returnTo URL: {return_to_url}")
+    
     params = urlencode(
         {
-            "returnTo": "https://www.oportunidades.lat/",  # Direct URL instead of url_for
+            "returnTo": return_to_url,  # Dynamic URL based on current domain
             "client_id": AUTH0_CLIENT_ID,
         },
         quote_via=quote_plus,
