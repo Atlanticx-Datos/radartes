@@ -565,6 +565,7 @@ export const DestacarModule = {
                      data-url="${Utils.escapeHTML(page.url)}"
                      data-base-url="${Utils.escapeHTML(page.base_url || '')}"
                      data-nombre="${Utils.escapeHTML(page.nombre_original || '')}"
+                     data-display-title="${Utils.escapeHTML(displayTitle)}"
                      data-country="${Utils.escapeHTML(page.país || '')}"
                      data-summary="${Utils.escapeHTML(page.og_resumida || '')}"
                      data-id="${Utils.escapeHTML(page.id || '')}"
@@ -657,9 +658,24 @@ export const DestacarModule = {
                 }
                 
                 if (window.ModalModule && window.ModalModule.showPreviewModal) {
+                    // Special handling for Cultura Circular case
+                    let titleToUse = sanitizedData.nombre;
+                    
+                    // If we have a display-title and it's not empty, use that instead
+                    if (sanitizedData.displayTitle && sanitizedData.displayTitle.trim() !== '') {
+                        console.log('Using displayTitle for modal:', sanitizedData.displayTitle);
+                        titleToUse = sanitizedData.displayTitle;
+                    } 
+                    // Special case for Cultura Circular with empty title
+                    else if (titleToUse === 'Convocatoria | ' || titleToUse === 'Convocatoria |' || 
+                             (titleToUse && titleToUse.includes('Cultura Circular'))) {
+                        console.log('Using hardcoded title for Cultura Circular');
+                        titleToUse = 'Cultura Circular 2025';
+                    }
+                    
                     window.ModalModule.showPreviewModal(
                         sanitizedData.url,
-                        sanitizedData.nombre,
+                        titleToUse,
                         sanitizedData.country,
                         sanitizedData.summary,
                         sanitizedData.id,
