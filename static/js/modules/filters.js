@@ -34,6 +34,8 @@ export const FilterModule = {
                 
                 console.log('FilterModule initialization complete');
                 
+                this.updateDisciplineButtons();
+                
                 // Note: We no longer apply filters on initialization to ensure
                 // all pages are shown initially
             } catch (error) {
@@ -301,22 +303,19 @@ export const FilterModule = {
         // Reset all buttons to default state
         document.querySelectorAll('[data-discipline-filter]').forEach(btn => {
             btn.classList.remove('active-filter', 'bg-blue-600', 'text-white');
-            
-            // We need to handle the icon container separately
-            const iconContainer = btn.querySelector('.icon-container');
-            
-            // First remove any inline styles that might be interfering
+            // Remove inline styles
             btn.removeAttribute('style');
-            
-            // Force default background color for all buttons with full opacity
-            // Add margin to buttons to prevent shadow cutoffs
-            btn.style.cssText = 'background-color: #fefeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; border-color: #E5E7EB !important; margin: 4px !important; box-shadow: 0 2px 4px rgba(0,0,0,0.08) !important;';
-            
-            // Special case for "Otras" button - always pink background
+            // Set uniform background for all buttons
+            btn.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; border-color: #E5E7EB !important; margin: 4px !important; box-shadow: 0 2px 4px rgba(0,0,0,0.08) !important;';
+            // For 'Otras' button, only style the icon container with pink
             if (btn.dataset.disciplineFilter === 'Otras') {
-                btn.style.cssText = 'background-color: #F15BB5 !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; border-color: #F15BB5 !important; margin: 4px !important; box-shadow: 0 2px 4px rgba(241,91,181,0.3) !important;';
+                // Remove any classes that might be applying a pink background
+                btn.classList.remove('bg-pink-500', 'bg-F15BB5');
+                const iconContainer = btn.querySelector('.icon-container');
+                if (iconContainer) {
+                    iconContainer.style.cssText = 'background-color: #F15BB5 !important; width: 24px; height: 24px; border-radius: 50% !important; display: inline-block !important; vertical-align: middle !important;';
+                }
             }
-            
             btn.dataset.active = 'false';
         });
 
@@ -325,7 +324,7 @@ export const FilterModule = {
             const todosButton = document.querySelector('[data-discipline-filter="todos"]');
             if (todosButton) {
                 todosButton.classList.add('active-filter');
-                todosButton.style.cssText = 'background-color: #fefeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; margin: 4px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;';
+                todosButton.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; margin: 4px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;';
                 todosButton.dataset.active = 'true';
             }
         } else {
@@ -333,14 +332,16 @@ export const FilterModule = {
             const activeButton = document.querySelector(`[data-discipline-filter="${this.activeFilters.discipline}"]`);
             if (activeButton) {
                 activeButton.classList.add('active-filter');
-                
-                // For "Otras" button, keep the pink color even when active
                 if (this.activeFilters.discipline === 'Otras') {
-                    activeButton.style.cssText = 'background-color: #F15BB5 !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; border-color: #F15BB5 !important; margin: 4px !important; box-shadow: 0 2px 6px rgba(241,91,181,0.4) !important;';
+                    activeButton.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; border-color: #E5E7EB !important; margin: 4px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;';
+                    activeButton.classList.remove('bg-pink-500', 'bg-F15BB5');
+                    const iconContainer = activeButton.querySelector('.icon-container');
+                    if (iconContainer) {
+                        iconContainer.style.cssText = 'background-color: #F15BB5 !important; width: 24px; height: 24px; border-radius: 50% !important; display: inline-block !important; vertical-align: middle !important;';
+                    }
                 } else {
-                    activeButton.style.cssText = 'background-color: #fefeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; margin: 4px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;';
+                    activeButton.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; margin: 4px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;';
                 }
-                
                 activeButton.dataset.active = 'true';
             }
         }
@@ -356,20 +357,12 @@ export const FilterModule = {
                     overflow: visible !important;
                     margin-bottom: 8px !important;
                 }
-                
                 .filter-btn {
+                    background-color: #fdfeff !important;
                     opacity: 1 !important;
                     filter: none !important;
                     margin: 4px !important;
                 }
-                
-                .filter-btn[data-discipline-filter="Otras"] {
-                    background-color: #F15BB5 !important;
-                    color: #1F1B2D !important;
-                    opacity: 1 !important;
-                    filter: none !important;
-                }
-                
                 .filter-container:has(.filter-btn[data-active="true"]) .filter-btn:not([data-active="true"]) {
                     opacity: 1 !important;
                 }
