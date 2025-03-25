@@ -293,11 +293,24 @@ export const FilterModule = {
     },
 
     updateDisciplineButtons() {
-        // First, enhance the container to allow for box shadow overflow
+        // First, update the container style in the beginning of updateDisciplineButtons
         const filterContainer = document.querySelector('.filter-container');
         if (filterContainer) {
-            // Add padding to the container to allow for shadow overflow
-            filterContainer.style.cssText += 'padding: 8px !important; margin-bottom: 8px !important; overflow: visible !important;';
+            // Add padding to the container to allow for shadow overflow and make it scrollable on mobile
+            // Ensure overflow-visible is prioritized over overflow-x for desktop view
+            filterContainer.style.cssText += 'padding: 8px !important; margin-bottom: 8px !important; overflow: visible !important; display: flex !important; flex-wrap: nowrap !important;';
+            
+            if (window.innerWidth < 1024) {
+                // Mobile: scrollable container
+                filterContainer.style.overflowX = 'auto';
+                filterContainer.style.paddingLeft = '0 !important';
+                filterContainer.style.marginLeft = '-10px !important';
+            } else {
+                // Desktop: prioritize visibility with extra padding for negative margin
+                filterContainer.style.overflowX = 'visible';
+                filterContainer.style.paddingLeft = '12px !important'; // Extra padding to compensate for negative margin
+                filterContainer.parentElement.style.overflowX = 'visible'; // Make sure parent also has overflow visible
+            }
         }
         
         // Reset all buttons to default state
@@ -397,21 +410,54 @@ export const FilterModule = {
             styleTag.innerHTML = `
                 .filter-container {
                     padding: 8px !important;
-                    overflow: visible !important;
                     margin-bottom: 8px !important;
+                    display: flex !important;
+                    flex-wrap: nowrap !important;
                 }
+                
+                /* Hide scrollbar */
+                .filter-container::-webkit-scrollbar {
+                    display: none !important;
+                }
+                
                 .filter-btn {
                     background-color: #fdfeff !important;
                     opacity: 1 !important;
                     filter: none !important;
                     margin: 4px !important;
+                    flex: 0 0 auto !important;
                 }
+                
                 .filter-container:has(.filter-btn[data-active="true"]) .filter-btn:not([data-active="true"]) {
                     opacity: 1 !important;
                 }
+                
+                /* Desktop alignment with overflow protection */
                 @media (min-width: 1024px) {
+                    .filter-container {
+                        overflow: visible !important;
+                        padding-left: 12px !important;
+                    }
+                    
+                    .filter-container-wrapper, 
+                    .filter-container-wrapper > * {
+                        overflow: visible !important;
+                    }
+                    
                     [data-discipline-filter="todos"] {
                         margin-left: -10px !important;
+                    }
+                }
+                
+                /* Mobile alignment and scrolling */
+                @media (max-width: 1023px) {
+                    .filter-container {
+                        overflow-x: auto !important;
+                        scrollbar-width: none !important;
+                        -ms-overflow-style: none !important;
+                        padding-left: 0 !important;
+                        margin-left: -10px !important;
+                        width: calc(100% + 20px) !important;
                     }
                 }
             `;
