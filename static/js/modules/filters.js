@@ -307,6 +307,7 @@ export const FilterModule = {
             btn.removeAttribute('style');
             // Set uniform background for all buttons
             btn.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; border-color: #E5E7EB !important; margin: 4px !important; box-shadow: 0 2px 4px rgba(0,0,0,0.08) !important;';
+            
             // For 'Otras' button, only style the icon container with pink
             if (btn.dataset.disciplineFilter === 'Otras') {
                 // Remove any classes that might be applying a pink background
@@ -316,6 +317,26 @@ export const FilterModule = {
                     iconContainer.style.cssText = 'background-color: #F15BB5 !important; width: 24px; height: 24px; border-radius: 50% !important; display: inline-block !important; vertical-align: middle !important;';
                 }
             }
+            // For 'todos' ("Todas") button, style its icon container with #EFECF3
+            else if (btn.dataset.disciplineFilter === 'todos') {
+                const iconContainer = btn.querySelector('.icon-container');
+                if (iconContainer) {
+                    iconContainer.style.cssText = 'background-color: #EFECF3 !important; width: 24px; height: 24px; border-radius: 50% !important; display: inline-block !important; vertical-align: middle !important;';
+                }
+                
+                // Add additional styling for desktop alignment
+                if (window.innerWidth >= 1024) {
+                    btn.style.marginLeft = '-10px';
+                }
+            }
+            // For 'Escénicas' button, replace its icon with theater.svg
+            else if (btn.dataset.disciplineFilter && btn.dataset.disciplineFilter.toLowerCase() === 'escenicas') {
+                const iconContainer = btn.querySelector('.icon-container');
+                if (iconContainer) {
+                    iconContainer.style.cssText = 'background-image: url(/static/public/icons/theater.svg) !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; width: 24px; height: 24px; border-radius: 50% !important; display: inline-block !important; vertical-align: middle !important;';
+                }
+            }
+            
             btn.dataset.active = 'false';
         });
 
@@ -325,6 +346,17 @@ export const FilterModule = {
             if (todosButton) {
                 todosButton.classList.add('active-filter');
                 todosButton.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; margin: 4px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;';
+                
+                // Add additional styling for desktop alignment
+                if (window.innerWidth >= 1024) {
+                    todosButton.style.marginLeft = '-10px';
+                }
+                
+                const iconContainer = todosButton.querySelector('.icon-container');
+                if (iconContainer) {
+                    iconContainer.style.cssText = 'background-color: #EFECF3 !important; width: 24px; height: 24px; border-radius: 50% !important; display: inline-block !important; vertical-align: middle !important;';
+                }
+                
                 todosButton.dataset.active = 'true';
             }
         } else {
@@ -332,6 +364,8 @@ export const FilterModule = {
             const activeButton = document.querySelector(`[data-discipline-filter="${this.activeFilters.discipline}"]`);
             if (activeButton) {
                 activeButton.classList.add('active-filter');
+                
+                // Style the active button based on type
                 if (this.activeFilters.discipline === 'Otras') {
                     activeButton.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; border-color: #E5E7EB !important; margin: 4px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;';
                     activeButton.classList.remove('bg-pink-500', 'bg-F15BB5');
@@ -339,9 +373,18 @@ export const FilterModule = {
                     if (iconContainer) {
                         iconContainer.style.cssText = 'background-color: #F15BB5 !important; width: 24px; height: 24px; border-radius: 50% !important; display: inline-block !important; vertical-align: middle !important;';
                     }
-                } else {
+                } 
+                else if (this.activeFilters.discipline && this.activeFilters.discipline.toLowerCase() === 'escenicas') {
+                    activeButton.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; margin: 4px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;';
+                    const iconContainer = activeButton.querySelector('.icon-container');
+                    if (iconContainer) {
+                        iconContainer.style.cssText = 'background-image: url(/static/public/icons/theater.svg) !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; width: 24px; height: 24px; border-radius: 50% !important; display: inline-block !important; vertical-align: middle !important;';
+                    }
+                }
+                else {
                     activeButton.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; margin: 4px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;';
                 }
+                
                 activeButton.dataset.active = 'true';
             }
         }
@@ -365,6 +408,11 @@ export const FilterModule = {
                 }
                 .filter-container:has(.filter-btn[data-active="true"]) .filter-btn:not([data-active="true"]) {
                     opacity: 1 !important;
+                }
+                @media (min-width: 1024px) {
+                    [data-discipline-filter="todos"] {
+                        margin-left: -10px !important;
+                    }
                 }
             `;
             document.head.appendChild(styleTag);
