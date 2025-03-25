@@ -261,8 +261,8 @@ def get_current_domain():
                 app.logger.info(f"Detected supported domain: {base_domain}")
                 return base_domain
     
-    # For production, default to the main domain if unable to determine
-    return "oportunidades.lat"
+    # For production, default to radartes.org if unable to determine
+    return "radartes.org"
 
 # Update URLs based on environment
 if not is_production:
@@ -390,9 +390,18 @@ if not is_production:
     AUTH0_TENANT_DOMAIN = "dev-3klm8ed6qtx4zj6v.us.auth0.com"
     app.logger.info(f"Using development Auth0 domain: {AUTH0_CUSTOM_DOMAIN}")
 else:
-    # Production configuration using custom domain from env or default
-    AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN", "login.oportunidades.lat")
+    # Production configuration using custom domain from env
+    # Use env variable or fallback to auth0 tenant domain
     AUTH0_TENANT_DOMAIN = os.environ.get("AUTH0_TENANT_DOMAIN", "dev-3klm8ed6qtx4zj6v.us.auth0.com")
+    
+    # For the custom domain, always use what's set in env
+    AUTH0_CUSTOM_DOMAIN = os.environ.get("AUTH0_CUSTOM_DOMAIN")
+    
+    # If custom domain is not set, use the tenant domain
+    if not AUTH0_CUSTOM_DOMAIN:
+        AUTH0_CUSTOM_DOMAIN = AUTH0_TENANT_DOMAIN
+        app.logger.warning(f"AUTH0_CUSTOM_DOMAIN not set, falling back to tenant domain: {AUTH0_CUSTOM_DOMAIN}")
+    
     app.logger.info(f"Using production Auth0 domain: {AUTH0_CUSTOM_DOMAIN}")
     app.logger.info(f"Using Auth0 tenant domain: {AUTH0_TENANT_DOMAIN}")
 
@@ -417,16 +426,27 @@ oauth.register(
 @app.route("/login")
 def login():
     app.logger.info(f"Login route accessed. Session contents: {session}")
+    app.logger.info(f"Current domain: {get_current_domain()}")
+    app.logger.info(f"Callback URL: {AUTH0_CALLBACK_URL}")
+    app.logger.info(f"Using Auth0 custom domain: {AUTH0_CUSTOM_DOMAIN}")
+    app.logger.info(f"Request headers: {dict(request.headers)}")
     
-    # Generate and store state in session
-    state = secrets.token_urlsafe(32)
-    session['state'] = state
-    session.modified = True
-    
-    return oauth.auth0.authorize_redirect(
-        redirect_uri=AUTH0_CALLBACK_URL,
-        state=state
-    )
+    try:
+        # Generate and store state in session
+        state = secrets.token_urlsafe(32)
+        session['state'] = state
+        session.modified = True
+        
+        redirect_response = oauth.auth0.authorize_redirect(
+            redirect_uri=AUTH0_CALLBACK_URL,
+            state=state
+        )
+        app.logger.info(f"Auth0 redirect URL: {redirect_response.location}")
+        return redirect_response
+    except Exception as e:
+        app.logger.error(f"Login error: {str(e)}")
+        app.logger.error(f"Traceback: {traceback.format_exc()}")
+        return render_template("error.html", error="Login service temporarily unavailable. Please try again later.")
 
 def safe_next_url(next_url):
     """Validate next URL to prevent open redirects"""
@@ -483,25 +503,40 @@ def callback():
     try:
         app.logger.info("Starting callback processing")
         app.logger.info(f"Session contents at callback start: {session}")
+        app.logger.info(f"Callback request args: {request.args}")
+        app.logger.info(f"Current domain: {get_current_domain()}")
+        app.logger.info(f"Using Auth0 custom domain: {AUTH0_CUSTOM_DOMAIN}")
         
         # Basic error handling
         if 'error' in request.args:
-            app.logger.error(f"Auth0 callback error: {request.args.get('error_description', 'Unknown error')}")
+            error_msg = request.args.get('error_description', 'Unknown error')
+            app.logger.error(f"Auth0 callback error: {error_msg}")
+            flash(f"Login error: {error_msg}", "error")
             return redirect(url_for("login"))
         
         # State verification
-        if request.args.get('state') != session.get('state'):
+        state_from_auth0 = request.args.get('state')
+        state_from_session = session.get('state')
+        app.logger.info(f"State from Auth0: {state_from_auth0}")
+        app.logger.info(f"State from session: {state_from_session}")
+        
+        if state_from_auth0 != state_from_session:
             app.logger.error("State mismatch")
+            flash("Authentication session expired. Please try again.", "error")
             return redirect(url_for("login"))
         
         # Get token and user info
+        app.logger.info("Attempting to authorize access token...")
         token = oauth.auth0.authorize_access_token()
+        app.logger.info("Access token authorized. Fetching user info...")
         user_info = oauth.auth0.get("userinfo").json()
+        app.logger.info(f"User info retrieved: {json.dumps(user_info, default=str)}")
         
         # Store in session
         session["jwt"] = token
         session["user"] = user_info
         session.modified = True
+        app.logger.info("Session updated with user data")
         
         # Get next URL from session
         next_url = session.pop('next', None)
@@ -520,8 +555,9 @@ def callback():
             
     except Exception as e:
         app.logger.error(f"Callback error: {str(e)}")
-        app.logger.exception("Full traceback:")
+        app.logger.error(f"Full traceback: {traceback.format_exc()}")
         session.clear()
+        flash("An error occurred during login. Please try again.", "error")
         return redirect(url_for("login"))
 
 
