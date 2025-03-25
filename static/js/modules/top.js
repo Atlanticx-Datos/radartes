@@ -265,7 +265,7 @@ export const TopModule = {
                     
                     <button 
                         type="button"
-                        class="top-opportunity-button relative bottom-3"
+                        class="top-opportunity-button"
                         data-url="${Utils.escapeHTML(page.url)}"
                         data-base-url="${Utils.escapeHTML(page.base_url || '')}"
                         data-nombre="${Utils.escapeHTML(page.nombre)}"

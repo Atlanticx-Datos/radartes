@@ -241,12 +241,13 @@
 .top-opportunity-badge {
     display: inline-flex;
     align-items: center;
+    justify-content: center; /* Add center justification for perfect centering */
     padding: 4px 12px;
     border-radius: 20px;
     font-family: 'Inter', sans-serif;
     font-weight: 400;
     font-size: 14px;
-    line-height: 150%;
+    line-height: 1; /* Adjust line height for better vertical centering */
     letter-spacing: 0;
     text-align: center;
     height: 24px;
@@ -322,9 +323,11 @@
     border: none;
     cursor: pointer;
     align-self: flex-start;
-    margin-top: 16px; /* Reduced margin to fit in fixed height */
+    margin-top: 16px; /* Base margin-top */
     margin-bottom: 0;
     height: 36px;
+    position: relative; /* Enable positioning */
+    bottom: 12px; /* Add some bottom positioning for desktop view */
 }
 
 .top-opportunity-button:hover {
@@ -401,6 +404,27 @@
         min-height: 140px; /* Ensure content container has minimum height */
     }
     
+    /* Update badge positioning and sizing for mobile */
+    .top-opportunity-badges {
+        top: 8px;
+        left: 8px;
+        gap: 6px;
+    }
+    
+    .top-opportunity-badge {
+        padding: 4px 12px;
+        font-size: 14px; /* Match destacar badge size */
+        height: 24px; /* Match destacar badge height */
+        max-width: 180px;
+    }
+    
+    .top-opportunity-favorite {
+        top: 8px;
+        right: 8px;
+        width: 2.25rem;
+        height: 2.25rem;
+    }
+    
     .top-opportunity-title {
         font-size: 18px;
     }
@@ -422,7 +446,8 @@
     }
     
     .top-opportunity-button {
-        margin-top: 12px;
+        margin-top: 24px !important; /* More margin on mobile */
+        bottom: 0; /* Reset the bottom positioning on mobile */
     }
     
     .top-opportunity-inscription img[src*="cash.svg"],
@@ -455,6 +480,7 @@
         min-height: 180px; /* Ensure content container has minimum height */
     }
     
+    /* Update badges for smaller screens */
     .top-opportunity-badges {
         top: 8px;
         left: 8px;
@@ -462,9 +488,10 @@
     }
     
     .top-opportunity-badge {
-        font-size: 12px;
-        padding: 2px 8px;
-        height: 20px;
+        font-size: 13px; /* Slightly reduced but still similar to destacar */
+        padding: 3px 10px;
+        height: 22px;
+        max-width: 150px;
     }
     
     .top-opportunity-favorite {
@@ -506,7 +533,7 @@
     .top-opportunity-button {
         font-size: 14px;
         padding: 0.4rem 1.2rem;
-        margin-top: 20px;
+        margin-top: 24px; /* Increased from 20px to 24px to match larger breakpoint */
         margin-bottom: 4px;
         height: 32px;
     }
@@ -542,10 +569,12 @@
         font-size: 15px;
     }
     
+    /* Smallest screen badge styling */
     .top-opportunity-badge {
-        font-size: 10px;
-        padding: 1px 6px;
-        height: 18px;
+        font-size: 12px; /* Increased from 10px to be more similar to destacar */
+        padding: 2px 8px;
+        height: 20px;
+        max-width: 120px;
     }
     
     .top-opportunity-location, 
@@ -558,7 +587,7 @@
     .top-opportunity-button {
         font-size: 12px;
         padding: 0.3rem 1rem;
-        margin-top: 16px;
+        margin-top: 24px; /* Increased from 16px to 24px to be consistent */
         height: 28px;
     }
 }
