@@ -72,7 +72,7 @@ body .filter-btn span {
 }
 
 .filter-btn[data-discipline-filter="Escénicas"] .icon-container {
-    background-color: #F3CE3A33;
+    background-color: rgba(245, 158, 11, 0.2);
 }
 
 .filter-btn[data-discipline-filter="Literatura"] .icon-container {
@@ -107,21 +107,21 @@ body .filter-btn span {
 .filter-btn[data-discipline-filter="Visuales"] .icon-container {
     background-image: url('/static/public/discipline-icons/visuales-icon.svg');
     background-position: center;
-    background-size: 60%;
+    background-size: 50%;
     background-repeat: no-repeat;
 }
 
 .filter-btn[data-discipline-filter="Música"] .icon-container {
     background-image: url('/static/public/discipline-icons/musica-icon.svg');
     background-position: center;
-    background-size: 60%;
+    background-size: 50%;
     background-repeat: no-repeat;
 }
 
 .filter-btn[data-discipline-filter="Escénicas"] .icon-container {
-    background-image: url('/static/public/discipline-icons/escenicas-icon.svg');
+    background-image: url('/static/public/icons/theater.svg');
     background-position: center;
-    background-size: 60%;
+    background-size: 70%;
     background-repeat: no-repeat;
 }
 
@@ -142,7 +142,7 @@ body .filter-btn span {
 .filter-btn[data-discipline-filter="Cine"] .icon-container {
     background-image: url('/static/public/discipline-icons/cine-icon.svg');
     background-position: center;
-    background-size: 60%;
+    background-size: 50%;
     background-repeat: no-repeat;
 }
 
