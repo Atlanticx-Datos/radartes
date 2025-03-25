@@ -1,0 +1,188 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<!-- Header section with background and breadcrumb -->
+<header class="bg-gray-50 h-[130px] w-full flex items-center">
+    <div class="container mx-auto px-4 mt-4">
+        <nav class="text-sm mb-4">
+            <a href="/" class="text-gray-600 hover:text-gray-900">Home</a>
+            <span class="mx-2 text-gray-400">&rsaquo;</span>
+            <span class="text-[#6232FF]">Sobre nosotros</span>
+        </nav>
+        <h1 class="text-[28px] text-gray-900 text-center">
+            Radartes: Proyecto Digital de Bien Público
+        </h1>
+    </div>
+</header>
+
+<!-- Main content -->
+<main class="container mx-auto px-4 py-8 bg-gray-50 max-w-[966px] -mt-6">
+    <div class="grid grid-cols-1 gap-8">
+        <!-- First Card: Sobre el proyecto -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
+            <div class="flex flex-col md:flex-row h-full">
+                <div class="w-full md:w-2/3 p-8 overflow-y-auto">
+                    <div class="flex flex-col">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-6 h-6 text-[#6232FF] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <h2 class="newsletter-title">Sobre el proyecto</h2>
+                        </div>
+                        <p class="newsletter-text mb-4">
+                            Radartes es una plataforma digital de acceso libre y gratuito, cuyo objetivo es difundir información sobre oportunidades artísticas, como premios, residencias, convocatorias y concursos, principalmente en América Latina, Estados Unidos, Canadá y Europa. 
+                        </p>
+                        <p class="newsletter-text">
+                            La plataforma utiliza una combinación de tecnología de punta y expertos para recopilar, editar, organizar y clasificar información de diversas fuentes, presentándola de forma clara e intuitiva.
+                        </p>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/3 bg-white p-4 flex items-center justify-center sm:flex">
+                    <img src="{{ url_for('static', filename='public/undraw_team.svg') }}" alt="Sobre el proyecto" class="h-auto w-full max-w-[320px] object-contain">
+                </div>
+            </div>
+        </div>
+
+        <!-- Second Card: Como utilizar Radartes -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
+            <div class="flex flex-col md:flex-row h-full">
+                <div class="w-full md:w-2/3 p-8 overflow-y-auto">
+                    <div class="flex flex-col h-full">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-6 h-6 text-[#6232FF] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                            </svg>
+                            <h2 class="newsletter-title">Como utilizar Radartes</h2>
+                        </div>
+                        <p class="newsletter-text mb-4">
+                            Radartes es un proyecto de código abierto, disponible en Github, y forma parte de la iniciativa Gestión Cultural Digital de Atlantic X, que busca mejorar las prácticas y resultados en las comunidades artísticas contemporáneas a través de herramientas y datos digitales.
+                        </p>
+                        <p class="newsletter-text mb-4">
+                            Aunque la base de datos es extensa, Radartes no puede abarcar todas las oportunidades existentes y recomienda verificar la información crucial, como fechas límite y costos, en los enlaces originales. Se invita a los usuarios a informar errores o compartir sus éxitos a través del correo electrónico o las redes sociales.
+                        </p>
+                        <p class="newsletter-text mb-4">
+                            Quienes deseen incluir una oportunidad en la base de datos, pueden enviar los detalles a oportunidades@radartes.org. Por otro lado, si sos desarrollador, te invitamos a contribuir desde nuestro repositorio en GitHub.
+                        </p>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/3 bg-white p-4 flex items-center justify-center sm:flex">
+                    <img src="{{ url_for('static', filename='public/undraw_sharing.svg') }}" alt="Como utilizar Radartes" class="h-auto w-full max-w-[320px] object-contain">
+                </div>
+            </div>
+        </div>
+
+        <!-- Third Card: Equipo Radartes -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
+            <div class="flex flex-col md:flex-row h-full">
+                <div class="w-full md:w-2/3 p-8 overflow-y-auto">
+                    <div class="flex flex-col h-full">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-6 h-6 text-[#6232FF] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                            <h2 class="newsletter-title">Equipo Radartes</h2>
+                        </div>
+                        <p class="newsletter-text mb-4">
+                            <strong>Programación, idea y desarrollo:</strong> Atlanticx.org
+                        </p>
+                        <p class="newsletter-text mb-4">
+                            <strong>Coordinación del Proyecto:</strong> Martín de Santos
+                        </p>
+                        <p class="newsletter-text mb-4">
+                            <strong>Coordinación y edición de oportunidades:</strong> Natalia Bellotto
+                        </p>
+                        <p class="newsletter-text mb-4">
+                            <strong>Diseño:</strong> Milagros Castro
+                        </p>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/3 bg-white p-4 flex items-center justify-center sm:flex">
+                    <img src="{{ url_for('static', filename='public/undraw_team_collaboration.svg') }}" alt="Equipo Radartes" class="h-auto w-full max-w-[320px] object-contain">
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Include the footer partial -->
+{% include '_footer.html' %}
+
+<style>
+    /* Override body background color */
+    body {
+        background-color: #F9FAFB !important; /* gray-50 with !important to override any other styles */
+    }
+    
+    /* Override main element background */
+    main.w-full.flex.flex-col.max-sm\:rounded-lg {
+        background-color: #F9FAFB !important;
+    }
+    
+    /* Override flex-1 div background */
+    main.w-full.flex.flex-col.max-sm\:rounded-lg > div.flex-1 {
+        background-color: #F9FAFB !important;
+    }
+    
+    /* Newsletter card typography */
+    .newsletter-title {
+        font-family: Inter, sans-serif;
+        font-weight: 700;
+        font-size: 24px;
+        line-height: 130%;
+        letter-spacing: 0%;
+        vertical-align: middle;
+        color: #111827;
+    }
+    
+    .newsletter-text {
+        font-family: Inter, sans-serif;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 150%;
+        letter-spacing: 0%;
+        color: #4B5563;
+    }
+    
+    /* Mobile responsive styles */
+    @media (max-width: 640px) {
+        /* Reduce margin between header and cards */
+        header.bg-gray-50.h-\[180px\] {
+            height: 150px !important;
+        }
+        
+        /* Adjust main container padding to reduce space after header */
+        main.container.mx-auto.px-4.py-8 {
+            padding-top: 1rem !important;
+        }
+        
+        /* Reduce gap between cards on mobile */
+        main .grid.grid-cols-1.gap-8 {
+            gap: 1.5rem;
+        }
+        
+        /* Increase card padding for mobile */
+        .w-full.md\:w-2\/3.p-8 {
+            padding: 28px 16px !important;
+        }
+        
+        /* Add more vertical padding to card containers */
+        .bg-white.rounded-lg.border.border-gray-200.overflow-hidden .flex.flex-col.md\:flex-row {
+            padding-top: 12px;
+            padding-bottom: 12px;
+        }
+        
+        /* Hide images on mobile */
+        .w-full.md\:w-1\/3.bg-white.p-4.flex.items-center.justify-center.sm\:flex {
+            display: none;
+        }
+        
+        .newsletter-title {
+            font-size: 20px;
+        }
+        
+        .newsletter-text {
+            font-size: 14px;
+        }
+    }
+</style>
+{% endblock %} 

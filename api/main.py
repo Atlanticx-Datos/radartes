@@ -1455,7 +1455,11 @@ def refresh_database_cache():
 
 @app.route("/politica-privacidad")
 def privacy_policy():
-    return render_template("privacy_policy.html")
+    return render_template("politica-privacidad.html")
+
+@app.route("/sobre_nosotros")
+def sobre_nosotros():
+    return render_template("sobre_nosotros.html")
 
 @app.context_processor
 def utility_processor():
