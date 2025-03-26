@@ -701,8 +701,8 @@ export const ModalModule = {
                         <div class="border-t" style="border-color: #D5D2DC; padding-top: 20px; margin-top: 0; display: flex; justify-content: flex-start; align-items: center;">
                             <a href="${Utils.escapeHTML(base_url || url)}" 
                                target="_blank" 
-                               class="text-center rounded-full flex items-center justify-center"
-                               style="height: 44px; width: 176px; background-color: white; color: black; border: 1px solid black; transition: all 0.25s ease-in-out;"
+                               class="text-center flex items-center justify-center"
+                               style="height: 37px; width: 152px; background-color: white; color: black; border: 1px solid black; border-radius: 40px; transition: all 0.25s ease-in-out; font-size: 14px; padding: 0 4px;"
                                onmouseover="this.style.borderColor='#6232FF'; this.style.borderWidth='2px';"
                                onmouseout="this.style.borderColor='black'; this.style.borderWidth='1px';">
                                 Ver oportunidad
@@ -943,7 +943,7 @@ export const ModalModule = {
             país: countryElement ? countryElement.textContent.trim() : '',
             disciplina: disciplinaElement ? disciplinaElement.textContent.trim() : '',
             fecha_de_cierre: '', // Not available in modal
-            inscripcion: modalElement.querySelector('.flex.items-center svg.w-3.h-3 + svg.absolute') ? 
+            inscripcion: modalElement.querySelector('.flex.items-center img[src*="money_off.svg"]') ? 
                 'Sin cargo' : 'Con cargo'
         };
         

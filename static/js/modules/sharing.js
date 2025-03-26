@@ -116,7 +116,7 @@ export const SharingModule = {
                     return this.shareToTwitter(opportunity.nombre, opportunity.url);
                     
                 case 'linkedin':
-                    return this.shareToLinkedIn(opportunity.url);
+                    return this.shareToLinkedIn(opportunity.url, opportunity.nombre);
                     
                 case 'facebook':
                     return this.shareToFacebook(opportunity.url);
@@ -173,11 +173,26 @@ export const SharingModule = {
     /**
      * Share to LinkedIn
      * @param {String} url - The URL to share
+     * @param {String} title - The title of the opportunity
      * @returns {Boolean} - Whether the share was initiated
      */
-    shareToLinkedIn(url) {
+    shareToLinkedIn(url, title) {
         try {
-            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
+            // LinkedIn sharing API doesn't officially support custom text in the feed creation
+            // However, we can use the alternate API that supports more parameters
+            const enhancedUrl = new URL(url);
+            
+            // Opening the LinkedIn share dialog with additional parameters
+            // Note: Some of these parameters might be ignored by LinkedIn, but it's worth trying
+            window.open(
+                `https://www.linkedin.com/shareArticle?` +
+                `mini=true&` +
+                `url=${encodeURIComponent(enhancedUrl.toString())}&` +
+                `title=${encodeURIComponent(title || '')}&` +
+                `summary=${encodeURIComponent('Compartido desde Radartes.org')}&` +
+                `source=${encodeURIComponent('Radartes.org')}`, 
+                '_blank'
+            );
             return true;
         } catch (error) {
             console.error('Error sharing to LinkedIn:', error);
@@ -320,7 +335,7 @@ export const SharingModule = {
             formattedText: this.formatOpportunityDetails(testOpportunity),
             shareToWhatsApp: () => this.shareToWhatsApp(this.formatOpportunityDetails(testOpportunity)),
             shareToTwitter: () => this.shareToTwitter(testOpportunity.nombre, testOpportunity.url),
-            shareToLinkedIn: () => this.shareToLinkedIn(testOpportunity.url),
+            shareToLinkedIn: () => this.shareToLinkedIn(testOpportunity.url, testOpportunity.nombre),
             shareViaEmail: () => this.shareViaEmail(testOpportunity.nombre, this.formatOpportunityDetails(testOpportunity)),
             copyToClipboard: () => this.copyToClipboard(this.formatOpportunityDetails(testOpportunity))
         };
