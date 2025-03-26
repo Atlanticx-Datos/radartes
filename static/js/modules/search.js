@@ -762,6 +762,29 @@ export const SearchModule = {
     },
 
     updateResults(results, preservePage = false) {
+        // Filter out opportunities with past closing dates
+        results = results.filter(page => {
+            // Skip filtering if no closing date or it's the placeholder date
+            if (!page.fecha_de_cierre || page.fecha_de_cierre === '1900-01-01') {
+                return true;
+            }
+            
+            // Get today's date in YYYY-MM-DD format, using UTC to match backend logic
+            const today = new Date();
+            const todayStr = today.getUTCFullYear() + '-' + 
+                            String(today.getUTCMonth() + 1).padStart(2, '0') + '-' + 
+                            String(today.getUTCDate()).padStart(2, '0');
+            
+            // Compare dates as strings (works for YYYY-MM-DD format)
+            const isNotExpired = page.fecha_de_cierre >= todayStr;
+            
+            if (!isNotExpired) {
+                console.log(`Filtering out expired opportunity: ${page.nombre} - Closing date: ${page.fecha_de_cierre} is before today (${todayStr})`);
+            }
+            
+            return isNotExpired;
+        });
+        
         // Store original order only on first load with all results
         if (!this.originalOrder.length && results.length > 0 && !this.isFiltered) {
             console.log('Storing original order with', results.length, 'items');
@@ -1190,6 +1213,29 @@ export const SearchModule = {
                     if (!dateStr || dateStr === '1900-01-01') {
                         return new Date(8640000000000000); // Far future date
                     }
+                    
+                    // TIMEZONE FIX: For YYYY-MM-DD format, parse parts manually to avoid timezone issues
+                    if (typeof dateStr === 'string' && dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                        console.log('Using timezone-safe parsing for YYYY-MM-DD format in parseDate');
+                        const [year, month, day] = dateStr.split('-').map(Number);
+                        
+                        // Get today's date in UTC for comparison
+                        const today = new Date();
+                        const todayUTC = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+                        
+                        // Create date with the parts using UTC to avoid timezone issues
+                        const date = new Date(Date.UTC(year, month - 1, day));
+                        
+                        // Ensure opportunities that have already passed show up sorted AFTER future ones
+                        // by returning a far future date for past opportunities
+                        if (date < todayUTC) {
+                            console.log(`Date ${dateStr} has passed, treating as far future for sorting`);
+                            return new Date(8640000000000000);
+                        }
+                        
+                        return date;
+                    }
+                    
                     return new Date(dateStr);
                 };
                 

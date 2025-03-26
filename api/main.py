@@ -1274,7 +1274,7 @@ def refresh_database_cache():
                         {
                             "or": [
                                 {"property": "Fecha de cierre", "date": {"is_empty": True}},
-                                {"property": "Fecha de cierre", "date": {"on_or_after": datetime.now().strftime('%Y-%m-%d')}}
+                                {"property": "Fecha de cierre", "date": {"on_or_after": datetime.utcnow().strftime('%Y-%m-%d')}}
                             ]
                         }
                     ]
@@ -1319,7 +1319,7 @@ def refresh_database_cache():
         all_pages = fetch_notion_pages()
         
         # Process pages using existing logic
-        now_date = datetime.now()
+        now_date = datetime.utcnow()
         seven_days_from_now = now_date + timedelta(days=7)
         placeholder_date = '1900-01-01'
 
@@ -1503,7 +1503,7 @@ def refresh_database_cache():
             'pages': sorted_pages,
             'closing_soon_pages': closing_soon_pages[:7],
             'destacar_pages': destacar_pages,
-            'timestamp': datetime.now().isoformat()
+            'timestamp': datetime.utcnow().isoformat()
         }
         
         # Count and log pages with top=true

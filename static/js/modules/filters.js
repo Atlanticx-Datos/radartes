@@ -537,6 +537,21 @@ export const FilterModule = {
                 if (pageMonth !== monthToFind) return false;
             }
 
+            // Add date filter to exclude past opportunities
+            if (page.fecha_de_cierre && page.fecha_de_cierre !== '1900-01-01') {
+                // Get today's date in YYYY-MM-DD format, using UTC to match backend logic
+                const today = new Date();
+                const todayStr = today.getUTCFullYear() + '-' + 
+                                String(today.getUTCMonth() + 1).padStart(2, '0') + '-' + 
+                                String(today.getUTCDate()).padStart(2, '0');
+                
+                // Compare dates as strings (works for YYYY-MM-DD format)
+                if (page.fecha_de_cierre < todayStr) {
+                    console.log(`Filtering out expired opportunity: ${page.nombre} - Closing date: ${page.fecha_de_cierre} is before today (${todayStr})`);
+                    return false;
+                }
+            }
+
             // Discipline filter - use the simplified matching logic
             if (this.activeFilters.discipline !== 'todos') {
                 if (!page.disciplina) return false;
