@@ -218,6 +218,9 @@ export const FilterModule = {
         console.log('Current discipline:', this.activeFilters.discipline);
         console.log('Clicked discipline:', discipline);
         
+        // First ensure button styling is updated properly
+        this.updateDisciplineButtons();
+        
         // Don't change the discipline here - it should already be set by toggleDisciplineFilter
         console.log('Using discipline:', this.activeFilters.discipline);
         
@@ -293,23 +296,24 @@ export const FilterModule = {
     },
 
     updateDisciplineButtons() {
-        // First, update the container style in the beginning of updateDisciplineButtons
+        // Update the container style in updateDisciplineButtons() to handle different wrapping behaviors
         const filterContainer = document.querySelector('.filter-container');
         if (filterContainer) {
-            // Add padding to the container to allow for shadow overflow and make it scrollable on mobile
-            // Ensure overflow-visible is prioritized over overflow-x for desktop view
-            filterContainer.style.cssText += 'padding: 8px !important; margin-bottom: 8px !important; overflow: visible !important; display: flex !important; flex-wrap: nowrap !important;';
+            // Base styling for all screen sizes
+            filterContainer.style.cssText += 'padding: 8px !important; margin-bottom: 8px !important; overflow: visible !important; display: flex !important;';
             
             if (window.innerWidth < 1024) {
-                // Mobile: scrollable container
+                // Mobile/tablet: horizontal scrolling
+                filterContainer.style.flexWrap = 'nowrap';
                 filterContainer.style.overflowX = 'auto';
                 filterContainer.style.paddingLeft = '0 !important';
                 filterContainer.style.marginLeft = '-10px !important';
             } else {
-                // Desktop: prioritize visibility with extra padding for negative margin
+                // Desktop/laptop: wrap to new lines
+                filterContainer.style.flexWrap = 'wrap';
                 filterContainer.style.overflowX = 'visible';
-                filterContainer.style.paddingLeft = '12px !important'; // Extra padding to compensate for negative margin
-                filterContainer.parentElement.style.overflowX = 'visible'; // Make sure parent also has overflow visible
+                filterContainer.style.paddingLeft = '12px !important';
+                filterContainer.parentElement.style.overflowX = 'visible';
             }
         }
         
@@ -336,11 +340,6 @@ export const FilterModule = {
                 if (iconContainer) {
                     iconContainer.style.cssText = 'background-color: #EFECF3 !important; width: 24px; height: 24px; border-radius: 50% !important; display: inline-block !important; vertical-align: middle !important;';
                 }
-                
-                // Add additional styling for desktop alignment
-                if (window.innerWidth >= 1024) {
-                    btn.style.marginLeft = '-10px';
-                }
             }
             // For 'Escénicas' button, replace its icon with theater.svg
             else if (btn.dataset.disciplineFilter && btn.dataset.disciplineFilter.toLowerCase() === 'escenicas') {
@@ -360,11 +359,6 @@ export const FilterModule = {
                 todosButton.classList.add('active-filter');
                 todosButton.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; margin: 4px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;';
                 
-                // Add additional styling for desktop alignment
-                if (window.innerWidth >= 1024) {
-                    todosButton.style.marginLeft = '-10px';
-                }
-                
                 const iconContainer = todosButton.querySelector('.icon-container');
                 if (iconContainer) {
                     iconContainer.style.cssText = 'background-color: #EFECF3 !important; width: 24px; height: 24px; border-radius: 50% !important; display: inline-block !important; vertical-align: middle !important;';
@@ -373,14 +367,14 @@ export const FilterModule = {
                 todosButton.dataset.active = 'true';
             }
         } else {
-            // Highlight the active discipline button
+            // Revert the active button style changes for other buttons
             const activeButton = document.querySelector(`[data-discipline-filter="${this.activeFilters.discipline}"]`);
             if (activeButton) {
                 activeButton.classList.add('active-filter');
                 
                 // Style the active button based on type
                 if (this.activeFilters.discipline === 'Otras') {
-                    activeButton.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; border-color: #E5E7EB !important; margin: 4px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;';
+                    activeButton.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; margin: 4px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;';
                     activeButton.classList.remove('bg-pink-500', 'bg-F15BB5');
                     const iconContainer = activeButton.querySelector('.icon-container');
                     if (iconContainer) {
@@ -412,7 +406,6 @@ export const FilterModule = {
                     padding: 8px !important;
                     margin-bottom: 8px !important;
                     display: flex !important;
-                    flex-wrap: nowrap !important;
                 }
                 
                 /* Hide scrollbar */
@@ -425,18 +418,19 @@ export const FilterModule = {
                     opacity: 1 !important;
                     filter: none !important;
                     margin: 4px !important;
-                    flex: 0 0 auto !important;
                 }
                 
                 .filter-container:has(.filter-btn[data-active="true"]) .filter-btn:not([data-active="true"]) {
                     opacity: 1 !important;
                 }
                 
-                /* Desktop alignment with overflow protection */
+                /* Desktop alignment with overflow protection and wrapping */
                 @media (min-width: 1024px) {
                     .filter-container {
                         overflow: visible !important;
                         padding-left: 12px !important;
+                        flex-wrap: wrap !important;
+                        margin-left: -10px !important;
                     }
                     
                     .filter-container-wrapper, 
@@ -444,8 +438,8 @@ export const FilterModule = {
                         overflow: visible !important;
                     }
                     
-                    [data-discipline-filter="todos"] {
-                        margin-left: -10px !important;
+                    .filter-btn {
+                        flex: 0 0 auto !important;
                     }
                 }
                 
@@ -453,11 +447,16 @@ export const FilterModule = {
                 @media (max-width: 1023px) {
                     .filter-container {
                         overflow-x: auto !important;
+                        flex-wrap: nowrap !important;
                         scrollbar-width: none !important;
                         -ms-overflow-style: none !important;
                         padding-left: 0 !important;
                         margin-left: -10px !important;
                         width: calc(100% + 20px) !important;
+                    }
+                    
+                    .filter-btn {
+                        flex: 0 0 auto !important;
                     }
                 }
             `;
