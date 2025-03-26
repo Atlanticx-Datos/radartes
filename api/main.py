@@ -1915,12 +1915,30 @@ def mi_espacio():
             disciplines = request.form.getlist('disciplines')
             email = request.form.get('email', '').strip()
             suscripcion = request.form.get('suscripcion')
+            action_type = request.form.get('action_type', 'save_preferences')
             
-            if not disciplines:
+            # Only require disciplines when saving preferences (not for subscription)
+            if not disciplines and action_type == 'save_preferences':
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     return jsonify({"error": "Debes seleccionar al menos una disciplina"}), 400
                 flash("Debes seleccionar al menos una disciplina", "error")
                 return redirect(url_for('mi_espacio'))
+            
+            # For subscription action, ensure we have an email
+            if action_type == 'subscribe' and not email:
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return jsonify({"error": "Debes ingresar un correo electrónico"}), 400
+                flash("Debes ingresar un correo electrónico", "error")
+                return redirect(url_for('mi_espacio'))
+            
+            # If it's only a subscription action, we'll use existing disciplines or an empty list
+            if action_type == 'subscribe' and not disciplines:
+                # Get existing disciplines if available
+                preferences = get_existing_preferences(user_id)
+                existing_disciplines = list(preferences.get('disciplines', set()))
+                
+                # Use existing disciplines or a placeholder if none exist
+                disciplines = existing_disciplines if existing_disciplines else ["newsletter_subscriber"]
             
             save_user_preferences(user_id, disciplines, email, suscripcion)
             
