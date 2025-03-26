@@ -571,7 +571,12 @@ def logout():
     
     # Get the current domain for returnTo URL
     current_domain = get_current_domain()
-    return_to_url = f"https://www.{current_domain}/"
+    
+    # Check if the domain already has www prefix to avoid www.www.domain
+    if current_domain.startswith('www.'):
+        return_to_url = f"https://{current_domain}/"
+    else:
+        return_to_url = f"https://www.{current_domain}/"
     
     if current_domain == "localhost:5001":
         return_to_url = "http://localhost:5001/"
