@@ -124,6 +124,18 @@
                                     </label>
                                 </div>
                                 {% endfor %}
+                                
+                                <!-- "Ninguna" option at the end -->
+                                <div class="flex items-center">
+                                    <input class="discipline-checkbox" 
+                                           type="checkbox" 
+                                           name="disciplines" 
+                                           value="ninguna" 
+                                           id="ninguna">
+                                    <label class="discipline-label" for="ninguna">
+                                        ninguna
+                                    </label>
+                                </div>
                             </div>
                             
                             <div>
@@ -559,6 +571,34 @@
         // Form submission handling with AJAX
         const preferencesForm = document.getElementById('preferences-form');
         if (preferencesForm) {
+            // Handle "Ninguna" checkbox - when selected, uncheck all other disciplines
+            const ningunaCheckbox = document.getElementById('ninguna');
+            const disciplineCheckboxes = document.querySelectorAll('input[name="disciplines"]');
+            
+            if (ningunaCheckbox) {
+                ningunaCheckbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        // Uncheck all other disciplines
+                        disciplineCheckboxes.forEach(checkbox => {
+                            if (checkbox.id !== 'ninguna') {
+                                checkbox.checked = false;
+                            }
+                        });
+                    }
+                });
+                
+                // When any other discipline is checked, uncheck "Ninguna"
+                disciplineCheckboxes.forEach(checkbox => {
+                    if (checkbox.id !== 'ninguna') {
+                        checkbox.addEventListener('change', function() {
+                            if (this.checked && ningunaCheckbox.checked) {
+                                ningunaCheckbox.checked = false;
+                            }
+                        });
+                    }
+                });
+            }
+            
             preferencesForm.addEventListener('submit', function(e) {
                 // Prevent default form submission
                 e.preventDefault();
@@ -567,23 +607,35 @@
                 const submitButton = document.activeElement;
                 const isSubscribeAction = submitButton && submitButton.classList.contains('subscribe-button');
                 
-                // Ensure at least one discipline is selected if disciplines exist AND we're saving preferences
-                // Only validate disciplines if the discipline-button was clicked (not the subscribe button)
+                // Validate based on action type
+                const ningunaIsChecked = document.getElementById('ninguna') && document.getElementById('ninguna').checked;
                 const disciplines = document.querySelectorAll('input[name="disciplines"]');
-                if (!isSubscribeAction && disciplines.length > 0) {
-                    const hasChecked = Array.from(disciplines).some(checkbox => checkbox.checked);
+                
+                // For discipline preference saving (not subscription), require at least one discipline or "Ninguna"
+                if (!isSubscribeAction && disciplines.length > 0 && !ningunaIsChecked) {
+                    const hasChecked = Array.from(disciplines).some(checkbox => checkbox.checked && checkbox.id !== 'ninguna');
                     if (!hasChecked) {
                         if (window.Utils && window.Utils.showAlert) {
-                            window.Utils.showAlert('Por favor, selecciona al menos una disciplina de interés.', 'error');
+                            window.Utils.showAlert('Por favor, selecciona al menos una disciplina de interés o selecciona "Ninguna".', 'error');
                         } else {
-                            alert('Por favor, selecciona al menos una disciplina de interés.');
+                            alert('Por favor, selecciona al menos una disciplina de interés o selecciona "Ninguna".');
                         }
                         return false;
                     }
                 }
                 
-                // Validate email if email field exists
+                // For subscription action, require an email
                 const emailField = document.querySelector('input[name="email"]');
+                if (isSubscribeAction && (!emailField || emailField.value.trim() === '')) {
+                    if (window.Utils && window.Utils.showAlert) {
+                        window.Utils.showAlert('Por favor, ingresa un correo electrónico para suscribirte.', 'error');
+                    } else {
+                        alert('Por favor, ingresa un correo electrónico para suscribirte.');
+                    }
+                    return false;
+                }
+                
+                // Validate email format if provided
                 if (emailField && emailField.value.trim() !== '') {
                     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                     if (!emailPattern.test(emailField.value)) {
@@ -596,7 +648,7 @@
                     }
                 }
                 
-                // Get the submit button to show loading state
+                // Show loading state
                 if (submitButton && (submitButton.classList.contains('subscribe-button') || submitButton.classList.contains('discipline-button'))) {
                     const originalText = submitButton.innerHTML;
                     submitButton.disabled = true;
@@ -626,35 +678,42 @@
                         submitButton.innerHTML = originalText;
                         
                         if (response.ok) {
-                            // Show success message
-                            if (window.Utils && window.Utils.showAlert) {
-                                const successMessage = submitButton.classList.contains('subscribe-button') 
-                                    ? 'Te has suscrito exitosamente al newsletter' 
-                                    : 'Tus preferencias han sido guardadas exitosamente';
-                                window.Utils.showAlert(successMessage, 'success');
-                            } else {
-                                const successMessage = submitButton.classList.contains('subscribe-button') 
-                                    ? 'Te has suscrito exitosamente al newsletter' 
-                                    : 'Tus preferencias han sido guardadas exitosamente';
-                                alert(successMessage);
-                            }
-                            
-                            // If this was a subscribe action, add the green checkmark
-                            if (isSubscribeAction && emailField && emailField.value.trim() !== '') {
-                                // Check if checkmark already exists
-                                let checkmark = emailField.parentNode.querySelector('.absolute');
-                                
-                                // If not, create it
-                                if (!checkmark) {
-                                    checkmark = document.createElement('span');
-                                    checkmark.className = 'absolute top-1/2 -translate-y-1/2';
-                                    checkmark.style.right = 'calc(100% - 62%)';
-                                    checkmark.innerHTML = '<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
-                                    emailField.parentNode.appendChild(checkmark);
+                            return response.json().then(data => {
+                                // Show success message
+                                if (window.Utils && window.Utils.showAlert) {
+                                    const successMessage = submitButton.classList.contains('subscribe-button') 
+                                        ? 'Te has suscrito exitosamente al newsletter' 
+                                        : 'Tus preferencias han sido guardadas exitosamente';
+                                    window.Utils.showAlert(successMessage, 'success');
+                                } else {
+                                    const successMessage = submitButton.classList.contains('subscribe-button') 
+                                        ? 'Te has suscrito exitosamente al newsletter' 
+                                        : 'Tus preferencias han sido guardadas exitosamente';
+                                    alert(successMessage);
                                 }
-                            }
-                            
-                            return response.json();
+                                
+                                // If we have an email in the response, update the field
+                                if (data.email && emailField) {
+                                    emailField.value = data.email;
+                                }
+                                
+                                // If this was a subscribe action, add the green checkmark
+                                if (isSubscribeAction && emailField && emailField.value.trim() !== '') {
+                                    // Check if checkmark already exists
+                                    let checkmark = emailField.parentNode.querySelector('.absolute');
+                                    
+                                    // If not, create it
+                                    if (!checkmark) {
+                                        checkmark = document.createElement('span');
+                                        checkmark.className = 'absolute top-1/2 -translate-y-1/2';
+                                        checkmark.style.right = 'calc(100% - 62%)';
+                                        checkmark.innerHTML = '<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+                                        emailField.parentNode.appendChild(checkmark);
+                                    }
+                                }
+                                
+                                return data;
+                            });
                         } else {
                             throw new Error('Error al guardar preferencias');
                         }

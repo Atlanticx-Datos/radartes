@@ -1917,8 +1917,16 @@ def mi_espacio():
             suscripcion = request.form.get('suscripcion')
             action_type = request.form.get('action_type', 'save_preferences')
             
+            # Get existing preferences to preserve data if needed
+            existing_preferences = get_existing_preferences(user_id)
+            
+            # Handle "Ninguna" option - clear disciplines but preserve email
+            if "ninguna" in disciplines:
+                disciplines = []  # Clear all disciplines
+            
             # Only require disciplines when saving preferences (not for subscription)
-            if not disciplines and action_type == 'save_preferences':
+            # And don't require them if "Ninguna" was selected
+            if not disciplines and action_type == 'save_preferences' and "ninguna" not in request.form.getlist('disciplines'):
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     return jsonify({"error": "Debes seleccionar al menos una disciplina"}), 400
                 flash("Debes seleccionar al menos una disciplina", "error")
@@ -1931,25 +1939,32 @@ def mi_espacio():
                 flash("Debes ingresar un correo electrónico", "error")
                 return redirect(url_for('mi_espacio'))
             
-            # If it's only a subscription action, we'll use existing disciplines or an empty list
+            # If it's a subscription action but no disciplines selected, use existing ones
             if action_type == 'subscribe' and not disciplines:
-                # Get existing disciplines if available
-                preferences = get_existing_preferences(user_id)
-                existing_disciplines = list(preferences.get('disciplines', set()))
-                
-                # Use existing disciplines or a placeholder if none exist
+                # Get existing disciplines if available (don't overwrite with empty)
+                existing_disciplines = list(existing_preferences.get('disciplines', set()))
+                # If the user doesn't have disciplines and this is just a newsletter subscription
+                # use the special newsletter_subscriber value
                 disciplines = existing_disciplines if existing_disciplines else ["newsletter_subscriber"]
             
+            # If no email provided but there is an existing one, preserve it
+            if not email and existing_preferences.get('email'):
+                email = existing_preferences.get('email')
+            
+            # Save the user preferences
             save_user_preferences(user_id, disciplines, email, suscripcion)
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # For AJAX requests, fetch the updated preferences to return accurate data
+                updated_preferences = get_existing_preferences(user_id)
                 return jsonify({
                     "success": True,
+                    "email": updated_preferences.get('email', email),
                     "redirect": url_for('index')
                 })
             
             flash("Preferencias guardadas correctamente", "success")
-            return redirect(url_for('index'))
+            return redirect(url_for('mi_espacio'))  # Redirect back to mi_espacio to see changes
             
         # GET request
         preferences = get_existing_preferences(user_id)
@@ -1957,6 +1972,9 @@ def mi_espacio():
         
         saved_opportunities = get_saved_opportunities(user_id)
         app.logger.debug(f"Retrieved saved opportunities: {saved_opportunities}")
+        
+        # Log the email we're going to display
+        app.logger.debug(f"Displaying email: {preferences.get('email', '')}")
         
         return render_template(
             "mi_espacio.html",
@@ -2040,7 +2058,8 @@ def get_existing_preferences(user_id):
         app.logger.debug(f"Querying preferences for user: {user_id}")
         url = f"https://api.notion.com/v1/databases/{OPORTUNIDADES_ID}/query"
         
-        # Query for user preferences that are not newsletter subscriptions
+        # Query for user preferences, including newsletter subscribers
+        # Remove the filter for "newsletter_subscriber" to retrieve all user records
         query = {
             "filter": {
                 "and": [
@@ -2050,13 +2069,7 @@ def get_existing_preferences(user_id):
                             {"property": "User ID", "title": {"equals": f"auth0|{user_id}"}}
                         ]
                     },
-                    {"property": "Opportunity ID", "rich_text": {"is_empty": True}},
-                    {
-                        "or": [
-                            {"property": "Preferences", "rich_text": {"does_not_equal": "newsletter_subscriber"}},
-                            {"property": "Preferences", "rich_text": {"is_empty": True}}
-                        ]
-                    }
+                    {"property": "Opportunity ID", "rich_text": {"is_empty": True}}
                 ]
             },
             "page_size": 1
@@ -2085,6 +2098,7 @@ def get_existing_preferences(user_id):
             if len(preferences_prop['rich_text']) > 0:
                 raw_disciplines = preferences_prop['rich_text'][0].get('text', {}).get('content', '')
         
+        # Get email - we always return this regardless of discipline preferences
         email_prop = properties.get('Contact Email', {})
         raw_email = email_prop.get('email', '')
         
@@ -2100,6 +2114,7 @@ def get_existing_preferences(user_id):
             raw_suscripcion = 'Quincenal'
         
         normalized_disciplines = set()
+        # Only process disciplines if it's not a newsletter-only subscription
         if raw_disciplines and raw_disciplines != "newsletter_subscriber":
             for d in raw_disciplines.split(','):
                 cleaned = d.strip()
@@ -2109,12 +2124,15 @@ def get_existing_preferences(user_id):
                         normalized_disciplines.add(normalized)
         
         app.logger.debug(f"Normalized preferences: {normalized_disciplines}")
+        app.logger.debug(f"Retrieved email: {raw_email}")
+        app.logger.debug(f"Subscription type: {raw_suscripcion}")
         
         return {
             'disciplines': normalized_disciplines,
             'email': raw_email,
             'suscripcion': raw_suscripcion,
-            'page_id': result[0]['id']
+            'page_id': result[0]['id'],
+            'is_newsletter_only': raw_disciplines == "newsletter_subscriber"
         }
 
     except Exception as e:
