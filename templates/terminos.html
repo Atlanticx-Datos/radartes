@@ -1,0 +1,237 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<!-- Header section with background and breadcrumb -->
+<header class="bg-gray-50 h-[130px] w-full flex items-center">
+    <div class="container mx-auto px-4 mt-4">
+        <nav class="text-sm mb-4">
+            <a href="/" class="text-gray-600 hover:text-gray-900">Home</a>
+            <span class="mx-2 text-gray-400">&rsaquo;</span>
+            <span class="text-[#6232FF]">Términos de uso</span>
+        </nav>
+        <h1 class="text-[28px] text-gray-900 text-center">
+            Términos y Condiciones de Uso
+        </h1>
+    </div>
+</header>
+
+<!-- Main content -->
+<main class="container mx-auto px-4 py-8 bg-gray-50 max-w-[966px] -mt-6">
+    <div class="grid grid-cols-1 gap-8">
+        <!-- Card: Información general -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
+            <div class="flex flex-col md:flex-row h-full">
+                <div class="w-full p-8 overflow-y-auto">
+                    <div class="flex flex-col">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-6 h-6 text-[#6232FF] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <h2 class="newsletter-title">Introducción</h2>
+                        </div>
+                        <p class="newsletter-text mb-4">
+                            Bienvenido a Radartes, una plataforma digital desarrollada por Atlanticx.org. Al acceder y utilizar este sitio web, usted acepta cumplir con los siguientes términos y condiciones de uso. Le recomendamos leer cuidadosamente estos términos antes de utilizar nuestros servicios.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card: Uso del servicio -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
+            <div class="flex flex-col md:flex-row h-full">
+                <div class="w-full p-8 overflow-y-auto">
+                    <div class="flex flex-col">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-6 h-6 text-[#6232FF] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                            </svg>
+                            <h2 class="newsletter-title">Uso del servicio</h2>
+                        </div>
+                        <p class="newsletter-text mb-4">
+                            <strong>1. Propósito y acceso:</strong> Radartes es una plataforma de acceso libre y gratuito que tiene como objetivo difundir información sobre oportunidades artísticas a nivel global. Usted puede acceder a nuestros contenidos sin necesidad de registro, aunque ciertas funcionalidades avanzadas podrían requerir la creación de una cuenta.
+                        </p>
+                        <p class="newsletter-text mb-4">
+                            <strong>2. Exactitud de la información:</strong> Aunque nos esforzamos por mantener la información actualizada y precisa, no podemos garantizar la total exactitud de todos los datos presentados. Le recomendamos verificar siempre la información crucial (fechas límite, requisitos, costos) directamente en las fuentes originales vinculadas desde nuestra plataforma.
+                        </p>
+                        <p class="newsletter-text mb-4">
+                            <strong>3. Propiedad intelectual:</strong> El contenido de Radartes, incluyendo textos, gráficos, logotipos, iconos y software está protegido por derechos de autor y otras leyes de propiedad intelectual. Atlanticx.org y sus colaboradores conservan todos los derechos sobre dicho contenido.
+                        </p>
+                        <p class="newsletter-text mb-4">
+                            <strong>4. Código abierto:</strong> Radartes es un proyecto de código abierto. El código fuente está disponible en GitHub bajo una licencia que permite su uso, modificación y distribución bajo ciertas condiciones. Para más información, consulte nuestra licencia en el repositorio oficial.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card: Cuentas de usuario -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
+            <div class="flex flex-col md:flex-row h-full">
+                <div class="w-full p-8 overflow-y-auto">
+                    <div class="flex flex-col">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-6 h-6 text-[#6232FF] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            <h2 class="newsletter-title">Cuentas de usuario</h2>
+                        </div>
+                        <p class="newsletter-text mb-4">
+                            <strong>1. Registro y seguridad:</strong> Al crear una cuenta en Radartes, usted es responsable de mantener la confidencialidad de su información de acceso y de todas las actividades que ocurran bajo su cuenta.
+                        </p>
+                        <p class="newsletter-text mb-4">
+                            <strong>2. Datos personales:</strong> La información que proporcione durante el registro será tratada de acuerdo con nuestra Política de Privacidad.
+                        </p>
+                        <p class="newsletter-text mb-4">
+                            <strong>3. Conducta del usuario:</strong> Usted acepta no utilizar nuestro servicio para fines ilícitos o prohibidos por estos términos. No debe intentar acceder sin autorización a secciones restringidas del sitio, a otros sistemas o redes conectadas a nuestro servicio.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card: Limitación de responsabilidad -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
+            <div class="flex flex-col md:flex-row h-full">
+                <div class="w-full p-8 overflow-y-auto">
+                    <div class="flex flex-col">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-6 h-6 text-[#6232FF] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                            <h2 class="newsletter-title">Limitación de responsabilidad</h2>
+                        </div>
+                        <p class="newsletter-text mb-4">
+                            <strong>1. Oportunidades listadas:</strong> Radartes funciona como un agregador y difusor de oportunidades creadas por terceros. No somos responsables por el contenido, políticas o prácticas de los sitios externos a los que enlazamos.
+                        </p>
+                        <p class="newsletter-text mb-4">
+                            <strong>2. Disponibilidad del servicio:</strong> Nos esforzamos por mantener la plataforma disponible constantemente, pero no podemos garantizar que el servicio sea ininterrumpido o libre de errores. Nos reservamos el derecho de modificar, suspender o discontinuar el servicio sin previo aviso.
+                        </p>
+                        <p class="newsletter-text mb-4">
+                            <strong>3. Limitación de daños:</strong> En ningún caso Atlanticx.org, sus directores, empleados o colaboradores serán responsables por daños directos, indirectos, incidentales, especiales o consecuentes que resulten del uso o la imposibilidad de uso de nuestros servicios.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card: Modificaciones de los términos -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
+            <div class="flex flex-col md:flex-row h-full">
+                <div class="w-full p-8 overflow-y-auto">
+                    <div class="flex flex-col">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-6 h-6 text-[#6232FF] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                            <h2 class="newsletter-title">Modificaciones de los términos</h2>
+                        </div>
+                        <p class="newsletter-text mb-4">
+                            Nos reservamos el derecho de modificar estos términos en cualquier momento. Las modificaciones entrarán en vigor inmediatamente después de su publicación en el sitio. Su uso continuado de la plataforma después de cualquier cambio constituye su aceptación de los nuevos términos.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card: Contacto -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden" style="box-shadow: 0px 4px 12px 0px #1F1B2D14, 0px 2px 2px -2px #1F1B2D14;">
+            <div class="flex flex-col md:flex-row h-full">
+                <div class="w-full p-8 overflow-y-auto">
+                    <div class="flex flex-col">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-6 h-6 text-[#6232FF] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                            <h2 class="newsletter-title">Contacto</h2>
+                        </div>
+                        <p class="newsletter-text mb-4">
+                            Si tiene alguna pregunta o inquietud sobre estos términos, por favor contáctenos a través de:
+                        </p>
+                        <p class="newsletter-text mb-4">
+                            Email: <a href="mailto:info@atlanticx.org" class="text-[#6232FF] hover:underline">info@atlanticx.org</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Include the footer partial -->
+{% include '_footer.html' %}
+
+<style>
+    /* Override body background color */
+    body {
+        background-color: #F9FAFB !important; /* gray-50 with !important to override any other styles */
+    }
+    
+    /* Override main element background */
+    main.w-full.flex.flex-col.max-sm\:rounded-lg {
+        background-color: #F9FAFB !important;
+    }
+    
+    /* Override flex-1 div background */
+    main.w-full.flex.flex-col.max-sm\:rounded-lg > div.flex-1 {
+        background-color: #F9FAFB !important;
+    }
+    
+    /* Newsletter card typography */
+    .newsletter-title {
+        font-family: Inter, sans-serif;
+        font-weight: 700;
+        font-size: 24px;
+        line-height: 130%;
+        letter-spacing: 0%;
+        vertical-align: middle;
+        color: #111827;
+    }
+    
+    .newsletter-text {
+        font-family: Inter, sans-serif;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 150%;
+        letter-spacing: 0%;
+        color: #4B5563;
+    }
+    
+    /* Mobile responsive styles */
+    @media (max-width: 640px) {
+        /* Reduce margin between header and cards */
+        header.bg-gray-50.h-\[130px\] {
+            height: 150px !important;
+        }
+        
+        /* Adjust main container padding to reduce space after header */
+        main.container.mx-auto.px-4.py-8 {
+            padding-top: 1rem !important;
+        }
+        
+        /* Reduce gap between cards on mobile */
+        main .grid.grid-cols-1.gap-8 {
+            gap: 1.5rem;
+        }
+        
+        /* Increase card padding for mobile */
+        .w-full.p-8 {
+            padding: 28px 16px !important;
+        }
+        
+        /* Add more vertical padding to card containers */
+        .bg-white.rounded-lg.border.border-gray-200.overflow-hidden .flex.flex-col.md\:flex-row {
+            padding-top: 12px;
+            padding-bottom: 12px;
+        }
+        
+        .newsletter-title {
+            font-size: 20px;
+        }
+        
+        .newsletter-text {
+            font-size: 14px;
+        }
+    }
+</style>
+{% endblock %} 

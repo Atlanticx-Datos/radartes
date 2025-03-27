@@ -928,6 +928,9 @@ video {
 .cursor-pointer {
   cursor: pointer;
 }
+.list-disc {
+  list-style-type: disc;
+}
 .grid-cols-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
@@ -1352,6 +1355,9 @@ video {
 }
 .pl-6 {
   padding-left: 1.5rem;
+}
+.pl-8 {
+  padding-left: 2rem;
 }
 .pr-12 {
   padding-right: 3rem;
