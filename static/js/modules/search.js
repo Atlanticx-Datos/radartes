@@ -555,7 +555,7 @@ export const SearchModule = {
     trackSearch(searchTerm) {
         if (typeof gtag === "function") {
             gtag("event", "opportunity_search", {
-                send_to: "G-36M4V4L5RX",
+                send_to: "G-TTXJE3WXKC",
                 search_term: searchTerm,
                 search_type: "opportunity",
             });

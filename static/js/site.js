@@ -14,6 +14,8 @@ import { TopModule } from './modules/top.js';
 import { SubscribeModule } from './modules/subscribe.js';
 import { SharingModule } from './modules/sharing.js';
 import { SharingTestModule } from './modules/sharing-test.js';
+import { AnalyticsModule } from './modules/analytics.js';
+import { AnalyticsDebugModule } from './modules/analytics-debug.js';
 import { processDestacarData } from './modules/data-processor.js';
 import { CONSTANTS } from './constants.js';
 
@@ -38,6 +40,7 @@ function exposeModules() {
     window.DestacarModule = DestacarModule;
     window.TopModule = TopModule;
     window.SharingModule = SharingModule;
+    window.AnalyticsModule = AnalyticsModule;
     
     // Add a debug function to help troubleshoot sharing issues
     window.debugSharing = function() {
@@ -92,14 +95,15 @@ function exposeModules() {
     // Initialize modules
     SearchModule.init();
     FilterModule.init();
+    AnalyticsModule.init();
     
     // Initialize sharing module
     SharingModule.init({
         brandInfo: {
             name: document.querySelector('meta[name="app-name"]')?.content || "Radartes",
             tagline: document.querySelector('meta[name="description"]')?.content || "Convocatorias, Becas y Recursos Globales para Artistas",
-            url: window.location.origin,
-            imageUrl: `${window.location.origin}/static/public/Logo_100_mediano.png`
+            url: document.querySelector('meta[name="app-url"]')?.content || "https://radartes.org",
+            imageUrl: document.querySelector('meta[name="app-image"]')?.content || "https://radartes.org/static/public/nuevoLogo.png"
         }
     });
     
@@ -140,6 +144,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize core modules
     FilterModule.init();
     SearchModule.init();
+    AnalyticsModule.init();
+    
+    // Initialize analytics debug in development environments
+    if (window.location.hostname === 'localhost' || 
+        window.location.hostname === '127.0.0.1' || 
+        window.location.search.includes('debug=true')) {
+        AnalyticsDebugModule.init();
+    }
     
     // Get prefiltered data for module initialization
     const preFilteredData = document.getElementById('prefiltered-data');

@@ -276,10 +276,10 @@ else:
     BASE_URL = f"https://{current_domain}"
     
     # Set the cookie domain based on the current domain
-    if 'radartes.org' in current_domain:
-        SESSION_COOKIE_DOMAIN = ".radartes.org"  # Allow radartes.org subdomains
-    else:
+    if 'oportunidades.lat' in current_domain:
         SESSION_COOKIE_DOMAIN = ".oportunidades.lat"  # Allow oportunidades.lat subdomains
+    else:
+        SESSION_COOKIE_DOMAIN = ".radartes.org"  # Allow radartes.org subdomains
     
     app.logger.info(f"Using production URLs with domain: {current_domain}")
     app.logger.info(f"Using session cookie domain: {SESSION_COOKIE_DOMAIN}")
@@ -306,10 +306,10 @@ def before_request():
         current_domain = get_current_domain()
         
         # Set cookie domain based on the current request
-        if 'radartes.org' in current_domain:
-            session.cookie_domain = ".radartes.org"
-        else:
+        if 'oportunidades.lat' in current_domain:
             session.cookie_domain = ".oportunidades.lat"
+        else:
+            session.cookie_domain = ".radartes.org"
             
         app.logger.info(f"Setting cookie domain to: {session.cookie_domain}")
 
@@ -694,8 +694,8 @@ def get_default_og_data():
     return {
         "title": "Radartes",
         "description": "Convocatorias, Becas y Recursos Globales para Artistas.",
-        "url": request.url,
-        "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
+        "url": "https://radartes.org",
+        "image": "https://radartes.org/static/public/nuevoLogo.png"
     }
 
 def is_opportunity_already_saved(user_id, page_id):
@@ -935,14 +935,14 @@ def find_similar_opportunities():
 
 @app.context_processor
 def inject_og_data():
-    def get_og_data(title="Radartes", description="Convocatorias, Becas y Recursos Globales para Artistas.", url="http://oportunidades-vercel.vercel.app", image="http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"):
+    def get_og_data(title="Radartes", description="Convocatorias, Becas y Recursos Globales para Artistas.", url="https://radartes.org", image="https://radartes.org/static/public/nuevoLogo.png"):
         return {
             "title": title,
             "description": description,
             "url": url,
             "image": image
         }
-    return dict(get_og_data=get_og_data)
+    return {"og_data": get_og_data}
 
 @app.context_processor
 def inject_total_nuevas():
@@ -1668,7 +1668,7 @@ def filter_by_discipline(discipline):
             "title": f"Oportunidades en {original_discipline.capitalize()}",
             "description": f"Convocatorias y becas relacionadas con {original_discipline}",
             "url": request.url,
-            "image": "http://oportunidades-vercel.vercel.app/static/public/Logo_100_mediano.png"
+            "image": "https://radartes.org/static/public/nuevoLogo.png"
         }
 
         if is_htmx:

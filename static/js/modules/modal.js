@@ -233,7 +233,17 @@ export const ModalModule = {
 
             // Add base_url to modalContent dataset for sharing functionality
             modalContent.dataset.baseUrl = base_url || '';
+            
+            // Add analytics data attributes to modal content
+            modalContent.dataset.id = id || '';
+            modalContent.dataset.pais = pais || '';
+            modalContent.dataset.disciplina = disciplina_param || '';
+            modalContent.className = 'opportunity-modal-content';
 
+            // Extract title for analytics
+            const title = this.extractTitle(nombre);
+            modalContent.dataset.title = title;
+            
             // Get CSRF token safely
             const csrfInput = document.querySelector('input[name="csrf_token"]');
             const csrfToken = csrfInput ? Utils.escapeHTML(csrfInput.value) : '';
@@ -699,12 +709,12 @@ export const ModalModule = {
                     <!-- CTA Section - increased spacing from resumen section -->
                     <div class="px-6 pt-3 pb-5" style="min-height: 100px;">
                         <div class="border-t" style="border-color: #D5D2DC; padding-top: 20px; margin-top: 0; display: flex; justify-content: flex-start; align-items: center;">
-                            <a href="${Utils.escapeHTML(base_url || url)}" 
-                               target="_blank" 
-                               class="text-center flex items-center justify-center"
-                               style="height: 37px; width: 152px; background-color: white; color: black; border: 1px solid black; border-radius: 40px; transition: all 0.25s ease-in-out; font-size: 14px; padding: 0 4px;"
-                               onmouseover="this.style.borderColor='#6232FF'; this.style.borderWidth='2px';"
-                               onmouseout="this.style.borderColor='black'; this.style.borderWidth='1px';">
+                            <a href="${Utils.escapeHTML(url)}" target="_blank" rel="noopener noreferrer"
+                               class="ver-oportunidad-btn block w-full text-center py-3 px-4 bg-[#6232FF] hover:bg-[#5628E0] text-white font-medium rounded-lg transition-colors"
+                               data-id="${Utils.escapeHTML(id)}"
+                               data-nombre="${Utils.escapeHTML(nombre)}"
+                               data-pais="${Utils.escapeHTML(pais)}"
+                               data-disciplina="${Utils.escapeHTML(disciplina_param)}">
                                 Ver oportunidad
                             </a>
                         </div>

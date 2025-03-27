@@ -17,8 +17,8 @@
     <!-- App Metadata for Sharing Module -->
     <meta name="app-name" content="{{ og_data.title if og_data else 'Radartes' }}">
     <meta name="description" content="{{ og_data.description if og_data else 'Convocatorias, Becas y Recursos Globales para Artistas.' }}">
-    <meta name="app-url" content="{{ og_data.url if og_data else 'http://oportunidades.lat' }}">
-    <meta name="app-image" content="{{ og_data.image if og_data else 'http://oportunidades.lat/static/public/LogoCienOpps.png' }}">
+    <meta name="app-url" content="{{ og_data.url if og_data else 'https://radartes.org' }}">
+    <meta name="app-image" content="{{ og_data.image if og_data else 'https://radartes.org/static/public/nuevoLogo.png' }}">
     
     <!-- Open Graph Tags -->
     <meta property="og:title" content="
@@ -31,28 +31,28 @@
         {% endif %}">
     <meta property="og:description"
         content="{{ og_data.description if og_data else 'Convocatorias, Becas y Recursos Globales para Artistas.' }}">
-    <meta property="og:url" content="{{ og_data.url if og_data else 'http://oportunidades.lat' }}">
+    <meta property="og:url" content="{{ og_data.url if og_data else 'https://radartes.org' }}">
     <meta property="og:image"
-        content="{{ og_data.image if og_data else 'http://oportunidades.lat/static/public/LogoCienOpps.png' }}">
+        content="{{ og_data.image if og_data else 'https://radartes.org/static/public/nuevoLogo.png' }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
     <!-- Twitter Card Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@your_twitter_username">
+    <meta name="twitter:site" content="@radartes_org">
     <meta name="twitter:title" content="{{ og_data.title if og_data else 'Radartes' }}">
     <meta name="twitter:description"
         content="{{ og_data.description if og_data else 'Convocatorias, Becas y Recursos Globales para Artistas.' }}">
     <meta name="twitter:image"
-        content="{{ og_data.image if og_data else 'http://oportunidades.lat/static/public/LogoCienOpps.png' }}">
+        content="{{ og_data.image if og_data else 'https://radartes.org/static/public/nuevoLogo.png' }}">
 
     <!-- Open Graph Tags for Facebook -->
     <meta property="og:title" content="{{ og_data.title if og_data else 'Radartes' }}">
     <meta property="og:description"
         content="{{ og_data.description if og_data else 'Convocatorias, Becas y Recursos Globales para Artistas.' }}">
-    <meta property="og:url" content="{{ og_data.url if og_data else 'http://oportunidades.lat' }}">
+    <meta property="og:url" content="{{ og_data.url if og_data else 'https://radartes.org' }}">
     <meta property="og:image"
-        content="{{ og_data.image if og_data else 'http://oportunidades.lat/static/public/LogoCienOpps.png' }}">
+        content="{{ og_data.image if og_data else 'https://radartes.org/static/public/nuevoLogo.png' }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:type" content="website">
@@ -60,15 +60,30 @@
     <meta property="og:locale" content="en_US">
 
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-36M4V4L5RX"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TTXJE3WXKC"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-        gtag('config', 'G-36M4V4L5RX', {
+        gtag('config', 'G-TTXJE3WXKC', {
             'anonymize_ip': true,
             'cookie_flags': 'SameSite=None;Secure'
         });
+        
+        // Define analytics tracking helper function
+        window.trackOpportunityEvent = function(eventName, opportunityData) {
+            if (typeof gtag === 'function') {
+                gtag('event', eventName, {
+                    'event_category': 'Opportunity',
+                    'event_label': opportunityData.name || 'Unknown',
+                    'opportunity_name': opportunityData.name || 'Unknown',
+                    'opportunity_country': opportunityData.country || 'Unknown',
+                    'opportunity_discipline': opportunityData.discipline || 'Unknown',
+                    'opportunity_id': opportunityData.id || ''
+                });
+                console.log(`Analytics: Tracked ${eventName} for "${opportunityData.name}"`);
+            }
+        };
     </script>
 
     <link href="{{ url_for('static', filename='css/tailwind-built.css') }}" rel="stylesheet">
