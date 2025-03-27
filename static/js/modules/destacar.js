@@ -470,7 +470,7 @@ export const DestacarModule = {
         // On mobile, LIMIT the number of pages shown instead of showing all
         // This prevents excessive image requests
         const pagesToShow = this.isMobile 
-            ? this.pages.slice(0, Math.min(3, this.pages.length)) 
+            ? this.pages.slice(0, this.pages.length) 
             : this.pages.slice(this.currentIndex, this.currentIndex + this.cardsPerPage);
 
         // Function to format date
