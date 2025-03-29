@@ -913,28 +913,28 @@ export const SearchModule = {
                 <table class="results-table min-w-full" style="border-collapse: collapse !important;">
                     <thead style="background-color: #6232FF !important; color: white !important; border-bottom: 1px solid #6232FF !important;">
                         <tr>
-                            <th scope="col" class="oportunidad-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('nombre')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
+                            <th scope="col" class="oportunidad-col px-4 py-3 text-left text-xs font-medium tracking-wider cursor-pointer" onclick="SearchModule.handleSort('nombre')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important; text-transform: none;">
                                 <div class="flex items-center">
                                     Oportunidad
                                     ${this.getSortIcon('nombre')}
                                 </div>
                             </th>
-                            <th scope="col" class="disciplina-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('disciplina')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
+                            <th scope="col" class="disciplina-col px-4 py-3 text-left text-xs font-medium tracking-wider cursor-pointer" onclick="SearchModule.handleSort('disciplina')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important; text-transform: none;">
                                 <div class="flex items-center">
                                     Disciplina
                                     ${this.getSortIcon('disciplina')}
                                 </div>
                             </th>
-                            <th scope="col" class="pais-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('pais')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
+                            <th scope="col" class="pais-col px-4 py-3 text-left text-xs font-medium tracking-wider cursor-pointer" onclick="SearchModule.handleSort('pais')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important; text-transform: none;">
                                 <div class="flex items-center">
                                     País
                                     ${this.getSortIcon('pais')}
                                 </div>
                             </th>
-                            <th scope="col" class="cierre-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
+                            <th scope="col" class="cierre-col px-4 py-3 text-left text-xs font-medium tracking-wider" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important; text-transform: none;">
                                 Cierre
                             </th>
-                            <th scope="col" class="pago-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
+                            <th scope="col" class="pago-col px-4 py-3 text-left text-xs font-medium tracking-wider" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important; text-transform: none;">
                                 Pago
                             </th>
                             <th scope="col" class="accion-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
@@ -1091,7 +1091,7 @@ export const SearchModule = {
             console.log('Applying direct styles to search results table');
             
             // First, remove problematic classes from header cells
-            const headerCells = document.querySelectorAll('.results-table th, table[id*="results"] th');
+            const headerCells = document.querySelectorAll('.results-table th:not(.accion-col), table[id*="results"] th:not(.accion-col)');
             headerCells.forEach(cell => {
                 // Remove Tailwind background classes that might be interfering
                 cell.classList.remove('bg-gray-50', 'hover:bg-gray-100');
@@ -1282,6 +1282,20 @@ export const SearchModule = {
         
         // Update the display with sorted or original results
         this.updateResults(resultsToDisplay, true);
+        
+        // Immediately apply text case styling to prevent uppercase flash
+        setTimeout(() => {
+            const headerCells = document.querySelectorAll('.results-table th:not(.accion-col), table[id*="results"] th:not(.accion-col)');
+            headerCells.forEach(cell => {
+                cell.style.textTransform = 'none';
+            });
+            
+            // Ensure "ACCIÓN" remains uppercase
+            const accionHeader = document.querySelector('.results-table th.accion-col, table[id*="results"] th.accion-col');
+            if (accionHeader) {
+                accionHeader.style.textTransform = 'uppercase';
+            }
+        }, 0);
     },
 
     // Function to get sort icon
