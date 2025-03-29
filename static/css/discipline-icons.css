@@ -6,8 +6,14 @@
     overflow: visible;
     background-color: white !important;
     border: 1px solid #E5E7EB;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease, width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Use a more natural spring effect */
     margin: 2px;  /* Add margin to prevent outline from being cut off */
+    width: auto !important; /* Allow buttons to size based on content */
+    min-width: min-content !important; /* Ensure buttons don't get too small */
+    display: flex !important; /* Use flexbox for inner content */
+    align-items: center !important; /* Center items vertically */
+    will-change: width, transform; /* Optimize animation performance */
+    transform-origin: left center; /* Set transform origin to the left side */
 }
 
 /* Add padding to the filter container to ensure outlines are visible */
@@ -16,6 +22,8 @@
     display: flex;
     flex-wrap: wrap;
     gap: 6px;  /* Reduce gap since we added margin to buttons */
+    align-items: flex-start; /* Ensure buttons align properly */
+    justify-content: flex-start; /* Start alignment for natural flow */
 }
 
 /* General text styling for filter buttons - make selector more specific */
@@ -23,19 +31,15 @@ body .filter-btn span {
     font-size: 14px;
     font-weight: 700 !important; /* Regular weight per Figma design with !important */
     color: #1F1B2D;
+    white-space: nowrap; /* Prevent text from wrapping */
+    padding-right: 10px; /* Add some padding after text */
+    transition: transform 0.3s ease; /* Add transition for text */
 }
 
-/* Hover state - outline instead of background */
+/* Hover state */
 .filter-btn:hover {
-    border-color: #1FC9D0;
-    box-shadow: 0 0 0 1px rgba(31, 201, 208, 0.5);
-}
-
-/* Active state - stronger outline instead of background */
-.filter-btn[data-active="true"] {
-    border-color: #1FC9D0;
-    box-shadow: 0 0 0 2px rgba(31, 201, 208, 0.5);
-    z-index: 2;
+    border-color: #E5E7EB;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 /* Remove the background element since we're using border instead */
@@ -53,14 +57,16 @@ body .filter-btn span {
     height: 28px;
     margin-right: 10px;
     border-radius: 50%;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Match springy transition */
     z-index: 1;
     box-sizing: border-box;
+    flex-shrink: 0; /* Prevent icon from shrinking */
+    overflow: visible !important; /* Ensure circle isn't cut off */
 }
 
 /* Define discipline-specific background colors for the icon containers */
 .filter-btn[data-discipline-filter="todos"] .icon-container {
-    background-color: rgba(31, 201, 208, 0.2);
+    background-color: #EFECF3;
 }
 
 .filter-btn[data-discipline-filter="Visuales"] .icon-container {
@@ -91,16 +97,11 @@ body .filter-btn span {
     background-color: #F15BB533;
 }
 
-/* Hide the default SVG icons */
-.filter-btn .icon-container svg {
-    display: none;
-}
-
 /* Define the discipline icons as background images */
 .filter-btn[data-discipline-filter="todos"] .icon-container {
     background-image: url('/static/public/discipline-icons/todas-icon.svg');
     background-position: center;
-    background-size: 60%;
+    background-size: 45%;
     background-repeat: no-repeat;
 }
 
@@ -153,16 +154,134 @@ body .filter-btn span {
     background-repeat: no-repeat;
 }
 
-/* Adjust text color for active state - make selector more specific */
-body .filter-btn[data-active="true"] span {
-    font-weight: 600 !important; /* Semi-bold for active state with !important */
-    color: #1F1B2D;
+/* Active state styling for discipline buttons */
+.filter-btn[data-active="true"] {
+    border-color: #D1D5DB;
+    border-width: 1px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: auto !important; /* Keep width automatic */
+    min-width: fit-content !important; /* Use fit-content instead of percentage */
+    padding-right: 24px !important; /* Add 8 more pixels to the right padding (original is 16px) */
+    padding-left: 16px !important; /* Add 8 more pixels to the left padding (original is 8px) */
+    background-color: #F9FAFB !important; /* Slightly lighter background */
+    transform: none !important; /* Remove scale effect that causes blur */
+    z-index: 2 !important; /* Keep active buttons above others but not too high */
+    justify-content: flex-start; /* Ensure content stays left-aligned */
 }
 
-/* Mobile responsive adjustments */
+/* Active state: todos/Todas button */
+.filter-btn[data-active="true"][data-discipline-filter="todos"] .icon-container {
+    background-color: #454056;
+    background-image: url('/static/public/discipline-icons/todas-icon-white.svg');
+    background-size: 45%;
+}
+
+/* Active state: Visuales button */
+.filter-btn[data-active="true"][data-discipline-filter="Visuales"] .icon-container {
+    background-color: #E92E4A;
+    background-image: url('/static/public/discipline-icons/visuales-icon-white.svg');
+}
+
+/* Active state: Música button */
+.filter-btn[data-active="true"][data-discipline-filter="Música"] .icon-container {
+    background-color: #FF7022;
+    background-image: url('/static/public/discipline-icons/musica-icon-white.svg');
+    background-position: center;
+    background-size: 50%;
+}
+
+/* Active state: Escénicas button */
+.filter-btn[data-active="true"][data-discipline-filter="Escénicas"] .icon-container {
+    background-color: #F59E0B;
+    background-image: url('/static/public/icons/theater-white.svg');
+}
+
+/* Active state: Literatura button */
+.filter-btn[data-active="true"][data-discipline-filter="Literatura"] .icon-container {
+    background-color: #2ED0FF;
+    background-image: url('/static/public/discipline-icons/literatura-icon-white.svg');
+}
+
+/* Active state: Diseño button */
+.filter-btn[data-active="true"][data-discipline-filter="Diseño"] .icon-container {
+    background-color: #17A398;
+    background-image: url('/static/public/discipline-icons/diseno-icon-white.svg');
+}
+
+/* Active state: Cine button */
+.filter-btn[data-active="true"][data-discipline-filter="Cine"] .icon-container {
+    background-color: #64113F;
+    background-image: url('/static/public/discipline-icons/cine-icon-white.svg');
+}
+
+/* Active state: Otras button */
+.filter-btn[data-active="true"][data-discipline-filter="Otras"] .icon-container {
+    background-color: #F15BB5;
+    background-image: url('/static/public/discipline-icons/otras-icon-white.svg');
+}
+
+/* Active state text styling - make it slightly bolder and add subtle transform */
+body .filter-btn[data-active="true"] span {
+    font-weight: 700 !important; /* Bolder for active state with !important */
+    color: #1F1B2D;
+    transform: translateX(2px); /* Slight shift for visual interest */
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), font-weight 0.2s ease; /* Match springy transition */
+}
+
+/* Add animation for the icon container in active state */
+.filter-btn[data-active="true"] .icon-container {
+    transform: scale(1.12); /* Slightly larger icon when active, but not too much */
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease; /* Match springy transition */
+    overflow: visible !important; /* Ensure circle isn't cut off when scaled */
+}
+
+/* Mobile styles */
 @media (max-width: 640px) {
-    .filter-btn .icon-container {
-        width: 24px;
-        height: 24px;
+    /* Mobile adjustments for filter buttons */
+    .filter-btn {
+        padding: 4px 12px 4px 4px !important;
+        min-width: 100px !important;
+        height: 40px !important;
+        overflow: visible !important; /* Ensure content isn't cut off */
     }
+    
+    /* Active state for mobile */
+    .filter-btn[data-active="true"] {
+        min-width: fit-content !important; /* Use fit-content on mobile too */
+        padding-right: 20px !important; /* Add 8 more pixels to the right (original is 12px) */
+        padding-left: 12px !important; /* Add 8 more pixels to the left (original is 4px) */
+        transform: none !important; /* Remove scale effect that causes blur */
+        background-color: #F9FAFB !important; /* Slightly lighter background */
+        max-width: none !important; /* Remove max-width limitation */
+    }
+    
+    /* Adjust icon container for mobile */
+    .filter-btn .icon-container {
+        width: 24px !important;
+        height: 24px !important;
+        margin-right: 8px !important;
+        overflow: visible !important; /* Ensure circle isn't cut off */
+    }
+    
+    /* Text styles */
+    .filter-btn span {
+        font-size: 12px !important;
+    }
+}
+
+/* Animation effects */
+.filter-btn.animating {
+    transform: translateY(-2px) scale(1.02); /* Slightly scale up for a more dynamic effect */
+    box-shadow: 0px 6px 16px 0px rgba(31, 27, 45, 0.12), 0px 2px 4px -2px rgba(31, 27, 45, 0.12);
+}
+
+/* Icon animation effect */
+.filter-btn.animating .icon-container {
+    transform: scale(1.15) rotate(5deg); /* Add slight rotation for more playful effect */
+}
+
+/* Text animation effect */
+.filter-btn.animating span {
+    font-weight: 700;
+    letter-spacing: 0.01em; /* Slightly adjust letter spacing for animation */
 } 

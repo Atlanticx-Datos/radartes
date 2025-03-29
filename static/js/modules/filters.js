@@ -218,10 +218,12 @@ export const FilterModule = {
         console.log('Current discipline:', this.activeFilters.discipline);
         console.log('Clicked discipline:', discipline);
         
-        // First ensure button styling is updated properly
+        // Set the discipline filter
+        this.activeFilters.discipline = discipline;
+        
+        // First ensure button styling is updated properly - will set data-active
         this.updateDisciplineButtons();
         
-        // Don't change the discipline here - it should already be set by toggleDisciplineFilter
         console.log('Using discipline:', this.activeFilters.discipline);
         
         // Update SearchModule's isFiltered flag
@@ -319,81 +321,27 @@ export const FilterModule = {
         
         // Reset all buttons to default state
         document.querySelectorAll('[data-discipline-filter]').forEach(btn => {
+            // Remove active classes
             btn.classList.remove('active-filter', 'bg-blue-600', 'text-white');
-            // Remove inline styles
+            // Set data-active attribute to false
+            btn.dataset.active = 'false';
+            // Remove inline styles that might interfere with our CSS
             btn.removeAttribute('style');
-            // Set uniform background for all buttons
+            // Apply uniform style for all buttons
             btn.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; border-color: #E5E7EB !important; margin: 4px !important; box-shadow: 0 2px 4px rgba(0,0,0,0.08) !important;';
             
-            // For 'Otras' button, only style the icon container with pink
-            if (btn.dataset.disciplineFilter === 'Otras') {
-                // Remove any classes that might be applying a pink background
-                btn.classList.remove('bg-pink-500', 'bg-F15BB5');
-                const iconContainer = btn.querySelector('.icon-container');
-                if (iconContainer) {
-                    iconContainer.style.cssText = 'background-color: #F15BB5 !important; width: 24px; height: 24px; border-radius: 50% !important; display: inline-block !important; vertical-align: middle !important;';
-                }
+            // Remove any styles on the icon container that might override our CSS
+            const iconContainer = btn.querySelector('.icon-container');
+            if (iconContainer) {
+                iconContainer.removeAttribute('style');
             }
-            // For 'todos' ("Todas") button, style its icon container with #EFECF3
-            else if (btn.dataset.disciplineFilter === 'todos') {
-                const iconContainer = btn.querySelector('.icon-container');
-                if (iconContainer) {
-                    iconContainer.style.cssText = 'background-color: #EFECF3 !important; width: 24px; height: 24px; border-radius: 50% !important; display: inline-block !important; vertical-align: middle !important;';
-                }
-            }
-            // For 'Escénicas' button, replace its icon with theater.svg
-            else if (btn.dataset.disciplineFilter && btn.dataset.disciplineFilter.toLowerCase() === 'escenicas') {
-                const iconContainer = btn.querySelector('.icon-container');
-                if (iconContainer) {
-                    iconContainer.style.cssText = 'background-image: url(/static/public/icons/theater.svg) !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; width: 24px; height: 24px; border-radius: 50% !important; display: inline-block !important; vertical-align: middle !important;';
-                }
-            }
-            
-            btn.dataset.active = 'false';
         });
 
-        // If we're in 'todos' state, highlight the todos button
-        if (this.activeFilters.discipline === 'todos') {
-            const todosButton = document.querySelector('[data-discipline-filter="todos"]');
-            if (todosButton) {
-                todosButton.classList.add('active-filter');
-                todosButton.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; margin: 4px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;';
-                
-                const iconContainer = todosButton.querySelector('.icon-container');
-                if (iconContainer) {
-                    iconContainer.style.cssText = 'background-color: #EFECF3 !important; width: 24px; height: 24px; border-radius: 50% !important; display: inline-block !important; vertical-align: middle !important;';
-                }
-                
-                todosButton.dataset.active = 'true';
-            }
-        } else {
-            // Revert the active button style changes for other buttons
-            const activeButton = document.querySelector(`[data-discipline-filter="${this.activeFilters.discipline}"]`);
-            if (activeButton) {
-                activeButton.classList.add('active-filter');
-                
-                // Style the active button based on type
-                if (this.activeFilters.discipline === 'Otras') {
-                    activeButton.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; margin: 4px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;';
-                    activeButton.classList.remove('bg-pink-500', 'bg-F15BB5');
-                    const iconContainer = activeButton.querySelector('.icon-container');
-                    if (iconContainer) {
-                        iconContainer.style.cssText = 'background-color: #F15BB5 !important; width: 24px; height: 24px; border-radius: 50% !important; display: inline-block !important; vertical-align: middle !important;';
-                    }
-                } 
-                else if (this.activeFilters.discipline && this.activeFilters.discipline.toLowerCase() === 'escenicas') {
-                    activeButton.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; margin: 4px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;';
-                    const iconContainer = activeButton.querySelector('.icon-container');
-                    if (iconContainer) {
-                        iconContainer.style.cssText = 'background-image: url(/static/public/icons/theater.svg) !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; width: 24px; height: 24px; border-radius: 50% !important; display: inline-block !important; vertical-align: middle !important;';
-                    }
-                }
-                else {
-                    activeButton.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; margin: 4px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;';
-                }
-                
-                activeButton.dataset.active = 'true';
-            }
+        // Set active button
+        const activeButton = document.querySelector(`[data-discipline-filter="${this.activeFilters.discipline}"]`);
+        if (activeButton) {
+            activeButton.dataset.active = 'true';
+            activeButton.style.cssText = 'background-color: #fdfeff !important; color: #1F1B2D !important; opacity: 1 !important; filter: none !important; margin: 4px !important; box-shadow: 0 2px 4px rgba(0,0,0,0.12) !important;';
         }
         
         // Add a style tag to the document to override global CSS styling
@@ -420,8 +368,27 @@ export const FilterModule = {
                     margin: 4px !important;
                 }
                 
-                .filter-container:has(.filter-btn[data-active="true"]) .filter-btn:not([data-active="true"]) {
-                    opacity: 1 !important;
+                /* Active button styling */
+                .filter-btn[data-active="true"] {
+                    width: auto !important;
+                    min-width: fit-content !important;
+                    padding-right: 24px !important;
+                    padding-left: 16px !important;
+                    background-color: #F9FAFB !important;
+                    border-color: #D1D5DB !important;
+                    border-width: 1px !important;
+                    transform: none !important;
+                    z-index: 2 !important;
+                }
+                
+                /* Fix icon container overflow */
+                .filter-btn .icon-container {
+                    overflow: visible !important;
+                }
+                
+                .filter-btn[data-active="true"] .icon-container {
+                    transform: scale(1.12) !important;
+                    overflow: visible !important;
                 }
                 
                 /* Desktop alignment with overflow protection and wrapping */
@@ -457,6 +424,15 @@ export const FilterModule = {
                     
                     .filter-btn {
                         flex: 0 0 auto !important;
+                        overflow: visible !important;
+                    }
+                    
+                    .filter-btn[data-active="true"] {
+                        min-width: fit-content !important;
+                        padding-right: 20px !important;
+                        padding-left: 12px !important;
+                        transform: none !important;
+                        background-color: #F9FAFB !important;
                     }
                 }
             `;

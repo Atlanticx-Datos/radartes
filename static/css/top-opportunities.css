@@ -323,11 +323,11 @@
     border: none;
     cursor: pointer;
     align-self: flex-start;
-    margin-top: 16px; /* Base margin-top */
+    margin-top: 24px; /* Increased from 16px to 24px for desktop */
     margin-bottom: 0;
     height: 36px;
     position: relative; /* Enable positioning */
-    bottom: 12px; /* Add some bottom positioning for desktop view */
+    bottom: 6px; /* Add some bottom positioning for desktop view */
 }
 
 .top-opportunity-button:hover {

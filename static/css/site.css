@@ -310,6 +310,8 @@ html {
     overflow-x: auto;
     padding: 0.25rem 0;
     margin-bottom: 0; /* Remove bottom margin as the parent container handles spacing */
+    justify-content: flex-start; /* Align buttons to the start for natural flow */
+    align-items: flex-start; /* Align items to the start of the container */
 }
 
 /* Chevron rotation for dropdown state */
@@ -328,7 +330,8 @@ html {
     display: flex;
     align-items: center;
     height: 50px;
-    width: 144px;
+    width: auto;
+    min-width: 120px;
     padding: 8px 16px 8px 8px;
     border-radius: 40px;
     font-size: 14px;
@@ -336,13 +339,15 @@ html {
     font-family: 'Inter', sans-serif;
     line-height: 150%;
     letter-spacing: 0;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease, width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Use a more natural spring effect */
     background-color: white;
     border: 1px solid #E5E7EB;
     color: #1F1B2D;
     box-shadow: 0px 4px 12px 0px rgba(31, 27, 45, 0.08), 0px 2px 2px -2px rgba(31, 27, 45, 0.08);
     position: relative;
     isolation: isolate;
+    will-change: width, transform; /* Optimize animation performance */
+    transform-origin: left center; /* Set transform origin to the left side */
 }
 
 /* Filter button text */
@@ -351,10 +356,12 @@ html {
     overflow: hidden;
     text-overflow: ellipsis;
     flex: 1;
-    text-align: center;
-    margin-left: -10px; /* Offset to center text in remaining space */
+    text-align: left;
+    margin-left: 0; /* Remove negative margin to ensure proper text alignment */
     color: #1F1B2D; /* Updated text color to match Figma design */
     font-weight: 600; /* Slightly bolder to match design */
+    padding-right: 8px; /* Add some padding between text and button edge */
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), font-weight 0.2s ease, letter-spacing 0.3s ease; /* Match springy transition */
 }
 
 /* Icon container */
@@ -368,7 +375,8 @@ html {
     border-radius: 50%;
     background-color: #F3F4F6;
     flex-shrink: 0;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Match springy transition */
+    overflow: visible !important; /* Ensure circle isn't cut off */
 }
 
 /* Filter button svg */
@@ -381,25 +389,30 @@ html {
 
 /* Filter button active state */
 .filter-btn[data-active="true"] {
-    background-color: #F3F4F6;
+    background-color: #F9FAFB !important;
     border-color: #D1D5DB;
+    border-width: 1px;
     box-shadow: 0px 2px 4px 0px rgba(31, 27, 45, 0.06), 0px 1px 1px -1px rgba(31, 27, 45, 0.06);
+    width: auto !important; /* Keep width automatic */
+    min-width: fit-content !important; /* Use fit-content */
+    padding-right: 24px !important; /* Add 8 more pixels to the right padding (original is 16px) */
+    padding-left: 16px !important; /* Add 8 more pixels to the left padding (original is 8px) */
+    transform: none !important; /* Remove scale effect that causes blur */
+    z-index: 2 !important; /* Keep active buttons above others but not too high */
 }
 
 /* Filter button active state - text */
 .filter-btn[data-active="true"] span {
     color: #1F1B2D;
     font-weight: 700;
+    transform: translateX(2px); /* Slight shift for visual interest */
 }
 
 /* Filter button active state - update icon container */
 .filter-btn[data-active="true"] .icon-container {
     background-color: rgba(31, 27, 45, 0.1); /* Slightly darker background when active */
-}
-
-/* Filter button active state - update icon */
-.filter-btn[data-active="true"] svg {
-    color: #1F1B2D;
+    transform: scale(1.12); /* Slightly larger icon when active, but not too much */
+    overflow: visible !important; /* Ensure circle isn't cut off when scaled */
 }
 
 /* Filter button hover state */
@@ -498,50 +511,49 @@ html {
     }
 }
 
-/* Responsive adjustments */
+/* Mobile styles */
 @media (max-width: 640px) {
+    /* Filter container */
     .filter-container {
         gap: 8px;
-        padding: 0.25rem 0;
+        padding: 10px;
         overflow-x: auto;
         flex-wrap: nowrap;
     }
     
+    /* Filter button */
     .filter-btn {
-        width: auto;
-        min-width: 120px;
-        height: 44px;
-        padding: 8px 12px 8px 8px;
-        white-space: nowrap;
-        font-size: 13px;
-        color: #1F1B2D;
-        box-shadow: 0px 4px 12px 0px rgba(31, 27, 45, 0.08), 0px 2px 2px -2px rgba(31, 27, 45, 0.08);
+        min-width: 100px;
+        height: 40px;
+        padding: 4px 12px 4px 4px;
+        font-size: 12px;
+        overflow: visible !important; /* Ensure content isn't cut off */
     }
     
-    .filter-btn:hover {
-        box-shadow: 0px 6px 16px 0px rgba(31, 27, 45, 0.1), 0px 2px 4px -2px rgba(31, 27, 45, 0.1);
-    }
-    
+    /* Filter button active state */
     .filter-btn[data-active="true"] {
-        box-shadow: 0px 2px 4px 0px rgba(31, 27, 45, 0.06), 0px 1px 1px -1px rgba(31, 27, 45, 0.06);
+        min-width: fit-content !important; /* Use fit-content on mobile too */
+        padding-right: 20px !important; /* Add 8 more pixels to the right (original is 12px) */
+        padding-left: 12px !important; /* Add 8 more pixels to the left (original is 4px) */
+        transform: none !important; /* Remove scale effect that causes blur */
+        background-color: #F9FAFB !important; /* Slightly lighter background */
+        max-width: none !important; /* Remove max-width limitation */
     }
     
+    /* Icon container */
     .filter-btn .icon-container {
         width: 24px;
         height: 24px;
         margin-right: 8px;
+        overflow: visible !important; /* Ensure circle isn't cut off */
     }
     
-    .filter-btn svg {
-        width: 14px;
-        height: 14px;
-        color: #1F1B2D;
-    }
-    
+    /* More filter button styles... */
     .filter-btn span {
-        margin-left: -8px;
+        margin-left: 0;
         color: #1F1B2D;
         font-weight: 600;
+        text-align: left;
     }
     
     .filter-btn[data-active="true"] span {
