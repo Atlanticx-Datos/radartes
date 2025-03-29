@@ -109,7 +109,7 @@ export const Utils = {
             const afterSeparator = match[3].trim();
             
             // Escape HTML in both parts
-            const category = this.escapeHTML(beforeSeparator);
+            const category = this.escapeHTML(beforeSeparator).toUpperCase();
             const name = this.escapeHTML(afterSeparator);
             
             // Always use the presentation form for vertical bar "︱" instead of any other separator

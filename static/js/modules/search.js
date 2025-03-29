@@ -1486,7 +1486,7 @@ export const SearchModule = {
         
         // If we found a separator, split the string and format
         if (foundSeparator && separatorIndex > 0) {
-            const category = Utils.escapeHTML(title.substring(0, separatorIndex).trim());
+            const category = Utils.escapeHTML(title.substring(0, separatorIndex).trim()).toUpperCase();
             const name = Utils.escapeHTML(title.substring(separatorIndex + 1).trim());
             
             // Always use the presentation form for vertical bar "︱" instead of any other separator
