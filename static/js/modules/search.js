@@ -915,30 +915,30 @@ export const SearchModule = {
                         <tr>
                             <th scope="col" class="oportunidad-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('nombre')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
                                 <div class="flex items-center">
-                                    OPORTUNIDAD
+                                    Oportunidad
                                     ${this.getSortIcon('nombre')}
                                 </div>
                             </th>
                             <th scope="col" class="disciplina-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('disciplina')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
                                 <div class="flex items-center">
-                                    DISCIPLINA
+                                    Disciplina
                                     ${this.getSortIcon('disciplina')}
                                 </div>
                             </th>
                             <th scope="col" class="pais-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer" onclick="SearchModule.handleSort('pais')" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
                                 <div class="flex items-center">
-                                    PAÍS
+                                    País
                                     ${this.getSortIcon('pais')}
                                 </div>
                             </th>
                             <th scope="col" class="cierre-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
-                                CIERRE
+                                Cierre
                             </th>
                             <th scope="col" class="pago-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
-                                PAGO
+                                Pago
                             </th>
                             <th scope="col" class="accion-col px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: white !important; padding: 12px 16px; font-weight: 600; font-size: 14px; border: none !important;">
-                                ACCIÓN
+                                <div style="position: relative; left: -5px; top: 1px;">ACCIÓN</div>
                             </th>
                         </tr>
                     </thead>
@@ -1006,8 +1006,8 @@ export const SearchModule = {
                                 </td>
                                 <td class="accion-col px-4 py-4 whitespace-nowrap text-right text-sm font-medium" style="border: none !important;">
                                     <button 
-                                        class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
-                                        style="background-color: #F0EBFF; color: #6232FF;"
+                                        class="inline-flex items-center text-sm font-medium"
+                                        style="background-color: #F0EBFF; color: #6232FF; width: 61px; height: 35px; border-radius: 40px; padding-top: 8px; padding-right: 20px; padding-bottom: 8px; padding-left: 20px; gap: 10px; display: flex; justify-content: center; align-items: center;"
                                         data-url="${page.url || ''}"
                                         data-base-url="${Utils.escapeHTML(page.base_url || '')}"
                                         data-nombre="${Utils.escapeHTML(page.nombre_original || page.nombre || '')}"
@@ -1105,6 +1105,11 @@ export const SearchModule = {
                 cell.style.padding = '12px 16px';
                 cell.style.fontWeight = '600';
                 cell.style.fontSize = '14px';
+                
+                // Override text transform for all headers except "ACCIÓN"
+                if (!cell.classList.contains('accion-col')) {
+                    cell.style.textTransform = 'none';
+                }
             });
             
             // Apply styles to the thead element
