@@ -920,9 +920,10 @@ html {
     font-size: 13px !important;
     font-weight: 500 !important;
     color: white !important;
-    text-align: center !important;
+    text-align: left !important;
     margin-right: 4px !important;
     margin-bottom: 4px !important;
+    width: fit-content !important;
 }
 
 /* Discipline tag colors - using colors from Tailwind config */

@@ -230,39 +230,61 @@
 
 .top-opportunity-badges {
     position: absolute;
-    top: 12px;
+    top: 20px; /* Updated from 12px to 20px to match Figma design */
     left: 12px;
     display: flex;
     flex-direction: column;
     gap: 8px;
     z-index: 10;
+    width: auto; /* Ensure container doesn't have fixed width */
+    align-items: flex-start; /* Align items to the start so they don't stretch */
 }
 
 .top-opportunity-badge {
     display: inline-flex;
     align-items: center;
-    justify-content: center; /* Add center justification for perfect centering */
-    padding: 4px 12px;
+    justify-content: flex-start; /* Ensure left alignment for all badges */
+    padding: 4px 12px; /* Equal padding on both sides */
     border-radius: 20px;
     font-family: 'Inter', sans-serif;
     font-weight: 400;
     font-size: 14px;
     line-height: 1; /* Adjust line height for better vertical centering */
     letter-spacing: 0;
-    text-align: center;
-    height: 24px;
+    text-align: left; /* Ensure text is left-aligned */
+    height: 24px; /* Fixed height for consistent badge size */
     color: white;
-    max-width: 200px;
+    max-width: none; /* Remove max-width to allow natural flow */
+    width: auto; /* Allow badge to size based on content */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    text-transform: capitalize;
+    text-transform: uppercase;
     box-shadow: 0px 2px 4px 0px rgba(31, 27, 45, 0.06), 0px 1px 1px -1px rgba(31, 27, 45, 0.06); /* This matches shadow-xs in site.css */
     isolation: isolate;
+    box-sizing: border-box; /* Ensure padding is included in width/height */
 }
 
 .top-opportunity-badge.category {
     background-color: #6232FF;
+    width: auto; /* Allow width to be based on content */
+}
+
+/* Discipline badge specific styling - only capitalize, not uppercase */
+.top-opportunity-badge.discipline-tag {
+    text-transform: capitalize !important; /* Override the uppercase from parent class */
+    justify-content: flex-start !important; /* Align text to the left */
+    text-align: left !important; /* Ensure text is left-aligned */
+    width: fit-content !important; /* Make width fit exactly to content */
+    display: flex !important; /* Ensure it uses flexbox */
+    align-items: center !important; /* Center items vertically */
+    padding-left: 12px !important; /* Ensure consistent left padding */
+    padding-right: 12px !important; /* Ensure consistent right padding */
+    box-sizing: border-box !important; /* Ensure consistent box model */
+    min-width: 0 !important; /* Reset any min-width */
+    margin-right: 0 !important; /* Reset any default margins */
+    margin-bottom: 0 !important; /* Reset any default margins */
+    max-width: none !important; /* Ensure no max-width constraint */
 }
 
 .top-opportunity-favorite {
@@ -418,6 +440,15 @@
         max-width: 180px;
     }
     
+    .top-opportunity-badge.category {
+        max-width: 180px; /* Keep category badge width constrained */
+    }
+
+    .top-opportunity-badge.discipline-tag {
+        width: fit-content !important; /* Ensure discipline badge has natural width */
+        max-width: none !important; /* Remove max-width constraint for discipline badge */
+    }
+    
     .top-opportunity-favorite {
         top: 8px;
         right: 8px;
@@ -492,6 +523,15 @@
         padding: 3px 10px;
         height: 22px;
         max-width: 150px;
+    }
+    
+    .top-opportunity-badge.category {
+        max-width: 150px; /* Keep category badge width constrained */
+    }
+
+    .top-opportunity-badge.discipline-tag {
+        width: fit-content !important; /* Ensure discipline badge has natural width */
+        max-width: none !important; /* Remove max-width constraint for discipline badge */
     }
     
     .top-opportunity-favorite {
@@ -575,6 +615,15 @@
         padding: 2px 8px;
         height: 20px;
         max-width: 120px;
+    }
+    
+    .top-opportunity-badge.category {
+        max-width: 120px; /* Keep category badge width constrained */
+    }
+
+    .top-opportunity-badge.discipline-tag {
+        width: fit-content !important; /* Ensure discipline badge has natural width */
+        max-width: none !important; /* Remove max-width constraint for discipline badge */
     }
     
     .top-opportunity-location, 
