@@ -1,7 +1,7 @@
 # Radartes
 
 <p align="center">
-  <img src="static/public/nuevoIso.svg" alt="Radartes Logo" width="300">
+  <img src="static/public/nuevoIso.png" alt="Radartes Logo" width="300">
 </p>
 
 ## Acerca de Radartes
