@@ -6,7 +6,7 @@
 
 ## Acerca de Radartes
 
-Radartes es una plataforma digital de acceso libre y gratuito, cuyo objetivo es difundir información sobre oportunidades artísticas, como premios, residencias, convocatorias y concursos, principalmente en América Latina, Estados Unidos, Canadá y Europa.
+Radartes es una plataforma digital de acceso libre y gratuito, cuyo objetivo es difundir información sobre oportunidades artísticas, como premios, residencias, convocatorias y concursos, principalmente en América Latina, Estados Unidos, Canadá y Europa. Este proyecto forma parte de la iniciativa Gestión Cultural Digital de [Atlanticx.org](https://atlanticx.org), que busca mejorar las prácticas y resultados en las comunidades artísticas contemporáneas a través de herramientas y datos digitales.
 
 La plataforma utiliza una combinación de tecnología de punta y expertos para recopilar, editar, organizar y clasificar información de diversas fuentes, presentándola de forma clara e intuitiva.
 
