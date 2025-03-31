@@ -23,8 +23,8 @@ La plataforma utiliza una combinación de tecnología de punta y expertos para r
 - Flask (Python)
 - JavaScript
 - HTMX
-- SQLite / PostgreSQL
-- HTML5 & CSS3
+- Upstash
+- Perplexity AI
 
 ## Contribuir
 
