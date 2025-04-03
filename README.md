@@ -38,7 +38,7 @@ La plataforma utiliza una combinación de tecnología de punta y expertos para r
 
 ## Contacto
 
-Para más información sobre Radartes, visita [nuestra web](https://radartes.com) o contáctanos en [radartes@gmail.com](mailto:radartes@gmail.com).
+Para más información sobre Radartes, visita [nuestra web](https://radartes.com) o contáctanos en [info@radartes.org](mailto:info@radartes.org).
 
 ## Licencia
 
